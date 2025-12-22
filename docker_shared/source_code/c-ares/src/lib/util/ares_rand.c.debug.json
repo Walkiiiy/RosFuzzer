@@ -1,0 +1,464 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static unsigned int ares_u32_from_ptr(void *addr)\n{\n  /* LCOV_EXCL_START: FallbackCode */\n  if (ares_is_64bit()) {\n    return (unsigned int)((((ares_uint64_t)addr >> 32) & 0xFFFFFFFF) ^\n                          ((ares_uint64_t)addr & 0xFFFFFFFF));\n  }\n  return (unsigned int)((size_t)addr & 0xFFFFFFFF);\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_u32_from_ptr",
+        "parameters": {
+          "addr": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static void ares_rc4_generate_key(ares_rand_rc4 *rc4_state, unsigned char *key,\n                                  size_t key_len)\n{\n  /* LCOV_EXCL_START: FallbackCode */\n  size_t         i;\n  size_t         len = 0;\n  unsigned int   data;\n  ares_timeval_t tv;\n\n  if (key_len != ARES_RC4_KEY_LEN) {\n    return;\n  }\n\n#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION\n  /* For fuzzing, random should be deterministic */\n  srand(0);\n#else\n  /* Randomness is hard to come by.  Maybe the system randomizes heap and stack\n   * addresses. Maybe the current timestamp give us some randomness. Use\n   * rc4_state (heap), &i (stack), and ares_tvnow()\n   */\n  data = ares_u32_from_ptr(rc4_state);\n  memcpy(key + len, &data, sizeof(data));\n  len += sizeof(data);\n\n  data = ares_u32_from_ptr(&i);\n  memcpy(key + len, &data, sizeof(data));\n  len += sizeof(data);\n\n  ares_tvnow(&tv);\n  data = (unsigned int)((tv.sec ^ tv.usec) & 0xFFFFFFFF);\n  memcpy(key + len, &data, sizeof(data));\n  len += sizeof(data);\n\n  srand(ares_u32_from_ptr(rc4_state) ^ ares_u32_from_ptr(&i) ^\n        (unsigned int)((tv.sec ^ tv.usec) & 0xFFFFFFFF));\n#endif\n\n  for (i = len; i < key_len; i++) {\n    key[i] = (unsigned char)(rand() % 256); /* LCOV_EXCL_LINE */\n  }\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          108,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_rc4_generate_key",
+        "parameters": {
+          "rc4_state": "ares_rand_rc4",
+          "key": "unsigned char",
+          "key_len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_rc4_init(ares_rand_rc4 *rc4_state)\n{\n  /* LCOV_EXCL_START: FallbackCode */\n  unsigned char key[ARES_RC4_KEY_LEN];\n  size_t        i;\n  size_t        j;\n\n  ares_rc4_generate_key(rc4_state, key, sizeof(key));\n\n  for (i = 0; i < sizeof(rc4_state->S); i++) {\n    rc4_state->S[i] = i & 0xFF;\n  }\n\n  for (i = 0, j = 0; i < 256; i++) {\n    j = (j + rc4_state->S[i] + key[i % sizeof(key)]) % 256;\n    ARES_SWAP_BYTE(&rc4_state->S[i], &rc4_state->S[j]);\n  }\n\n  rc4_state->i = 0;\n  rc4_state->j = 0;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          117,
+          0
+        ],
+        [
+          138,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_rc4_init",
+        "parameters": {
+          "rc4_state": "ares_rand_rc4"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_rc4_prng(ares_rand_rc4 *rc4_state, unsigned char *buf,\n                          size_t len)\n{\n  /* LCOV_EXCL_START: FallbackCode */\n  unsigned char *S = rc4_state->S;\n  size_t         i = rc4_state->i;\n  size_t         j = rc4_state->j;\n  size_t         cnt;\n\n  for (cnt = 0; cnt < len; cnt++) {\n    i = (i + 1) % 256;\n    j = (j + S[i]) % 256;\n\n    ARES_SWAP_BYTE(&S[i], &S[j]);\n    buf[cnt] = S[(S[i] + S[j]) % 256];\n  }\n\n  rc4_state->i = i;\n  rc4_state->j = j;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          142,
+          0
+        ],
+        [
+          162,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_rc4_prng",
+        "parameters": {
+          "rc4_state": "ares_rand_rc4",
+          "buf": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_init_rand_engine(ares_rand_state *state)\n{\n  state->cache_remaining = 0;\n\n#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION\n  /* For fuzzing, random should be deterministic */\n  state->bad_backends |= ARES_RAND_OS | ARES_RAND_FILE;\n#endif\n\n#if defined(HAVE_ARC4RANDOM_BUF) || defined(HAVE_GETRANDOM) || defined(_WIN32)\n  if (!(state->bad_backends & ARES_RAND_OS)) {\n    state->type = ARES_RAND_OS;\n    return ARES_TRUE;\n  }\n#endif\n\n#if defined(CARES_RANDOM_FILE)\n  /* LCOV_EXCL_START: FallbackCode */\n  if (!(state->bad_backends & ARES_RAND_FILE)) {\n    state->type            = ARES_RAND_FILE;\n    state->state.rand_file = fopen(CARES_RANDOM_FILE, \"rb\");\n    if (state->state.rand_file) {\n      setvbuf(state->state.rand_file, NULL, _IONBF, 0);\n      return ARES_TRUE;\n    }\n  }\n  /* LCOV_EXCL_STOP */\n\n  /* Fall-Thru on failure to RC4 */\n#endif\n\n  /* LCOV_EXCL_START: FallbackCode */\n  state->type = ARES_RAND_RC4;\n  ares_rc4_init(&state->state.rc4);\n  /* LCOV_EXCL_STOP */\n\n  /* Currently cannot fail */\n  return ARES_TRUE; /* LCOV_EXCL_LINE: UntestablePath */\n}",
+      "fn_code_pos": [
+        [
+          195,
+          0
+        ],
+        [
+          233,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_rand_engine",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_rand_state *ares_init_rand_state(void)\n{\n  ares_rand_state *state = NULL;\n\n  state = ares_malloc_zero(sizeof(*state));\n  if (!state) {\n    return NULL;\n  }\n\n  if (!ares_init_rand_engine(state)) {\n    ares_free(state); /* LCOV_EXCL_LINE: UntestablePath */\n    return NULL;      /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  return state;\n}",
+      "fn_code_pos": [
+        [
+          235,
+          0
+        ],
+        [
+          250,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_rand_state",
+        "parameters": {},
+        "return_type": "ares_rand_state"
+      }
+    },
+    {
+      "fn_code": "static void ares_clear_rand_state(ares_rand_state *state)\n{\n  if (!state) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  switch (state->type) {\n    case ARES_RAND_OS:\n      break;\n    /* LCOV_EXCL_START: FallbackCode */\n    case ARES_RAND_FILE:\n      fclose(state->state.rand_file);\n      break;\n    case ARES_RAND_RC4:\n      break;\n      /* LCOV_EXCL_STOP */\n  }\n}",
+      "fn_code_pos": [
+        [
+          252,
+          0
+        ],
+        [
+          269,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_clear_rand_state",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_reinit_rand(ares_rand_state *state)\n{\n  /* LCOV_EXCL_START: UntestablePath */\n  ares_clear_rand_state(state);\n  ares_init_rand_engine(state);\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          271,
+          0
+        ],
+        [
+          277,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_reinit_rand",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_destroy_rand_state(ares_rand_state *state)\n{\n  if (!state) {\n    return;\n  }\n\n  ares_clear_rand_state(state);\n  ares_free(state);\n}",
+      "fn_code_pos": [
+        [
+          279,
+          0
+        ],
+        [
+          287,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_rand_state",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_rand_bytes_fetch(ares_rand_state *state, unsigned char *buf,\n                                  size_t len)\n{\n  while (1) {\n    size_t bytes_read = 0;\n\n    switch (state->type) {\n      case ARES_RAND_OS:\n#ifdef _WIN32\n        RtlGenRandom(buf, (ULONG)len);\n        return;\n#elif defined(HAVE_ARC4RANDOM_BUF)\n        arc4random_buf(buf, len);\n        return;\n#elif defined(HAVE_GETRANDOM)\n        while (1) {\n          size_t  n = len - bytes_read;\n          /* getrandom() on Linux always succeeds and is never\n           * interrupted by a signal when requesting <= 256 bytes.\n           */\n          ssize_t rv = getrandom(buf + bytes_read, n > 256 ? 256 : n, 0);\n          if (rv <= 0) {\n            /* We need to fall back to another backend */\n            if (errno == ENOSYS) {\n              state->bad_backends |= ARES_RAND_OS;\n              break;\n            }\n            continue; /* Just retry. */\n          }\n\n          bytes_read += (size_t)rv;\n          if (bytes_read == len) {\n            return;\n          }\n        }\n        break;\n#else\n        /* Shouldn't be possible to be here */\n        break;\n#endif\n\n        /* LCOV_EXCL_START: FallbackCode */\n\n      case ARES_RAND_FILE:\n        while (1) {\n          size_t rv = fread(buf + bytes_read, 1, len - bytes_read,\n                            state->state.rand_file);\n          if (rv == 0) {\n            break; /* critical error, will reinit rand state */\n          }\n\n          bytes_read += rv;\n          if (bytes_read == len) {\n            return;\n          }\n        }\n        break;\n\n      case ARES_RAND_RC4:\n        ares_rc4_prng(&state->state.rc4, buf, len);\n        return;\n\n        /* LCOV_EXCL_STOP */\n    }\n\n    /* If we didn't return before we got here, that means we had a critical rand\n     * failure and need to reinitialized */\n    ares_reinit_rand(state); /* LCOV_EXCL_LINE: UntestablePath */\n  }\n}",
+      "fn_code_pos": [
+        [
+          289,
+          0
+        ],
+        [
+          358,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_rand_bytes_fetch",
+        "parameters": {
+          "state": "ares_rand_state",
+          "buf": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_rand_bytes(ares_rand_state *state, unsigned char *buf, size_t len)\n{\n  /* See if we need to refill the cache to serve the request, but if len is\n   * excessive, we're not going to update our cache or serve from cache */\n  if (len > state->cache_remaining && len < sizeof(state->cache)) {\n    size_t fetch_size = sizeof(state->cache) - state->cache_remaining;\n    ares_rand_bytes_fetch(state, state->cache, fetch_size);\n    state->cache_remaining = sizeof(state->cache);\n  }\n\n  /* Serve from cache */\n  if (len <= state->cache_remaining) {\n    size_t offset = sizeof(state->cache) - state->cache_remaining;\n    memcpy(buf, state->cache + offset, len);\n    state->cache_remaining -= len;\n    return;\n  }\n\n  /* Serve direct due to excess size of request */\n  ares_rand_bytes_fetch(state, buf, len);\n}",
+      "fn_code_pos": [
+        [
+          360,
+          0
+        ],
+        [
+          380,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_rand_bytes",
+        "parameters": {
+          "state": "ares_rand_state",
+          "buf": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_generate_new_id(ares_rand_state *state)\n{\n  unsigned short r = 0;\n\n  ares_rand_bytes(state, (unsigned char *)&r, sizeof(r));\n  return r;\n}",
+      "fn_code_pos": [
+        [
+          382,
+          0
+        ],
+        [
+          388,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_generate_new_id",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)",
+      "fn_dec_pos": [
+        [
+          188,
+          15
+        ],
+        [
+          188,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "SystemFunction036",
+        "parameters": {
+          "RandomBuffer": "PVOID",
+          "RandomBufferLength": "ULONG"
+        },
+        "return_type": "BOOLEAN"
+      }
+    },
+    {
+      "fn_code": "ares_init_rand_state(void)",
+      "fn_dec_pos": [
+        [
+          235,
+          17
+        ],
+        [
+          235,
+          43
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_rand_state",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct ares_rand_rc4 {\n  unsigned char S[256];\n  size_t        i;\n  size_t        j;\n} ares_rand_rc4;",
+      {
+        "S[256]": "unsigned char",
+        "i": "size_t",
+        "j": "size_t"
+      },
+      "ares_rand_rc4",
+      [
+        48,
+        0
+      ],
+      [
+        52,
+        16
+      ]
+    ],
+    [
+      "struct ares_rand_state {\n  ares_rand_backend type;\n  ares_rand_backend bad_backends;\n\n  union {\n    FILE         *rand_file;\n    ares_rand_rc4 rc4;\n  } state;\n\n  /* Since except for RC4, random data will likely result in a syscall, lets\n   * pre-pull 256 bytes at a time.  Every query will pull 2 bytes off this so\n   * that means we should only need a syscall every 128 queries. 256bytes\n   * appears to be a sweet spot that may be able to be served without\n   * interruption */\n  unsigned char cache[256];\n  size_t        cache_remaining;\n}",
+      {
+        "type": "ares_rand_backend",
+        "bad_backends": "ares_rand_backend",
+        "state": "union {\n    FILE         *rand_file;\n    ares_rand_rc4 rc4;\n  }",
+        "*rand_file": "FILE",
+        "rc4": "ares_rand_rc4",
+        "cache[256]": "unsigned char",
+        "cache_remaining": "size_t"
+      },
+      "ares_rand_state",
+      [
+        164,
+        0
+      ],
+      [
+        180,
+        1
+      ]
+    ],
+    [
+      "typedef struct ares_rand_rc4 {\n  unsigned char S[256];\n  size_t        i;\n  size_t        j;\n} ares_rand_rc4;",
+      {
+        "S[256]": "unsigned char",
+        "i": "size_t",
+        "j": "size_t"
+      },
+      "ares_rand_rc4",
+      [
+        48,
+        0
+      ],
+      [
+        52,
+        16
+      ]
+    ],
+    [
+      "struct ares_rand_state {\n  ares_rand_backend type;\n  ares_rand_backend bad_backends;\n\n  union {\n    FILE         *rand_file;\n    ares_rand_rc4 rc4;\n  } state;\n\n  /* Since except for RC4, random data will likely result in a syscall, lets\n   * pre-pull 256 bytes at a time.  Every query will pull 2 bytes off this so\n   * that means we should only need a syscall every 128 queries. 256bytes\n   * appears to be a sweet spot that may be able to be served without\n   * interruption */\n  unsigned char cache[256];\n  size_t        cache_remaining;\n}",
+      {
+        "type": "ares_rand_backend",
+        "bad_backends": "ares_rand_backend",
+        "state": "union {\n    FILE         *rand_file;\n    ares_rand_rc4 rc4;\n  }",
+        "*rand_file": "FILE",
+        "rc4": "ares_rand_rc4",
+        "cache[256]": "unsigned char",
+        "cache_remaining": "size_t"
+      },
+      "ares_rand_state",
+      [
+        164,
+        0
+      ],
+      [
+        180,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <AvailabilityMacros.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/random.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_RAND_OS   = 1 << 0, /* OS-provided such as RtlGenRandom or arc4random */\n  ARES_RAND_FILE = 1 << 1, /* OS file-backed random number generator */\n  ARES_RAND_RC4  = 1 << 2  /* Internal RC4 based PRNG */\n} ares_rand_backend;",
+      {
+        "ARES_RAND_OS": "",
+        "ARES_RAND_FILE": "",
+        "ARES_RAND_RC4": ""
+      },
+      "ares_rand_backend",
+      [
+        40,
+        0
+      ],
+      [
+        44,
+        20
+      ]
+    ]
+  ]
+}

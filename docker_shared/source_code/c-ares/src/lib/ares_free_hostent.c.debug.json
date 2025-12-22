@@ -1,0 +1,69 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_free_hostent(struct hostent *host)\n{\n  char **p;\n\n  if (!host) {\n    return;\n  }\n\n  ares_free(host->h_name);\n  for (p = host->h_aliases; p && *p; p++) {\n    ares_free(*p);\n  }\n  ares_free(host->h_aliases);\n  if (host->h_addr_list) {\n    size_t i;\n    for (i=0; host->h_addr_list[i] != NULL; i++) {\n      ares_free(host->h_addr_list[i]);\n    }\n    ares_free(host->h_addr_list);\n  }\n  ares_free(host);\n}",
+      "fn_code_pos": [
+        [
+          32,
+          0
+        ],
+        [
+          53,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_hostent",
+        "parameters": {
+          "host": "struct hostent"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        32,
+        23
+      ],
+      [
+        32,
+        37
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

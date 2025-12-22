@@ -1,0 +1,869 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_bool_t ares_dns_opcode_isvalid(ares_dns_opcode_t opcode)\n{\n  switch (opcode) {\n    case ARES_OPCODE_QUERY:\n    case ARES_OPCODE_IQUERY:\n    case ARES_OPCODE_STATUS:\n    case ARES_OPCODE_NOTIFY:\n    case ARES_OPCODE_UPDATE:\n      return ARES_TRUE;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          27,
+          0
+        ],
+        [
+          38,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opcode_isvalid",
+        "parameters": {
+          "opcode": "ares_dns_opcode_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_rcode_isvalid(ares_dns_rcode_t rcode)\n{\n  switch (rcode) {\n    case ARES_RCODE_NOERROR:\n    case ARES_RCODE_FORMERR:\n    case ARES_RCODE_SERVFAIL:\n    case ARES_RCODE_NXDOMAIN:\n    case ARES_RCODE_NOTIMP:\n    case ARES_RCODE_REFUSED:\n    case ARES_RCODE_YXDOMAIN:\n    case ARES_RCODE_YXRRSET:\n    case ARES_RCODE_NXRRSET:\n    case ARES_RCODE_NOTAUTH:\n    case ARES_RCODE_NOTZONE:\n    case ARES_RCODE_DSOTYPEI:\n    case ARES_RCODE_BADSIG:\n    case ARES_RCODE_BADKEY:\n    case ARES_RCODE_BADTIME:\n    case ARES_RCODE_BADMODE:\n    case ARES_RCODE_BADNAME:\n    case ARES_RCODE_BADALG:\n    case ARES_RCODE_BADTRUNC:\n    case ARES_RCODE_BADCOOKIE:\n      return ARES_TRUE;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          40,
+          0
+        ],
+        [
+          66,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rcode_isvalid",
+        "parameters": {
+          "rcode": "ares_dns_rcode_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_flags_arevalid(unsigned short flags)\n{\n  unsigned short allflags = ARES_FLAG_QR | ARES_FLAG_AA | ARES_FLAG_TC |\n                            ARES_FLAG_RD | ARES_FLAG_RA | ARES_FLAG_AD |\n                            ARES_FLAG_CD;\n\n  if (flags & ~allflags) {\n    return ARES_FALSE;\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          68,
+          0
+        ],
+        [
+          79,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_flags_arevalid",
+        "parameters": {
+          "flags": "unsigned short"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_rec_type_isvalid(ares_dns_rec_type_t type,\n                                      ares_bool_t         is_query)\n{\n  switch (type) {\n    case ARES_REC_TYPE_A:\n    case ARES_REC_TYPE_NS:\n    case ARES_REC_TYPE_CNAME:\n    case ARES_REC_TYPE_SOA:\n    case ARES_REC_TYPE_PTR:\n    case ARES_REC_TYPE_HINFO:\n    case ARES_REC_TYPE_MX:\n    case ARES_REC_TYPE_TXT:\n    case ARES_REC_TYPE_SIG:\n    case ARES_REC_TYPE_AAAA:\n    case ARES_REC_TYPE_SRV:\n    case ARES_REC_TYPE_NAPTR:\n    case ARES_REC_TYPE_OPT:\n    case ARES_REC_TYPE_TLSA:\n    case ARES_REC_TYPE_SVCB:\n    case ARES_REC_TYPE_HTTPS:\n    case ARES_REC_TYPE_ANY:\n    case ARES_REC_TYPE_URI:\n    case ARES_REC_TYPE_CAA:\n      return ARES_TRUE;\n    case ARES_REC_TYPE_RAW_RR:\n      return is_query ? ARES_FALSE : ARES_TRUE;\n    default:\n      break;\n  }\n  return is_query ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          81,
+          0
+        ],
+        [
+          111,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rec_type_isvalid",
+        "parameters": {
+          "type": "ares_dns_rec_type_t",
+          "is_query": "ares_bool_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_rec_allow_name_comp(ares_dns_rec_type_t type)\n{\n  /* Only record types defined in RFC1035 allow name compression within the\n   * RDATA.  Otherwise nameservers that don't understand an RR may not be\n   * able to pass along the RR in a proper manner */\n  switch (type) {\n    case ARES_REC_TYPE_A:\n    case ARES_REC_TYPE_NS:\n    case ARES_REC_TYPE_CNAME:\n    case ARES_REC_TYPE_SOA:\n    case ARES_REC_TYPE_PTR:\n    case ARES_REC_TYPE_HINFO:\n    case ARES_REC_TYPE_MX:\n    case ARES_REC_TYPE_TXT:\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          113,
+          0
+        ],
+        [
+          132,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rec_allow_name_comp",
+        "parameters": {
+          "type": "ares_dns_rec_type_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_class_isvalid(ares_dns_class_t    qclass,\n                                   ares_dns_rec_type_t type,\n                                   ares_bool_t         is_query)\n{\n  /* If we don't understand the record type, we shouldn't validate the class\n   * as there are some instances like on RFC 2391 (SIG RR) the class is\n   * meaningless, but since we didn't support that record type, we didn't\n   * know it shouldn't be validated */\n  if (type == ARES_REC_TYPE_RAW_RR) {\n    return ARES_TRUE;\n  }\n\n  switch (qclass) {\n    case ARES_CLASS_IN:\n    case ARES_CLASS_CHAOS:\n    case ARES_CLASS_HESOID:\n    case ARES_CLASS_NONE:\n      return ARES_TRUE;\n    case ARES_CLASS_ANY:\n      if (type == ARES_REC_TYPE_SIG) {\n        return ARES_TRUE;\n      }\n      if (is_query) {\n        return ARES_TRUE;\n      }\n      return ARES_FALSE;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          134,
+          0
+        ],
+        [
+          162,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_class_isvalid",
+        "parameters": {
+          "qclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "is_query": "ares_bool_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_section_isvalid(ares_dns_section_t sect)\n{\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n    case ARES_SECTION_AUTHORITY:\n    case ARES_SECTION_ADDITIONAL:\n      return ARES_TRUE;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          164,
+          0
+        ],
+        [
+          173,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_section_isvalid",
+        "parameters": {
+          "sect": "ares_dns_section_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_rec_type_t ares_dns_rr_key_to_rec_type(ares_dns_rr_key_t key)\n{\n  /* NOTE: due to the way we've numerated the keys, we can simply divide by\n   *       100 to get the type rather than having to do a huge switch\n   *       statement.  That said, we do then validate the type returned is\n   *       valid in case something completely bogus is passed in */\n  ares_dns_rec_type_t type = key / 100;\n  if (!ares_dns_rec_type_isvalid(type, ARES_FALSE)) {\n    return 0;\n  }\n  return type;\n}",
+      "fn_code_pos": [
+        [
+          175,
+          0
+        ],
+        [
+          186,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_key_to_rec_type",
+        "parameters": {
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_dns_rec_type_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_rec_type_tostr(ares_dns_rec_type_t type)\n{\n  switch (type) {\n    case ARES_REC_TYPE_A:\n      return \"A\";\n    case ARES_REC_TYPE_NS:\n      return \"NS\";\n    case ARES_REC_TYPE_CNAME:\n      return \"CNAME\";\n    case ARES_REC_TYPE_SOA:\n      return \"SOA\";\n    case ARES_REC_TYPE_PTR:\n      return \"PTR\";\n    case ARES_REC_TYPE_HINFO:\n      return \"HINFO\";\n    case ARES_REC_TYPE_MX:\n      return \"MX\";\n    case ARES_REC_TYPE_TXT:\n      return \"TXT\";\n    case ARES_REC_TYPE_SIG:\n      return \"SIG\";\n    case ARES_REC_TYPE_AAAA:\n      return \"AAAA\";\n    case ARES_REC_TYPE_SRV:\n      return \"SRV\";\n    case ARES_REC_TYPE_NAPTR:\n      return \"NAPTR\";\n    case ARES_REC_TYPE_OPT:\n      return \"OPT\";\n    case ARES_REC_TYPE_TLSA:\n      return \"TLSA\";\n    case ARES_REC_TYPE_SVCB:\n      return \"SVCB\";\n    case ARES_REC_TYPE_HTTPS:\n      return \"HTTPS\";\n    case ARES_REC_TYPE_ANY:\n      return \"ANY\";\n    case ARES_REC_TYPE_URI:\n      return \"URI\";\n    case ARES_REC_TYPE_CAA:\n      return \"CAA\";\n    case ARES_REC_TYPE_RAW_RR:\n      return \"RAWRR\";\n  }\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          188,
+          0
+        ],
+        [
+          233,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rec_type_tostr",
+        "parameters": {
+          "type": "ares_dns_rec_type_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_class_tostr(ares_dns_class_t qclass)\n{\n  switch (qclass) {\n    case ARES_CLASS_IN:\n      return \"IN\";\n    case ARES_CLASS_CHAOS:\n      return \"CH\";\n    case ARES_CLASS_HESOID:\n      return \"HS\";\n    case ARES_CLASS_ANY:\n      return \"ANY\";\n    case ARES_CLASS_NONE:\n      return \"NONE\";\n  }\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          235,
+          0
+        ],
+        [
+          250,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_class_tostr",
+        "parameters": {
+          "qclass": "ares_dns_class_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_opcode_tostr(ares_dns_opcode_t opcode)\n{\n  switch (opcode) {\n    case ARES_OPCODE_QUERY:\n      return \"QUERY\";\n    case ARES_OPCODE_IQUERY:\n      return \"IQUERY\";\n    case ARES_OPCODE_STATUS:\n      return \"STATUS\";\n    case ARES_OPCODE_NOTIFY:\n      return \"NOTIFY\";\n    case ARES_OPCODE_UPDATE:\n      return \"UPDATE\";\n  }\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          252,
+          0
+        ],
+        [
+          267,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opcode_tostr",
+        "parameters": {
+          "opcode": "ares_dns_opcode_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_rr_key_tostr(ares_dns_rr_key_t key)\n{\n  switch (key) {\n    case ARES_RR_A_ADDR:\n      return \"ADDR\";\n\n    case ARES_RR_NS_NSDNAME:\n      return \"NSDNAME\";\n\n    case ARES_RR_CNAME_CNAME:\n      return \"CNAME\";\n\n    case ARES_RR_SOA_MNAME:\n      return \"MNAME\";\n\n    case ARES_RR_SOA_RNAME:\n      return \"RNAME\";\n\n    case ARES_RR_SOA_SERIAL:\n      return \"SERIAL\";\n\n    case ARES_RR_SOA_REFRESH:\n      return \"REFRESH\";\n\n    case ARES_RR_SOA_RETRY:\n      return \"RETRY\";\n\n    case ARES_RR_SOA_EXPIRE:\n      return \"EXPIRE\";\n\n    case ARES_RR_SOA_MINIMUM:\n      return \"MINIMUM\";\n\n    case ARES_RR_PTR_DNAME:\n      return \"DNAME\";\n\n    case ARES_RR_AAAA_ADDR:\n      return \"ADDR\";\n\n    case ARES_RR_HINFO_CPU:\n      return \"CPU\";\n\n    case ARES_RR_HINFO_OS:\n      return \"OS\";\n\n    case ARES_RR_MX_PREFERENCE:\n      return \"PREFERENCE\";\n\n    case ARES_RR_MX_EXCHANGE:\n      return \"EXCHANGE\";\n\n    case ARES_RR_TXT_DATA:\n      return \"DATA\";\n\n    case ARES_RR_SIG_TYPE_COVERED:\n      return \"TYPE_COVERED\";\n\n    case ARES_RR_SIG_ALGORITHM:\n      return \"ALGORITHM\";\n\n    case ARES_RR_SIG_LABELS:\n      return \"LABELS\";\n\n    case ARES_RR_SIG_ORIGINAL_TTL:\n      return \"ORIGINAL_TTL\";\n\n    case ARES_RR_SIG_EXPIRATION:\n      return \"EXPIRATION\";\n\n    case ARES_RR_SIG_INCEPTION:\n      return \"INCEPTION\";\n\n    case ARES_RR_SIG_KEY_TAG:\n      return \"KEY_TAG\";\n\n    case ARES_RR_SIG_SIGNERS_NAME:\n      return \"SIGNERS_NAME\";\n\n    case ARES_RR_SIG_SIGNATURE:\n      return \"SIGNATURE\";\n\n    case ARES_RR_SRV_PRIORITY:\n      return \"PRIORITY\";\n\n    case ARES_RR_SRV_WEIGHT:\n      return \"WEIGHT\";\n\n    case ARES_RR_SRV_PORT:\n      return \"PORT\";\n\n    case ARES_RR_SRV_TARGET:\n      return \"TARGET\";\n\n    case ARES_RR_NAPTR_ORDER:\n      return \"ORDER\";\n\n    case ARES_RR_NAPTR_PREFERENCE:\n      return \"PREFERENCE\";\n\n    case ARES_RR_NAPTR_FLAGS:\n      return \"FLAGS\";\n\n    case ARES_RR_NAPTR_SERVICES:\n      return \"SERVICES\";\n\n    case ARES_RR_NAPTR_REGEXP:\n      return \"REGEXP\";\n\n    case ARES_RR_NAPTR_REPLACEMENT:\n      return \"REPLACEMENT\";\n\n    case ARES_RR_OPT_UDP_SIZE:\n      return \"UDP_SIZE\";\n\n    case ARES_RR_OPT_VERSION:\n      return \"VERSION\";\n\n    case ARES_RR_OPT_FLAGS:\n      return \"FLAGS\";\n\n    case ARES_RR_OPT_OPTIONS:\n      return \"OPTIONS\";\n\n    case ARES_RR_TLSA_CERT_USAGE:\n      return \"CERT_USAGE\";\n\n    case ARES_RR_TLSA_SELECTOR:\n      return \"SELECTOR\";\n\n    case ARES_RR_TLSA_MATCH:\n      return \"MATCH\";\n\n    case ARES_RR_TLSA_DATA:\n      return \"DATA\";\n\n    case ARES_RR_SVCB_PRIORITY:\n      return \"PRIORITY\";\n\n    case ARES_RR_SVCB_TARGET:\n      return \"TARGET\";\n\n    case ARES_RR_SVCB_PARAMS:\n      return \"PARAMS\";\n\n    case ARES_RR_HTTPS_PRIORITY:\n      return \"PRIORITY\";\n\n    case ARES_RR_HTTPS_TARGET:\n      return \"TARGET\";\n\n    case ARES_RR_HTTPS_PARAMS:\n      return \"PARAMS\";\n\n    case ARES_RR_URI_PRIORITY:\n      return \"PRIORITY\";\n\n    case ARES_RR_URI_WEIGHT:\n      return \"WEIGHT\";\n\n    case ARES_RR_URI_TARGET:\n      return \"TARGET\";\n\n    case ARES_RR_CAA_CRITICAL:\n      return \"CRITICAL\";\n\n    case ARES_RR_CAA_TAG:\n      return \"TAG\";\n\n    case ARES_RR_CAA_VALUE:\n      return \"VALUE\";\n\n    case ARES_RR_RAW_RR_TYPE:\n      return \"TYPE\";\n\n    case ARES_RR_RAW_RR_DATA:\n      return \"DATA\";\n  }\n\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          269,
+          0
+        ],
+        [
+          448,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_key_tostr",
+        "parameters": {
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_dns_datatype_t ares_dns_rr_key_datatype(ares_dns_rr_key_t key)\n{\n  switch (key) {\n    case ARES_RR_A_ADDR:\n      return ARES_DATATYPE_INADDR;\n\n    case ARES_RR_AAAA_ADDR:\n      return ARES_DATATYPE_INADDR6;\n\n    case ARES_RR_NS_NSDNAME:\n    case ARES_RR_CNAME_CNAME:\n    case ARES_RR_SOA_MNAME:\n    case ARES_RR_SOA_RNAME:\n    case ARES_RR_PTR_DNAME:\n    case ARES_RR_MX_EXCHANGE:\n    case ARES_RR_SIG_SIGNERS_NAME:\n    case ARES_RR_SRV_TARGET:\n    case ARES_RR_SVCB_TARGET:\n    case ARES_RR_HTTPS_TARGET:\n    case ARES_RR_NAPTR_REPLACEMENT:\n    case ARES_RR_URI_TARGET:\n      return ARES_DATATYPE_NAME;\n\n    case ARES_RR_HINFO_CPU:\n    case ARES_RR_HINFO_OS:\n    case ARES_RR_NAPTR_FLAGS:\n    case ARES_RR_NAPTR_SERVICES:\n    case ARES_RR_NAPTR_REGEXP:\n    case ARES_RR_CAA_TAG:\n      return ARES_DATATYPE_STR;\n\n    case ARES_RR_SOA_SERIAL:\n    case ARES_RR_SOA_REFRESH:\n    case ARES_RR_SOA_RETRY:\n    case ARES_RR_SOA_EXPIRE:\n    case ARES_RR_SOA_MINIMUM:\n    case ARES_RR_SIG_ORIGINAL_TTL:\n    case ARES_RR_SIG_EXPIRATION:\n    case ARES_RR_SIG_INCEPTION:\n      return ARES_DATATYPE_U32;\n\n    case ARES_RR_MX_PREFERENCE:\n    case ARES_RR_SIG_TYPE_COVERED:\n    case ARES_RR_SIG_KEY_TAG:\n    case ARES_RR_SRV_PRIORITY:\n    case ARES_RR_SRV_WEIGHT:\n    case ARES_RR_SRV_PORT:\n    case ARES_RR_NAPTR_ORDER:\n    case ARES_RR_NAPTR_PREFERENCE:\n    case ARES_RR_OPT_UDP_SIZE:\n    case ARES_RR_OPT_FLAGS:\n    case ARES_RR_SVCB_PRIORITY:\n    case ARES_RR_HTTPS_PRIORITY:\n    case ARES_RR_URI_PRIORITY:\n    case ARES_RR_URI_WEIGHT:\n    case ARES_RR_RAW_RR_TYPE:\n      return ARES_DATATYPE_U16;\n\n    case ARES_RR_SIG_ALGORITHM:\n    case ARES_RR_SIG_LABELS:\n    case ARES_RR_OPT_VERSION:\n    case ARES_RR_TLSA_CERT_USAGE:\n    case ARES_RR_TLSA_SELECTOR:\n    case ARES_RR_TLSA_MATCH:\n    case ARES_RR_CAA_CRITICAL:\n      return ARES_DATATYPE_U8;\n\n    case ARES_RR_CAA_VALUE:\n      return ARES_DATATYPE_BINP;\n\n    case ARES_RR_TXT_DATA:\n      return ARES_DATATYPE_ABINP;\n\n    case ARES_RR_SIG_SIGNATURE:\n    case ARES_RR_TLSA_DATA:\n    case ARES_RR_RAW_RR_DATA:\n      return ARES_DATATYPE_BIN;\n\n    case ARES_RR_OPT_OPTIONS:\n    case ARES_RR_SVCB_PARAMS:\n    case ARES_RR_HTTPS_PARAMS:\n      return ARES_DATATYPE_OPT;\n  }\n\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          450,
+          0
+        ],
+        [
+          535,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_key_datatype",
+        "parameters": {
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_dns_datatype_t"
+      }
+    },
+    {
+      "fn_code": "const ares_dns_rr_key_t       *ares_dns_rr_get_keys(ares_dns_rec_type_t type,\n                                                    size_t             *cnt)\n{\n  if (cnt == NULL) {\n    return NULL;\n  }\n\n  *cnt = 0;\n\n  switch (type) {\n    case ARES_REC_TYPE_A:\n      *cnt = sizeof(rr_a_keys) / sizeof(*rr_a_keys);\n      return rr_a_keys;\n    case ARES_REC_TYPE_NS:\n      *cnt = sizeof(rr_ns_keys) / sizeof(*rr_ns_keys);\n      return rr_ns_keys;\n    case ARES_REC_TYPE_CNAME:\n      *cnt = sizeof(rr_cname_keys) / sizeof(*rr_cname_keys);\n      return rr_cname_keys;\n    case ARES_REC_TYPE_SOA:\n      *cnt = sizeof(rr_soa_keys) / sizeof(*rr_soa_keys);\n      return rr_soa_keys;\n    case ARES_REC_TYPE_PTR:\n      *cnt = sizeof(rr_ptr_keys) / sizeof(*rr_ptr_keys);\n      return rr_ptr_keys;\n    case ARES_REC_TYPE_HINFO:\n      *cnt = sizeof(rr_hinfo_keys) / sizeof(*rr_hinfo_keys);\n      return rr_hinfo_keys;\n    case ARES_REC_TYPE_MX:\n      *cnt = sizeof(rr_mx_keys) / sizeof(*rr_mx_keys);\n      return rr_mx_keys;\n    case ARES_REC_TYPE_TXT:\n      *cnt = sizeof(rr_txt_keys) / sizeof(*rr_txt_keys);\n      return rr_txt_keys;\n    case ARES_REC_TYPE_SIG:\n      *cnt = sizeof(rr_sig_keys) / sizeof(*rr_sig_keys);\n      return rr_sig_keys;\n    case ARES_REC_TYPE_AAAA:\n      *cnt = sizeof(rr_aaaa_keys) / sizeof(*rr_aaaa_keys);\n      return rr_aaaa_keys;\n    case ARES_REC_TYPE_SRV:\n      *cnt = sizeof(rr_srv_keys) / sizeof(*rr_srv_keys);\n      return rr_srv_keys;\n    case ARES_REC_TYPE_NAPTR:\n      *cnt = sizeof(rr_naptr_keys) / sizeof(*rr_naptr_keys);\n      return rr_naptr_keys;\n    case ARES_REC_TYPE_OPT:\n      *cnt = sizeof(rr_opt_keys) / sizeof(*rr_opt_keys);\n      return rr_opt_keys;\n    case ARES_REC_TYPE_TLSA:\n      *cnt = sizeof(rr_tlsa_keys) / sizeof(*rr_tlsa_keys);\n      return rr_tlsa_keys;\n    case ARES_REC_TYPE_SVCB:\n      *cnt = sizeof(rr_svcb_keys) / sizeof(*rr_svcb_keys);\n      return rr_svcb_keys;\n    case ARES_REC_TYPE_HTTPS:\n      *cnt = sizeof(rr_https_keys) / sizeof(*rr_https_keys);\n      return rr_https_keys;\n    case ARES_REC_TYPE_ANY:\n      /* Not real */\n      break;\n    case ARES_REC_TYPE_URI:\n      *cnt = sizeof(rr_uri_keys) / sizeof(*rr_uri_keys);\n      return rr_uri_keys;\n    case ARES_REC_TYPE_CAA:\n      *cnt = sizeof(rr_caa_keys) / sizeof(*rr_caa_keys);\n      return rr_caa_keys;\n    case ARES_REC_TYPE_RAW_RR:\n      *cnt = sizeof(rr_raw_rr_keys) / sizeof(*rr_raw_rr_keys);\n      return rr_raw_rr_keys;\n  }\n\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          587,
+          0
+        ],
+        [
+          660,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_keys",
+        "parameters": {
+          "type": "ares_dns_rec_type_t",
+          "cnt": "size_t"
+        },
+        "return_type": "ares_dns_rr_key_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_class_fromstr(ares_dns_class_t *qclass, const char *str)\n{\n  size_t i;\n\n  static const struct {\n    const char      *name;\n    ares_dns_class_t qclass;\n  } list[] = {\n    { \"IN\",   ARES_CLASS_IN     },\n    { \"CH\",   ARES_CLASS_CHAOS  },\n    { \"HS\",   ARES_CLASS_HESOID },\n    { \"NONE\", ARES_CLASS_NONE   },\n    { \"ANY\",  ARES_CLASS_ANY    },\n    { NULL,   0                 }\n  };\n\n  if (qclass == NULL || str == NULL) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; list[i].name != NULL; i++) {\n    if (ares_strcaseeq(list[i].name, str)) {\n      *qclass = list[i].qclass;\n      return ARES_TRUE;\n    }\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          662,
+          0
+        ],
+        [
+          689,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_class_fromstr",
+        "parameters": {
+          "qclass": "ares_dns_class_t",
+          "str": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_rec_type_fromstr(ares_dns_rec_type_t *qtype,\n                                      const char          *str)\n{\n  size_t i;\n\n  static const struct {\n    const char         *name;\n    ares_dns_rec_type_t type;\n  } list[] = {\n    { \"A\",      ARES_REC_TYPE_A      },\n    { \"NS\",     ARES_REC_TYPE_NS     },\n    { \"CNAME\",  ARES_REC_TYPE_CNAME  },\n    { \"SOA\",    ARES_REC_TYPE_SOA    },\n    { \"PTR\",    ARES_REC_TYPE_PTR    },\n    { \"HINFO\",  ARES_REC_TYPE_HINFO  },\n    { \"MX\",     ARES_REC_TYPE_MX     },\n    { \"TXT\",    ARES_REC_TYPE_TXT    },\n    { \"SIG\",    ARES_REC_TYPE_SIG    },\n    { \"AAAA\",   ARES_REC_TYPE_AAAA   },\n    { \"SRV\",    ARES_REC_TYPE_SRV    },\n    { \"NAPTR\",  ARES_REC_TYPE_NAPTR  },\n    { \"OPT\",    ARES_REC_TYPE_OPT    },\n    { \"TLSA\",   ARES_REC_TYPE_TLSA   },\n    { \"SVCB\",   ARES_REC_TYPE_SVCB   },\n    { \"HTTPS\",  ARES_REC_TYPE_HTTPS  },\n    { \"ANY\",    ARES_REC_TYPE_ANY    },\n    { \"URI\",    ARES_REC_TYPE_URI    },\n    { \"CAA\",    ARES_REC_TYPE_CAA    },\n    { \"RAW_RR\", ARES_REC_TYPE_RAW_RR },\n    { NULL,     0                    }\n  };\n\n  if (qtype == NULL || str == NULL) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; list[i].name != NULL; i++) {\n    if (ares_strcaseeq(list[i].name, str)) {\n      *qtype = list[i].type;\n      return ARES_TRUE;\n    }\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          691,
+          0
+        ],
+        [
+          734,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rec_type_fromstr",
+        "parameters": {
+          "qtype": "ares_dns_rec_type_t",
+          "str": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_section_tostr(ares_dns_section_t section)\n{\n  switch (section) {\n    case ARES_SECTION_ANSWER:\n      return \"ANSWER\";\n    case ARES_SECTION_AUTHORITY:\n      return \"AUTHORITY\";\n    case ARES_SECTION_ADDITIONAL:\n      return \"ADDITIONAL\";\n  }\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          736,
+          0
+        ],
+        [
+          747,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_section_tostr",
+        "parameters": {
+          "section": "ares_dns_section_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_dns_opt_datatype_t ares_dns_opt_get_type_opt(unsigned short opt)\n{\n  ares_opt_param_t param = (ares_opt_param_t)opt;\n  switch (param) {\n    case ARES_OPT_PARAM_LLQ:\n      /* Really it is u16 version, u16 opcode, u16 error, u64 id, u32 lease */\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_OPT_PARAM_UL:\n      return ARES_OPT_DATATYPE_U32;\n    case ARES_OPT_PARAM_NSID:\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_OPT_PARAM_DAU:\n      return ARES_OPT_DATATYPE_U8_LIST;\n    case ARES_OPT_PARAM_DHU:\n      return ARES_OPT_DATATYPE_U8_LIST;\n    case ARES_OPT_PARAM_N3U:\n      return ARES_OPT_DATATYPE_U8_LIST;\n    case ARES_OPT_PARAM_EDNS_CLIENT_SUBNET:\n      /* Really it is a u16 address family, u8 source prefix length,\n       * u8 scope prefix length, address */\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_OPT_PARAM_EDNS_EXPIRE:\n      return ARES_OPT_DATATYPE_U32;\n    case ARES_OPT_PARAM_COOKIE:\n      /* 8 bytes for client, 16-40 bytes for server */\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_OPT_PARAM_EDNS_TCP_KEEPALIVE:\n      /* Timeout in 100ms intervals */\n      return ARES_OPT_DATATYPE_U16;\n    case ARES_OPT_PARAM_PADDING:\n      /* Arbitrary padding */\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_OPT_PARAM_CHAIN:\n      return ARES_OPT_DATATYPE_NAME;\n    case ARES_OPT_PARAM_EDNS_KEY_TAG:\n      return ARES_OPT_DATATYPE_U16_LIST;\n    case ARES_OPT_PARAM_EXTENDED_DNS_ERROR:\n      /* Really 16bit code followed by textual message */\n      return ARES_OPT_DATATYPE_BIN;\n  }\n  return ARES_OPT_DATATYPE_BIN;\n}",
+      "fn_code_pos": [
+        [
+          749,
+          0
+        ],
+        [
+          790,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_type_opt",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": "ares_dns_opt_datatype_t"
+      }
+    },
+    {
+      "fn_code": "static ares_dns_opt_datatype_t ares_dns_opt_get_type_svcb(unsigned short opt)\n{\n  ares_svcb_param_t param = (ares_svcb_param_t)opt;\n  switch (param) {\n    case ARES_SVCB_PARAM_NO_DEFAULT_ALPN:\n      return ARES_OPT_DATATYPE_NONE;\n    case ARES_SVCB_PARAM_ECH:\n      return ARES_OPT_DATATYPE_BIN;\n    case ARES_SVCB_PARAM_MANDATORY:\n      return ARES_OPT_DATATYPE_U16_LIST;\n    case ARES_SVCB_PARAM_ALPN:\n      return ARES_OPT_DATATYPE_STR_LIST;\n    case ARES_SVCB_PARAM_PORT:\n      return ARES_OPT_DATATYPE_U16;\n    case ARES_SVCB_PARAM_IPV4HINT:\n      return ARES_OPT_DATATYPE_INADDR4_LIST;\n    case ARES_SVCB_PARAM_IPV6HINT:\n      return ARES_OPT_DATATYPE_INADDR6_LIST;\n  }\n  return ARES_OPT_DATATYPE_BIN;\n}",
+      "fn_code_pos": [
+        [
+          792,
+          0
+        ],
+        [
+          812,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_type_svcb",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": "ares_dns_opt_datatype_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_opt_datatype_t ares_dns_opt_get_datatype(ares_dns_rr_key_t key,\n                                                  unsigned short    opt)\n{\n  switch (key) {\n    case ARES_RR_OPT_OPTIONS:\n      return ares_dns_opt_get_type_opt(opt);\n    case ARES_RR_SVCB_PARAMS:\n    case ARES_RR_HTTPS_PARAMS:\n      return ares_dns_opt_get_type_svcb(opt);\n    default:\n      break;\n  }\n  return ARES_OPT_DATATYPE_BIN;\n}",
+      "fn_code_pos": [
+        [
+          814,
+          0
+        ],
+        [
+          827,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_datatype",
+        "parameters": {
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short"
+        },
+        "return_type": "ares_dns_opt_datatype_t"
+      }
+    },
+    {
+      "fn_code": "static const char *ares_dns_opt_get_name_opt(unsigned short opt)\n{\n  ares_opt_param_t param = (ares_opt_param_t)opt;\n  switch (param) {\n    case ARES_OPT_PARAM_LLQ:\n      return \"LLQ\";\n    case ARES_OPT_PARAM_UL:\n      return \"UL\";\n    case ARES_OPT_PARAM_NSID:\n      return \"NSID\";\n    case ARES_OPT_PARAM_DAU:\n      return \"DAU\";\n    case ARES_OPT_PARAM_DHU:\n      return \"DHU\";\n    case ARES_OPT_PARAM_N3U:\n      return \"N3U\";\n    case ARES_OPT_PARAM_EDNS_CLIENT_SUBNET:\n      return \"edns-client-subnet\";\n    case ARES_OPT_PARAM_EDNS_EXPIRE:\n      return \"edns-expire\";\n    case ARES_OPT_PARAM_COOKIE:\n      return \"COOKIE\";\n    case ARES_OPT_PARAM_EDNS_TCP_KEEPALIVE:\n      return \"edns-tcp-keepalive\";\n    case ARES_OPT_PARAM_PADDING:\n      return \"Padding\";\n    case ARES_OPT_PARAM_CHAIN:\n      return \"CHAIN\";\n    case ARES_OPT_PARAM_EDNS_KEY_TAG:\n      return \"edns-key-tag\";\n    case ARES_OPT_PARAM_EXTENDED_DNS_ERROR:\n      return \"extended-dns-error\";\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          829,
+          0
+        ],
+        [
+          863,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name_opt",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static const char *ares_dns_opt_get_name_svcb(unsigned short opt)\n{\n  ares_svcb_param_t param = (ares_svcb_param_t)opt;\n  switch (param) {\n    case ARES_SVCB_PARAM_NO_DEFAULT_ALPN:\n      return \"no-default-alpn\";\n    case ARES_SVCB_PARAM_ECH:\n      return \"ech\";\n    case ARES_SVCB_PARAM_MANDATORY:\n      return \"mandatory\";\n    case ARES_SVCB_PARAM_ALPN:\n      return \"alpn\";\n    case ARES_SVCB_PARAM_PORT:\n      return \"port\";\n    case ARES_SVCB_PARAM_IPV4HINT:\n      return \"ipv4hint\";\n    case ARES_SVCB_PARAM_IPV6HINT:\n      return \"ipv6hint\";\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          865,
+          0
+        ],
+        [
+          885,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name_svcb",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_opt_get_name(ares_dns_rr_key_t key, unsigned short opt)\n{\n  switch (key) {\n    case ARES_RR_OPT_OPTIONS:\n      return ares_dns_opt_get_name_opt(opt);\n    case ARES_RR_SVCB_PARAMS:\n    case ARES_RR_HTTPS_PARAMS:\n      return ares_dns_opt_get_name_svcb(opt);\n    default:\n      break;\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          887,
+          0
+        ],
+        [
+          899,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name",
+        "parameters": {
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_rcode_tostr(ares_dns_rcode_t rcode)\n{\n  switch (rcode) {\n    case ARES_RCODE_NOERROR:\n      return \"NOERROR\";\n    case ARES_RCODE_FORMERR:\n      return \"FORMERR\";\n    case ARES_RCODE_SERVFAIL:\n      return \"SERVFAIL\";\n    case ARES_RCODE_NXDOMAIN:\n      return \"NXDOMAIN\";\n    case ARES_RCODE_NOTIMP:\n      return \"NOTIMP\";\n    case ARES_RCODE_REFUSED:\n      return \"REFUSED\";\n    case ARES_RCODE_YXDOMAIN:\n      return \"YXDOMAIN\";\n    case ARES_RCODE_YXRRSET:\n      return \"YXRRSET\";\n    case ARES_RCODE_NXRRSET:\n      return \"NXRRSET\";\n    case ARES_RCODE_NOTAUTH:\n      return \"NOTAUTH\";\n    case ARES_RCODE_NOTZONE:\n      return \"NOTZONE\";\n    case ARES_RCODE_DSOTYPEI:\n      return \"DSOTYPEI\";\n    case ARES_RCODE_BADSIG:\n      return \"BADSIG\";\n    case ARES_RCODE_BADKEY:\n      return \"BADKEY\";\n    case ARES_RCODE_BADTIME:\n      return \"BADTIME\";\n    case ARES_RCODE_BADMODE:\n      return \"BADMODE\";\n    case ARES_RCODE_BADNAME:\n      return \"BADNAME\";\n    case ARES_RCODE_BADALG:\n      return \"BADALG\";\n    case ARES_RCODE_BADTRUNC:\n      return \"BADTRUNC\";\n    case ARES_RCODE_BADCOOKIE:\n      return \"BADCOOKIE\";\n  }\n\n  return \"UNKNOWN\";\n}",
+      "fn_code_pos": [
+        [
+          901,
+          0
+        ],
+        [
+          947,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rcode_tostr",
+        "parameters": {
+          "rcode": "ares_dns_rcode_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_query_reply_tostatus(ares_dns_rcode_t rcode,\n                                            size_t           ancount)\n{\n  ares_status_t status = ARES_SUCCESS;\n\n  switch (rcode) {\n    case ARES_RCODE_NOERROR:\n      status = (ancount > 0) ? ARES_SUCCESS : ARES_ENODATA;\n      break;\n    case ARES_RCODE_FORMERR:\n      status = ARES_EFORMERR;\n      break;\n    case ARES_RCODE_SERVFAIL:\n      status = ARES_ESERVFAIL;\n      break;\n    case ARES_RCODE_NXDOMAIN:\n      status = ARES_ENOTFOUND;\n      break;\n    case ARES_RCODE_NOTIMP:\n      status = ARES_ENOTIMP;\n      break;\n    case ARES_RCODE_REFUSED:\n      status = ARES_EREFUSED;\n      break;\n    default:\n      break;\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          952,
+          0
+        ],
+        [
+          981,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_query_reply_tostatus",
+        "parameters": {
+          "rcode": "ares_dns_rcode_t",
+          "ancount": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_dns_rec_type_tostr(ares_dns_rec_type_t type)",
+      "fn_dec_pos": [
+        [
+          188,
+          12
+        ],
+        [
+          188,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rec_type_tostr",
+        "parameters": {
+          "type": "ares_dns_rec_type_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_class_tostr(ares_dns_class_t qclass)",
+      "fn_dec_pos": [
+        [
+          235,
+          12
+        ],
+        [
+          235,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_class_tostr",
+        "parameters": {
+          "qclass": "ares_dns_class_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_opcode_tostr(ares_dns_opcode_t opcode)",
+      "fn_dec_pos": [
+        [
+          252,
+          12
+        ],
+        [
+          252,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opcode_tostr",
+        "parameters": {
+          "opcode": "ares_dns_opcode_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_key_tostr(ares_dns_rr_key_t key)",
+      "fn_dec_pos": [
+        [
+          269,
+          12
+        ],
+        [
+          269,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_key_tostr",
+        "parameters": {
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_keys(ares_dns_rec_type_t type,\n                                                    size_t             *cnt)",
+      "fn_dec_pos": [
+        [
+          587,
+          31
+        ],
+        [
+          588,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_keys",
+        "parameters": {
+          "type": "ares_dns_rec_type_t",
+          "cnt": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_section_tostr(ares_dns_section_t section)",
+      "fn_dec_pos": [
+        [
+          736,
+          12
+        ],
+        [
+          736,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_section_tostr",
+        "parameters": {
+          "section": "ares_dns_section_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_opt_get_name_opt(unsigned short opt)",
+      "fn_dec_pos": [
+        [
+          829,
+          19
+        ],
+        [
+          829,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name_opt",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_opt_get_name_svcb(unsigned short opt)",
+      "fn_dec_pos": [
+        [
+          865,
+          19
+        ],
+        [
+          865,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name_svcb",
+        "parameters": {
+          "opt": "unsigned short"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_opt_get_name(ares_dns_rr_key_t key, unsigned short opt)",
+      "fn_dec_pos": [
+        [
+          887,
+          12
+        ],
+        [
+          887,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_get_name",
+        "parameters": {
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rcode_tostr(ares_dns_rcode_t rcode)",
+      "fn_dec_pos": [
+        [
+          901,
+          12
+        ],
+        [
+          901,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rcode_tostr",
+        "parameters": {
+          "rcode": "ares_dns_rcode_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct {\n    const char      *name;\n    ares_dns_class_t qclass;\n  }",
+      {
+        "char": "const",
+        "qclass": "ares_dns_class_t"
+      },
+      "",
+      [
+        666,
+        15
+      ],
+      [
+        669,
+        3
+      ]
+    ],
+    [
+      "struct {\n    const char         *name;\n    ares_dns_rec_type_t type;\n  }",
+      {
+        "char": "const",
+        "type": "ares_dns_rec_type_t"
+      },
+      "",
+      [
+        696,
+        15
+      ],
+      [
+        699,
+        3
+      ]
+    ],
+    [
+      "struct {\n    const char      *name;\n    ares_dns_class_t qclass;\n  }",
+      {
+        "char": "const",
+        "qclass": "ares_dns_class_t"
+      },
+      "",
+      [
+        666,
+        15
+      ],
+      [
+        669,
+        3
+      ]
+    ],
+    [
+      "struct {\n    const char         *name;\n    ares_dns_rec_type_t type;\n  }",
+      {
+        "char": "const",
+        "type": "ares_dns_rec_type_t"
+      },
+      "",
+      [
+        696,
+        15
+      ],
+      [
+        699,
+        3
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

@@ -1,0 +1,419 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_bool_t ares_ai_has_family(int aftype,\n                                      const struct ares_addrinfo_node *nodes)\n{\n  const struct ares_addrinfo_node *node;\n\n  for (node = nodes; node != NULL; node = node->ai_next) {\n    if (node->ai_family == aftype)\n      return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          62,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_ai_has_family",
+        "parameters": {
+          "aftype": "int",
+          "nodes": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_append_ai_node(int aftype, unsigned short port,\n                                  unsigned int ttl, const void *adata,\n                                  struct ares_addrinfo_node **nodes)\n{\n  struct ares_addrinfo_node *node;\n\n  node = ares_append_addrinfo_node(nodes);\n  if (!node) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  memset(node, 0, sizeof(*node));\n\n  if (aftype == AF_INET) {\n    struct sockaddr_in *sin = ares_malloc(sizeof(*sin));\n    if (!sin) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    memset(sin, 0, sizeof(*sin));\n    memcpy(&sin->sin_addr.s_addr, adata, sizeof(sin->sin_addr.s_addr));\n    sin->sin_family = AF_INET;\n    sin->sin_port   = htons(port);\n\n    node->ai_addr    = (struct sockaddr *)sin;\n    node->ai_family  = AF_INET;\n    node->ai_addrlen = sizeof(*sin);\n    node->ai_addr    = (struct sockaddr *)sin;\n    node->ai_ttl     = (int)ttl;\n  }\n\n  if (aftype == AF_INET6) {\n    struct sockaddr_in6 *sin6 = ares_malloc(sizeof(*sin6));\n    if (!sin6) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    memset(sin6, 0, sizeof(*sin6));\n    memcpy(&sin6->sin6_addr.s6_addr, adata, sizeof(sin6->sin6_addr.s6_addr));\n    sin6->sin6_family = AF_INET6;\n    sin6->sin6_port   = htons(port);\n\n    node->ai_addr    = (struct sockaddr *)sin6;\n    node->ai_family  = AF_INET6;\n    node->ai_addrlen = sizeof(*sin6);\n    node->ai_addr    = (struct sockaddr *)sin6;\n    node->ai_ttl     = (int)ttl;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          64,
+          0
+        ],
+        [
+          114,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_append_ai_node",
+        "parameters": {
+          "aftype": "int",
+          "port": "unsigned short",
+          "ttl": "unsigned int",
+          "adata": "void",
+          "nodes": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_default_loopback_addrs(int aftype, unsigned short port,\n                              struct ares_addrinfo_node **nodes)\n{\n  ares_status_t status = ARES_SUCCESS;\n\n  if ((aftype == AF_UNSPEC || aftype == AF_INET6) &&\n      !ares_ai_has_family(AF_INET6, *nodes)) {\n    struct ares_in6_addr addr6;\n    ares_inet_pton(AF_INET6, \"::1\", &addr6);\n    status = ares_append_ai_node(AF_INET6, port, 0, &addr6, nodes);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  if ((aftype == AF_UNSPEC || aftype == AF_INET) &&\n      !ares_ai_has_family(AF_INET, *nodes)) {\n    struct in_addr addr4;\n    ares_inet_pton(AF_INET, \"127.0.0.1\", &addr4);\n    status = ares_append_ai_node(AF_INET, port, 0, &addr4, nodes);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          116,
+          0
+        ],
+        [
+          143,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_default_loopback_addrs",
+        "parameters": {
+          "aftype": "int",
+          "port": "unsigned short",
+          "nodes": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_system_loopback_addrs(int aftype, unsigned short port,\n                             struct ares_addrinfo_node **nodes)\n{\n#if defined(USE_WINSOCK) && defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600 && \\\n  !defined(__WATCOMC__)\n  PMIB_UNICASTIPADDRESS_TABLE table;\n  unsigned int                i;\n  ares_status_t               status = ARES_ENOTFOUND;\n\n  *nodes = NULL;\n\n  if (GetUnicastIpAddressTable((ADDRESS_FAMILY)aftype, &table) != NO_ERROR) {\n    return ARES_ENOTFOUND;\n  }\n\n  for (i = 0; i < table->NumEntries; i++) {\n    if (table->Table[i].InterfaceLuid.Info.IfType !=\n        IF_TYPE_SOFTWARE_LOOPBACK) {\n      continue;\n    }\n\n    if (table->Table[i].Address.si_family == AF_INET &&\n        !ares_ai_has_family(AF_INET, *nodes)) {\n      status =\n        ares_append_ai_node(table->Table[i].Address.si_family, port, 0,\n                            &table->Table[i].Address.Ipv4.sin_addr, nodes);\n    } else if (table->Table[i].Address.si_family == AF_INET6 &&\n               !ares_ai_has_family(AF_INET6, *nodes)) {\n      status =\n        ares_append_ai_node(table->Table[i].Address.si_family, port, 0,\n                            &table->Table[i].Address.Ipv6.sin6_addr, nodes);\n    } else {\n      /* Ignore any others */\n      continue;\n    }\n\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  if (*nodes == NULL) {\n    status = ARES_ENOTFOUND;\n  }\n\nfail:\n  FreeMibTable(table);\n\n  if (status != ARES_SUCCESS) {\n    ares_freeaddrinfo_nodes(*nodes);\n    *nodes = NULL;\n  }\n\n  return status;\n\n#else\n  (void)aftype;\n  (void)port;\n  (void)nodes;\n  /* Not supported on any other OS at this time */\n  return ARES_ENOTFOUND;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          145,
+          0
+        ],
+        [
+          208,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_system_loopback_addrs",
+        "parameters": {
+          "aftype": "int",
+          "port": "unsigned short",
+          "nodes": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_addrinfo_localhost(const char *name, unsigned short port,\n                                      const struct ares_addrinfo_hints *hints,\n                                      struct ares_addrinfo             *ai)\n{\n  ares_status_t status;\n\n  /* Validate family */\n  switch (hints->ai_family) {\n    case AF_INET:\n    case AF_INET6:\n    case AF_UNSPEC:\n      break;\n    default:                  /* LCOV_EXCL_LINE: DefensiveCoding */\n      return ARES_EBADFAMILY; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (ai->name != NULL) {\n    ares_free(ai->name);\n  }\n  ai->name = ares_strdup(name);\n  if (ai->name == NULL) {\n    status = ARES_ENOMEM;\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_system_loopback_addrs(hints->ai_family, port, &ai->nodes);\n  if (status != ARES_SUCCESS && status != ARES_ENOTFOUND) {\n    goto done;\n  }\n\n  status = ares_default_loopback_addrs(hints->ai_family, port, &ai->nodes);\n\ndone:\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          210,
+          0
+        ],
+        [
+          244,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo_localhost",
+        "parameters": {
+          "name": "char",
+          "port": "unsigned short",
+          "hints": "struct ares_addrinfo_hints",
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        52,
+        44
+      ],
+      [
+        52,
+        69
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        54,
+        8
+      ],
+      [
+        54,
+        33
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        66,
+        34
+      ],
+      [
+        66,
+        59
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        68,
+        2
+      ],
+      [
+        68,
+        27
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        78,
+        4
+      ],
+      [
+        78,
+        22
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        88,
+        24
+      ],
+      [
+        88,
+        39
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        91,
+        24
+      ],
+      [
+        91,
+        39
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        96,
+        4
+      ],
+      [
+        96,
+        23
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        106,
+        24
+      ],
+      [
+        106,
+        39
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        109,
+        24
+      ],
+      [
+        109,
+        39
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        118,
+        30
+      ],
+      [
+        118,
+        55
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        124,
+        4
+      ],
+      [
+        124,
+        24
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        134,
+        4
+      ],
+      [
+        134,
+        18
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        147,
+        29
+      ],
+      [
+        147,
+        54
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        211,
+        44
+      ],
+      [
+        211,
+        70
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        212,
+        38
+      ],
+      [
+        212,
+        58
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#    include <ws2ipdef.h>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    [
+      "#    include <iphlpapi.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#    include <netioapi.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

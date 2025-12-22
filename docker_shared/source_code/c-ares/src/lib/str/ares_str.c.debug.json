@@ -1,0 +1,687 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "size_t ares_strnlen(const char *str, size_t maxlen) {\n  const char *p = NULL;\n  if (str == NULL) {\n    return 0;\n  }\n#ifdef HAVE_STRNLEN\n  (void)p;\n  return strnlen(str, maxlen);\n#else\n  if ((p = memchr(str, 0, maxlen)) == NULL) {\n    return maxlen;\n  } else {\n    return (size_t)(p - str);\n  }\n#endif /* HAVE_STRNLEN */\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          49,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strnlen",
+        "parameters": {
+          "str": "char",
+          "maxlen": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_strlen(const char *str)\n{\n  if (str == NULL) {\n    return 0;\n  }\n\n  return strlen(str);\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          58,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strlen",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "char *ares_strdup(const char *s1)\n{\n  size_t len;\n  char  *out;\n\n  if (s1 == NULL) {\n    return NULL;\n  }\n\n  len = ares_strlen(s1);\n\n  /* Don't see how this is possible */\n  if (len == SIZE_MAX) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  out = ares_malloc(len + 1);\n  if (out == NULL) {\n    return NULL;\n  }\n\n  if (len) {\n    memcpy(out, s1, len);\n  }\n\n  out[len] = 0;\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          60,
+          0
+        ],
+        [
+          87,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strdup",
+        "parameters": {
+          "s1": "char"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "size_t ares_strcpy(char *dest, const char *src, size_t dest_size)\n{\n  size_t len = 0;\n\n  if (dest == NULL || dest_size == 0) {\n    return 0; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  len = ares_strlen(src);\n\n  if (len >= dest_size) {\n    len = dest_size - 1;\n  }\n\n  if (len) {\n    memcpy(dest, src, len);\n  }\n\n  dest[len] = 0;\n  return len;\n}",
+      "fn_code_pos": [
+        [
+          89,
+          0
+        ],
+        [
+          109,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcpy",
+        "parameters": {
+          "dest": "char",
+          "src": "char",
+          "dest_size": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_str_isnum(const char *str)\n{\n  size_t i;\n\n  if (str == NULL || *str == 0) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; str[i] != 0; i++) {\n    if (!ares_isdigit(str[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          111,
+          0
+        ],
+        [
+          125,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_isnum",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_str_isalnum(const char *str)\n{\n  size_t i;\n\n  if (str == NULL || *str == 0) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; str[i] != 0; i++) {\n    if (!ares_isdigit(str[i]) && !ares_isalpha(str[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          127,
+          0
+        ],
+        [
+          141,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_isalnum",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void ares_str_rtrim(char *str)\n{\n  size_t len;\n  size_t i;\n\n  if (str == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  len = ares_strlen(str);\n  for (i = len; i > 0; i--) {\n    if (!ares_isspace(str[i - 1])) {\n      break;\n    }\n  }\n  str[i] = 0;\n}",
+      "fn_code_pos": [
+        [
+          143,
+          0
+        ],
+        [
+          159,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_rtrim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_str_ltrim(char *str)\n{\n  size_t i;\n  size_t len;\n\n  if (str == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  for (i = 0; str[i] != 0 && ares_isspace(str[i]); i++) {\n    /* Do nothing */\n  }\n\n  if (i == 0) {\n    return;\n  }\n\n  len = ares_strlen(str);\n  if (i != len) {\n    memmove(str, str + i, len - i);\n  }\n  str[len - i] = 0;\n}",
+      "fn_code_pos": [
+        [
+          161,
+          0
+        ],
+        [
+          183,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_ltrim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_str_trim(char *str)\n{\n  ares_str_ltrim(str);\n  ares_str_rtrim(str);\n}",
+      "fn_code_pos": [
+        [
+          185,
+          0
+        ],
+        [
+          189,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_trim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "unsigned char ares_tolower(unsigned char c)\n{\n  return ares_tolower_lookup[c];\n}",
+      "fn_code_pos": [
+        [
+          216,
+          0
+        ],
+        [
+          219,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tolower",
+        "parameters": {
+          "c": "unsigned char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void ares_str_lower(char *str)\n{\n  size_t i;\n\n  if (str == NULL) {\n    return;\n  }\n\n  for (i = 0; str[i] != 0; i++) {\n    str[i] = (char)ares_tolower((unsigned char)str[i]);\n  }\n}",
+      "fn_code_pos": [
+        [
+          221,
+          0
+        ],
+        [
+          232,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_lower",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "unsigned char *ares_memmem(const unsigned char *big, size_t big_len,\n                           const unsigned char *little, size_t little_len)\n{\n  unsigned char *ptr;\n\n  if (big == NULL || little == NULL || big_len == 0 || little_len == 0) {\n    return NULL;\n  }\n\n#ifdef HAVE_MEMMEM\n  ptr = memmem(big, big_len, little, little_len);\n  return ptr;\n#else\n  while (1) {\n    ptr = memchr(big, little[0], big_len);\n    if (ptr == NULL) {\n      break;\n    }\n\n    big_len -= (size_t)(ptr - big);\n    big      = ptr;\n    if (big_len < little_len) {\n      break;\n    }\n\n    if (memcmp(big, little, little_len) == 0) {\n      return ptr;\n    }\n\n    big++;\n    big_len--;\n  }\n\n  return NULL;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          234,
+          0
+        ],
+        [
+          269,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_memmem",
+        "parameters": {
+          "big": "unsigned char",
+          "big_len": "size_t",
+          "little": "unsigned char",
+          "little_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_memeq(const unsigned char *ptr, const unsigned char *val,\n                       size_t len)\n{\n  return memcmp(ptr, val, len) == 0 ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          271,
+          0
+        ],
+        [
+          275,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_memeq",
+        "parameters": {
+          "ptr": "unsigned char",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_memeq_ci(const unsigned char *ptr, const unsigned char *val,\n                          size_t len)\n{\n  size_t i;\n  for (i = 0; i < len; i++) {\n    if (ares_tolower_lookup[ptr[i]] != ares_tolower_lookup[val[i]]) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          277,
+          0
+        ],
+        [
+          287,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_memeq_ci",
+        "parameters": {
+          "ptr": "unsigned char",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_is_hostname(const char *str)\n{\n  size_t i;\n\n  if (str == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  for (i = 0; str[i] != 0; i++) {\n    if (!ares_is_hostnamech(str[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          289,
+          0
+        ],
+        [
+          303,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_hostname",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_str_isprint(const char *str, size_t len)\n{\n  size_t i;\n\n  if (str == NULL && len != 0) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; i < len; i++) {\n    if (!ares_isprint(str[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          305,
+          0
+        ],
+        [
+          319,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_isprint",
+        "parameters": {
+          "str": "char",
+          "len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "int ares_strcmp(const char *a, const char *b)\n{\n  if (a == NULL && b == NULL) {\n    return 0;\n  }\n\n  if (a != NULL && b == NULL) {\n    if (*a == 0) {\n      return 0;\n    }\n    return 1;\n  }\n\n  if (a == NULL && b != NULL) {\n    if (*b == 0) {\n      return 0;\n    }\n    return -1;\n  }\n\n  return strcmp(a, b);\n}",
+      "fn_code_pos": [
+        [
+          321,
+          0
+        ],
+        [
+          342,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcmp",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_strncmp(const char *a, const char *b, size_t n)\n{\n  if (n == 0) {\n    return 0;\n  }\n\n  if (a == NULL && b == NULL) {\n    return 0;\n  }\n\n  if (a != NULL && b == NULL) {\n    if (*a == 0) {\n      return 0;\n    }\n    return 1;\n  }\n\n  if (a == NULL && b != NULL) {\n    if (*b == 0) {\n      return 0;\n    }\n    return -1;\n  }\n\n  return strncmp(a, b, n);\n}",
+      "fn_code_pos": [
+        [
+          344,
+          0
+        ],
+        [
+          369,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strncmp",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_strcasecmp(const char *a, const char *b)\n{\n  if (a == NULL && b == NULL) {\n    return 0;\n  }\n\n  if (a != NULL && b == NULL) {\n    if (*a == 0) {\n      return 0;\n    }\n    return 1;\n  }\n\n  if (a == NULL && b != NULL) {\n    if (*b == 0) {\n      return 0;\n    }\n    return -1;\n  }\n\n#if defined(HAVE_STRCASECMP)\n  return strcasecmp(a, b);\n#elif defined(HAVE_STRCMPI)\n  return strcmpi(a, b);\n#elif defined(HAVE_STRICMP)\n  return stricmp(a, b);\n#else\n  {\n    size_t i;\n\n    for (i = 0; i < (size_t)-1; i++) {\n      int c1 = ares_tolower(a[i]);\n      int c2 = ares_tolower(b[i]);\n      if (c1 != c2) {\n        return c1 - c2;\n      }\n      if (!c1) {\n        break;\n      }\n    }\n  }\n  return 0;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          371,
+          0
+        ],
+        [
+          414,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcasecmp",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_strncasecmp(const char *a, const char *b, size_t n)\n{\n  if (n == 0) {\n    return 0;\n  }\n\n  if (a == NULL && b == NULL) {\n    return 0;\n  }\n\n  if (a != NULL && b == NULL) {\n    if (*a == 0) {\n      return 0;\n    }\n    return 1;\n  }\n\n  if (a == NULL && b != NULL) {\n    if (*b == 0) {\n      return 0;\n    }\n    return -1;\n  }\n\n#if defined(HAVE_STRNCASECMP)\n  return strncasecmp(a, b, n);\n#elif defined(HAVE_STRNCMPI)\n  return strncmpi(a, b, n);\n#elif defined(HAVE_STRNICMP)\n  return strnicmp(a, b, n);\n#else\n  {\n    size_t i;\n\n    for (i = 0; i < n; i++) {\n      int c1 = ares_tolower(a[i]);\n      int c2 = ares_tolower(b[i]);\n      if (c1 != c2) {\n        return c1 - c2;\n      }\n      if (!c1) {\n        break;\n      }\n    }\n  }\n  return 0;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          416,
+          0
+        ],
+        [
+          463,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strncasecmp",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_strcaseeq(const char *a, const char *b)\n{\n  return ares_strcasecmp(a, b) == 0 ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          465,
+          0
+        ],
+        [
+          468,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcaseeq",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_strcaseeq_max(const char *a, const char *b, size_t n)\n{\n  return ares_strncasecmp(a, b, n) == 0 ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          470,
+          0
+        ],
+        [
+          473,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcaseeq_max",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_streq(const char *a, const char *b)\n{\n  return ares_strcmp(a, b) == 0 ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          475,
+          0
+        ],
+        [
+          478,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_streq",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_streq_max(const char *a, const char *b, size_t n)\n{\n  return ares_strncmp(a, b, n) == 0 ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          480,
+          0
+        ],
+        [
+          483,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_streq_max",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void ares_free_array(void *arrp, size_t nmembers, void (*freefunc)(void *))\n{\n  size_t i;\n  void **arr = arrp;\n\n  if (arr == NULL) {\n    return;\n  }\n\n  if (freefunc != NULL) {\n    if (nmembers == SIZE_MAX) {\n      for (i = 0; arr[i] != NULL; i++) {\n        freefunc(arr[i]);\n      }\n    } else {\n      for (i = 0; i < nmembers; i++) {\n        freefunc(arr[i]);\n      }\n    }\n  }\n\n  ares_free(arr);\n}",
+      "fn_code_pos": [
+        [
+          485,
+          0
+        ],
+        [
+          507,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_array",
+        "parameters": {
+          "arrp": "void",
+          "nmembers": "size_t",
+          "freefunc": "void"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_strdup(const char *s1)",
+      "fn_dec_pos": [
+        [
+          60,
+          6
+        ],
+        [
+          60,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strdup",
+        "parameters": {
+          "s1": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_memmem(const unsigned char *big, size_t big_len,\n                           const unsigned char *little, size_t little_len)",
+      "fn_dec_pos": [
+        [
+          234,
+          15
+        ],
+        [
+          235,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_memmem",
+        "parameters": {
+          "big": "unsigned char",
+          "big_len": "size_t",
+          "little": "unsigned char",
+          "little_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*freefunc)(void *)",
+      "fn_dec_pos": [
+        [
+          485,
+          55
+        ],
+        [
+          485,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_str.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

@@ -1,0 +1,1011 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_iface_ip_free_cb(void *arg)\n{\n  ares_iface_ip_t *ip = arg;\n  if (ip == NULL) {\n    return;\n  }\n  ares_free(ip->name);\n}",
+      "fn_code_pos": [
+        [
+          77,
+          0
+        ],
+        [
+          84,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ip_free_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_iface_ips_t *ares_iface_ips_alloc(ares_iface_ip_flags_t flags)\n{\n  ares_iface_ips_t *ips = ares_malloc_zero(sizeof(*ips));\n  if (ips == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  ips->enum_flags = flags;\n  ips->ips = ares_array_create(sizeof(ares_iface_ip_t), ares_iface_ip_free_cb);\n  if (ips->ips == NULL) {\n    ares_free(ips); /* LCOV_EXCL_LINE: OutOfMemory */\n    return NULL;    /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  return ips;\n}",
+      "fn_code_pos": [
+        [
+          86,
+          0
+        ],
+        [
+          100,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_alloc",
+        "parameters": {
+          "flags": "ares_iface_ip_flags_t"
+        },
+        "return_type": "ares_iface_ips_t"
+      }
+    },
+    {
+      "fn_code": "void ares_iface_ips_destroy(ares_iface_ips_t *ips)\n{\n  if (ips == NULL) {\n    return;\n  }\n\n  ares_array_destroy(ips->ips);\n  ares_free(ips);\n}",
+      "fn_code_pos": [
+        [
+          102,
+          0
+        ],
+        [
+          110,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_destroy",
+        "parameters": {
+          "ips": "ares_iface_ips_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_iface_ips(ares_iface_ips_t    **ips,\n                             ares_iface_ip_flags_t flags, const char *name)\n{\n  ares_status_t status;\n\n  if (ips == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *ips = ares_iface_ips_alloc(flags);\n  if (*ips == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_iface_ips_enumerate(*ips, name);\n  if (status != ARES_SUCCESS) {\n    /* LCOV_EXCL_START: UntestablePath */\n    ares_iface_ips_destroy(*ips);\n    *ips = NULL;\n    return status;\n    /* LCOV_EXCL_STOP */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          112,
+          0
+        ],
+        [
+          136,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "flags": "ares_iface_ip_flags_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_iface_ips_add(ares_iface_ips_t *ips, ares_iface_ip_flags_t flags,\n                     const char *name, const struct ares_addr *addr,\n                     unsigned char netmask, unsigned int ll_scope)\n{\n  ares_iface_ip_t *ip;\n  ares_status_t    status;\n\n  if (ips == NULL || name == NULL || addr == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Don't want loopback */\n  if (flags & ARES_IFACE_IP_LOOPBACK &&\n      !(ips->enum_flags & ARES_IFACE_IP_LOOPBACK)) {\n    return ARES_SUCCESS;\n  }\n\n  /* Don't want offline */\n  if (flags & ARES_IFACE_IP_OFFLINE &&\n      !(ips->enum_flags & ARES_IFACE_IP_OFFLINE)) {\n    return ARES_SUCCESS;\n  }\n\n  /* Check for link-local */\n  if (ares_addr_is_linklocal(addr)) {\n    flags |= ARES_IFACE_IP_LINKLOCAL;\n  }\n  if (flags & ARES_IFACE_IP_LINKLOCAL &&\n      !(ips->enum_flags & ARES_IFACE_IP_LINKLOCAL)) {\n    return ARES_SUCCESS;\n  }\n\n  /* Set address flag based on address provided */\n  if (addr->family == AF_INET) {\n    flags |= ARES_IFACE_IP_V4;\n  }\n\n  if (addr->family == AF_INET6) {\n    flags |= ARES_IFACE_IP_V6;\n  }\n\n  /* If they specified either v4 or v6 validate flags otherwise assume they\n   * want to enumerate both */\n  if (ips->enum_flags & (ARES_IFACE_IP_V4 | ARES_IFACE_IP_V6)) {\n    if (flags & ARES_IFACE_IP_V4 && !(ips->enum_flags & ARES_IFACE_IP_V4)) {\n      return ARES_SUCCESS;\n    }\n    if (flags & ARES_IFACE_IP_V6 && !(ips->enum_flags & ARES_IFACE_IP_V6)) {\n      return ARES_SUCCESS;\n    }\n  }\n\n  status = ares_array_insert_last((void **)&ip, ips->ips);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  ip->flags   = flags;\n  ip->netmask = netmask;\n  if (flags & ARES_IFACE_IP_LINKLOCAL) {\n    ip->ll_scope = ll_scope;\n  }\n  memcpy(&ip->addr, addr, sizeof(*addr));\n  ip->name = ares_strdup(name);\n  if (ip->name == NULL) {\n    ares_array_remove_last(ips->ips);\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          138,
+          0
+        ],
+        [
+          209,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_add",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "flags": "ares_iface_ip_flags_t",
+          "name": "char",
+          "addr": "struct ares_addr",
+          "netmask": "unsigned char",
+          "ll_scope": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_iface_ips_cnt(const ares_iface_ips_t *ips)\n{\n  if (ips == NULL) {\n    return 0;\n  }\n  return ares_array_len(ips->ips);\n}",
+      "fn_code_pos": [
+        [
+          211,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_cnt",
+        "parameters": {
+          "ips": "ares_iface_ips_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_iface_ips_get_name(const ares_iface_ips_t *ips, size_t idx)\n{\n  const ares_iface_ip_t *ip;\n\n  if (ips == NULL) {\n    return NULL;\n  }\n\n  ip = ares_array_at_const(ips->ips, idx);\n  if (ip == NULL) {\n    return NULL;\n  }\n\n  return ip->name;\n}",
+      "fn_code_pos": [
+        [
+          219,
+          0
+        ],
+        [
+          233,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_name",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "const struct ares_addr *ares_iface_ips_get_addr(const ares_iface_ips_t *ips,\n                                                size_t                  idx)\n{\n  const ares_iface_ip_t *ip;\n\n  if (ips == NULL) {\n    return NULL;\n  }\n\n  ip = ares_array_at_const(ips->ips, idx);\n  if (ip == NULL) {\n    return NULL;\n  }\n\n  return &ip->addr;\n}",
+      "fn_code_pos": [
+        [
+          235,
+          0
+        ],
+        [
+          250,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_addr",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_iface_ip_flags_t ares_iface_ips_get_flags(const ares_iface_ips_t *ips,\n                                               size_t                  idx)\n{\n  const ares_iface_ip_t *ip;\n\n  if (ips == NULL) {\n    return 0;\n  }\n\n  ip = ares_array_at_const(ips->ips, idx);\n  if (ip == NULL) {\n    return 0;\n  }\n\n  return ip->flags;\n}",
+      "fn_code_pos": [
+        [
+          252,
+          0
+        ],
+        [
+          267,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_flags",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_iface_ip_flags_t"
+      }
+    },
+    {
+      "fn_code": "unsigned char ares_iface_ips_get_netmask(const ares_iface_ips_t *ips,\n                                         size_t                  idx)\n{\n  const ares_iface_ip_t *ip;\n\n  if (ips == NULL) {\n    return 0;\n  }\n\n  ip = ares_array_at_const(ips->ips, idx);\n  if (ip == NULL) {\n    return 0;\n  }\n\n  return ip->netmask;\n}",
+      "fn_code_pos": [
+        [
+          269,
+          0
+        ],
+        [
+          284,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_netmask",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_iface_ips_get_ll_scope(const ares_iface_ips_t *ips,\n                                         size_t                  idx)\n{\n  const ares_iface_ip_t *ip;\n\n  if (ips == NULL) {\n    return 0;\n  }\n\n  ip = ares_array_at_const(ips->ips, idx);\n  if (ip == NULL) {\n    return 0;\n  }\n\n  return ip->ll_scope;\n}",
+      "fn_code_pos": [
+        [
+          286,
+          0
+        ],
+        [
+          301,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_ll_scope",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static char *wcharp_to_charp(const wchar_t *in)\n{\n  char *out;\n  int   len;\n\n  len = WideCharToMultiByte(CP_UTF8, 0, in, -1, NULL, 0, NULL, NULL);\n  if (len == -1) {\n    return NULL;\n  }\n\n  out = ares_malloc_zero((size_t)len + 1);\n\n  if (WideCharToMultiByte(CP_UTF8, 0, in, -1, out, len, NULL, NULL) == -1) {\n    ares_free(out);\n    return NULL;\n  }\n\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          307,
+          0
+        ],
+        [
+          325,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "wcharp_to_charp",
+        "parameters": {
+          "in": "wchar_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t name_match(const char *name, const char *adapter_name,\n                              unsigned int ll_scope)\n{\n  if (name == NULL || *name == 0) {\n    return ARES_TRUE;\n  }\n\n  if (ares_strcaseeq(name, adapter_name)) {\n    return ARES_TRUE;\n  }\n\n  if (ares_str_isnum(name) && (unsigned int)atoi(name) == ll_scope) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          328,
+          0
+        ],
+        [
+          344,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "name_match",
+        "parameters": {
+          "name": "char",
+          "adapter_name": "char",
+          "ll_scope": "unsigned int"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_iface_ips_enumerate(ares_iface_ips_t *ips,\n                                              const char       *name)\n{\n  ULONG myflags = GAA_FLAG_INCLUDE_PREFIX /*|GAA_FLAG_INCLUDE_ALL_INTERFACES */;\n  ULONG outBufLen = 0;\n  DWORD retval;\n  IP_ADAPTER_ADDRESSES *addresses = NULL;\n  IP_ADAPTER_ADDRESSES *address   = NULL;\n  ares_status_t         status    = ARES_SUCCESS;\n\n  /* Get necessary buffer size */\n  GetAdaptersAddresses(AF_UNSPEC, myflags, NULL, NULL, &outBufLen);\n  if (outBufLen == 0) {\n    status = ARES_EFILE;\n    goto done;\n  }\n\n  addresses = ares_malloc_zero(outBufLen);\n  if (addresses == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  retval =\n    GetAdaptersAddresses(AF_UNSPEC, myflags, NULL, addresses, &outBufLen);\n  if (retval != ERROR_SUCCESS) {\n    status = ARES_EFILE;\n    goto done;\n  }\n\n  for (address = addresses; address != NULL; address = address->Next) {\n    IP_ADAPTER_UNICAST_ADDRESS *ipaddr     = NULL;\n    ares_iface_ip_flags_t       addrflag   = 0;\n    char                        ifname[64] = \"\";\n\n#  if defined(HAVE_CONVERTINTERFACEINDEXTOLUID) && \\\n    defined(HAVE_CONVERTINTERFACELUIDTONAMEA)\n    /* Retrieve name from interface index.\n     * address->AdapterName appears to be a GUID/UUID of some sort, not a name.\n     * address->FriendlyName is user-changeable.\n     * That said, this doesn't appear to help us out on systems that don't\n     * have if_nametoindex() or if_indextoname() as they don't have these\n     * functions either! */\n    NET_LUID luid;\n    ConvertInterfaceIndexToLuid(address->IfIndex, &luid);\n    ConvertInterfaceLuidToNameA(&luid, ifname, sizeof(ifname));\n#  else\n    ares_strcpy(ifname, address->AdapterName, sizeof(ifname));\n#  endif\n\n    if (address->OperStatus != IfOperStatusUp) {\n      addrflag |= ARES_IFACE_IP_OFFLINE;\n    }\n\n    if (address->IfType == IF_TYPE_SOFTWARE_LOOPBACK) {\n      addrflag |= ARES_IFACE_IP_LOOPBACK;\n    }\n\n    for (ipaddr = address->FirstUnicastAddress; ipaddr != NULL;\n         ipaddr = ipaddr->Next) {\n      struct ares_addr addr;\n\n      if (ipaddr->Address.lpSockaddr->sa_family == AF_INET) {\n        const struct sockaddr_in *sockaddr_in =\n          (const struct sockaddr_in *)((void *)ipaddr->Address.lpSockaddr);\n        addr.family = AF_INET;\n        memcpy(&addr.addr.addr4, &sockaddr_in->sin_addr,\n               sizeof(addr.addr.addr4));\n      } else if (ipaddr->Address.lpSockaddr->sa_family == AF_INET6) {\n        const struct sockaddr_in6 *sockaddr_in6 =\n          (const struct sockaddr_in6 *)((void *)ipaddr->Address.lpSockaddr);\n        addr.family = AF_INET6;\n        memcpy(&addr.addr.addr6, &sockaddr_in6->sin6_addr,\n               sizeof(addr.addr.addr6));\n      } else {\n        /* Unknown */\n        continue;\n      }\n\n      /* Sometimes windows may use numerics to indicate a DNS server's adapter,\n       * which corresponds to the index rather than the name.  Check and\n       * validate both. */\n      if (!name_match(name, ifname, address->Ipv6IfIndex)) {\n        continue;\n      }\n\n      status = ares_iface_ips_add(ips, addrflag, ifname, &addr,\n#if _WIN32_WINNT >= 0x0600\n                                  ipaddr->OnLinkPrefixLength /* netmask */,\n#else\n                                  ipaddr->Address.lpSockaddr->sa_family\n                                    == AF_INET?32:128,\n#endif\n                                  address->Ipv6IfIndex /* ll_scope */\n                                  );\n\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n  }\n\ndone:\n  ares_free(addresses);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          346,
+          0
+        ],
+        [
+          451,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_enumerate",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static unsigned char count_addr_bits(const unsigned char *addr, size_t addr_len)\n{\n  size_t        i;\n  unsigned char count = 0;\n\n  for (i = 0; i < addr_len; i++) {\n    count += ares_count_bits_u8(addr[i]);\n  }\n  return count;\n}",
+      "fn_code_pos": [
+        [
+          455,
+          0
+        ],
+        [
+          464,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "count_addr_bits",
+        "parameters": {
+          "addr": "unsigned char",
+          "addr_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_iface_ips_enumerate(ares_iface_ips_t *ips,\n                                              const char       *name)\n{\n  struct ifaddrs *ifap   = NULL;\n  struct ifaddrs *ifa    = NULL;\n  ares_status_t   status = ARES_SUCCESS;\n\n  if (getifaddrs(&ifap) != 0) {\n    status = ARES_EFILE;\n    goto done;\n  }\n\n  for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {\n    ares_iface_ip_flags_t addrflag = 0;\n    struct ares_addr      addr;\n    unsigned char         netmask  = 0;\n    unsigned int          ll_scope = 0;\n\n    if (ifa->ifa_addr == NULL) {\n      continue;\n    }\n\n    if (!(ifa->ifa_flags & IFF_UP)) {\n      addrflag |= ARES_IFACE_IP_OFFLINE;\n    }\n\n    if (ifa->ifa_flags & IFF_LOOPBACK) {\n      addrflag |= ARES_IFACE_IP_LOOPBACK;\n    }\n\n    if (ifa->ifa_addr->sa_family == AF_INET) {\n      const struct sockaddr_in *sockaddr_in =\n        (const struct sockaddr_in *)((void *)ifa->ifa_addr);\n      addr.family = AF_INET;\n      memcpy(&addr.addr.addr4, &sockaddr_in->sin_addr, sizeof(addr.addr.addr4));\n      /* netmask */\n      sockaddr_in = (struct sockaddr_in *)((void *)ifa->ifa_netmask);\n      netmask     = count_addr_bits((const void *)&sockaddr_in->sin_addr, 4);\n    } else if (ifa->ifa_addr->sa_family == AF_INET6) {\n      const struct sockaddr_in6 *sockaddr_in6 =\n        (const struct sockaddr_in6 *)((void *)ifa->ifa_addr);\n      addr.family = AF_INET6;\n      memcpy(&addr.addr.addr6, &sockaddr_in6->sin6_addr,\n             sizeof(addr.addr.addr6));\n      /* netmask */\n      sockaddr_in6 = (struct sockaddr_in6 *)((void *)ifa->ifa_netmask);\n      netmask = count_addr_bits((const void *)&sockaddr_in6->sin6_addr, 16);\n#  ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID\n      ll_scope = sockaddr_in6->sin6_scope_id;\n#  endif\n    } else {\n      /* unknown */\n      continue;\n    }\n\n    /* Name mismatch */\n    if (name != NULL && !ares_strcaseeq(ifa->ifa_name, name)) {\n      continue;\n    }\n\n    status = ares_iface_ips_add(ips, addrflag, ifa->ifa_name, &addr, netmask,\n                                ll_scope);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n  }\n\ndone:\n  freeifaddrs(ifap);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          466,
+          0
+        ],
+        [
+          536,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_enumerate",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_iface_ips_enumerate(ares_iface_ips_t *ips,\n                                              const char       *name)\n{\n  (void)ips;\n  (void)name;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          540,
+          0
+        ],
+        [
+          546,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_enumerate",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_os_if_nametoindex(const char *name)\n{\n#ifdef HAVE_IF_NAMETOINDEX\n  if (name == NULL) {\n    return 0;\n  }\n  return if_nametoindex(name);\n#else\n  ares_status_t     status;\n  ares_iface_ips_t *ips = NULL;\n  size_t            i;\n  unsigned int      index = 0;\n\n  if (name == NULL) {\n    return 0;\n  }\n\n  status =\n    ares_iface_ips(&ips, ARES_IFACE_IP_V6 | ARES_IFACE_IP_LINKLOCAL, name);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  for (i = 0; i < ares_iface_ips_cnt(ips); i++) {\n    if (ares_iface_ips_get_flags(ips, i) & ARES_IFACE_IP_LINKLOCAL) {\n      index = ares_iface_ips_get_ll_scope(ips, i);\n      goto done;\n    }\n  }\n\ndone:\n  ares_iface_ips_destroy(ips);\n  return index;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          551,
+          0
+        ],
+        [
+          585,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_os_if_nametoindex",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "const char *ares_os_if_indextoname(unsigned int index, char *name, size_t name_len)\n{\n#ifdef HAVE_IF_INDEXTONAME\n  if (name_len < IF_NAMESIZE) {\n    return NULL;\n  }\n  return if_indextoname(index, name);\n#else\n  ares_status_t     status;\n  ares_iface_ips_t *ips = NULL;\n  size_t            i;\n  const char       *ptr = NULL;\n\n  if (name == NULL || name_len < IF_NAMESIZE) {\n    goto done;\n  }\n\n  if (index == 0) {\n    goto done;\n  }\n\n  status =\n    ares_iface_ips(&ips, ARES_IFACE_IP_V6 | ARES_IFACE_IP_LINKLOCAL, NULL);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  for (i = 0; i < ares_iface_ips_cnt(ips); i++) {\n    if (ares_iface_ips_get_flags(ips, i) & ARES_IFACE_IP_LINKLOCAL &&\n        ares_iface_ips_get_ll_scope(ips, i) == index) {\n      ares_strcpy(name, ares_iface_ips_get_name(ips, i), name_len);\n      ptr = name;\n      goto done;\n    }\n  }\n\ndone:\n  ares_iface_ips_destroy(ips);\n  return ptr;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          587,
+          0
+        ],
+        [
+          627,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_os_if_indextoname",
+        "parameters": {
+          "index": "unsigned int",
+          "name": "char",
+          "name_len": "size_t"
+        },
+        "return_type": "char"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_iface_ips_enumerate(ares_iface_ips_t *ips,\n                                              const char       *name)",
+      "fn_dec_pos": [
+        [
+          61,
+          21
+        ],
+        [
+          62,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_enumerate",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_iface_ips_alloc(ares_iface_ip_flags_t flags)",
+      "fn_dec_pos": [
+        [
+          86,
+          25
+        ],
+        [
+          86,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_alloc",
+        "parameters": {
+          "flags": "ares_iface_ip_flags_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_iface_ips_get_name(const ares_iface_ips_t *ips, size_t idx)",
+      "fn_dec_pos": [
+        [
+          219,
+          12
+        ],
+        [
+          219,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_name",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_iface_ips_get_addr(const ares_iface_ips_t *ips,\n                                                size_t                  idx)",
+      "fn_dec_pos": [
+        [
+          235,
+          24
+        ],
+        [
+          236,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iface_ips_get_addr",
+        "parameters": {
+          "ips": "ares_iface_ips_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "wcharp_to_charp(const wchar_t *in)",
+      "fn_dec_pos": [
+        [
+          307,
+          13
+        ],
+        [
+          307,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "wcharp_to_charp",
+        "parameters": {
+          "in": "wchar_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_os_if_indextoname(unsigned int index, char *name, size_t name_len)",
+      "fn_dec_pos": [
+        [
+          587,
+          12
+        ],
+        [
+          587,
+          83
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_os_if_indextoname",
+        "parameters": {
+          "index": "unsigned int",
+          "name": "char",
+          "name_len": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  char                 *name;\n  struct ares_addr      addr;\n  unsigned char         netmask;\n  unsigned int          ll_scope;\n  ares_iface_ip_flags_t flags;\n} ares_iface_ip_t;",
+      {
+        "*name": "char",
+        "addr": "struct ares_addr",
+        "netmask": "unsigned char",
+        "ll_scope": "unsigned int",
+        "flags": "ares_iface_ip_flags_t"
+      },
+      "ares_iface_ip_t",
+      [
+        64,
+        0
+      ],
+      [
+        70,
+        18
+      ]
+    ],
+    [
+      "struct ares_iface_ips {\n  ares_array_t         *ips; /*!< Type is ares_iface_ip_t */\n  ares_iface_ip_flags_t enum_flags;\n}",
+      {
+        "*ips": "ares_array_t",
+        "enum_flags": "ares_iface_ip_flags_t"
+      },
+      "ares_iface_ips",
+      [
+        72,
+        0
+      ],
+      [
+        75,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  char                 *name;\n  struct ares_addr      addr;\n  unsigned char         netmask;\n  unsigned int          ll_scope;\n  ares_iface_ip_flags_t flags;\n} ares_iface_ip_t;",
+      {
+        "*name": "char",
+        "addr": "struct ares_addr",
+        "netmask": "unsigned char",
+        "ll_scope": "unsigned int",
+        "flags": "ares_iface_ip_flags_t"
+      },
+      "ares_iface_ip_t",
+      [
+        64,
+        0
+      ],
+      [
+        70,
+        18
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        66,
+        2
+      ],
+      [
+        66,
+        18
+      ]
+    ],
+    [
+      "struct ares_iface_ips {\n  ares_array_t         *ips; /*!< Type is ares_iface_ip_t */\n  ares_iface_ip_flags_t enum_flags;\n}",
+      {
+        "*ips": "ares_array_t",
+        "enum_flags": "ares_iface_ip_flags_t"
+      },
+      "ares_iface_ips",
+      [
+        72,
+        0
+      ],
+      [
+        75,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        140,
+        45
+      ],
+      [
+        140,
+        61
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        235,
+        6
+      ],
+      [
+        235,
+        22
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        406,
+        6
+      ],
+      [
+        406,
+        22
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        409,
+        14
+      ],
+      [
+        409,
+        32
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        410,
+        17
+      ],
+      [
+        410,
+        35
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        415,
+        14
+      ],
+      [
+        415,
+        33
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        416,
+        17
+      ],
+      [
+        416,
+        36
+      ]
+    ],
+    [
+      "struct ifaddrs",
+      {},
+      "",
+      [
+        469,
+        2
+      ],
+      [
+        469,
+        16
+      ]
+    ],
+    [
+      "struct ifaddrs",
+      {},
+      "",
+      [
+        470,
+        2
+      ],
+      [
+        470,
+        16
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        480,
+        4
+      ],
+      [
+        480,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        497,
+        12
+      ],
+      [
+        497,
+        30
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        498,
+        15
+      ],
+      [
+        498,
+        33
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        502,
+        21
+      ],
+      [
+        502,
+        39
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        505,
+        12
+      ],
+      [
+        505,
+        31
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        506,
+        15
+      ],
+      [
+        506,
+        34
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        511,
+        22
+      ],
+      [
+        511,
+        41
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#  include <winsock2.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <ws2tcpip.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#    include <iphlpapi.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#    include <netioapi.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/socket.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#  include <net/if.h>\n",
+      [
+        45,
+        0
+      ],
+      [
+        46,
+        0
+      ]
+    ],
+    [
+      "#  include <ifaddrs.h>\n",
+      [
+        48,
+        0
+      ],
+      [
+        49,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/ioctl.h>\n",
+      [
+        51,
+        0
+      ],
+      [
+        52,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        57,
+        0
+      ],
+      [
+        58,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

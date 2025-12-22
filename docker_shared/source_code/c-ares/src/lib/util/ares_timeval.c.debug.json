@@ -1,0 +1,128 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_tvnow(ares_timeval_t *now)\n{\n  /* QueryPerformanceCounters() has been around since Windows 2000, though\n   * significant fixes were made in later versions.  Documentation states\n   * 1 microsecond or better resolution with a rollover not less than 100 years.\n   * This differs from GetTickCount{64}() which has a resolution between 10 and\n   * 16 ms. */\n  LARGE_INTEGER freq;\n  LARGE_INTEGER current;\n\n  /* Not sure how long it takes to get the frequency, I see it recommended to\n   * cache it */\n  QueryPerformanceFrequency(&freq);\n  QueryPerformanceCounter(&current);\n\n  now->sec = current.QuadPart / freq.QuadPart;\n  /* We want to prevent overflows so we get the remainder, then multiply to\n   * microseconds before dividing */\n  now->usec = (unsigned int)(((current.QuadPart % freq.QuadPart) * 1000000) /\n                             freq.QuadPart);\n}",
+      "fn_code_pos": [
+        [
+          30,
+          0
+        ],
+        [
+          50,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tvnow",
+        "parameters": {
+          "now": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_tvnow(ares_timeval_t *now)\n{\n  /* clock_gettime() is guaranteed to be increased monotonically when the\n   * monotonic clock is queried. Time starting point is unspecified, it\n   * could be the system start-up time, the Epoch, or something else,\n   * in any case the time starting point does not change once that the\n   * system has started up. */\n  struct timespec tsnow;\n\n  if (clock_gettime(CLOCK_MONOTONIC, &tsnow) == 0) {\n    now->sec  = (ares_int64_t)tsnow.tv_sec;\n    now->usec = (unsigned int)(tsnow.tv_nsec / 1000);\n  } else {\n    /* LCOV_EXCL_START: FallbackCode */\n    struct timeval tv;\n    (void)gettimeofday(&tv, NULL);\n    now->sec  = (ares_int64_t)tv.tv_sec;\n    now->usec = (unsigned int)tv.tv_usec;\n    /* LCOV_EXCL_STOP */\n  }\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          74,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tvnow",
+        "parameters": {
+          "now": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_tvnow(ares_timeval_t *now)\n{\n  /* gettimeofday() is not granted to be increased monotonically, due to\n   * clock drifting and external source time synchronization it can jump\n   * forward or backward in time. */\n  struct timeval tv;\n\n  (void)gettimeofday(&tv, NULL);\n  now->sec  = (ares_int64_t)tv.tv_sec;\n  now->usec = (unsigned int)tv.tv_usec;\n}",
+      "fn_code_pos": [
+        [
+          78,
+          0
+        ],
+        [
+          88,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tvnow",
+        "parameters": {
+          "now": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct timespec",
+      {},
+      "",
+      [
+        61,
+        2
+      ],
+      [
+        61,
+        17
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        68,
+        4
+      ],
+      [
+        68,
+        18
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        83,
+        2
+      ],
+      [
+        83,
+        16
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

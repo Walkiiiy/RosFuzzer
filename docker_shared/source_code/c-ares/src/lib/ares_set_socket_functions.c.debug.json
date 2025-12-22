@@ -1,0 +1,875 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_status_t\n  ares_set_socket_functions_ex(ares_channel_t                        *channel,\n                               const struct ares_socket_functions_ex *funcs,\n                               void                                  *user_data)\n{\n  unsigned int known_versions[] = { 1 };\n  size_t       i;\n\n  if (channel == NULL || funcs == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* Check to see if we know the version referenced */\n  for (i = 0; i < sizeof(known_versions) / sizeof(*known_versions); i++) {\n    if (funcs->version == known_versions[i]) {\n      break;\n    }\n  }\n  if (i == sizeof(known_versions) / sizeof(*known_versions)) {\n    return ARES_EFORMERR;\n  }\n\n  memset(&channel->sock_funcs, 0, sizeof(channel->sock_funcs));\n\n  /* Copy individually for ABI compliance.  memcpy() with a sizeof would do\n   * invalid reads */\n  if (funcs->version >= 1) {\n    if (funcs->asocket == NULL || funcs->aclose == NULL ||\n        funcs->asetsockopt == NULL || funcs->aconnect == NULL ||\n        funcs->arecvfrom == NULL || funcs->asendto == NULL) {\n      return ARES_EFORMERR;\n    }\n    channel->sock_funcs.version      = funcs->version;\n    channel->sock_funcs.flags        = funcs->flags;\n    channel->sock_funcs.asocket      = funcs->asocket;\n    channel->sock_funcs.aclose       = funcs->aclose;\n    channel->sock_funcs.asetsockopt  = funcs->asetsockopt;\n    channel->sock_funcs.aconnect     = funcs->aconnect;\n    channel->sock_funcs.arecvfrom    = funcs->arecvfrom;\n    channel->sock_funcs.asendto      = funcs->asendto;\n    channel->sock_funcs.agetsockname = funcs->agetsockname;\n    channel->sock_funcs.abind        = funcs->abind;\n    channel->sock_funcs.aif_nametoindex = funcs->aif_nametoindex;\n    channel->sock_funcs.aif_indextoname = funcs->aif_indextoname;\n  }\n\n  /* Implement newer versions here ...*/\n\n\n  channel->sock_func_cb_data = user_data;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          87,
+          0
+        ],
+        [
+          139,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_functions_ex",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "funcs": "struct ares_socket_functions_ex",
+          "user_data": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static int setsocknonblock(ares_socket_t sockfd, /* operate on this */\n                           int           nonblock /* TRUE or FALSE */)\n{\n#if defined(HAVE_FCNTL_O_NONBLOCK)\n\n  /* most recent unix versions */\n  int flags;\n  flags = fcntl(sockfd, F_GETFL, 0);\n  if (nonblock) {\n    return fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);\n  } else {\n    return fcntl(sockfd, F_SETFL, flags & (~O_NONBLOCK)); /* LCOV_EXCL_LINE */\n  }\n\n#elif defined(HAVE_IOCTL_FIONBIO)\n\n  /* older unix versions */\n  int flags = nonblock ? 1 : 0;\n  return ioctl(sockfd, FIONBIO, &flags);\n\n#elif defined(HAVE_IOCTLSOCKET_FIONBIO)\n\n#  ifdef WATT32\n  char flags = nonblock ? 1 : 0;\n#  else\n  /* Windows */\n  unsigned long flags = nonblock ? 1UL : 0UL;\n#  endif\n  return ioctlsocket(sockfd, (long)FIONBIO, &flags);\n\n#elif defined(HAVE_IOCTLSOCKET_CAMEL_FIONBIO)\n\n  /* Amiga */\n  long flags = nonblock ? 1L : 0L;\n  return IoctlSocket(sockfd, FIONBIO, flags);\n\n#elif defined(HAVE_SETSOCKOPT_SO_NONBLOCK)\n\n  /* BeOS */\n  long b = nonblock ? 1L : 0L;\n  return setsockopt(sockfd, SOL_SOCKET, SO_NONBLOCK, &b, sizeof(b));\n\n#else\n#  error \"no non-blocking method was found/used/set\"\n#endif\n}",
+      "fn_code_pos": [
+        [
+          141,
+          0
+        ],
+        [
+          186,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "setsocknonblock",
+        "parameters": {
+          "sockfd": "ares_socket_t",
+          "nonblock": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int default_aclose(ares_socket_t sock, void *user_data)\n{\n  (void)user_data;\n\n#if defined(HAVE_CLOSESOCKET)\n  return closesocket(sock);\n#elif defined(HAVE_CLOSESOCKET_CAMEL)\n  return CloseSocket(sock);\n#elif defined(HAVE_CLOSE_S)\n  return close_s(sock);\n#else\n  return close(sock);\n#endif\n}",
+      "fn_code_pos": [
+        [
+          188,
+          0
+        ],
+        [
+          201,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_aclose",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_socket_t default_asocket(int domain, int type, int protocol,\n                                     void *user_data)\n{\n  ares_socket_t s;\n  (void)user_data;\n\n  s = socket(domain, type, protocol);\n  if (s == ARES_SOCKET_BAD) {\n    return s;\n  }\n\n  if (setsocknonblock(s, 1) != 0) {\n    goto fail; /* LCOV_EXCL_LINE */\n  }\n\n#if defined(FD_CLOEXEC) && !defined(MSDOS)\n  /* Configure the socket fd as close-on-exec. */\n  if (fcntl(s, F_SETFD, FD_CLOEXEC) != 0) {\n    goto fail; /* LCOV_EXCL_LINE */\n  }\n#endif\n\n  /* No need to emit SIGPIPE on socket errors */\n#if defined(SO_NOSIGPIPE)\n  {\n    int opt = 1;\n    (void)setsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, (void *)&opt, sizeof(opt));\n  }\n#endif\n\n\n  if (type == SOCK_STREAM) {\n    int opt = 1;\n\n#ifdef TCP_NODELAY\n    /*\n     * Disable the Nagle algorithm (only relevant for TCP sockets, and thus not\n     * in configure_socket). In general, in DNS lookups we're pretty much\n     * interested in firing off a single request and then waiting for a reply,\n     * so batching isn't very interesting.\n     */\n    if (setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (void *)&opt, sizeof(opt)) !=\n        0) {\n      goto fail;\n    }\n#endif\n  }\n\n#if defined(IPV6_V6ONLY) && defined(USE_WINSOCK)\n  /* Support for IPv4-mapped IPv6 addresses.\n   * Linux kernel, NetBSD, FreeBSD and Darwin: default is off;\n   * Windows Vista and later: default is on;\n   * DragonFly BSD: acts like off, and dummy setting;\n   * OpenBSD and earlier Windows: unsupported.\n   * Linux: controlled by /proc/sys/net/ipv6/bindv6only.\n   */\n  if (domain == PF_INET6) {\n    int on = 0;\n    (void)setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, (void *)&on, sizeof(on));\n  }\n#endif\n\n  return s;\n\nfail:\n  default_aclose(s, user_data);\n  return ARES_SOCKET_BAD;\n}",
+      "fn_code_pos": [
+        [
+          203,
+          0
+        ],
+        [
+          270,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_asocket",
+        "parameters": {
+          "domain": "int",
+          "type": "int",
+          "protocol": "int",
+          "user_data": "void"
+        },
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "static int default_asetsockopt(ares_socket_t sock, ares_socket_opt_t opt,\n                               const void *val, ares_socklen_t val_size,\n                               void *user_data)\n{\n  switch (opt) {\n    case ARES_SOCKET_OPT_SENDBUF_SIZE:\n      if (val_size != sizeof(int)) {\n        SET_SOCKERRNO(EINVAL);\n        return -1;\n      }\n      return setsockopt(sock, SOL_SOCKET, SO_SNDBUF, val, val_size);\n\n    case ARES_SOCKET_OPT_RECVBUF_SIZE:\n      if (val_size != sizeof(int)) {\n        SET_SOCKERRNO(EINVAL);\n        return -1;\n      }\n      return setsockopt(sock, SOL_SOCKET, SO_RCVBUF, val, val_size);\n\n    case ARES_SOCKET_OPT_BIND_DEVICE:\n      /* Count the number of characters before NULL terminator then\n       * validate those are all printable */\n      if (!ares_str_isprint(val, ares_strnlen(val, (size_t)val_size))) {\n        SET_SOCKERRNO(EINVAL);\n        return -1;\n      }\n#ifdef SO_BINDTODEVICE\n      return setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, val, val_size);\n#else\n      SET_SOCKERRNO(ENOSYS);\n      return -1;\n#endif\n\n    case ARES_SOCKET_OPT_TCP_FASTOPEN:\n      if (val_size != sizeof(ares_bool_t)) {\n        SET_SOCKERRNO(EINVAL);\n        return -1;\n      }\n#if defined(TFO_CLIENT_SOCKOPT)\n      {\n        int                oval;\n        const ares_bool_t *pval = val;\n        oval                    = (int)*pval;\n        return setsockopt(sock, IPPROTO_TCP, TFO_CLIENT_SOCKOPT, (void *)&oval,\n                          sizeof(oval));\n      }\n#elif TFO_SUPPORTED\n      return 0;\n#else\n      SET_SOCKERRNO(ENOSYS);\n      return -1;\n#endif\n  }\n\n  (void)user_data;\n  SET_SOCKERRNO(ENOSYS);\n  return -1;\n}",
+      "fn_code_pos": [
+        [
+          272,
+          0
+        ],
+        [
+          329,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_asetsockopt",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "opt": "ares_socket_opt_t",
+          "val": "void",
+          "val_size": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int default_aconnect(ares_socket_t sock, const struct sockaddr *address,\n                            ares_socklen_t address_len, unsigned int flags,\n                            void *user_data)\n{\n  (void)user_data;\n\n#if defined(TFO_SKIP_CONNECT) && TFO_SKIP_CONNECT\n  if (flags & ARES_SOCKET_CONN_TCP_FASTOPEN) {\n    return 0;\n  }\n  return connect(sock, address, address_len);\n#elif defined(TFO_USE_CONNECTX) && TFO_USE_CONNECTX\n  if (flags & ARES_SOCKET_CONN_TCP_FASTOPEN) {\n    sa_endpoints_t endpoints;\n\n    memset(&endpoints, 0, sizeof(endpoints));\n    endpoints.sae_dstaddr    = address;\n    endpoints.sae_dstaddrlen = address_len;\n\n    return connectx(sock, &endpoints, SAE_ASSOCID_ANY,\n                    CONNECT_DATA_IDEMPOTENT | CONNECT_RESUME_ON_READ_WRITE,\n                    NULL, 0, NULL, NULL);\n  } else {\n    return connect(sock, address, address_len);\n  }\n#else\n  (void)flags;\n  return connect(sock, address, address_len);\n#endif\n}",
+      "fn_code_pos": [
+        [
+          331,
+          0
+        ],
+        [
+          360,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_aconnect",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "flags": "unsigned int",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_ssize_t default_arecvfrom(ares_socket_t sock, void *buffer,\n                                      size_t length, int flags,\n                                      struct sockaddr *address,\n                                      ares_socklen_t  *address_len,\n                                      void            *user_data)\n{\n  (void)user_data;\n\n#ifdef HAVE_RECVFROM\n  return (ares_ssize_t)recvfrom(sock, buffer, (RECVFROM_TYPE_ARG3)length, flags,\n                                address, address_len);\n#else\n  if (address != NULL && address_len != NULL) {\n    memset(address, 0, (size_t)*address_len);\n    address->sa_family = AF_UNSPEC;\n  }\n  return (ares_ssize_t)recv(sock, buffer, (RECVFROM_TYPE_ARG3)length, flags);\n#endif\n}",
+      "fn_code_pos": [
+        [
+          362,
+          0
+        ],
+        [
+          380,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_arecvfrom",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "static ares_ssize_t default_asendto(ares_socket_t sock, const void *buffer,\n                                    size_t length, int flags,\n                                    const struct sockaddr *address,\n                                    ares_socklen_t address_len, void *user_data)\n{\n  (void)user_data;\n\n  if (address != NULL) {\n#ifdef HAVE_SENDTO\n    return (ares_ssize_t)sendto((SEND_TYPE_ARG1)sock, (SEND_TYPE_ARG2)buffer,\n                                (SEND_TYPE_ARG3)length, (SEND_TYPE_ARG4)flags,\n                                address, address_len);\n#else\n    (void)address_len;\n#endif\n  }\n\n  return (ares_ssize_t)send((SEND_TYPE_ARG1)sock, (SEND_TYPE_ARG2)buffer,\n                            (SEND_TYPE_ARG3)length, (SEND_TYPE_ARG4)flags);\n}",
+      "fn_code_pos": [
+        [
+          382,
+          0
+        ],
+        [
+          401,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_asendto",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "static int default_agetsockname(ares_socket_t sock, struct sockaddr *address,\n                                ares_socklen_t *address_len, void *user_data)\n{\n  (void)user_data;\n  return getsockname(sock, address, address_len);\n}",
+      "fn_code_pos": [
+        [
+          403,
+          0
+        ],
+        [
+          408,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_agetsockname",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int default_abind(ares_socket_t sock, unsigned int flags,\n                         const struct sockaddr *address, socklen_t address_len,\n                         void *user_data)\n{\n  (void)user_data;\n\n#ifdef IP_BIND_ADDRESS_NO_PORT\n  if (flags & ARES_SOCKET_BIND_TCP && flags & ARES_SOCKET_BIND_CLIENT) {\n    int opt = 1;\n    (void)setsockopt(sock, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &opt, sizeof(opt));\n  }\n#else\n  (void)flags;\n#endif\n\n  return bind(sock, address, address_len);\n}",
+      "fn_code_pos": [
+        [
+          410,
+          0
+        ],
+        [
+          426,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_abind",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "flags": "unsigned int",
+          "address": "struct sockaddr",
+          "address_len": "socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static unsigned int default_aif_nametoindex(const char *ifname, void *user_data)\n{\n  (void)user_data;\n  return ares_os_if_nametoindex(ifname);\n}",
+      "fn_code_pos": [
+        [
+          428,
+          0
+        ],
+        [
+          432,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_aif_nametoindex",
+        "parameters": {
+          "ifname": "char",
+          "user_data": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static const char *default_aif_indextoname(unsigned int ifindex,\n                                           char        *ifname_buf,\n                                           size_t       ifname_buf_len,\n                                           void        *user_data)\n{\n  (void)user_data;\n  return ares_os_if_indextoname(ifindex, ifname_buf, ifname_buf_len);\n}",
+      "fn_code_pos": [
+        [
+          434,
+          0
+        ],
+        [
+          441,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_aif_indextoname",
+        "parameters": {
+          "ifindex": "unsigned int",
+          "ifname_buf": "char",
+          "ifname_buf_len": "size_t",
+          "user_data": "void"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "void ares_set_socket_functions_def(ares_channel_t *channel)\n{\n  ares_set_socket_functions_ex(channel, &default_socket_functions, NULL);\n}",
+      "fn_code_pos": [
+        [
+          458,
+          0
+        ],
+        [
+          461,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_functions_def",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static int legacycb_aclose(ares_socket_t sock, void *user_data)\n{\n  ares_channel_t *channel = user_data;\n\n  if (channel->legacy_sock_funcs != NULL &&\n      channel->legacy_sock_funcs->aclose != NULL) {\n    return channel->legacy_sock_funcs->aclose(\n      sock, channel->legacy_sock_funcs_cb_data);\n  }\n\n  return default_aclose(sock, NULL);\n}",
+      "fn_code_pos": [
+        [
+          463,
+          0
+        ],
+        [
+          474,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_aclose",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_socket_t legacycb_asocket(int domain, int type, int protocol,\n                                      void *user_data)\n{\n  ares_channel_t *channel = user_data;\n\n  if (channel->legacy_sock_funcs != NULL &&\n      channel->legacy_sock_funcs->asocket != NULL) {\n    return channel->legacy_sock_funcs->asocket(\n      domain, type, protocol, channel->legacy_sock_funcs_cb_data);\n  }\n\n  return default_asocket(domain, type, protocol, NULL);\n}",
+      "fn_code_pos": [
+        [
+          476,
+          0
+        ],
+        [
+          488,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_asocket",
+        "parameters": {
+          "domain": "int",
+          "type": "int",
+          "protocol": "int",
+          "user_data": "void"
+        },
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "static int legacycb_asetsockopt(ares_socket_t sock, ares_socket_opt_t opt,\n                                const void *val, ares_socklen_t val_size,\n                                void *user_data)\n{\n  (void)sock;\n  (void)opt;\n  (void)val;\n  (void)val_size;\n  (void)user_data;\n  SET_SOCKERRNO(ENOSYS);\n  return -1;\n}",
+      "fn_code_pos": [
+        [
+          490,
+          0
+        ],
+        [
+          501,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_asetsockopt",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "opt": "ares_socket_opt_t",
+          "val": "void",
+          "val_size": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int legacycb_aconnect(ares_socket_t sock, const struct sockaddr *address,\n                             ares_socklen_t address_len, unsigned int flags,\n                             void *user_data)\n{\n  ares_channel_t *channel = user_data;\n\n  if (channel->legacy_sock_funcs != NULL &&\n      channel->legacy_sock_funcs->aconnect != NULL) {\n    return channel->legacy_sock_funcs->aconnect(\n      sock, address, address_len, channel->legacy_sock_funcs_cb_data);\n  }\n\n  return default_aconnect(sock, address, address_len, flags, NULL);\n}",
+      "fn_code_pos": [
+        [
+          503,
+          0
+        ],
+        [
+          516,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_aconnect",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "flags": "unsigned int",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_ssize_t legacycb_arecvfrom(ares_socket_t sock, void *buffer,\n                                       size_t length, int flags,\n                                       struct sockaddr *address,\n                                       ares_socklen_t  *address_len,\n                                       void            *user_data)\n{\n  ares_channel_t *channel = user_data;\n\n  if (channel->legacy_sock_funcs != NULL &&\n      channel->legacy_sock_funcs->arecvfrom != NULL) {\n    if (address != NULL && address_len != NULL) {\n      memset(address, 0, (size_t)*address_len);\n      address->sa_family = AF_UNSPEC;\n    }\n    return channel->legacy_sock_funcs->arecvfrom(\n      sock, buffer, length, flags, address, address_len,\n      channel->legacy_sock_funcs_cb_data);\n  }\n\n  return default_arecvfrom(sock, buffer, length, flags, address, address_len,\n                           NULL);\n}",
+      "fn_code_pos": [
+        [
+          518,
+          0
+        ],
+        [
+          539,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_arecvfrom",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "static ares_ssize_t legacycb_asendto(ares_socket_t sock, const void *buffer,\n                                     size_t length, int flags,\n                                     const struct sockaddr *address,\n                                     ares_socklen_t         address_len,\n                                     void                  *user_data)\n{\n  ares_channel_t *channel = user_data;\n\n  if (channel->legacy_sock_funcs != NULL &&\n      channel->legacy_sock_funcs->asendv != NULL) {\n    struct iovec vec;\n    vec.iov_base = (void *)((size_t)buffer); /* Cast off const */\n    vec.iov_len  = length;\n    return channel->legacy_sock_funcs->asendv(\n      sock, &vec, 1, channel->legacy_sock_funcs_cb_data);\n  }\n\n  return default_asendto(sock, buffer, length, flags, address, address_len,\n                         NULL);\n}",
+      "fn_code_pos": [
+        [
+          541,
+          0
+        ],
+        [
+          560,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "legacycb_asendto",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "void ares_set_socket_functions(ares_channel_t                     *channel,\n                               const struct ares_socket_functions *funcs,\n                               void                               *data)\n{\n  if (channel == NULL || channel->optmask & ARES_OPT_EVENT_THREAD) {\n    return;\n  }\n\n  channel->legacy_sock_funcs         = funcs;\n  channel->legacy_sock_funcs_cb_data = data;\n  ares_set_socket_functions_ex(channel, &legacy_socket_functions, channel);\n}",
+      "fn_code_pos": [
+        [
+          578,
+          0
+        ],
+        [
+          589,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_functions",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "funcs": "struct ares_socket_functions",
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "default_aif_indextoname(unsigned int ifindex,\n                                           char        *ifname_buf,\n                                           size_t       ifname_buf_len,\n                                           void        *user_data)",
+      "fn_dec_pos": [
+        [
+          434,
+          19
+        ],
+        [
+          437,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_aif_indextoname",
+        "parameters": {
+          "ifindex": "unsigned int",
+          "ifname_buf": "char",
+          "ifname_buf_len": "size_t",
+          "user_data": "void"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct iovec {\n  void  *iov_base; /* Pointer to data. */\n  size_t iov_len;  /* Length of data.  */\n}",
+      {
+        "*iov_base": "void",
+        "iov_len": "size_t"
+      },
+      "iovec",
+      [
+        81,
+        0
+      ],
+      [
+        84,
+        1
+      ]
+    ],
+    [
+      "struct iovec {\n  void  *iov_base; /* Pointer to data. */\n  size_t iov_len;  /* Length of data.  */\n}",
+      {
+        "*iov_base": "void",
+        "iov_len": "size_t"
+      },
+      "iovec",
+      [
+        81,
+        0
+      ],
+      [
+        84,
+        1
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex",
+      {},
+      "",
+      [
+        89,
+        37
+      ],
+      [
+        89,
+        68
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        331,
+        54
+      ],
+      [
+        331,
+        69
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        364,
+        38
+      ],
+      [
+        364,
+        53
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        384,
+        42
+      ],
+      [
+        384,
+        57
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        403,
+        52
+      ],
+      [
+        403,
+        67
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        411,
+        31
+      ],
+      [
+        411,
+        46
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex",
+      {},
+      "",
+      [
+        443,
+        13
+      ],
+      [
+        443,
+        44
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        503,
+        55
+      ],
+      [
+        503,
+        70
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        520,
+        39
+      ],
+      [
+        520,
+        54
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        543,
+        43
+      ],
+      [
+        543,
+        58
+      ]
+    ],
+    [
+      "struct iovec",
+      {},
+      "",
+      [
+        551,
+        4
+      ],
+      [
+        551,
+        16
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex",
+      {},
+      "",
+      [
+        563,
+        13
+      ],
+      [
+        563,
+        44
+      ]
+    ],
+    [
+      "struct ares_socket_functions",
+      {},
+      "",
+      [
+        579,
+        37
+      ],
+      [
+        579,
+        65
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/uio.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/tcp.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#  include <strings.h>\n",
+      [
+        43,
+        0
+      ],
+      [
+        44,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/ioctl.h>\n",
+      [
+        46,
+        0
+      ],
+      [
+        47,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/filio.h>\n",
+      [
+        49,
+        0
+      ],
+      [
+        50,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        52,
+        0
+      ],
+      [
+        53,
+        0
+      ]
+    ],
+    [
+      "#include <fcntl.h>\n",
+      [
+        53,
+        0
+      ],
+      [
+        54,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

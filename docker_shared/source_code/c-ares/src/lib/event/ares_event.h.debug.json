@@ -1,0 +1,517 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_event_cb_t)(ares_event_thread_t *e, ares_socket_t fd,\n                                void *data, ares_event_flags_t flags)",
+      "fn_dec_pos": [
+        [
+          38,
+          13
+        ],
+        [
+          39,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_event_free_data_t)(void *data)",
+      "fn_dec_pos": [
+        [
+          41,
+          13
+        ],
+        [
+          41,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_event_signal_cb_t)(const ares_event_t *event)",
+      "fn_dec_pos": [
+        [
+          43,
+          13
+        ],
+        [
+          43,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*init)(ares_event_thread_t *e)",
+      "fn_dec_pos": [
+        [
+          71,
+          14
+        ],
+        [
+          71,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "(*destroy)(ares_event_thread_t *e)",
+      "fn_dec_pos": [
+        [
+          72,
+          7
+        ],
+        [
+          72,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*event_add)(ares_event_t *event)",
+      "fn_dec_pos": [
+        [
+          73,
+          14
+        ],
+        [
+          73,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "(*event_del)(ares_event_t *event)",
+      "fn_dec_pos": [
+        [
+          74,
+          7
+        ],
+        [
+          74,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*event_mod)(ares_event_t *event, ares_event_flags_t new_flags)",
+      "fn_dec_pos": [
+        [
+          75,
+          7
+        ],
+        [
+          75,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*wait)(ares_event_thread_t *e, unsigned long timeout_ms)",
+      "fn_dec_pos": [
+        [
+          76,
+          9
+        ],
+        [
+          76,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)",
+      "fn_dec_pos": [
+        [
+          82,
+          14
+        ],
+        [
+          83,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_event_configchg_destroy(ares_event_configchg_t *configchg)",
+      "fn_dec_pos": [
+        [
+          85,
+          14
+        ],
+        [
+          85,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_event_update(ares_event_t **event, ares_event_thread_t *e,\n                                ares_event_flags_t flags, ares_event_cb_t cb,\n                                ares_socket_t fd, void *data,\n                                ares_event_free_data_t free_data_cb,\n                                ares_event_signal_cb_t signal_cb)",
+      "fn_dec_pos": [
+        [
+          154,
+          14
+        ],
+        [
+          158,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_update",
+        "parameters": {
+          "event": "ares_event_t",
+          "e": "ares_event_thread_t",
+          "flags": "ares_event_flags_t",
+          "cb": "ares_event_cb_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "free_data_cb": "ares_event_free_data_t",
+          "signal_cb": "ares_event_signal_cb_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_pipeevent_create(ares_event_thread_t *e)",
+      "fn_dec_pos": [
+        [
+          163,
+          14
+        ],
+        [
+          163,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_create",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_event {\n  /*! Registered event thread this event is bound to */\n  ares_event_thread_t   *e;\n  /*! Flags to monitor. OTHER is only allowed if the socket is ARES_SOCKET_BAD.\n   */\n  ares_event_flags_t     flags;\n  /*! Callback to be called when event is triggered */\n  ares_event_cb_t        cb;\n  /*! Socket to monitor, allowed to be ARES_SOCKET_BAD if not monitoring a\n   *  socket. */\n  ares_socket_t          fd;\n  /*! Data associated with event handle that will be passed to the callback.\n   *  Typically OS/event subsystem specific data.\n   *  Optional, may be NULL. */\n  /*! Data to be passed to callback. Optional, may be NULL. */\n  void                  *data;\n  /*! When cleaning up the registered event (either when removed or during\n   *  shutdown), this function will be called to clean up the user-supplied\n   *  data. Optional, May be NULL. */\n  ares_event_free_data_t free_data_cb;\n  /*! Callback to call to trigger an event. */\n  ares_event_signal_cb_t signal_cb;\n}",
+      {
+        "*e": "ares_event_thread_t",
+        "flags": "ares_event_flags_t",
+        "cb": "ares_event_cb_t",
+        "fd": "ares_socket_t",
+        "*data": "void",
+        "free_data_cb": "ares_event_free_data_t",
+        "signal_cb": "ares_event_signal_cb_t"
+      },
+      "ares_event",
+      [
+        45,
+        0
+      ],
+      [
+        67,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  const char *name;\n  ares_bool_t (*init)(ares_event_thread_t *e);\n  void (*destroy)(ares_event_thread_t *e);\n  ares_bool_t (*event_add)(ares_event_t *event);\n  void (*event_del)(ares_event_t *event);\n  void (*event_mod)(ares_event_t *event, ares_event_flags_t new_flags);\n  size_t (*wait)(ares_event_thread_t *e, unsigned long timeout_ms);\n} ares_event_sys_t;",
+      {
+        "char": "const",
+        "(*init)(ares_event_thread_t *e)": "ares_bool_t",
+        "(*destroy)(ares_event_thread_t *e)": "void",
+        "(*event_add)(ares_event_t *event)": "ares_bool_t",
+        "(*event_del)(ares_event_t *event)": "void",
+        "(*event_mod)(ares_event_t *event, ares_event_flags_t new_flags)": "void",
+        "(*wait)(ares_event_thread_t *e, unsigned long timeout_ms)": "size_t"
+      },
+      "ares_event_sys_t",
+      [
+        69,
+        0
+      ],
+      [
+        77,
+        19
+      ]
+    ],
+    [
+      "struct ares_event_thread {\n  /*! Whether the event thread should be online or not.  Checked on every wake\n   *  event before sleeping. */\n  ares_bool_t             isup;\n  /*! Handle to the thread for joining during shutdown */\n  ares_thread_t          *thread;\n  /*! Lock to protect the data contained within the event thread itself */\n  ares_thread_mutex_t    *mutex;\n  /*! Reference to the ares channel, for being able to call things like\n   *  ares_timeout() and ares_process_fd(). */\n  ares_channel_t         *channel;\n  /*! Whether or not on the next loop we should process a pending write */\n  ares_bool_t             process_pending_write;\n  /*! Not-yet-processed event handle updates.  These will get enqueued by a\n   *  thread other than the event thread itself. The event thread will then\n   *  be woken then process these updates itself */\n  ares_llist_t           *ev_updates;\n  /*! Registered socket event handles */\n  ares_htable_asvp_t     *ev_sock_handles;\n  /*! Registered custom event handles. Typically used for external triggering.\n   */\n  ares_htable_vpvp_t     *ev_cust_handles;\n  /*! Pointer to the event handle which is used to signal and wake the event\n   *  thread itself.  This is needed to be able to do things like update the\n   *  file descriptors being waited on and to wake the event subsystem during\n   *  shutdown */\n  ares_event_t           *ev_signal;\n  /*! Handle for configuration change monitoring */\n  ares_event_configchg_t *configchg;\n  /* Event subsystem callbacks */\n  const ares_event_sys_t *ev_sys;\n  /* Event subsystem private data */\n  void                   *ev_sys_data;\n}",
+      {
+        "isup": "ares_bool_t",
+        "*thread": "ares_thread_t",
+        "*mutex": "ares_thread_mutex_t",
+        "*channel": "ares_channel_t",
+        "process_pending_write": "ares_bool_t",
+        "*ev_updates": "ares_llist_t",
+        "*ev_sock_handles": "ares_htable_asvp_t",
+        "*ev_cust_handles": "ares_htable_vpvp_t",
+        "*ev_signal": "ares_event_t",
+        "*configchg": "ares_event_configchg_t",
+        "ares_event_sys_t": "const",
+        "*ev_sys_data": "void"
+      },
+      "ares_event_thread",
+      [
+        87,
+        0
+      ],
+      [
+        120,
+        1
+      ]
+    ],
+    [
+      "struct ares_event",
+      {},
+      "",
+      [
+        28,
+        0
+      ],
+      [
+        28,
+        17
+      ]
+    ],
+    [
+      "typedef struct ares_event ares_event_t;",
+      {},
+      "ares_event_t",
+      [
+        29,
+        0
+      ],
+      [
+        29,
+        39
+      ]
+    ],
+    [
+      "struct ares_event {\n  /*! Registered event thread this event is bound to */\n  ares_event_thread_t   *e;\n  /*! Flags to monitor. OTHER is only allowed if the socket is ARES_SOCKET_BAD.\n   */\n  ares_event_flags_t     flags;\n  /*! Callback to be called when event is triggered */\n  ares_event_cb_t        cb;\n  /*! Socket to monitor, allowed to be ARES_SOCKET_BAD if not monitoring a\n   *  socket. */\n  ares_socket_t          fd;\n  /*! Data associated with event handle that will be passed to the callback.\n   *  Typically OS/event subsystem specific data.\n   *  Optional, may be NULL. */\n  /*! Data to be passed to callback. Optional, may be NULL. */\n  void                  *data;\n  /*! When cleaning up the registered event (either when removed or during\n   *  shutdown), this function will be called to clean up the user-supplied\n   *  data. Optional, May be NULL. */\n  ares_event_free_data_t free_data_cb;\n  /*! Callback to call to trigger an event. */\n  ares_event_signal_cb_t signal_cb;\n}",
+      {
+        "*e": "ares_event_thread_t",
+        "flags": "ares_event_flags_t",
+        "cb": "ares_event_cb_t",
+        "fd": "ares_socket_t",
+        "*data": "void",
+        "free_data_cb": "ares_event_free_data_t",
+        "signal_cb": "ares_event_signal_cb_t"
+      },
+      "ares_event",
+      [
+        45,
+        0
+      ],
+      [
+        67,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  const char *name;\n  ares_bool_t (*init)(ares_event_thread_t *e);\n  void (*destroy)(ares_event_thread_t *e);\n  ares_bool_t (*event_add)(ares_event_t *event);\n  void (*event_del)(ares_event_t *event);\n  void (*event_mod)(ares_event_t *event, ares_event_flags_t new_flags);\n  size_t (*wait)(ares_event_thread_t *e, unsigned long timeout_ms);\n} ares_event_sys_t;",
+      {
+        "char": "const",
+        "(*init)(ares_event_thread_t *e)": "ares_bool_t",
+        "(*destroy)(ares_event_thread_t *e)": "void",
+        "(*event_add)(ares_event_t *event)": "ares_bool_t",
+        "(*event_del)(ares_event_t *event)": "void",
+        "(*event_mod)(ares_event_t *event, ares_event_flags_t new_flags)": "void",
+        "(*wait)(ares_event_thread_t *e, unsigned long timeout_ms)": "size_t"
+      },
+      "ares_event_sys_t",
+      [
+        69,
+        0
+      ],
+      [
+        77,
+        19
+      ]
+    ],
+    [
+      "struct ares_event_configchg",
+      {},
+      "",
+      [
+        79,
+        0
+      ],
+      [
+        79,
+        27
+      ]
+    ],
+    [
+      "typedef struct ares_event_configchg ares_event_configchg_t;",
+      {},
+      "ares_event_configchg_t",
+      [
+        80,
+        0
+      ],
+      [
+        80,
+        59
+      ]
+    ],
+    [
+      "struct ares_event_thread {\n  /*! Whether the event thread should be online or not.  Checked on every wake\n   *  event before sleeping. */\n  ares_bool_t             isup;\n  /*! Handle to the thread for joining during shutdown */\n  ares_thread_t          *thread;\n  /*! Lock to protect the data contained within the event thread itself */\n  ares_thread_mutex_t    *mutex;\n  /*! Reference to the ares channel, for being able to call things like\n   *  ares_timeout() and ares_process_fd(). */\n  ares_channel_t         *channel;\n  /*! Whether or not on the next loop we should process a pending write */\n  ares_bool_t             process_pending_write;\n  /*! Not-yet-processed event handle updates.  These will get enqueued by a\n   *  thread other than the event thread itself. The event thread will then\n   *  be woken then process these updates itself */\n  ares_llist_t           *ev_updates;\n  /*! Registered socket event handles */\n  ares_htable_asvp_t     *ev_sock_handles;\n  /*! Registered custom event handles. Typically used for external triggering.\n   */\n  ares_htable_vpvp_t     *ev_cust_handles;\n  /*! Pointer to the event handle which is used to signal and wake the event\n   *  thread itself.  This is needed to be able to do things like update the\n   *  file descriptors being waited on and to wake the event subsystem during\n   *  shutdown */\n  ares_event_t           *ev_signal;\n  /*! Handle for configuration change monitoring */\n  ares_event_configchg_t *configchg;\n  /* Event subsystem callbacks */\n  const ares_event_sys_t *ev_sys;\n  /* Event subsystem private data */\n  void                   *ev_sys_data;\n}",
+      {
+        "isup": "ares_bool_t",
+        "*thread": "ares_thread_t",
+        "*mutex": "ares_thread_mutex_t",
+        "*channel": "ares_channel_t",
+        "process_pending_write": "ares_bool_t",
+        "*ev_updates": "ares_llist_t",
+        "*ev_sock_handles": "ares_htable_asvp_t",
+        "*ev_cust_handles": "ares_htable_vpvp_t",
+        "*ev_signal": "ares_event_t",
+        "*configchg": "ares_event_configchg_t",
+        "ares_event_sys_t": "const",
+        "*ev_sys_data": "void"
+      },
+      "ares_event_thread",
+      [
+        87,
+        0
+      ],
+      [
+        120,
+        1
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_EVENT_FLAG_NONE  = 0,\n  ARES_EVENT_FLAG_READ  = 1 << 0,\n  ARES_EVENT_FLAG_WRITE = 1 << 1,\n  ARES_EVENT_FLAG_OTHER = 1 << 2\n} ares_event_flags_t;",
+      {
+        "ARES_EVENT_FLAG_NONE": "",
+        "ARES_EVENT_FLAG_READ": "",
+        "ARES_EVENT_FLAG_WRITE": "",
+        "ARES_EVENT_FLAG_OTHER": ""
+      },
+      "ares_event_flags_t",
+      [
+        31,
+        0
+      ],
+      [
+        36,
+        21
+      ]
+    ]
+  ]
+}

@@ -1,0 +1,1951 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_dns_qd_free_cb(void *arg)\n{\n  ares_dns_qd_t *qd = arg;\n  if (qd == NULL) {\n    return;\n  }\n  ares_free(qd->name);\n}",
+      "fn_code_pos": [
+        [
+          33,
+          0
+        ],
+        [
+          40,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_qd_free_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_dns_rr_free_cb(void *arg)\n{\n  ares_dns_rr_t *rr = arg;\n  if (rr == NULL) {\n    return;\n  }\n  ares_dns_rr_free(rr);\n}",
+      "fn_code_pos": [
+        [
+          42,
+          0
+        ],
+        [
+          49,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_free_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_create(ares_dns_record_t **dnsrec,\n                                     unsigned short id, unsigned short flags,\n                                     ares_dns_opcode_t opcode,\n                                     ares_dns_rcode_t  rcode)\n{\n  if (dnsrec == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *dnsrec = NULL;\n\n  if (!ares_dns_opcode_isvalid(opcode) || !ares_dns_rcode_isvalid(rcode) ||\n      !ares_dns_flags_arevalid(flags)) {\n    return ARES_EFORMERR;\n  }\n\n  *dnsrec = ares_malloc_zero(sizeof(**dnsrec));\n  if (*dnsrec == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  (*dnsrec)->id     = id;\n  (*dnsrec)->flags  = flags;\n  (*dnsrec)->opcode = opcode;\n  (*dnsrec)->rcode  = rcode;\n  (*dnsrec)->qd = ares_array_create(sizeof(ares_dns_qd_t), ares_dns_qd_free_cb);\n  (*dnsrec)->an = ares_array_create(sizeof(ares_dns_rr_t), ares_dns_rr_free_cb);\n  (*dnsrec)->ns = ares_array_create(sizeof(ares_dns_rr_t), ares_dns_rr_free_cb);\n  (*dnsrec)->ar = ares_array_create(sizeof(ares_dns_rr_t), ares_dns_rr_free_cb);\n\n  if ((*dnsrec)->qd == NULL || (*dnsrec)->an == NULL || (*dnsrec)->ns == NULL ||\n      (*dnsrec)->ar == NULL) {\n    ares_dns_record_destroy(*dnsrec);\n    *dnsrec = NULL;\n    return ARES_ENOMEM;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          89,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_create",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "id": "unsigned short",
+          "flags": "unsigned short",
+          "opcode": "ares_dns_opcode_t",
+          "rcode": "ares_dns_rcode_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_dns_record_get_id(const ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return 0;\n  }\n  return dnsrec->id;\n}",
+      "fn_code_pos": [
+        [
+          91,
+          0
+        ],
+        [
+          97,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_get_id",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_record_set_id(ares_dns_record_t *dnsrec, unsigned short id)\n{\n  if (dnsrec == NULL) {\n    return ARES_FALSE;\n  }\n  dnsrec->id = id;\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          99,
+          0
+        ],
+        [
+          106,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_set_id",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "id": "unsigned short"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_dns_record_get_flags(const ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return 0;\n  }\n  return dnsrec->flags;\n}",
+      "fn_code_pos": [
+        [
+          108,
+          0
+        ],
+        [
+          114,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_get_flags",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_opcode_t ares_dns_record_get_opcode(const ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return 0;\n  }\n  return dnsrec->opcode;\n}",
+      "fn_code_pos": [
+        [
+          116,
+          0
+        ],
+        [
+          122,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_get_opcode",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_opcode_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_rcode_t ares_dns_record_get_rcode(const ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return 0;\n  }\n  return dnsrec->rcode;\n}",
+      "fn_code_pos": [
+        [
+          124,
+          0
+        ],
+        [
+          130,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_get_rcode",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_rcode_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_dns_rr_free(ares_dns_rr_t *rr)\n{\n  ares_free(rr->name);\n\n  switch (rr->type) {\n    case ARES_REC_TYPE_A:\n    case ARES_REC_TYPE_AAAA:\n    case ARES_REC_TYPE_ANY:\n      /* Nothing to free */\n      break;\n\n    case ARES_REC_TYPE_NS:\n      ares_free(rr->r.ns.nsdname);\n      break;\n\n    case ARES_REC_TYPE_CNAME:\n      ares_free(rr->r.cname.cname);\n      break;\n\n    case ARES_REC_TYPE_SOA:\n      ares_free(rr->r.soa.mname);\n      ares_free(rr->r.soa.rname);\n      break;\n\n    case ARES_REC_TYPE_PTR:\n      ares_free(rr->r.ptr.dname);\n      break;\n\n    case ARES_REC_TYPE_HINFO:\n      ares_free(rr->r.hinfo.cpu);\n      ares_free(rr->r.hinfo.os);\n      break;\n\n    case ARES_REC_TYPE_MX:\n      ares_free(rr->r.mx.exchange);\n      break;\n\n    case ARES_REC_TYPE_TXT:\n      ares_dns_multistring_destroy(rr->r.txt.strs);\n      break;\n\n    case ARES_REC_TYPE_SIG:\n      ares_free(rr->r.sig.signers_name);\n      ares_free(rr->r.sig.signature);\n      break;\n\n    case ARES_REC_TYPE_SRV:\n      ares_free(rr->r.srv.target);\n      break;\n\n    case ARES_REC_TYPE_NAPTR:\n      ares_free(rr->r.naptr.flags);\n      ares_free(rr->r.naptr.services);\n      ares_free(rr->r.naptr.regexp);\n      ares_free(rr->r.naptr.replacement);\n      break;\n\n    case ARES_REC_TYPE_OPT:\n      ares_array_destroy(rr->r.opt.options);\n      break;\n\n    case ARES_REC_TYPE_TLSA:\n      ares_free(rr->r.tlsa.data);\n      break;\n\n    case ARES_REC_TYPE_SVCB:\n      ares_free(rr->r.svcb.target);\n      ares_array_destroy(rr->r.svcb.params);\n      break;\n\n    case ARES_REC_TYPE_HTTPS:\n      ares_free(rr->r.https.target);\n      ares_array_destroy(rr->r.https.params);\n      break;\n\n    case ARES_REC_TYPE_URI:\n      ares_free(rr->r.uri.target);\n      break;\n\n    case ARES_REC_TYPE_CAA:\n      ares_free(rr->r.caa.tag);\n      ares_free(rr->r.caa.value);\n      break;\n\n    case ARES_REC_TYPE_RAW_RR:\n      ares_free(rr->r.raw_rr.data);\n      break;\n  }\n}",
+      "fn_code_pos": [
+        [
+          132,
+          0
+        ],
+        [
+          220,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_free",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_dns_record_destroy(ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return;\n  }\n\n  /* Free questions */\n  ares_array_destroy(dnsrec->qd);\n\n  /* Free answers */\n  ares_array_destroy(dnsrec->an);\n\n  /* Free authority */\n  ares_array_destroy(dnsrec->ns);\n\n  /* Free additional */\n  ares_array_destroy(dnsrec->ar);\n\n  ares_free(dnsrec);\n}",
+      "fn_code_pos": [
+        [
+          222,
+          0
+        ],
+        [
+          241,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_destroy",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "size_t ares_dns_record_query_cnt(const ares_dns_record_t *dnsrec)\n{\n  if (dnsrec == NULL) {\n    return 0;\n  }\n  return ares_array_len(dnsrec->qd);\n}",
+      "fn_code_pos": [
+        [
+          243,
+          0
+        ],
+        [
+          249,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_query_cnt",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_query_add(ares_dns_record_t  *dnsrec,\n                                        const char         *name,\n                                        ares_dns_rec_type_t qtype,\n                                        ares_dns_class_t    qclass)\n{\n  size_t         idx;\n  ares_dns_qd_t *qd;\n  ares_status_t  status;\n\n  if (dnsrec == NULL || name == NULL ||\n      !ares_dns_rec_type_isvalid(qtype, ARES_TRUE) ||\n      !ares_dns_class_isvalid(qclass, qtype, ARES_TRUE)) {\n    return ARES_EFORMERR;\n  }\n\n  idx    = ares_array_len(dnsrec->qd);\n  status = ares_array_insert_last((void **)&qd, dnsrec->qd);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  qd->name = ares_strdup(name);\n  if (qd->name == NULL) {\n    ares_array_remove_at(dnsrec->qd, idx);\n    return ARES_ENOMEM;\n  }\n  qd->qtype  = qtype;\n  qd->qclass = qclass;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          251,
+          0
+        ],
+        [
+          280,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_query_add",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "name": "char",
+          "qtype": "ares_dns_rec_type_t",
+          "qclass": "ares_dns_class_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_query_set_name(ares_dns_record_t *dnsrec,\n                                             size_t idx, const char *name)\n{\n  char          *orig_name = NULL;\n  ares_dns_qd_t *qd;\n\n  if (dnsrec == NULL || idx >= ares_array_len(dnsrec->qd) || name == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  qd = ares_array_at(dnsrec->qd, idx);\n\n  orig_name = qd->name;\n  qd->name  = ares_strdup(name);\n  if (qd->name == NULL) {\n    qd->name = orig_name; /* LCOV_EXCL_LINE: OutOfMemory */\n    return ARES_ENOMEM;   /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  ares_free(orig_name);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          282,
+          0
+        ],
+        [
+          303,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_query_set_name",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "idx": "size_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_query_set_type(ares_dns_record_t  *dnsrec,\n                                             size_t              idx,\n                                             ares_dns_rec_type_t qtype)\n{\n  ares_dns_qd_t *qd;\n\n  if (dnsrec == NULL || idx >= ares_array_len(dnsrec->qd) ||\n      !ares_dns_rec_type_isvalid(qtype, ARES_TRUE)) {\n    return ARES_EFORMERR;\n  }\n\n  qd        = ares_array_at(dnsrec->qd, idx);\n  qd->qtype = qtype;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          305,
+          0
+        ],
+        [
+          320,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_query_set_type",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "idx": "size_t",
+          "qtype": "ares_dns_rec_type_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_query_get(const ares_dns_record_t *dnsrec,\n                                        size_t idx, const char **name,\n                                        ares_dns_rec_type_t *qtype,\n                                        ares_dns_class_t    *qclass)\n{\n  const ares_dns_qd_t *qd;\n  if (dnsrec == NULL || idx >= ares_array_len(dnsrec->qd)) {\n    return ARES_EFORMERR;\n  }\n\n  qd = ares_array_at(dnsrec->qd, idx);\n  if (name != NULL) {\n    *name = qd->name;\n  }\n\n  if (qtype != NULL) {\n    *qtype = qd->qtype;\n  }\n\n  if (qclass != NULL) {\n    *qclass = qd->qclass;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          322,
+          0
+        ],
+        [
+          346,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_query_get",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "idx": "size_t",
+          "name": "char",
+          "qtype": "ares_dns_rec_type_t",
+          "qclass": "ares_dns_class_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_dns_record_rr_cnt(const ares_dns_record_t *dnsrec,\n                              ares_dns_section_t       sect)\n{\n  if (dnsrec == NULL || !ares_dns_section_isvalid(sect)) {\n    return 0;\n  }\n\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n      return ares_array_len(dnsrec->an);\n    case ARES_SECTION_AUTHORITY:\n      return ares_array_len(dnsrec->ns);\n    case ARES_SECTION_ADDITIONAL:\n      return ares_array_len(dnsrec->ar);\n  }\n\n  return 0; /* LCOV_EXCL_LINE: DefensiveCoding */\n}",
+      "fn_code_pos": [
+        [
+          348,
+          0
+        ],
+        [
+          365,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_cnt",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_rr_prealloc(ares_dns_record_t *dnsrec,\n                                          ares_dns_section_t sect, size_t cnt)\n{\n  ares_array_t *arr = NULL;\n\n  if (dnsrec == NULL || !ares_dns_section_isvalid(sect)) {\n    return ARES_EFORMERR;\n  }\n\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n      arr = dnsrec->an;\n      break;\n    case ARES_SECTION_AUTHORITY:\n      arr = dnsrec->ns;\n      break;\n    case ARES_SECTION_ADDITIONAL:\n      arr = dnsrec->ar;\n      break;\n  }\n\n  if (cnt < ares_array_len(arr)) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_array_set_size(arr, cnt);\n}",
+      "fn_code_pos": [
+        [
+          367,
+          0
+        ],
+        [
+          393,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_prealloc",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "cnt": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_rr_add(ares_dns_rr_t    **rr_out,\n                                     ares_dns_record_t *dnsrec,\n                                     ares_dns_section_t sect, const char *name,\n                                     ares_dns_rec_type_t type,\n                                     ares_dns_class_t rclass, unsigned int ttl)\n{\n  ares_dns_rr_t *rr  = NULL;\n  ares_array_t  *arr = NULL;\n  ares_status_t  status;\n  size_t         idx;\n\n  if (dnsrec == NULL || name == NULL || rr_out == NULL ||\n      !ares_dns_section_isvalid(sect) ||\n      !ares_dns_rec_type_isvalid(type, ARES_FALSE) ||\n      !ares_dns_class_isvalid(rclass, type, ARES_FALSE)) {\n    return ARES_EFORMERR;\n  }\n\n  *rr_out = NULL;\n\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n      arr = dnsrec->an;\n      break;\n    case ARES_SECTION_AUTHORITY:\n      arr = dnsrec->ns;\n      break;\n    case ARES_SECTION_ADDITIONAL:\n      arr = dnsrec->ar;\n      break;\n  }\n\n  idx    = ares_array_len(arr);\n  status = ares_array_insert_last((void **)&rr, arr);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  rr->name = ares_strdup(name);\n  if (rr->name == NULL) {\n    ares_array_remove_at(arr, idx);\n    return ARES_ENOMEM;\n  }\n\n  rr->parent = dnsrec;\n  rr->type   = type;\n  rr->rclass = rclass;\n  rr->ttl    = ttl;\n\n  *rr_out = rr;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          447,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_add",
+        "parameters": {
+          "rr_out": "ares_dns_rr_t",
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "name": "char",
+          "type": "ares_dns_rec_type_t",
+          "rclass": "ares_dns_class_t",
+          "ttl": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_rr_del(ares_dns_record_t *dnsrec,\n                                     ares_dns_section_t sect, size_t idx)\n{\n  ares_array_t *arr = NULL;\n\n  if (dnsrec == NULL || !ares_dns_section_isvalid(sect)) {\n    return ARES_EFORMERR;\n  }\n\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n      arr = dnsrec->an;\n      break;\n    case ARES_SECTION_AUTHORITY:\n      arr = dnsrec->ns;\n      break;\n    case ARES_SECTION_ADDITIONAL:\n      arr = dnsrec->ar;\n      break;\n  }\n\n  return ares_array_remove_at(arr, idx);\n}",
+      "fn_code_pos": [
+        [
+          449,
+          0
+        ],
+        [
+          471,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_del",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_t *ares_dns_record_rr_get(ares_dns_record_t *dnsrec,\n                                      ares_dns_section_t sect, size_t idx)\n{\n  ares_array_t *arr = NULL;\n\n  if (dnsrec == NULL || !ares_dns_section_isvalid(sect)) {\n    return NULL;\n  }\n\n  switch (sect) {\n    case ARES_SECTION_ANSWER:\n      arr = dnsrec->an;\n      break;\n    case ARES_SECTION_AUTHORITY:\n      arr = dnsrec->ns;\n      break;\n    case ARES_SECTION_ADDITIONAL:\n      arr = dnsrec->ar;\n      break;\n  }\n\n  return ares_array_at(arr, idx);\n}",
+      "fn_code_pos": [
+        [
+          473,
+          0
+        ],
+        [
+          495,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_get",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_dns_rr_t"
+      }
+    },
+    {
+      "fn_code": "const ares_dns_rr_t *\n  ares_dns_record_rr_get_const(const ares_dns_record_t *dnsrec,\n                               ares_dns_section_t sect, size_t idx)\n{\n  return ares_dns_record_rr_get((void *)((size_t)dnsrec), sect, idx);\n}",
+      "fn_code_pos": [
+        [
+          497,
+          0
+        ],
+        [
+          502,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_get_const",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_dns_rr_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_rr_get_name(const ares_dns_rr_t *rr)\n{\n  if (rr == NULL) {\n    return NULL;\n  }\n  return rr->name;\n}",
+      "fn_code_pos": [
+        [
+          504,
+          0
+        ],
+        [
+          510,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_name",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_dns_rec_type_t ares_dns_rr_get_type(const ares_dns_rr_t *rr)\n{\n  if (rr == NULL) {\n    return 0;\n  }\n  return rr->type;\n}",
+      "fn_code_pos": [
+        [
+          512,
+          0
+        ],
+        [
+          518,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_type",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": "ares_dns_rec_type_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_class_t ares_dns_rr_get_class(const ares_dns_rr_t *rr)\n{\n  if (rr == NULL) {\n    return 0;\n  }\n  return rr->rclass;\n}",
+      "fn_code_pos": [
+        [
+          520,
+          0
+        ],
+        [
+          526,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_class",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": "ares_dns_class_t"
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_dns_rr_get_ttl(const ares_dns_rr_t *rr)\n{\n  if (rr == NULL) {\n    return 0;\n  }\n  return rr->ttl;\n}",
+      "fn_code_pos": [
+        [
+          528,
+          0
+        ],
+        [
+          534,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_ttl",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static void *ares_dns_rr_data_ptr(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  size_t **lenptr)\n{\n  if (dns_rr == NULL || dns_rr->type != ares_dns_rr_key_to_rec_type(key)) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  switch (key) {\n    case ARES_RR_A_ADDR:\n      return &dns_rr->r.a.addr;\n\n    case ARES_RR_NS_NSDNAME:\n      return &dns_rr->r.ns.nsdname;\n\n    case ARES_RR_CNAME_CNAME:\n      return &dns_rr->r.cname.cname;\n\n    case ARES_RR_SOA_MNAME:\n      return &dns_rr->r.soa.mname;\n\n    case ARES_RR_SOA_RNAME:\n      return &dns_rr->r.soa.rname;\n\n    case ARES_RR_SOA_SERIAL:\n      return &dns_rr->r.soa.serial;\n\n    case ARES_RR_SOA_REFRESH:\n      return &dns_rr->r.soa.refresh;\n\n    case ARES_RR_SOA_RETRY:\n      return &dns_rr->r.soa.retry;\n\n    case ARES_RR_SOA_EXPIRE:\n      return &dns_rr->r.soa.expire;\n\n    case ARES_RR_SOA_MINIMUM:\n      return &dns_rr->r.soa.minimum;\n\n    case ARES_RR_PTR_DNAME:\n      return &dns_rr->r.ptr.dname;\n\n    case ARES_RR_AAAA_ADDR:\n      return &dns_rr->r.aaaa.addr;\n\n    case ARES_RR_HINFO_CPU:\n      return &dns_rr->r.hinfo.cpu;\n\n    case ARES_RR_HINFO_OS:\n      return &dns_rr->r.hinfo.os;\n\n    case ARES_RR_MX_PREFERENCE:\n      return &dns_rr->r.mx.preference;\n\n    case ARES_RR_MX_EXCHANGE:\n      return &dns_rr->r.mx.exchange;\n\n    case ARES_RR_SIG_TYPE_COVERED:\n      return &dns_rr->r.sig.type_covered;\n\n    case ARES_RR_SIG_ALGORITHM:\n      return &dns_rr->r.sig.algorithm;\n\n    case ARES_RR_SIG_LABELS:\n      return &dns_rr->r.sig.labels;\n\n    case ARES_RR_SIG_ORIGINAL_TTL:\n      return &dns_rr->r.sig.original_ttl;\n\n    case ARES_RR_SIG_EXPIRATION:\n      return &dns_rr->r.sig.expiration;\n\n    case ARES_RR_SIG_INCEPTION:\n      return &dns_rr->r.sig.inception;\n\n    case ARES_RR_SIG_KEY_TAG:\n      return &dns_rr->r.sig.key_tag;\n\n    case ARES_RR_SIG_SIGNERS_NAME:\n      return &dns_rr->r.sig.signers_name;\n\n    case ARES_RR_SIG_SIGNATURE:\n      if (lenptr == NULL) {\n        return NULL;\n      }\n      *lenptr = &dns_rr->r.sig.signature_len;\n      return &dns_rr->r.sig.signature;\n\n    case ARES_RR_TXT_DATA:\n      return &dns_rr->r.txt.strs;\n\n    case ARES_RR_SRV_PRIORITY:\n      return &dns_rr->r.srv.priority;\n\n    case ARES_RR_SRV_WEIGHT:\n      return &dns_rr->r.srv.weight;\n\n    case ARES_RR_SRV_PORT:\n      return &dns_rr->r.srv.port;\n\n    case ARES_RR_SRV_TARGET:\n      return &dns_rr->r.srv.target;\n\n    case ARES_RR_NAPTR_ORDER:\n      return &dns_rr->r.naptr.order;\n\n    case ARES_RR_NAPTR_PREFERENCE:\n      return &dns_rr->r.naptr.preference;\n\n    case ARES_RR_NAPTR_FLAGS:\n      return &dns_rr->r.naptr.flags;\n\n    case ARES_RR_NAPTR_SERVICES:\n      return &dns_rr->r.naptr.services;\n\n    case ARES_RR_NAPTR_REGEXP:\n      return &dns_rr->r.naptr.regexp;\n\n    case ARES_RR_NAPTR_REPLACEMENT:\n      return &dns_rr->r.naptr.replacement;\n\n    case ARES_RR_OPT_UDP_SIZE:\n      return &dns_rr->r.opt.udp_size;\n\n    case ARES_RR_OPT_VERSION:\n      return &dns_rr->r.opt.version;\n\n    case ARES_RR_OPT_FLAGS:\n      return &dns_rr->r.opt.flags;\n\n    case ARES_RR_OPT_OPTIONS:\n      return &dns_rr->r.opt.options;\n\n    case ARES_RR_TLSA_CERT_USAGE:\n      return &dns_rr->r.tlsa.cert_usage;\n\n    case ARES_RR_TLSA_SELECTOR:\n      return &dns_rr->r.tlsa.selector;\n\n    case ARES_RR_TLSA_MATCH:\n      return &dns_rr->r.tlsa.match;\n\n    case ARES_RR_TLSA_DATA:\n      if (lenptr == NULL) {\n        return NULL;\n      }\n      *lenptr = &dns_rr->r.tlsa.data_len;\n      return &dns_rr->r.tlsa.data;\n\n    case ARES_RR_SVCB_PRIORITY:\n      return &dns_rr->r.svcb.priority;\n\n    case ARES_RR_SVCB_TARGET:\n      return &dns_rr->r.svcb.target;\n\n    case ARES_RR_SVCB_PARAMS:\n      return &dns_rr->r.svcb.params;\n\n    case ARES_RR_HTTPS_PRIORITY:\n      return &dns_rr->r.https.priority;\n\n    case ARES_RR_HTTPS_TARGET:\n      return &dns_rr->r.https.target;\n\n    case ARES_RR_HTTPS_PARAMS:\n      return &dns_rr->r.https.params;\n\n    case ARES_RR_URI_PRIORITY:\n      return &dns_rr->r.uri.priority;\n\n    case ARES_RR_URI_WEIGHT:\n      return &dns_rr->r.uri.weight;\n\n    case ARES_RR_URI_TARGET:\n      return &dns_rr->r.uri.target;\n\n    case ARES_RR_CAA_CRITICAL:\n      return &dns_rr->r.caa.critical;\n\n    case ARES_RR_CAA_TAG:\n      return &dns_rr->r.caa.tag;\n\n    case ARES_RR_CAA_VALUE:\n      if (lenptr == NULL) {\n        return NULL;\n      }\n      *lenptr = &dns_rr->r.caa.value_len;\n      return &dns_rr->r.caa.value;\n\n    case ARES_RR_RAW_RR_TYPE:\n      return &dns_rr->r.raw_rr.type;\n\n    case ARES_RR_RAW_RR_DATA:\n      if (lenptr == NULL) {\n        return NULL;\n      }\n      *lenptr = &dns_rr->r.raw_rr.length;\n      return &dns_rr->r.raw_rr.data;\n  }\n\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          536,
+          0
+        ],
+        [
+          736,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_data_ptr",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "lenptr": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static const void *ares_dns_rr_data_ptr_const(const ares_dns_rr_t *dns_rr,\n                                              ares_dns_rr_key_t    key,\n                                              const size_t       **lenptr)\n{\n  /* We're going to cast off the const */\n  return ares_dns_rr_data_ptr((void *)((size_t)dns_rr), key,\n                              (void *)((size_t)lenptr));\n}",
+      "fn_code_pos": [
+        [
+          738,
+          0
+        ],
+        [
+          745,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_data_ptr_const",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "lenptr": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "const struct in_addr *ares_dns_rr_get_addr(const ares_dns_rr_t *dns_rr,\n                                           ares_dns_rr_key_t    key)\n{\n  const struct in_addr *addr;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_INADDR) {\n    return NULL;\n  }\n\n  addr = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (addr == NULL) {\n    return NULL;\n  }\n\n  return addr;\n}",
+      "fn_code_pos": [
+        [
+          747,
+          0
+        ],
+        [
+          762,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_addr",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "const struct ares_in6_addr *ares_dns_rr_get_addr6(const ares_dns_rr_t *dns_rr,\n                                                  ares_dns_rr_key_t    key)\n{\n  const struct ares_in6_addr *addr;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_INADDR6) {\n    return NULL;\n  }\n\n  addr = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (addr == NULL) {\n    return NULL;\n  }\n\n  return addr;\n}",
+      "fn_code_pos": [
+        [
+          764,
+          0
+        ],
+        [
+          779,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_addr6",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned char ares_dns_rr_get_u8(const ares_dns_rr_t *dns_rr,\n                                 ares_dns_rr_key_t    key)\n{\n  const unsigned char *u8;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U8) {\n    return 0;\n  }\n\n  u8 = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (u8 == NULL) {\n    return 0;\n  }\n\n  return *u8;\n}",
+      "fn_code_pos": [
+        [
+          781,
+          0
+        ],
+        [
+          796,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_u8",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_dns_rr_get_u16(const ares_dns_rr_t *dns_rr,\n                                   ares_dns_rr_key_t    key)\n{\n  const unsigned short *u16;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U16) {\n    return 0;\n  }\n\n  u16 = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (u16 == NULL) {\n    return 0;\n  }\n\n  return *u16;\n}",
+      "fn_code_pos": [
+        [
+          798,
+          0
+        ],
+        [
+          813,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_u16",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_dns_rr_get_u32(const ares_dns_rr_t *dns_rr,\n                                 ares_dns_rr_key_t    key)\n{\n  const unsigned int *u32;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U32) {\n    return 0;\n  }\n\n  u32 = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (u32 == NULL) {\n    return 0;\n  }\n\n  return *u32;\n}",
+      "fn_code_pos": [
+        [
+          815,
+          0
+        ],
+        [
+          830,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_u32",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "const unsigned char *ares_dns_rr_get_bin(const ares_dns_rr_t *dns_rr,\n                                         ares_dns_rr_key_t key, size_t *len)\n{\n  unsigned char * const *bin     = NULL;\n  size_t const          *bin_len = NULL;\n\n  if ((ares_dns_rr_key_datatype(key) != ARES_DATATYPE_BIN &&\n       ares_dns_rr_key_datatype(key) != ARES_DATATYPE_BINP &&\n       ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) ||\n      len == NULL) {\n    return NULL;\n  }\n\n  /* Array of strings, return concatenated version */\n  if (ares_dns_rr_key_datatype(key) == ARES_DATATYPE_ABINP) {\n    ares_dns_multistring_t * const *strs =\n      ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n\n    if (strs == NULL) {\n      return NULL;\n    }\n\n    return ares_dns_multistring_combined(*strs, len);\n  }\n\n  /* Not a multi-string, just straight binary data */\n  bin = ares_dns_rr_data_ptr_const(dns_rr, key, &bin_len);\n  if (bin == NULL) {\n    return NULL;\n  }\n\n  /* Shouldn't be possible */\n  if (bin_len == NULL) {\n    return NULL;\n  }\n  *len = *bin_len;\n\n  return *bin;\n}",
+      "fn_code_pos": [
+        [
+          832,
+          0
+        ],
+        [
+          870,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_bin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "size_t ares_dns_rr_get_abin_cnt(const ares_dns_rr_t *dns_rr,\n                                ares_dns_rr_key_t    key)\n{\n  ares_dns_multistring_t * const *strs;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return 0;\n  }\n\n  strs = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (strs == NULL) {\n    return 0;\n  }\n\n  return ares_dns_multistring_cnt(*strs);\n}",
+      "fn_code_pos": [
+        [
+          872,
+          0
+        ],
+        [
+          887,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_abin_cnt",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "const unsigned char *ares_dns_rr_get_abin(const ares_dns_rr_t *dns_rr,\n                                          ares_dns_rr_key_t key, size_t idx,\n                                          size_t *len)\n{\n  ares_dns_multistring_t * const *strs;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return NULL;\n  }\n\n  strs = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (strs == NULL) {\n    return NULL;\n  }\n\n  return ares_dns_multistring_get(*strs, idx, len);\n}",
+      "fn_code_pos": [
+        [
+          889,
+          0
+        ],
+        [
+          905,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_abin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "idx": "size_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_del_abin(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                   size_t idx)\n{\n  ares_dns_multistring_t **strs;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return ARES_EFORMERR;\n  }\n\n  strs = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (strs == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_dns_multistring_del(*strs, idx);\n}",
+      "fn_code_pos": [
+        [
+          907,
+          0
+        ],
+        [
+          922,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_del_abin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_add_abin(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                   const unsigned char *val, size_t len)\n{\n  ares_status_t       status;\n  ares_dns_datatype_t datatype = ares_dns_rr_key_datatype(key);\n  ares_bool_t         is_nullterm =\n    (datatype == ARES_DATATYPE_ABINP) ? ARES_TRUE : ARES_FALSE;\n  size_t                   alloclen = is_nullterm ? len + 1 : len;\n  unsigned char           *temp;\n  ares_dns_multistring_t **strs;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return ARES_EFORMERR;\n  }\n\n  strs = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (strs == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*strs == NULL) {\n    *strs = ares_dns_multistring_create();\n    if (*strs == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  temp = ares_malloc(alloclen);\n  if (temp == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  memcpy(temp, val, len);\n\n  /* NULL-term ABINP */\n  if (is_nullterm) {\n    temp[len] = 0;\n  }\n\n  status = ares_dns_multistring_add_own(*strs, temp, len);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          924,
+          0
+        ],
+        [
+          969,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_add_abin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_dns_rr_get_str(const ares_dns_rr_t *dns_rr,\n                                ares_dns_rr_key_t    key)\n{\n  char * const *str;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_STR &&\n      ares_dns_rr_key_datatype(key) != ARES_DATATYPE_NAME) {\n    return NULL;\n  }\n\n  str = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (str == NULL) {\n    return NULL;\n  }\n\n  return *str;\n}",
+      "fn_code_pos": [
+        [
+          971,
+          0
+        ],
+        [
+          987,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_str",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "size_t ares_dns_rr_get_opt_cnt(const ares_dns_rr_t *dns_rr,\n                               ares_dns_rr_key_t    key)\n{\n  ares_array_t * const *opts;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_OPT) {\n    return 0;\n  }\n\n  opts = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (opts == NULL || *opts == NULL) {\n    return 0;\n  }\n\n  return ares_array_len(*opts);\n}",
+      "fn_code_pos": [
+        [
+          989,
+          0
+        ],
+        [
+          1004,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_opt_cnt",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_dns_rr_get_opt(const ares_dns_rr_t *dns_rr,\n                                   ares_dns_rr_key_t key, size_t idx,\n                                   const unsigned char **val, size_t *val_len)\n{\n  ares_array_t * const    *opts;\n  const ares_dns_optval_t *opt;\n\n  if (val) {\n    *val = NULL;\n  }\n  if (val_len) {\n    *val_len = 0;\n  }\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_OPT) {\n    return 65535;\n  }\n\n  opts = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (opts == NULL || *opts == NULL) {\n    return 65535;\n  }\n\n  opt = ares_array_at(*opts, idx);\n  if (opt == NULL) {\n    return 65535;\n  }\n\n  if (val) {\n    *val = opt->val;\n  }\n  if (val_len) {\n    *val_len = opt->val_len;\n  }\n\n  return opt->opt;\n}",
+      "fn_code_pos": [
+        [
+          1006,
+          0
+        ],
+        [
+          1042,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_opt",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "idx": "size_t",
+          "val": "unsigned char",
+          "val_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_dns_rr_get_opt_byid(const ares_dns_rr_t *dns_rr,\n                                     ares_dns_rr_key_t key, unsigned short opt,\n                                     const unsigned char **val, size_t *val_len)\n{\n  ares_array_t * const    *opts;\n  size_t                   i;\n  size_t                   cnt;\n  const ares_dns_optval_t *optptr = NULL;\n\n  if (val) {\n    *val = NULL;\n  }\n  if (val_len) {\n    *val_len = 0;\n  }\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_OPT) {\n    return ARES_FALSE;\n  }\n\n  opts = ares_dns_rr_data_ptr_const(dns_rr, key, NULL);\n  if (opts == NULL || *opts == NULL) {\n    return ARES_FALSE;\n  }\n\n  cnt = ares_array_len(*opts);\n  for (i = 0; i < cnt; i++) {\n    optptr = ares_array_at(*opts, i);\n    if (optptr == NULL) {\n      return ARES_FALSE;\n    }\n    if (optptr->opt == opt) {\n      break;\n    }\n  }\n\n  if (i >= cnt || optptr == NULL) {\n    return ARES_FALSE;\n  }\n\n  if (val) {\n    *val = optptr->val;\n  }\n  if (val_len) {\n    *val_len = optptr->val_len;\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          1044,
+          0
+        ],
+        [
+          1091,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_opt_byid",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short",
+          "val": "unsigned char",
+          "val_len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_addr(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                   const struct in_addr *addr)\n{\n  struct in_addr *a;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_INADDR || addr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  a = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (a == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  memcpy(a, addr, sizeof(*a));\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1093,
+          0
+        ],
+        [
+          1109,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_addr",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "addr": "struct in_addr"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_addr6(ares_dns_rr_t              *dns_rr,\n                                    ares_dns_rr_key_t           key,\n                                    const struct ares_in6_addr *addr)\n{\n  struct ares_in6_addr *a;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_INADDR6 || addr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  a = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (a == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  memcpy(a, addr, sizeof(*a));\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1111,
+          0
+        ],
+        [
+          1128,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_addr6",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "addr": "struct ares_in6_addr"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_u8(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                 unsigned char val)\n{\n  unsigned char *u8;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U8) {\n    return ARES_EFORMERR;\n  }\n\n  u8 = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (u8 == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *u8 = val;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1130,
+          0
+        ],
+        [
+          1146,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_u8",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_u16(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  unsigned short val)\n{\n  unsigned short *u16;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U16) {\n    return ARES_EFORMERR;\n  }\n\n  u16 = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (u16 == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *u16 = val;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1148,
+          0
+        ],
+        [
+          1164,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_u16",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_u32(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  unsigned int val)\n{\n  unsigned int *u32;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U32) {\n    return ARES_EFORMERR;\n  }\n\n  u32 = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (u32 == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *u32 = val;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1166,
+          0
+        ],
+        [
+          1182,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_u32",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_bin_own(ares_dns_rr_t    *dns_rr,\n                                      ares_dns_rr_key_t key, unsigned char *val,\n                                      size_t len)\n{\n  unsigned char **bin;\n  size_t         *bin_len = NULL;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_BIN &&\n      ares_dns_rr_key_datatype(key) != ARES_DATATYPE_BINP &&\n      ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return ARES_EFORMERR;\n  }\n\n  if (ares_dns_rr_key_datatype(key) == ARES_DATATYPE_ABINP) {\n    ares_dns_multistring_t **strs = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n    if (strs == NULL) {\n      return ARES_EFORMERR;\n    }\n\n    if (*strs == NULL) {\n      *strs = ares_dns_multistring_create();\n      if (*strs == NULL) {\n        return ARES_ENOMEM;\n      }\n    }\n\n    /* Clear all existing entries as this is an override */\n    ares_dns_multistring_clear(*strs);\n\n    return ares_dns_multistring_add_own(*strs, val, len);\n  }\n\n  bin = ares_dns_rr_data_ptr(dns_rr, key, &bin_len);\n  if (bin == NULL || bin_len == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*bin) {\n    ares_free(*bin);\n  }\n  *bin     = val;\n  *bin_len = len;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1184,
+          0
+        ],
+        [
+          1228,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_bin_own",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_bin(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  const unsigned char *val, size_t len)\n{\n  ares_status_t       status;\n  ares_dns_datatype_t datatype = ares_dns_rr_key_datatype(key);\n  ares_bool_t         is_nullterm =\n    (datatype == ARES_DATATYPE_BINP || datatype == ARES_DATATYPE_ABINP)\n              ? ARES_TRUE\n              : ARES_FALSE;\n  size_t         alloclen = is_nullterm ? len + 1 : len;\n  unsigned char *temp     = ares_malloc(alloclen);\n\n  if (temp == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  memcpy(temp, val, len);\n\n  /* NULL-term BINP */\n  if (is_nullterm) {\n    temp[len] = 0;\n  }\n\n  status = ares_dns_rr_set_bin_own(dns_rr, key, temp, len);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1230,
+          0
+        ],
+        [
+          1259,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_bin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_str_own(ares_dns_rr_t    *dns_rr,\n                                      ares_dns_rr_key_t key, char *val)\n{\n  char **str;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_STR &&\n      ares_dns_rr_key_datatype(key) != ARES_DATATYPE_NAME) {\n    return ARES_EFORMERR;\n  }\n\n  str = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (str == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*str) {\n    ares_free(*str);\n  }\n  *str = val;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1261,
+          0
+        ],
+        [
+          1282,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_str_own",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_str(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  const char *val)\n{\n  ares_status_t status;\n  char         *temp = NULL;\n\n  if (val != NULL) {\n    temp = ares_strdup(val);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  status = ares_dns_rr_set_str_own(dns_rr, key, temp);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1284,
+          0
+        ],
+        [
+          1303,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_str",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "val": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_abin_own(ares_dns_rr_t          *dns_rr,\n                                       ares_dns_rr_key_t       key,\n                                       ares_dns_multistring_t *strs)\n{\n  ares_dns_multistring_t **strs_ptr;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_ABINP) {\n    return ARES_EFORMERR;\n  }\n\n  strs_ptr = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (strs_ptr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*strs_ptr != NULL) {\n    ares_dns_multistring_destroy(*strs_ptr);\n  }\n  *strs_ptr = strs;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1305,
+          0
+        ],
+        [
+          1326,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_abin_own",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "strs": "ares_dns_multistring_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_dns_opt_free_cb(void *arg)\n{\n  ares_dns_optval_t *opt = arg;\n  if (opt == NULL) {\n    return;\n  }\n  ares_free(opt->val);\n}",
+      "fn_code_pos": [
+        [
+          1328,
+          0
+        ],
+        [
+          1335,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_opt_free_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_opt_own(ares_dns_rr_t    *dns_rr,\n                                      ares_dns_rr_key_t key, unsigned short opt,\n                                      unsigned char *val, size_t val_len)\n{\n  ares_array_t     **options;\n  ares_dns_optval_t *optptr = NULL;\n  size_t             idx;\n  size_t             cnt;\n  ares_status_t      status;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_OPT) {\n    return ARES_EFORMERR;\n  }\n\n  options = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (options == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*options == NULL) {\n    *options =\n      ares_array_create(sizeof(ares_dns_optval_t), ares_dns_opt_free_cb);\n  }\n  if (*options == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  cnt = ares_array_len(*options);\n  for (idx = 0; idx < cnt; idx++) {\n    optptr = ares_array_at(*options, idx);\n    if (optptr == NULL) {\n      return ARES_EFORMERR;\n    }\n    if (optptr->opt == opt) {\n      break;\n    }\n  }\n\n  /* Duplicate entry, replace */\n  if (idx != cnt && optptr != NULL) {\n    goto done;\n  }\n\n  status = ares_array_insert_last((void **)&optptr, *options);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\ndone:\n  ares_free(optptr->val);\n  optptr->opt     = opt;\n  optptr->val     = val;\n  optptr->val_len = val_len;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1337,
+          0
+        ],
+        [
+          1392,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_opt_own",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short",
+          "val": "unsigned char",
+          "val_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_set_opt(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  unsigned short opt, const unsigned char *val,\n                                  size_t val_len)\n{\n  unsigned char *temp = NULL;\n  ares_status_t  status;\n\n  if (val != NULL) {\n    temp = ares_malloc(val_len + 1);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n    memcpy(temp, val, val_len);\n    temp[val_len] = 0;\n  }\n\n  status = ares_dns_rr_set_opt_own(dns_rr, key, opt, temp, val_len);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1394,
+          0
+        ],
+        [
+          1416,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_set_opt",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short",
+          "val": "unsigned char",
+          "val_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_rr_del_opt_byid(ares_dns_rr_t    *dns_rr,\n                                       ares_dns_rr_key_t key,\n                                       unsigned short    opt)\n{\n  ares_array_t           **options;\n  const ares_dns_optval_t *optptr;\n  size_t                   idx;\n  size_t                   cnt;\n\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_OPT) {\n    return ARES_EFORMERR;\n  }\n\n  options = ares_dns_rr_data_ptr(dns_rr, key, NULL);\n  if (options == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* No options */\n  if (*options == NULL) {\n    return ARES_SUCCESS;\n  }\n\n  cnt = ares_array_len(*options);\n  for (idx = 0; idx < cnt; idx++) {\n    optptr = ares_array_at_const(*options, idx);\n    if (optptr == NULL) {\n      return ARES_ENOTFOUND;\n    }\n    if (optptr->opt == opt) {\n      return ares_array_remove_at(*options, idx);\n    }\n  }\n\n  return ARES_ENOTFOUND;\n}",
+      "fn_code_pos": [
+        [
+          1418,
+          0
+        ],
+        [
+          1453,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_del_opt_byid",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "opt": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "char *ares_dns_addr_to_ptr(const struct ares_addr *addr)\n{\n  ares_buf_t                *buf     = NULL;\n  const unsigned char       *ptr     = NULL;\n  size_t                     ptr_len = 0;\n  size_t                     i;\n  ares_status_t              status;\n  static const unsigned char hexbytes[] = \"0123456789abcdef\";\n\n  if (addr->family != AF_INET && addr->family != AF_INET6) {\n    goto fail;\n  }\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    goto fail;\n  }\n\n  if (addr->family == AF_INET) {\n    ptr     = (const unsigned char *)&addr->addr.addr4;\n    ptr_len = 4;\n  } else {\n    ptr     = (const unsigned char *)&addr->addr.addr6;\n    ptr_len = 16;\n  }\n\n  for (i = ptr_len; i > 0; i--) {\n    if (addr->family == AF_INET) {\n      status = ares_buf_append_num_dec(buf, (size_t)ptr[i - 1], 0);\n    } else {\n      unsigned char c;\n\n      c      = ptr[i - 1] & 0xF;\n      status = ares_buf_append_byte(buf, hexbytes[c]);\n      if (status != ARES_SUCCESS) {\n        goto fail;\n      }\n\n      status = ares_buf_append_byte(buf, '.');\n      if (status != ARES_SUCCESS) {\n        goto fail;\n      }\n\n      c      = (ptr[i - 1] >> 4) & 0xF;\n      status = ares_buf_append_byte(buf, hexbytes[c]);\n    }\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n\n    status = ares_buf_append_byte(buf, '.');\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  if (addr->family == AF_INET) {\n    status = ares_buf_append(buf, (const unsigned char *)\"in-addr.arpa\", 12);\n  } else {\n    status = ares_buf_append(buf, (const unsigned char *)\"ip6.arpa\", 8);\n  }\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  return ares_buf_finish_str(buf, NULL);\n\nfail:\n  ares_buf_destroy(buf);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          1455,
+          0
+        ],
+        [
+          1525,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_addr_to_ptr",
+        "parameters": {
+          "addr": "struct ares_addr"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_t *ares_dns_get_opt_rr(ares_dns_record_t *rec)\n{\n  size_t i;\n  for (i = 0; i < ares_dns_record_rr_cnt(rec, ARES_SECTION_ADDITIONAL); i++) {\n    ares_dns_rr_t *rr = ares_dns_record_rr_get(rec, ARES_SECTION_ADDITIONAL, i);\n\n    if (ares_dns_rr_get_type(rr) == ARES_REC_TYPE_OPT) {\n      return rr;\n    }\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          1527,
+          0
+        ],
+        [
+          1538,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_get_opt_rr",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_rr_t"
+      }
+    },
+    {
+      "fn_code": "const ares_dns_rr_t *ares_dns_get_opt_rr_const(const ares_dns_record_t *rec)\n{\n  size_t i;\n  for (i = 0; i < ares_dns_record_rr_cnt(rec, ARES_SECTION_ADDITIONAL); i++) {\n    const ares_dns_rr_t *rr =\n      ares_dns_record_rr_get_const(rec, ARES_SECTION_ADDITIONAL, i);\n\n    if (ares_dns_rr_get_type(rr) == ARES_REC_TYPE_OPT) {\n      return rr;\n    }\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          1540,
+          0
+        ],
+        [
+          1552,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_get_opt_rr_const",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_rr_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t\n  ares_dns_record_create_query(ares_dns_record_t **dnsrec, const char *name,\n                               ares_dns_class_t    dnsclass,\n                               ares_dns_rec_type_t type, unsigned short id,\n                               ares_dns_flags_t flags, size_t max_udp_size)\n{\n  ares_status_t  status;\n  ares_dns_rr_t *rr = NULL;\n\n  if (dnsrec == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *dnsrec = NULL;\n\n  /* Per RFC 7686, reject queries for \".onion\" domain names with NXDOMAIN */\n  if (ares_is_onion_domain(name)) {\n    status = ARES_ENOTFOUND;\n    goto done;\n  }\n\n  status = ares_dns_record_create(dnsrec, id, (unsigned short)flags,\n                                  ARES_OPCODE_QUERY, ARES_RCODE_NOERROR);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_record_query_add(*dnsrec, name, type, dnsclass);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* max_udp_size > 0 indicates EDNS, so send OPT RR as an additional record */\n  if (max_udp_size > 0) {\n    /* max_udp_size must fit into a 16 bit unsigned integer field on the OPT\n     * RR, so check here that it fits\n     */\n    if (max_udp_size > 65535) {\n      status = ARES_EFORMERR;\n      goto done;\n    }\n\n    status = ares_dns_record_rr_add(&rr, *dnsrec, ARES_SECTION_ADDITIONAL, \"\",\n                                    ARES_REC_TYPE_OPT, ARES_CLASS_IN, 0);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_dns_rr_set_u16(rr, ARES_RR_OPT_UDP_SIZE,\n                                 (unsigned short)max_udp_size);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_dns_rr_set_u8(rr, ARES_RR_OPT_VERSION, 0);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_dns_rr_set_u16(rr, ARES_RR_OPT_FLAGS, 0);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_dns_record_destroy(*dnsrec);\n    *dnsrec = NULL;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1557,
+          0
+        ],
+        [
+          1628,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_create_query",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "name": "char",
+          "dnsclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "id": "unsigned short",
+          "flags": "ares_dns_flags_t",
+          "max_udp_size": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_record_duplicate_ex(ares_dns_record_t      **dest,\n                                           const ares_dns_record_t *src)\n{\n  unsigned char *data     = NULL;\n  size_t         data_len = 0;\n  ares_status_t  status;\n\n  if (dest == NULL || src == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *dest = NULL;\n\n  status = ares_dns_write(src, &data, &data_len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse(data, data_len, 0, dest);\n  ares_free(data);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1630,
+          0
+        ],
+        [
+          1652,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_duplicate_ex",
+        "parameters": {
+          "dest": "ares_dns_record_t",
+          "src": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_record_t *ares_dns_record_duplicate(const ares_dns_record_t *dnsrec)\n{\n  ares_dns_record_t *dest = NULL;\n\n  ares_dns_record_duplicate_ex(&dest, dnsrec);\n  return dest;\n}",
+      "fn_code_pos": [
+        [
+          1654,
+          0
+        ],
+        [
+          1660,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_duplicate",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_record_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_dns_rr_free(ares_dns_rr_t *rr)",
+      "fn_dec_pos": [
+        [
+          31,
+          12
+        ],
+        [
+          31,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_free",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_dns_record_rr_get(ares_dns_record_t *dnsrec,\n                                      ares_dns_section_t sect, size_t idx)",
+      "fn_dec_pos": [
+        [
+          473,
+          15
+        ],
+        [
+          474,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_get",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_record_rr_get_const(const ares_dns_record_t *dnsrec,\n                               ares_dns_section_t sect, size_t idx)",
+      "fn_dec_pos": [
+        [
+          498,
+          2
+        ],
+        [
+          499,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_rr_get_const",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "sect": "ares_dns_section_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_name(const ares_dns_rr_t *rr)",
+      "fn_dec_pos": [
+        [
+          504,
+          12
+        ],
+        [
+          504,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_name",
+        "parameters": {
+          "rr": "ares_dns_rr_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_data_ptr(ares_dns_rr_t *dns_rr, ares_dns_rr_key_t key,\n                                  size_t **lenptr)",
+      "fn_dec_pos": [
+        [
+          536,
+          13
+        ],
+        [
+          537,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_data_ptr",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "lenptr": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_data_ptr_const(const ares_dns_rr_t *dns_rr,\n                                              ares_dns_rr_key_t    key,\n                                              const size_t       **lenptr)",
+      "fn_dec_pos": [
+        [
+          738,
+          19
+        ],
+        [
+          740,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_data_ptr_const",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "lenptr": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_addr(const ares_dns_rr_t *dns_rr,\n                                           ares_dns_rr_key_t    key)",
+      "fn_dec_pos": [
+        [
+          747,
+          22
+        ],
+        [
+          748,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_addr",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_addr6(const ares_dns_rr_t *dns_rr,\n                                                  ares_dns_rr_key_t    key)",
+      "fn_dec_pos": [
+        [
+          764,
+          28
+        ],
+        [
+          765,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_addr6",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_bin(const ares_dns_rr_t *dns_rr,\n                                         ares_dns_rr_key_t key, size_t *len)",
+      "fn_dec_pos": [
+        [
+          832,
+          21
+        ],
+        [
+          833,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_bin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_abin(const ares_dns_rr_t *dns_rr,\n                                          ares_dns_rr_key_t key, size_t idx,\n                                          size_t *len)",
+      "fn_dec_pos": [
+        [
+          889,
+          21
+        ],
+        [
+          891,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_abin",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "idx": "size_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_rr_get_str(const ares_dns_rr_t *dns_rr,\n                                ares_dns_rr_key_t    key)",
+      "fn_dec_pos": [
+        [
+          971,
+          12
+        ],
+        [
+          972,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_get_str",
+        "parameters": {
+          "dns_rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_addr_to_ptr(const struct ares_addr *addr)",
+      "fn_dec_pos": [
+        [
+          1455,
+          6
+        ],
+        [
+          1455,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_addr_to_ptr",
+        "parameters": {
+          "addr": "struct ares_addr"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_get_opt_rr(ares_dns_record_t *rec)",
+      "fn_dec_pos": [
+        [
+          1527,
+          15
+        ],
+        [
+          1527,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_get_opt_rr",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_get_opt_rr_const(const ares_dns_record_t *rec)",
+      "fn_dec_pos": [
+        [
+          1540,
+          21
+        ],
+        [
+          1540,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_get_opt_rr_const",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_record_duplicate(const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          1654,
+          19
+        ],
+        [
+          1654,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_duplicate",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        747,
+        6
+      ],
+      [
+        747,
+        20
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        750,
+        8
+      ],
+      [
+        750,
+        22
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        764,
+        6
+      ],
+      [
+        764,
+        26
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        767,
+        8
+      ],
+      [
+        767,
+        28
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        1094,
+        41
+      ],
+      [
+        1094,
+        55
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        1096,
+        2
+      ],
+      [
+        1096,
+        16
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        1113,
+        42
+      ],
+      [
+        1113,
+        62
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        1115,
+        2
+      ],
+      [
+        1115,
+        22
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        1455,
+        33
+      ],
+      [
+        1455,
+        49
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

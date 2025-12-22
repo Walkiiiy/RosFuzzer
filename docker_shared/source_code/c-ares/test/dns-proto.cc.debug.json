@@ -1,0 +1,771 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void arestest_strtolower(char *dest, const char *src, size_t dest_size)\n{\n  size_t len;\n\n  if (dest == NULL)\n    return;\n\n  memset(dest, 0, dest_size);\n\n  if (src == NULL)\n    return;\n\n  len = strlen(src);\n  if (len >= dest_size)\n    return;\n\n  for (size_t i = 0; i<len; i++) {\n    dest[i] = (char)tolower(src[i]);\n  }\n}",
+      "fn_code_pos": [
+        [
+          42,
+          0
+        ],
+        [
+          61,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "arestest_strtolower",
+        "parameters": {
+          "dest": "char",
+          "src": "char",
+          "dest_size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "std::string HexDump(std::vector<byte> data) {\n  std::stringstream ss;\n  for (size_t ii = 0; ii < data.size();  ii++) {\n    char buffer[2 + 1];\n    snprintf(buffer, sizeof(buffer), \"%02x\", data[ii]);\n    ss << buffer;\n  }\n  return ss.str();\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          74,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string HexDump(const byte *data, int len) {\n  return HexDump(std::vector<byte>(data, data + len));\n}",
+      "fn_code_pos": [
+        [
+          76,
+          0
+        ],
+        [
+          78,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string HexDump(const char *data, int len) {\n  return HexDump(reinterpret_cast<const byte*>(data), len);\n}",
+      "fn_code_pos": [
+        [
+          80,
+          0
+        ],
+        [
+          82,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "char",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string StatusToString(int status) {\n  switch (status) {\n  case ARES_SUCCESS: return \"ARES_SUCCESS\";\n  case ARES_ENODATA: return \"ARES_ENODATA\";\n  case ARES_EFORMERR: return \"ARES_EFORMERR\";\n  case ARES_ESERVFAIL: return \"ARES_ESERVFAIL\";\n  case ARES_ENOTFOUND: return \"ARES_ENOTFOUND\";\n  case ARES_ENOTIMP: return \"ARES_ENOTIMP\";\n  case ARES_EREFUSED: return \"ARES_EREFUSED\";\n  case ARES_EBADQUERY: return \"ARES_EBADQUERY\";\n  case ARES_EBADNAME: return \"ARES_EBADNAME\";\n  case ARES_EBADFAMILY: return \"ARES_EBADFAMILY\";\n  case ARES_EBADRESP: return \"ARES_EBADRESP\";\n  case ARES_ECONNREFUSED: return \"ARES_ECONNREFUSED\";\n  case ARES_ETIMEOUT: return \"ARES_ETIMEOUT\";\n  case ARES_EOF: return \"ARES_EOF\";\n  case ARES_EFILE: return \"ARES_EFILE\";\n  case ARES_ENOMEM: return \"ARES_ENOMEM\";\n  case ARES_EDESTRUCTION: return \"ARES_EDESTRUCTION\";\n  case ARES_EBADSTR: return \"ARES_EBADSTR\";\n  case ARES_EBADFLAGS: return \"ARES_EBADFLAGS\";\n  case ARES_ENONAME: return \"ARES_ENONAME\";\n  case ARES_EBADHINTS: return \"ARES_EBADHINTS\";\n  case ARES_ENOTINITIALIZED: return \"ARES_ENOTINITIALIZED\";\n  case ARES_ELOADIPHLPAPI: return \"ARES_ELOADIPHLPAPI\";\n  case ARES_EADDRGETNETWORKPARAMS: return \"ARES_EADDRGETNETWORKPARAMS\";\n  case ARES_ECANCELLED: return \"ARES_ECANCELLED\";\n  default: return \"UNKNOWN\";\n  }\n}",
+      "fn_code_pos": [
+        [
+          84,
+          0
+        ],
+        [
+          113,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "StatusToString",
+        "parameters": {
+          "status": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string RcodeToString(int rcode) {\n  switch (rcode) {\n  case NOERROR: return \"NOERROR\";\n  case FORMERR: return \"FORMERR\";\n  case SERVFAIL: return \"SERVFAIL\";\n  case NXDOMAIN: return \"NXDOMAIN\";\n  case NOTIMP: return \"NOTIMP\";\n  case REFUSED: return \"REFUSED\";\n  case YXDOMAIN: return \"YXDOMAIN\";\n  case YXRRSET: return \"YXRRSET\";\n  case NXRRSET: return \"NXRRSET\";\n  case NOTAUTH: return \"NOTAUTH\";\n  case NOTZONE: return \"NOTZONE\";\n  case TSIG_BADSIG: return \"BADSIG\";\n  case TSIG_BADKEY: return \"BADKEY\";\n  case TSIG_BADTIME: return \"BADTIME\";\n  default: return \"UNKNOWN\";\n  }\n}",
+      "fn_code_pos": [
+        [
+          115,
+          0
+        ],
+        [
+          133,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RcodeToString",
+        "parameters": {
+          "rcode": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string RRTypeToString(int rrtype) {\n  switch (rrtype) {\n  case T_A: return \"A\";\n  case T_NS: return \"NS\";\n  case T_MD: return \"MD\";\n  case T_MF: return \"MF\";\n  case T_CNAME: return \"CNAME\";\n  case T_SOA: return \"SOA\";\n  case T_MB: return \"MB\";\n  case T_MG: return \"MG\";\n  case T_MR: return \"MR\";\n  case T_NULL: return \"NULL\";\n  case T_WKS: return \"WKS\";\n  case T_PTR: return \"PTR\";\n  case T_HINFO: return \"HINFO\";\n  case T_MINFO: return \"MINFO\";\n  case T_MX: return \"MX\";\n  case T_TXT: return \"TXT\";\n  case T_RP: return \"RP\";\n  case T_AFSDB: return \"AFSDB\";\n  case T_X25: return \"X25\";\n  case T_ISDN: return \"ISDN\";\n  case T_RT: return \"RT\";\n  case T_NSAP: return \"NSAP\";\n  case T_NSAP_PTR: return \"NSAP_PTR\";\n  case T_SIG: return \"SIG\";\n  case T_KEY: return \"KEY\";\n  case T_PX: return \"PX\";\n  case T_GPOS: return \"GPOS\";\n  case T_AAAA: return \"AAAA\";\n  case T_LOC: return \"LOC\";\n  case T_NXT: return \"NXT\";\n  case T_EID: return \"EID\";\n  case T_NIMLOC: return \"NIMLOC\";\n  case T_SRV: return \"SRV\";\n  case T_ATMA: return \"ATMA\";\n  case T_NAPTR: return \"NAPTR\";\n  case T_KX: return \"KX\";\n  case T_CERT: return \"CERT\";\n  case T_A6: return \"A6\";\n  case T_DNAME: return \"DNAME\";\n  case T_SINK: return \"SINK\";\n  case T_OPT: return \"OPT\";\n  case T_APL: return \"APL\";\n  case T_DS: return \"DS\";\n  case T_SSHFP: return \"SSHFP\";\n  case T_RRSIG: return \"RRSIG\";\n  case T_NSEC: return \"NSEC\";\n  case T_DNSKEY: return \"DNSKEY\";\n  case T_TKEY: return \"TKEY\";\n  case T_TSIG: return \"TSIG\";\n  case T_IXFR: return \"IXFR\";\n  case T_AXFR: return \"AXFR\";\n  case T_MAILB: return \"MAILB\";\n  case T_MAILA: return \"MAILA\";\n  case T_ANY: return \"ANY\";\n  case T_URI: return \"URI\";\n  case T_MAX: return \"MAX\";\n  default: return \"UNKNOWN\";\n  }\n}",
+      "fn_code_pos": [
+        [
+          135,
+          0
+        ],
+        [
+          195,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RRTypeToString",
+        "parameters": {
+          "rrtype": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string ClassToString(int qclass) {\n  switch (qclass) {\n  case C_IN: return \"IN\";\n  case C_CHAOS: return \"CHAOS\";\n  case C_HS: return \"HESIOD\";\n  case C_NONE: return \"NONE\";\n  case C_ANY: return \"ANY\";\n  default: return \"UNKNOWN\";\n  }\n}",
+      "fn_code_pos": [
+        [
+          197,
+          0
+        ],
+        [
+          206,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ClassToString",
+        "parameters": {
+          "qclass": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string AddressToString(const void* vaddr, int len) {\n  const byte* addr = reinterpret_cast<const byte*>(vaddr);\n  std::stringstream ss;\n  if (len == 4) {\n    char buffer[4*4 + 3 + 1];\n    snprintf(buffer, sizeof(buffer), \"%u.%u.%u.%u\",\n             (unsigned char)addr[0],\n             (unsigned char)addr[1],\n             (unsigned char)addr[2],\n             (unsigned char)addr[3]);\n    ss << buffer;\n  } else if (len == 16) {\n    for (int ii = 0; ii < 16;  ii+=2) {\n      if (ii > 0) ss << ':';\n      char buffer[4 + 1];\n      snprintf(buffer, sizeof(buffer), \"%02x%02x\", (unsigned char)addr[ii], (unsigned char)addr[ii+1]);\n      ss << buffer;\n    }\n  } else {\n    ss << \"!\" << HexDump(addr, len) << \"!\";\n  }\n  return ss.str();\n}",
+      "fn_code_pos": [
+        [
+          208,
+          0
+        ],
+        [
+          230,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "AddressToString",
+        "parameters": {
+          "vaddr": "void",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string PacketToString(const std::vector<byte>& packet) {\n  const byte* data = packet.data();\n  int len = (int)packet.size();\n  std::stringstream ss;\n  if (len < NS_HFIXEDSZ) {\n    ss << \"(too short, len \" << len << \")\";\n    return ss.str();\n  }\n  ss << ((DNS_HEADER_QR(data) == 0) ? \"REQ \" : \"RSP \");\n  switch (DNS_HEADER_OPCODE(data)) {\n  case O_QUERY: ss << \"QRY \"; break;\n  case O_IQUERY: ss << \"IQRY \"; break;\n  case O_STATUS: ss << \"STATUS \"; break;\n  case O_NOTIFY: ss << \"NOTIFY \"; break;\n  case O_UPDATE: ss << \"UPDATE \"; break;\n  default: ss << \"UNKNOWN(\" << DNS_HEADER_OPCODE(data) << \") \"; break;\n  }\n  if (DNS_HEADER_AA(data)) ss << \"AA \";\n  if (DNS_HEADER_TC(data)) ss << \"TC \";\n  if (DNS_HEADER_RD(data)) ss << \"RD \";\n  if (DNS_HEADER_RA(data)) ss << \"RA \";\n  if (DNS_HEADER_Z(data)) ss << \"Z \";\n  if (DNS_HEADER_QR(data) == 1) ss << RcodeToString(DNS_HEADER_RCODE(data));\n\n  int nquestions = DNS_HEADER_QDCOUNT(data);\n  int nanswers = DNS_HEADER_ANCOUNT(data);\n  int nauths = DNS_HEADER_NSCOUNT(data);\n  int nadds = DNS_HEADER_ARCOUNT(data);\n\n  const byte* pq = data + NS_HFIXEDSZ;\n  len -= NS_HFIXEDSZ;\n  for (int ii = 0; ii < nquestions; ii++) {\n    ss << \" Q:\" << QuestionToString(packet, &pq, &len);\n  }\n  const byte* prr = pq;\n  for (int ii = 0; ii < nanswers; ii++) {\n    ss << \" A:\" << RRToString(packet, &prr, &len);\n  }\n  for (int ii = 0; ii < nauths; ii++) {\n    ss << \" AUTH:\" << RRToString(packet, &prr, &len);\n  }\n  for (int ii = 0; ii < nadds; ii++) {\n    ss << \" ADD:\" << RRToString(packet, &prr, &len);\n  }\n  return ss.str();\n}",
+      "fn_code_pos": [
+        [
+          232,
+          0
+        ],
+        [
+          277,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PacketToString",
+        "parameters": {
+          "packet": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string QuestionToString(const std::vector<byte>& packet,\n                             const byte** data, int* len) {\n  std::stringstream ss;\n  ss << \"{\";\n  if (*len < NS_QFIXEDSZ) {\n    ss << \"(too short, len \" << *len << \")\";\n    return ss.str();\n  }\n\n  char *name = nullptr;\n  long enclen;\n  int rc = ares_expand_name(*data, packet.data(), (int)packet.size(), &name, &enclen);\n  if (rc != ARES_SUCCESS) {\n    ss << \"(error from ares_expand_name)\";\n    return ss.str();\n  }\n  if (enclen > *len) {\n    ss << \"(error, encoded name len \" << enclen << \"bigger than remaining data \" << *len << \" bytes)\";\n    return ss.str();\n  }\n  *len -= (int)enclen;\n  *data += enclen;\n\n  // DNS 0x20 may mix case, output as all lower for checks as the mixed case\n  // is really more of an internal thing\n  char lowername[256];\n  arestest_strtolower(lowername, name, sizeof(lowername));\n  ares_free_string(name);\n\n  ss << \"'\" << lowername << \"' \";\n  if (*len < NS_QFIXEDSZ) {\n    ss << \"(too short, len left \" << *len << \")\";\n    return ss.str();\n  }\n  ss << ClassToString(DNS_QUESTION_CLASS(*data)) << \" \";\n  ss << RRTypeToString(DNS_QUESTION_TYPE(*data));\n  *data += NS_QFIXEDSZ;\n  *len -= NS_QFIXEDSZ;\n  ss << \"}\";\n  return ss.str();\n}",
+      "fn_code_pos": [
+        [
+          279,
+          0
+        ],
+        [
+          319,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "QuestionToString",
+        "parameters": {
+          "packet": "std::vector<byte>",
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string RRToString(const std::vector<byte>& packet,\n                       const byte** data, int* len) {\n  std::stringstream ss;\n  ss << \"{\";\n  if (*len < NS_RRFIXEDSZ) {\n    ss << \"too short, len \" << *len << \")\";\n    return ss.str();\n  }\n\n  char *name = nullptr;\n  long enclen;\n  int rc = ares_expand_name(*data, packet.data(), (int)packet.size(), &name, &enclen);\n  if (rc != ARES_SUCCESS) {\n    ss << \"(error from ares_expand_name)\";\n    return ss.str();\n  }\n  if (enclen > *len) {\n    ss << \"(error, encoded name len \" << enclen << \"bigger than remaining data \" << *len << \" bytes)\";\n    return ss.str();\n  }\n  *len -= (int)enclen;\n  *data += enclen;\n  ss << \"'\" << name << \"' \";\n  ares_free_string(name);\n  name = nullptr;\n\n  if (*len < NS_RRFIXEDSZ) {\n    ss << \"(too short, len left \" << *len << \")\";\n    return ss.str();\n  }\n  int rrtype = DNS_RR_TYPE(*data);\n  if (rrtype == T_OPT) {\n    ss << \"MAXUDP=\" << DNS_RR_CLASS(*data) << \" \";\n    ss << RRTypeToString(rrtype) << \" \";\n    ss << \"RCODE2=\" << DNS_RR_TTL(*data);\n  } else {\n    ss << ClassToString(DNS_RR_CLASS(*data)) << \" \";\n    ss << RRTypeToString(rrtype) << \" \";\n    ss << \"TTL=\" << DNS_RR_TTL(*data);\n  }\n  int rdatalen = DNS_RR_LEN(*data);\n\n  *data += NS_RRFIXEDSZ;\n  *len -= NS_RRFIXEDSZ;\n  if (*len < rdatalen) {\n    ss << \"(RR too long at \" << rdatalen << \", len left \" << *len << \")\";\n  } else {\n    switch (rrtype) {\n    case T_A:\n    case T_AAAA:\n      ss << \" \" << AddressToString(*data, rdatalen);\n      break;\n    case T_TXT: {\n      const byte* p = *data;\n      while (p < (*data + rdatalen)) {\n        int tlen = *p++;\n        if ((p + tlen) <= (*data + rdatalen)) {\n          std::string txt(p, p + tlen);\n          ss << \" \" << tlen << \":'\" << txt << \"'\";\n        } else {\n          ss << \"(string too long)\";\n        }\n        p += tlen;\n      }\n      break;\n    }\n    case T_CNAME:\n    case T_NS:\n    case T_PTR: {\n      rc = ares_expand_name(*data, packet.data(), (int)packet.size(), &name, &enclen);\n      if (rc != ARES_SUCCESS) {\n        ss << \"(error from ares_expand_name)\";\n        break;\n      }\n      ss << \" '\" << name << \"'\";\n      ares_free_string(name);\n      break;\n    }\n    case T_MX:\n      if (rdatalen > 2) {\n        rc = ares_expand_name(*data + 2, packet.data(), (int)packet.size(), &name, &enclen);\n        if (rc != ARES_SUCCESS) {\n          ss << \"(error from ares_expand_name)\";\n          break;\n        }\n        ss << \" \" << DNS__16BIT(*data) << \" '\" << name << \"'\";\n        ares_free_string(name);\n      } else {\n        ss << \"(RR too short)\";\n      }\n      break;\n    case T_SRV: {\n      if (rdatalen > 6) {\n        const byte* p = *data;\n        unsigned long prio = DNS__16BIT(p);\n        unsigned long weight = DNS__16BIT(p + 2);\n        unsigned long port = DNS__16BIT(p + 4);\n        p += 6;\n        rc = ares_expand_name(p, packet.data(), (int)packet.size(), &name, &enclen);\n        if (rc != ARES_SUCCESS) {\n          ss << \"(error from ares_expand_name)\";\n          break;\n        }\n        ss << prio << \" \" << weight << \" \" << port << \" '\" << name << \"'\";\n        ares_free_string(name);\n      } else {\n        ss << \"(RR too short)\";\n      }\n      break;\n    }\n    case T_URI: {\n      if (rdatalen > 4) {\n        const byte* p = *data;\n        unsigned long prio = DNS__16BIT(p);\n        unsigned long weight = DNS__16BIT(p + 2);\n        p += 4;\n        std::string uri(p, p + (rdatalen - 4));\n        ss << prio << \" \" << weight << \" '\" << uri << \"'\";\n      } else {\n        ss << \"(RR too short)\";\n      }\n      break;\n    }\n    case T_SOA: {\n      const byte* p = *data;\n      rc = ares_expand_name(p, packet.data(), (int)packet.size(), &name, &enclen);\n      if (rc != ARES_SUCCESS) {\n        ss << \"(error from ares_expand_name)\";\n        break;\n      }\n      ss << \" '\" << name << \"'\";\n      ares_free_string(name);\n      p += enclen;\n      rc = ares_expand_name(p, packet.data(), (int)packet.size(), &name, &enclen);\n      if (rc != ARES_SUCCESS) {\n        ss << \"(error from ares_expand_name)\";\n        break;\n      }\n      ss << \" '\" << name << \"'\";\n      ares_free_string(name);\n      p += enclen;\n      if ((p + 20) <= (*data + rdatalen)) {\n        unsigned long serial = DNS__32BIT(p);\n        unsigned long refresh = DNS__32BIT(p + 4);\n        unsigned long retry = DNS__32BIT(p + 8);\n        unsigned long expire = DNS__32BIT(p + 12);\n        unsigned long minimum = DNS__32BIT(p + 16);\n        ss << \" \" << serial << \" \" << refresh << \" \" << retry << \" \" << expire << \" \" << minimum;\n      } else {\n        ss << \"(RR too short)\";\n      }\n      break;\n    }\n    case T_NAPTR: {\n      if (rdatalen > 7) {\n        const byte* p = *data;\n        unsigned long order = DNS__16BIT(p);\n        unsigned long pref = DNS__16BIT(p + 2);\n        p += 4;\n        ss << order << \" \" << pref;\n\n        int nlen = *p++;\n        std::string flags(p, p + nlen);\n        ss << \" \" << flags;\n        p += nlen;\n\n        nlen = *p++;\n        std::string service(p, p + nlen);\n        ss << \" '\" << service << \"'\";\n        p += nlen;\n\n        nlen = *p++;\n        std::string regexp(p, p + nlen);\n        ss << \" '\" << regexp << \"'\";\n        p += nlen;\n\n        rc = ares_expand_name(p, packet.data(), (int)packet.size(), &name, &enclen);\n        if (rc != ARES_SUCCESS) {\n          ss << \"(error from ares_expand_name)\";\n          break;\n        }\n        ss << \" '\" << name << \"'\";\n        ares_free_string(name);\n      } else {\n        ss << \"(RR too short)\";\n      }\n      break;\n    }\n    default:\n      ss << \" \" << HexDump(*data, rdatalen);\n      break;\n    }\n  }\n  *data += rdatalen;\n  *len -= rdatalen;\n\n  ss << \"}\";\n  return ss.str();\n}",
+      "fn_code_pos": [
+        [
+          321,
+          0
+        ],
+        [
+          519,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RRToString",
+        "parameters": {
+          "packet": "std::vector<byte>",
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void PushInt32(std::vector<byte>* data, int value) {\n  data->push_back((byte)(((unsigned int)value & 0xff000000) >> 24));\n  data->push_back((byte)(((unsigned int)value & 0x00ff0000) >> 16));\n  data->push_back((byte)(((unsigned int)value & 0x0000ff00) >> 8));\n  data->push_back((byte)(value & 0x000000ff));\n}",
+      "fn_code_pos": [
+        [
+          521,
+          0
+        ],
+        [
+          526,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PushInt32",
+        "parameters": {
+          "data": "std::vector<byte>",
+          "value": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void PushInt16(std::vector<byte>* data, int value) {\n  data->push_back((byte)((value & 0xff00) >> 8));\n  data->push_back((byte)value & 0x00ff);\n}",
+      "fn_code_pos": [
+        [
+          528,
+          0
+        ],
+        [
+          531,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PushInt16",
+        "parameters": {
+          "data": "std::vector<byte>",
+          "value": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> EncodeString(const std::string &name) {\n  std::vector<byte> data;\n  std::stringstream ss(name);\n  std::string label;\n  // TODO: cope with escapes\n  while (std::getline(ss, label, '.')) {\n    /* Label length of 0 indicates the end, and we always push an end\n     * terminator, so don't do it twice */\n    if (label.length() == 0)\n      break;\n    data.push_back((byte)label.length());\n    data.insert(data.end(), label.begin(), label.end());\n  }\n  data.push_back(0);\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          533,
+          0
+        ],
+        [
+          548,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "EncodeString",
+        "parameters": {
+          "name": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSQuestion::data(const char *request_name, const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data;\n  std::vector<byte> encname;\n  if (request_name != nullptr && strcasecmp(request_name, name_.c_str()) == 0) {\n    encname = EncodeString(request_name);\n  } else {\n    encname = EncodeString(name_);\n  }\n  data.insert(data.end(), encname.begin(), encname.end());\n  PushInt16(&data, rrtype_);\n  PushInt16(&data, qclass_);\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          550,
+          0
+        ],
+        [
+          562,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSQuestion::data",
+        "parameters": {
+          "request_name": "char",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSQuestion::data(dnsrec);\n  PushInt32(&data, ttl_);\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          564,
+          0
+        ],
+        [
+          568,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSSingleNameRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  std::vector<byte> encname = EncodeString(other_);\n  int len = (int)encname.size();\n  PushInt16(&data, len);\n  data.insert(data.end(), encname.begin(), encname.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          570,
+          0
+        ],
+        [
+          577,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSingleNameRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSTxtRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  int len = 0;\n  for (const std::string& txt : txt_) {\n    len += (1 + (int)txt.size());\n  }\n  PushInt16(&data, len);\n  for (const std::string& txt : txt_) {\n    data.push_back((byte)txt.size());\n    data.insert(data.end(), txt.begin(), txt.end());\n  }\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          579,
+          0
+        ],
+        [
+          591,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSTxtRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSMxRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  std::vector<byte> encname = EncodeString(other_);\n  int len = 2 + (int)encname.size();\n  PushInt16(&data, len);\n  PushInt16(&data, pref_);\n  data.insert(data.end(), encname.begin(), encname.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          593,
+          0
+        ],
+        [
+          601,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSMxRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSSrvRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  std::vector<byte> encname = EncodeString(target_);\n  int len = 6 + (int)encname.size();\n  PushInt16(&data, len);\n  PushInt16(&data, prio_);\n  PushInt16(&data, weight_);\n  PushInt16(&data, port_);\n  data.insert(data.end(), encname.begin(), encname.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          603,
+          0
+        ],
+        [
+          613,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSrvRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSUriRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  int len = 4 + (int)target_.size();\n  PushInt16(&data, len);\n  PushInt16(&data, prio_);\n  PushInt16(&data, weight_);\n  data.insert(data.end(), target_.begin(), target_.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          615,
+          0
+        ],
+        [
+          623,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSUriRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSAddressRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  int len = (int)addr_.size();\n  PushInt16(&data, len);\n  data.insert(data.end(), addr_.begin(), addr_.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          625,
+          0
+        ],
+        [
+          631,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSAddressRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSSoaRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  std::vector<byte> encname1 = EncodeString(nsname_);\n  std::vector<byte> encname2 = EncodeString(rname_);\n  int len = (int)encname1.size() + (int)encname2.size() + 5*4;\n  PushInt16(&data, len);\n  data.insert(data.end(), encname1.begin(), encname1.end());\n  data.insert(data.end(), encname2.begin(), encname2.end());\n  PushInt32(&data, serial_);\n  PushInt32(&data, refresh_);\n  PushInt32(&data, retry_);\n  PushInt32(&data, expire_);\n  PushInt32(&data, minimum_);\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          633,
+          0
+        ],
+        [
+          647,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSoaRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "const ares_dns_rr_t *fetch_rr_opt(const ares_dns_record_t *rec)\n{\n  size_t i;\n  for (i = 0; i < ares_dns_record_rr_cnt(rec, ARES_SECTION_ADDITIONAL); i++) {\n    const ares_dns_rr_t *rr =\n      ares_dns_record_rr_get_const(rec, ARES_SECTION_ADDITIONAL, i);\n\n    if (ares_dns_rr_get_type(rr) == ARES_REC_TYPE_OPT) {\n      return rr;\n    }\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          649,
+          0
+        ],
+        [
+          661,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "fetch_rr_opt",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": "ares_dns_rr_t"
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSOptRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte>    data = DNSRR::data(dnsrec);\n  int len                   = 0;\n  std::vector<byte>    cookie;\n  const ares_dns_rr_t *rr  = fetch_rr_opt(dnsrec);\n  size_t               passed_cookie_len = 0;\n  const unsigned char *passed_cookie = NULL;\n\n  ares_dns_rr_get_opt_byid(rr, ARES_RR_OPT_OPTIONS, ARES_OPT_PARAM_COOKIE,\n                           &passed_cookie, &passed_cookie_len);\n\n  /* Error out if we expected a server cookie but didn't get one, or if the\n   * passed in server cookie doesn't match our expected value */\n  if (expect_server_cookie_ &&\n      (passed_cookie_len <= 8 ||\n       passed_cookie_len - 8 != server_cookie_.size() ||\n       memcmp(passed_cookie + 8, server_cookie_.data(), server_cookie_.size()) != 0\n      )\n     ) {\n    data.clear();\n    return data;\n  }\n\n  /* See if we should be applying a server cookie */\n  if (server_cookie_.size() && passed_cookie_len >= 8) {\n    /* If client cookie was provided to test framework, we are overwriting\n     * the one received from the client.  This is likely to test failure\n     * scenarios */\n    if (client_cookie_.size()) {\n      cookie.insert(cookie.end(), client_cookie_.begin(), client_cookie_.end());\n    } else {\n      cookie.insert(cookie.end(), passed_cookie, passed_cookie+8);\n    }\n    cookie.insert(cookie.end(), server_cookie_.begin(), server_cookie_.end());\n  }\n\n  if (cookie.size()) {\n    len += 4 + (int)cookie.size();\n  }\n  for (const DNSOption& opt : opts_) {\n    len += (4 + (int)opt.data_.size());\n  }\n\n  PushInt16(&data, len);\n  for (const DNSOption& opt : opts_) {\n    PushInt16(&data, opt.code_);\n    PushInt16(&data, (int)opt.data_.size());\n    data.insert(data.end(), opt.data_.begin(), opt.data_.end());\n  }\n\n  if (cookie.size()) {\n    PushInt16(&data, ARES_OPT_PARAM_COOKIE);\n    PushInt16(&data, (int)cookie.size());\n    data.insert(data.end(), cookie.begin(), cookie.end());\n  }\n\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          663,
+          0
+        ],
+        [
+          720,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSOptRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSNaptrRR::data(const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data = DNSRR::data(dnsrec);\n  std::vector<byte> encname = EncodeString(replacement_);\n  int len = (4 + 1 + (int)flags_.size() + 1 + (int)service_.size() + 1 + (int)regexp_.size() + (int)encname.size());\n  PushInt16(&data, len);\n  PushInt16(&data, order_);\n  PushInt16(&data, pref_);\n  data.push_back((byte)flags_.size());\n  data.insert(data.end(), flags_.begin(), flags_.end());\n  data.push_back((byte)service_.size());\n  data.insert(data.end(), service_.begin(), service_.end());\n  data.push_back((byte)regexp_.size());\n  data.insert(data.end(), regexp_.begin(), regexp_.end());\n  data.insert(data.end(), encname.begin(), encname.end());\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          722,
+          0
+        ],
+        [
+          737,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSNaptrRR::data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> DNSPacket::data(const char *request_name, const ares_dns_record_t *dnsrec) const {\n  std::vector<byte> data;\n  PushInt16(&data, qid_);\n  byte b = 0x00;\n  if (response_) b |= 0x80;\n  b |= ((opcode_ & 0x0f) << 3);\n  if (aa_) b |= 0x04;\n  if (tc_) b |= 0x02;\n  if (rd_) b |= 0x01;\n  data.push_back(b);\n  b = 0x00;\n  if (ra_) b |= 0x80;\n  if (z_) b |= 0x40;\n  if (ad_) b |= 0x20;\n  if (cd_) b |= 0x10;\n  b |= (rcode_ & 0x0f);\n  data.push_back(b);\n\n  int count = (int)questions_.size();\n  PushInt16(&data, count);\n  count = (int)answers_.size();\n  PushInt16(&data, count);\n  count = (int)auths_.size();\n  PushInt16(&data, count);\n  count = (int)adds_.size();\n  PushInt16(&data, count);\n\n  for (const std::unique_ptr<DNSQuestion>& question : questions_) {\n    std::vector<byte> qdata = question->data(request_name, dnsrec);\n    if (qdata.size() == 0) {\n      data.clear();\n      return data;\n    }\n    data.insert(data.end(), qdata.begin(), qdata.end());\n  }\n  for (const std::unique_ptr<DNSRR>& rr : answers_) {\n    std::vector<byte> rrdata = rr->data(dnsrec);\n    if (rrdata.size() == 0) {\n      data.clear();\n      return data;\n    }\n    data.insert(data.end(), rrdata.begin(), rrdata.end());\n  }\n  for (const std::unique_ptr<DNSRR>& rr : auths_) {\n    std::vector<byte> rrdata = rr->data(dnsrec);\n    if (rrdata.size() == 0) {\n      data.clear();\n      return data;\n    }\n    data.insert(data.end(), rrdata.begin(), rrdata.end());\n  }\n  for (const std::unique_ptr<DNSRR>& rr : adds_) {\n    std::vector<byte> rrdata = rr->data(dnsrec);\n    if (rrdata.size() == 0) {\n      data.clear();\n      return data;\n    }\n    data.insert(data.end(), rrdata.begin(), rrdata.end());\n  }\n  return data;\n}",
+      "fn_code_pos": [
+        [
+          739,
+          0
+        ],
+        [
+          799,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSPacket::data",
+        "parameters": {
+          "request_name": "char",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ss(name)",
+      "fn_dec_pos": [
+        [
+          535,
+          20
+        ],
+        [
+          535,
+          28
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ss",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "fetch_rr_opt(const ares_dns_record_t *rec)",
+      "fn_dec_pos": [
+        [
+          649,
+          21
+        ],
+        [
+          649,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "fetch_rr_opt",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_setup.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_dns.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"dns-proto.h\"\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include <stdio.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#include <sstream>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#include <algorithm>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

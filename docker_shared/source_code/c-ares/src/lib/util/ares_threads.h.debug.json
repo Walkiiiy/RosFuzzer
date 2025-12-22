@@ -1,0 +1,377 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_thread_mutex_create(void)",
+      "fn_dec_pos": [
+        [
+          31,
+          33
+        ],
+        [
+          31,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_destroy(ares_thread_mutex_t *mut)",
+      "fn_dec_pos": [
+        [
+          32,
+          5
+        ],
+        [
+          32,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_destroy",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_lock(ares_thread_mutex_t *mut)",
+      "fn_dec_pos": [
+        [
+          33,
+          5
+        ],
+        [
+          33,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_lock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_unlock(ares_thread_mutex_t *mut)",
+      "fn_dec_pos": [
+        [
+          34,
+          5
+        ],
+        [
+          34,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_unlock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_create(void)",
+      "fn_dec_pos": [
+        [
+          40,
+          32
+        ],
+        [
+          40,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_destroy(ares_thread_cond_t *cond)",
+      "fn_dec_pos": [
+        [
+          41,
+          14
+        ],
+        [
+          41,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_destroy",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_signal(ares_thread_cond_t *cond)",
+      "fn_dec_pos": [
+        [
+          42,
+          14
+        ],
+        [
+          42,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_signal",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_broadcast(ares_thread_cond_t *cond)",
+      "fn_dec_pos": [
+        [
+          43,
+          14
+        ],
+        [
+          43,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_broadcast",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_wait(ares_thread_cond_t  *cond,\n                                    ares_thread_mutex_t *mut)",
+      "fn_dec_pos": [
+        [
+          44,
+          14
+        ],
+        [
+          45,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_wait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_timedwait(ares_thread_cond_t  *cond,\n                                         ares_thread_mutex_t *mut,\n                                         size_t               timeout_ms)",
+      "fn_dec_pos": [
+        [
+          48,
+          14
+        ],
+        [
+          50,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_timedwait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t",
+          "timeout_ms": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "(*ares_thread_func_t)(void *arg)",
+      "fn_dec_pos": [
+        [
+          56,
+          14
+        ],
+        [
+          56,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_create(ares_thread_t    **thread,\n                                 ares_thread_func_t func, void *arg)",
+      "fn_dec_pos": [
+        [
+          57,
+          14
+        ],
+        [
+          58,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_create",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "func": "ares_thread_func_t",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_thread_join(ares_thread_t *thread, void **rv)",
+      "fn_dec_pos": [
+        [
+          59,
+          14
+        ],
+        [
+          59,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_join",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "rv": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_thread_mutex",
+      {},
+      "",
+      [
+        28,
+        0
+      ],
+      [
+        28,
+        24
+      ]
+    ],
+    [
+      "typedef struct ares_thread_mutex ares_thread_mutex_t;",
+      {},
+      "ares_thread_mutex_t",
+      [
+        29,
+        0
+      ],
+      [
+        29,
+        53
+      ]
+    ],
+    [
+      "struct ares_thread_cond",
+      {},
+      "",
+      [
+        37,
+        0
+      ],
+      [
+        37,
+        23
+      ]
+    ],
+    [
+      "typedef struct ares_thread_cond ares_thread_cond_t;",
+      {},
+      "ares_thread_cond_t",
+      [
+        38,
+        0
+      ],
+      [
+        38,
+        51
+      ]
+    ],
+    [
+      "struct ares_thread",
+      {},
+      "",
+      [
+        53,
+        0
+      ],
+      [
+        53,
+        18
+      ]
+    ],
+    [
+      "typedef struct ares_thread ares_thread_t;",
+      {},
+      "ares_thread_t",
+      [
+        54,
+        0
+      ],
+      [
+        54,
+        41
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

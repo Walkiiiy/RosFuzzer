@@ -1,0 +1,110 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_destroy(ares_channel_t *channel)\n{\n  size_t             i;\n  ares_llist_node_t *node = NULL;\n\n  if (channel == NULL) {\n    return;\n  }\n\n  /* Mark as being shutdown */\n  ares_channel_lock(channel);\n  channel->sys_up = ARES_FALSE;\n  ares_channel_unlock(channel);\n\n  /* Disable configuration change monitoring.  We can't hold a lock because\n   * some cleanup routines, such as on Windows, are synchronous operations.\n   * What we've observed is a system config change event was triggered right\n   * at shutdown time and it tries to take the channel lock and the destruction\n   * waits for that event to complete before it continues so we get a channel\n   * lock deadlock at shutdown if we hold a lock during this process. */\n  if (channel->optmask & ARES_OPT_EVENT_THREAD) {\n    ares_event_thread_t *e = channel->sock_state_cb_data;\n    if (e && e->configchg) {\n      ares_event_configchg_destroy(e->configchg);\n      e->configchg = NULL;\n    }\n  }\n\n  /* Wait for reinit thread to exit if there was one pending, can't be\n   * holding a lock as the thread may take locks. */\n  if (channel->reinit_thread != NULL) {\n    void *rv;\n    ares_thread_join(channel->reinit_thread, &rv);\n    channel->reinit_thread = NULL;\n  }\n\n  /* Lock because callbacks will be triggered, and any system-generated\n   * callbacks need to hold a channel lock. */\n  ares_channel_lock(channel);\n\n  /* Destroy all queries */\n  node = ares_llist_node_first(channel->all_queries);\n  while (node != NULL) {\n    ares_llist_node_t *next  = ares_llist_node_next(node);\n    ares_query_t      *query = ares_llist_node_claim(node);\n\n    query->node_all_queries = NULL;\n    query->callback(query->arg, ARES_EDESTRUCTION, 0, NULL);\n    ares_free_query(query);\n\n    node = next;\n  }\n\n  ares_queue_notify_empty(channel);\n\n#ifndef NDEBUG\n  /* Freeing the query should remove it from all the lists in which it sits,\n   * so all query lists should be empty now.\n   */\n  assert(ares_llist_len(channel->all_queries) == 0);\n  assert(ares_htable_szvp_num_keys(channel->queries_by_qid) == 0);\n  assert(ares_slist_len(channel->queries_by_timeout) == 0);\n#endif\n\n  ares_destroy_servers_state(channel);\n\n#ifndef NDEBUG\n  assert(ares_htable_asvp_num_keys(channel->connnode_by_socket) == 0);\n#endif\n\n  /* No more callbacks will be triggered after this point, unlock */\n  ares_channel_unlock(channel);\n\n  /* Shut down the event thread */\n  if (channel->optmask & ARES_OPT_EVENT_THREAD) {\n    ares_event_thread_destroy(channel);\n  }\n\n  if (channel->domains) {\n    for (i = 0; i < channel->ndomains; i++) {\n      ares_free(channel->domains[i]);\n    }\n    ares_free(channel->domains);\n  }\n\n  ares_llist_destroy(channel->all_queries);\n  ares_slist_destroy(channel->queries_by_timeout);\n  ares_htable_szvp_destroy(channel->queries_by_qid);\n  ares_htable_asvp_destroy(channel->connnode_by_socket);\n\n  ares_free(channel->sortlist);\n  ares_free(channel->lookups);\n  ares_free(channel->resolvconf_path);\n  ares_free(channel->hosts_path);\n  ares_destroy_rand_state(channel->rand_state);\n\n  ares_hosts_file_destroy(channel->hf);\n\n  ares_qcache_destroy(channel->qcache);\n\n  ares_channel_threading_destroy(channel);\n\n  ares_free(channel);\n}",
+      "fn_code_pos": [
+        [
+          31,
+          0
+        ],
+        [
+          134,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_destroy_server(ares_server_t *server)\n{\n  if (server == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_close_sockets(server);\n  ares_llist_destroy(server->connections);\n  ares_free(server);\n}",
+      "fn_code_pos": [
+        [
+          136,
+          0
+        ],
+        [
+          145,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_server",
+        "parameters": {
+          "server": "ares_server_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_destroy_servers_state(ares_channel_t *channel)\n{\n  ares_slist_node_t *node;\n\n  while ((node = ares_slist_node_first(channel->servers)) != NULL) {\n    ares_server_t *server = ares_slist_node_claim(node);\n    ares_destroy_server(server);\n  }\n\n  ares_slist_destroy(channel->servers);\n  channel->servers = NULL;\n}",
+      "fn_code_pos": [
+        [
+          147,
+          0
+        ],
+        [
+          158,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_servers_state",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"event/ares_event.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

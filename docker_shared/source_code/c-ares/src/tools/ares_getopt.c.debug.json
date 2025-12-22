@@ -1,0 +1,102 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_getopt_init(ares_getopt_state_t *state, int nargc,\n                      const char * const *nargv)\n{\n  memset(state, 0, sizeof(*state));\n  state->opterr = 1;\n  state->optind = 1;\n  state->place  = EMSG;\n  state->argc   = nargc;\n  state->argv   = nargv;\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getopt_init",
+        "parameters": {
+          "state": "ares_getopt_state_t",
+          "nargc": "int",
+          "nargv": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int ares_getopt(ares_getopt_state_t *state, const char *ostr)\n{\n  const char *oli; /* option letter list index */\n\n  /* update scanning pointer */\n  if (!*state->place) {\n    if (state->optind >= state->argc) {\n      return -1;\n    }\n    state->place = state->argv[state->optind];\n    if (*(state->place) != '-') {\n      return -1;\n    }\n    state->place++;\n\n    /* found \"--\" */\n    if (*(state->place) == '-') {\n      state->optind++;\n      return -1;\n    }\n\n    /* Found just - */\n    if (!*(state->place)) {\n      state->optopt = 0;\n      return BADCH;\n    }\n  }\n\n  /* option letter okay? */\n  state->optopt = *(state->place);\n  state->place++;\n  oli = strchr(ostr, state->optopt);\n\n  if (oli == NULL) {\n    if (!(*state->place)) {\n      ++state->optind;\n    }\n    if (state->opterr) {\n      (void)fprintf(stderr, \"%s: illegal option -- %c\\n\", __FILE__,\n                    state->optopt);\n    }\n    return BADCH;\n  }\n\n  /* don't need argument */\n  if (*++oli != ':') {\n    state->optarg = NULL;\n    if (!*state->place) {\n      ++state->optind;\n    }\n  } else {\n    /* need an argument */\n    if (*state->place) {                         /* no white space */\n      state->optarg = state->place;\n    } else if (state->argc <= ++state->optind) { /* no arg */\n      state->place = EMSG;\n      if (*ostr == ':') {\n        return BADARG;\n      }\n      if (state->opterr) {\n        (void)fprintf(stderr, \"%s: option requires an argument -- %c\\n\",\n                      __FILE__, state->optopt);\n      }\n      return BADARG;\n    } else { /* white space */\n      state->optarg = state->argv[state->optind];\n    }\n    state->place = EMSG;\n    ++state->optind;\n  }\n  return state->optopt; /* dump back option letter */\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          137,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getopt",
+        "parameters": {
+          "state": "ares_getopt_state_t",
+          "ostr": "char"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <stdio.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        43,
+        0
+      ],
+      [
+        44,
+        0
+      ]
+    ],
+    [
+      "#include <string.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_getopt.h\"\n",
+      [
+        45,
+        0
+      ],
+      [
+        46,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

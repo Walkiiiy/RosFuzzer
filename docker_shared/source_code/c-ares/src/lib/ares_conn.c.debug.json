@@ -1,0 +1,495 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_conn_sock_state_cb_update(ares_conn_t            *conn,\n                                    ares_conn_state_flags_t flags)\n{\n  ares_channel_t *channel = conn->server->channel;\n\n  if ((conn->state_flags & ARES_CONN_STATE_CBFLAGS) != flags &&\n      channel->sock_state_cb) {\n    channel->sock_state_cb(channel->sock_state_cb_data, conn->fd,\n                           flags & ARES_CONN_STATE_READ ? 1 : 0,\n                           flags & ARES_CONN_STATE_WRITE ? 1 : 0);\n  }\n\n  conn->state_flags &= ~((unsigned int)ARES_CONN_STATE_CBFLAGS);\n  conn->state_flags |= flags;\n}",
+      "fn_code_pos": [
+        [
+          28,
+          0
+        ],
+        [
+          42,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_sock_state_cb_update",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "flags": "ares_conn_state_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_conn_read(ares_conn_t *conn, void *data, size_t len,\n                               size_t *read_bytes)\n{\n  ares_channel_t *channel = conn->server->channel;\n  ares_conn_err_t err;\n\n  if (!(conn->flags & ARES_CONN_FLAG_TCP)) {\n    struct sockaddr_storage sa_storage;\n    ares_socklen_t          salen = sizeof(sa_storage);\n\n    memset(&sa_storage, 0, sizeof(sa_storage));\n\n    err =\n      ares_socket_recvfrom(channel, conn->fd, ARES_FALSE, data, len, 0,\n                           (struct sockaddr *)&sa_storage, &salen, read_bytes);\n\n#ifdef HAVE_RECVFROM\n    if (err == ARES_CONN_ERR_SUCCESS &&\n        !ares_sockaddr_addr_eq((struct sockaddr *)&sa_storage,\n                               &conn->server->addr)) {\n      err = ARES_CONN_ERR_WOULDBLOCK;\n    }\n#endif\n  } else {\n    err = ares_socket_recv(channel, conn->fd, ARES_TRUE, data, len, read_bytes);\n  }\n\n  /* Toggle connected state if needed */\n  if (err == ARES_CONN_ERR_SUCCESS) {\n    conn->state_flags |= ARES_CONN_STATE_CONNECTED;\n  }\n\n  return err;\n}",
+      "fn_code_pos": [
+        [
+          44,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_read",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "data": "void",
+          "len": "size_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_conn_set_sockaddr(const ares_conn_t *conn,\n                                            struct sockaddr   *sa,\n                                            ares_socklen_t    *salen)\n{\n  const ares_server_t *server = conn->server;\n  unsigned short       port =\n    conn->flags & ARES_CONN_FLAG_TCP ? server->tcp_port : server->udp_port;\n  struct sockaddr_in  *sin;\n  struct sockaddr_in6 *sin6;\n\n  switch (server->addr.family) {\n    case AF_INET:\n      sin = (struct sockaddr_in *)(void *)sa;\n      if (*salen < (ares_socklen_t)sizeof(*sin)) {\n        return ARES_EFORMERR;\n      }\n      *salen = sizeof(*sin);\n      memset(sin, 0, sizeof(*sin));\n      sin->sin_family = AF_INET;\n      sin->sin_port   = htons(port);\n      memcpy(&sin->sin_addr, &server->addr.addr.addr4, sizeof(sin->sin_addr));\n      return ARES_SUCCESS;\n    case AF_INET6:\n      sin6 = (struct sockaddr_in6 *)(void *)sa;\n      if (*salen < (ares_socklen_t)sizeof(*sin6)) {\n        return ARES_EFORMERR;\n      }\n      *salen = sizeof(*sin6);\n      memset(sin6, 0, sizeof(*sin6));\n      sin6->sin6_family = AF_INET6;\n      sin6->sin6_port   = htons(port);\n      memcpy(&sin6->sin6_addr, &server->addr.addr.addr6,\n             sizeof(sin6->sin6_addr));\n#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID\n      sin6->sin6_scope_id = server->ll_scope;\n#endif\n      return ARES_SUCCESS;\n    default:\n      break;\n  }\n\n  return ARES_EBADFAMILY;\n}",
+      "fn_code_pos": [
+        [
+          85,
+          0
+        ],
+        [
+          127,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_set_sockaddr",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_conn_set_self_ip(ares_conn_t *conn, ares_bool_t early)\n{\n  ares_channel_t         *channel = conn->server->channel;\n  struct sockaddr_storage sa_storage;\n  int                     rv;\n  ares_socklen_t          len = sizeof(sa_storage);\n\n  /* We call this twice on TFO, if we already have the IP we can go ahead and\n   * skip processing */\n  if (!early && conn->self_ip.family != AF_UNSPEC) {\n    return ARES_SUCCESS;\n  }\n\n  memset(&sa_storage, 0, sizeof(sa_storage));\n\n  if (channel->sock_funcs.agetsockname == NULL) {\n    /* Not specified, we can still use cookies cooked with an empty self_ip */\n    memset(&conn->self_ip, 0, sizeof(conn->self_ip));\n    return ARES_SUCCESS;\n  }\n  rv = channel->sock_funcs.agetsockname(conn->fd,\n                                        (struct sockaddr *)(void *)&sa_storage,\n                                        &len, channel->sock_func_cb_data);\n  if (rv != 0) {\n    /* During TCP FastOpen, we can't get the IP this early since connect()\n     * may not be called.  That's ok, we'll try again later */\n    if (early && conn->flags & ARES_CONN_FLAG_TCP &&\n        conn->flags & ARES_CONN_FLAG_TFO) {\n      memset(&conn->self_ip, 0, sizeof(conn->self_ip));\n      return ARES_SUCCESS;\n    }\n    return ARES_ECONNREFUSED;\n  }\n\n  if (!ares_sockaddr_to_ares_addr(&conn->self_ip, NULL,\n                                  (struct sockaddr *)(void *)&sa_storage)) {\n    return ARES_ECONNREFUSED;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          129,
+          0
+        ],
+        [
+          169,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_set_self_ip",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "early": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_conn_write(ares_conn_t *conn, const void *data, size_t len,\n                                size_t *written)\n{\n  ares_channel_t         *channel = conn->server->channel;\n  ares_bool_t             is_tfo  = ARES_FALSE;\n  ares_conn_err_t         err     = ARES_CONN_ERR_SUCCESS;\n  struct sockaddr_storage sa_storage;\n  ares_socklen_t          salen = 0;\n  struct sockaddr        *sa    = NULL;\n\n  *written = 0;\n\n  /* Don't try to write if not doing initial TFO and not connected */\n  if (conn->flags & ARES_CONN_FLAG_TCP &&\n      !(conn->state_flags & ARES_CONN_STATE_CONNECTED) &&\n      !(conn->flags & ARES_CONN_FLAG_TFO_INITIAL)) {\n    return ARES_CONN_ERR_WOULDBLOCK;\n  }\n\n  /* On initial write during TFO we need to send an address */\n  if (conn->flags & ARES_CONN_FLAG_TFO_INITIAL) {\n    salen = sizeof(sa_storage);\n    sa    = (struct sockaddr *)&sa_storage;\n\n    conn->flags &= ~((unsigned int)ARES_CONN_FLAG_TFO_INITIAL);\n    is_tfo       = ARES_TRUE;\n\n    if (ares_conn_set_sockaddr(conn, sa, &salen) != ARES_SUCCESS) {\n      return ARES_CONN_ERR_FAILURE;\n    }\n  }\n\n  err = ares_socket_write(channel, conn->fd, data, len, written, sa, salen);\n  if (err != ARES_CONN_ERR_SUCCESS) {\n    goto done;\n  }\n\n  if (is_tfo) {\n    /* If using TFO, we might not have been able to get an IP earlier, since\n     * we hadn't informed the OS of the destination.  When using sendto()\n     * now we have so we should be able to fetch it */\n    ares_conn_set_self_ip(conn, ARES_FALSE);\n    goto done;\n  }\n\ndone:\n  if (err == ARES_CONN_ERR_SUCCESS && len == *written) {\n    /* Wrote all data, make sure we're not listening for write events unless\n     * using TFO, in which case we'll need a write event to know when\n     * we're connected. */\n    ares_conn_sock_state_cb_update(\n      conn, ARES_CONN_STATE_READ |\n              (is_tfo ? ARES_CONN_STATE_WRITE : ARES_CONN_STATE_NONE));\n  } else if (err == ARES_CONN_ERR_WOULDBLOCK) {\n    /* Need to wait on more buffer space to write */\n    ares_conn_sock_state_cb_update(conn, ARES_CONN_STATE_READ |\n                                           ARES_CONN_STATE_WRITE);\n  }\n\n  return err;\n}",
+      "fn_code_pos": [
+        [
+          171,
+          0
+        ],
+        [
+          231,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_write",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "data": "void",
+          "len": "size_t",
+          "written": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_conn_flush(ares_conn_t *conn)\n{\n  const unsigned char *data;\n  size_t               data_len;\n  size_t               count;\n  ares_conn_err_t      err;\n  ares_status_t        status;\n  ares_bool_t          tfo = ARES_FALSE;\n\n  if (conn == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (conn->flags & ARES_CONN_FLAG_TFO_INITIAL) {\n    tfo = ARES_TRUE;\n  }\n\n  do {\n    if (ares_buf_len(conn->out_buf) == 0) {\n      status = ARES_SUCCESS;\n      goto done;\n    }\n\n    if (conn->flags & ARES_CONN_FLAG_TCP) {\n      data = ares_buf_peek(conn->out_buf, &data_len);\n    } else {\n      unsigned short msg_len;\n\n      /* Read length, then provide buffer without length */\n      ares_buf_tag(conn->out_buf);\n      status = ares_buf_fetch_be16(conn->out_buf, &msg_len);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n      ares_buf_tag_rollback(conn->out_buf);\n\n      data = ares_buf_peek(conn->out_buf, &data_len);\n      if (data_len < (size_t)(msg_len + 2)) {\n        status = ARES_EFORMERR;\n        goto done;\n      }\n      data     += 2;\n      data_len  = msg_len;\n    }\n\n    err = ares_conn_write(conn, data, data_len, &count);\n    if (err != ARES_CONN_ERR_SUCCESS) {\n      if (err != ARES_CONN_ERR_WOULDBLOCK) {\n        status = ARES_ECONNREFUSED;\n        goto done;\n      }\n      status = ARES_SUCCESS;\n      goto done;\n    }\n\n    /* UDP didn't send the length prefix so augment that here */\n    if (!(conn->flags & ARES_CONN_FLAG_TCP)) {\n      count += 2;\n    }\n\n    /* Strip data written from the buffer */\n    ares_buf_consume(conn->out_buf, count);\n    status = ARES_SUCCESS;\n\n    /* Loop only for UDP since we have to send per-packet.  We already\n     * sent everything we could if using tcp */\n  } while (!(conn->flags & ARES_CONN_FLAG_TCP));\n\ndone:\n  if (status == ARES_SUCCESS) {\n    ares_conn_state_flags_t flags = ARES_CONN_STATE_READ;\n\n    /* When using TFO, the we need to enabling waiting on a write event to\n     * be notified of when a connection is actually established */\n    if (tfo) {\n      flags |= ARES_CONN_STATE_WRITE;\n    }\n\n    /* If using TCP and not all data was written (partial write), that means\n     * we need to also wait on a write event */\n    if (conn->flags & ARES_CONN_FLAG_TCP && ares_buf_len(conn->out_buf)) {\n      flags |= ARES_CONN_STATE_WRITE;\n    }\n\n    ares_conn_sock_state_cb_update(conn, flags);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          233,
+          0
+        ],
+        [
+          321,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_flush",
+        "parameters": {
+          "conn": "ares_conn_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_conn_connect(ares_conn_t           *conn,\n                                       const struct sockaddr *sa,\n                                       ares_socklen_t         salen)\n{\n  ares_conn_err_t err;\n\n  err = ares_socket_connect(\n    conn->server->channel, conn->fd,\n    (conn->flags & ARES_CONN_FLAG_TFO) ? ARES_TRUE : ARES_FALSE, sa, salen);\n\n  if (err != ARES_CONN_ERR_WOULDBLOCK && err != ARES_CONN_ERR_SUCCESS) {\n    return ARES_ECONNREFUSED;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          323,
+          0
+        ],
+        [
+          337,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_connect",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_open_connection(ares_conn_t   **conn_out,\n                                   ares_channel_t *channel,\n                                   ares_server_t *server, ares_bool_t is_tcp)\n{\n  ares_status_t           status;\n  struct sockaddr_storage sa_storage;\n  ares_socklen_t          salen = sizeof(sa_storage);\n  struct sockaddr        *sa    = (struct sockaddr *)&sa_storage;\n  ares_conn_t            *conn;\n  ares_llist_node_t      *node  = NULL;\n  int                     stype = is_tcp ? SOCK_STREAM : SOCK_DGRAM;\n  ares_conn_state_flags_t state_flags;\n\n  *conn_out = NULL;\n\n  conn = ares_malloc(sizeof(*conn));\n  if (conn == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  memset(conn, 0, sizeof(*conn));\n  conn->fd              = ARES_SOCKET_BAD;\n  conn->server          = server;\n  conn->queries_to_conn = ares_llist_create(NULL);\n  conn->flags           = is_tcp ? ARES_CONN_FLAG_TCP : ARES_CONN_FLAG_NONE;\n  conn->out_buf         = ares_buf_create();\n  conn->in_buf          = ares_buf_create();\n\n  if (conn->queries_to_conn == NULL || conn->out_buf == NULL ||\n      conn->in_buf == NULL) {\n    /* LCOV_EXCL_START: OutOfMemory */\n    status = ARES_ENOMEM;\n    goto done;\n    /* LCOV_EXCL_STOP */\n  }\n\n  /* Try to enable TFO always if using TCP. it will fail later on if its\n   * really not supported when we try to enable it on the socket. */\n  if (conn->flags & ARES_CONN_FLAG_TCP) {\n    conn->flags |= ARES_CONN_FLAG_TFO;\n  }\n\n  /* Convert into the struct sockaddr structure needed by the OS */\n  status = ares_conn_set_sockaddr(conn, sa, &salen);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Acquire a socket. */\n  if (ares_socket_open(&conn->fd, channel, server->addr.family, stype, 0) !=\n      ARES_CONN_ERR_SUCCESS) {\n    status = ARES_ECONNREFUSED;\n    goto done;\n  }\n\n  /* Configure channel configured options */\n  status = ares_socket_configure(\n    channel, server->addr.family,\n    (conn->flags & ARES_CONN_FLAG_TCP) ? ARES_TRUE : ARES_FALSE, conn->fd);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Enable TFO if possible */\n  if (conn->flags & ARES_CONN_FLAG_TFO &&\n      ares_socket_enable_tfo(channel, conn->fd) != ARES_CONN_ERR_SUCCESS) {\n    conn->flags &= ~((unsigned int)ARES_CONN_FLAG_TFO);\n  }\n\n  if (channel->sock_config_cb) {\n    int err =\n      channel->sock_config_cb(conn->fd, stype, channel->sock_config_cb_data);\n    if (err < 0) {\n      status = ARES_ECONNREFUSED;\n      goto done;\n    }\n  }\n\n  /* Connect */\n  status = ares_conn_connect(conn, sa, salen);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (channel->sock_create_cb) {\n    int err =\n      channel->sock_create_cb(conn->fd, stype, channel->sock_create_cb_data);\n    if (err < 0) {\n      status = ARES_ECONNREFUSED;\n      goto done;\n    }\n  }\n\n  /* Let the connection know we haven't written our first packet yet for TFO */\n  if (conn->flags & ARES_CONN_FLAG_TFO) {\n    conn->flags |= ARES_CONN_FLAG_TFO_INITIAL;\n  }\n\n  /* Need to store our own ip for DNS cookie support */\n  status = ares_conn_set_self_ip(conn, ARES_TRUE);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  /* TCP connections are thrown to the end as we don't spawn multiple TCP\n   * connections. UDP connections are put on front where the newest connection\n   * can be quickly pulled */\n  if (is_tcp) {\n    node = ares_llist_insert_last(server->connections, conn);\n  } else {\n    node = ares_llist_insert_first(server->connections, conn);\n  }\n  if (node == NULL) {\n    /* LCOV_EXCL_START: OutOfMemory */\n    status = ARES_ENOMEM;\n    goto done;\n    /* LCOV_EXCL_STOP */\n  }\n\n  /* Register globally to quickly map event on file descriptor to connection\n   * node object */\n  if (!ares_htable_asvp_insert(channel->connnode_by_socket, conn->fd, node)) {\n    /* LCOV_EXCL_START: OutOfMemory */\n    status = ARES_ENOMEM;\n    goto done;\n    /* LCOV_EXCL_STOP */\n  }\n\n  state_flags = ARES_CONN_STATE_READ;\n\n  /* Get notified on connect if using TCP */\n  if (conn->flags & ARES_CONN_FLAG_TCP) {\n    state_flags |= ARES_CONN_STATE_WRITE;\n  }\n\n  /* Dot no attempt to update sock state callbacks on TFO until *after* the\n   * initial write is performed.  Due to the notification event, its possible\n   * an erroneous read can come in before the attempt to write the data which\n   * might be used to set the ip address */\n  if (!(conn->flags & ARES_CONN_FLAG_TFO_INITIAL)) {\n    ares_conn_sock_state_cb_update(conn, state_flags);\n  }\n\n  if (is_tcp) {\n    server->tcp_conn = conn;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_llist_node_claim(node);\n    ares_llist_destroy(conn->queries_to_conn);\n    ares_socket_close(channel, conn->fd);\n    ares_buf_destroy(conn->out_buf);\n    ares_buf_destroy(conn->in_buf);\n    ares_free(conn);\n  } else {\n    *conn_out = conn;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          339,
+          0
+        ],
+        [
+          498,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_open_connection",
+        "parameters": {
+          "conn_out": "ares_conn_t",
+          "channel": "ares_channel_t",
+          "server": "ares_server_t",
+          "is_tcp": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_t *ares_conn_from_fd(const ares_channel_t *channel, ares_socket_t fd)\n{\n  ares_llist_node_t *node;\n\n  node = ares_htable_asvp_get_direct(channel->connnode_by_socket, fd);\n  if (node == NULL) {\n    return NULL;\n  }\n\n  return ares_llist_node_val(node);\n}",
+      "fn_code_pos": [
+        [
+          500,
+          0
+        ],
+        [
+          510,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_from_fd",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": "ares_conn_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_conn_from_fd(const ares_channel_t *channel, ares_socket_t fd)",
+      "fn_dec_pos": [
+        [
+          500,
+          13
+        ],
+        [
+          500,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_from_fd",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        51,
+        4
+      ],
+      [
+        51,
+        27
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        58,
+        28
+      ],
+      [
+        58,
+        43
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        62,
+        32
+      ],
+      [
+        62,
+        47
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        86,
+        44
+      ],
+      [
+        86,
+        59
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        92,
+        2
+      ],
+      [
+        92,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        93,
+        2
+      ],
+      [
+        93,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        97,
+        13
+      ],
+      [
+        97,
+        31
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        108,
+        14
+      ],
+      [
+        108,
+        33
+      ]
+    ],
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        132,
+        2
+      ],
+      [
+        132,
+        25
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        150,
+        41
+      ],
+      [
+        150,
+        56
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        164,
+        35
+      ],
+      [
+        164,
+        50
+      ]
+    ],
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        177,
+        2
+      ],
+      [
+        177,
+        25
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        179,
+        2
+      ],
+      [
+        179,
+        17
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        193,
+        13
+      ],
+      [
+        193,
+        28
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        324,
+        45
+      ],
+      [
+        324,
+        60
+      ]
+    ],
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        344,
+        2
+      ],
+      [
+        344,
+        25
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        346,
+        2
+      ],
+      [
+        346,
+        17
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        346,
+        35
+      ],
+      [
+        346,
+        50
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

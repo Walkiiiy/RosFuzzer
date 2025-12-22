@@ -1,0 +1,349 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_evsys_kqueue_destroy(ares_event_thread_t *e)\n{\n  ares_evsys_kqueue_t *kq = NULL;\n\n  if (e == NULL) {\n    return;\n  }\n\n  kq = e->ev_sys_data;\n  if (kq == NULL) {\n    return;\n  }\n\n  if (kq->kqueue_fd != -1) {\n    close(kq->kqueue_fd);\n  }\n\n  ares_free(kq->changelist);\n  ares_free(kq);\n  e->ev_sys_data = NULL;\n}",
+      "fn_code_pos": [
+        [
+          50,
+          0
+        ],
+        [
+          70,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_destroy",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_kqueue_init(ares_event_thread_t *e)\n{\n  ares_evsys_kqueue_t *kq = NULL;\n\n  kq = ares_malloc_zero(sizeof(*kq));\n  if (kq == NULL) {\n    return ARES_FALSE;\n  }\n\n  e->ev_sys_data = kq;\n\n  kq->kqueue_fd = kqueue();\n  if (kq->kqueue_fd == -1) {\n    ares_evsys_kqueue_destroy(e);\n    return ARES_FALSE;\n  }\n\n#  ifdef FD_CLOEXEC\n  fcntl(kq->kqueue_fd, F_SETFD, FD_CLOEXEC);\n#  endif\n\n  kq->nchanges_alloc = 8;\n  kq->changelist =\n    ares_malloc_zero(kq->nchanges_alloc * sizeof(*kq->changelist));\n  if (kq->changelist == NULL) {\n    ares_evsys_kqueue_destroy(e);\n    return ARES_FALSE;\n  }\n\n  e->ev_signal = ares_pipeevent_create(e);\n  if (e->ev_signal == NULL) {\n    ares_evsys_kqueue_destroy(e);\n    return ARES_FALSE;\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          72,
+          0
+        ],
+        [
+          108,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_init",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_kqueue_enqueue(ares_evsys_kqueue_t *kq, int fd,\n                                      int16_t filter, uint16_t flags)\n{\n  size_t idx;\n\n  if (kq == NULL) {\n    return;\n  }\n\n  idx = kq->nchanges;\n\n  kq->nchanges++;\n\n  if (kq->nchanges > kq->nchanges_alloc) {\n    kq->nchanges_alloc <<= 1;\n    kq->changelist       = ares_realloc_zero(\n      kq->changelist, (kq->nchanges_alloc >> 1) * sizeof(*kq->changelist),\n      kq->nchanges_alloc * sizeof(*kq->changelist));\n  }\n\n  EV_SET(&kq->changelist[idx], fd, filter, flags, 0, 0, 0);\n}",
+      "fn_code_pos": [
+        [
+          110,
+          0
+        ],
+        [
+          131,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_enqueue",
+        "parameters": {
+          "kq": "ares_evsys_kqueue_t",
+          "fd": "int",
+          "filter": "int16_t",
+          "flags": "uint16_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_kqueue_event_process(ares_event_t      *event,\n                                            ares_event_flags_t old_flags,\n                                            ares_event_flags_t new_flags)\n{\n  ares_event_thread_t *e = event->e;\n  ares_evsys_kqueue_t *kq;\n\n  if (e == NULL) {\n    return;\n  }\n\n  kq = e->ev_sys_data;\n  if (kq == NULL) {\n    return;\n  }\n\n  if (new_flags & ARES_EVENT_FLAG_READ && !(old_flags & ARES_EVENT_FLAG_READ)) {\n    ares_evsys_kqueue_enqueue(kq, event->fd, EVFILT_READ, EV_ADD | EV_ENABLE);\n  }\n\n  if (!(new_flags & ARES_EVENT_FLAG_READ) && old_flags & ARES_EVENT_FLAG_READ) {\n    ares_evsys_kqueue_enqueue(kq, event->fd, EVFILT_READ, EV_DELETE);\n  }\n\n  if (new_flags & ARES_EVENT_FLAG_WRITE &&\n      !(old_flags & ARES_EVENT_FLAG_WRITE)) {\n    ares_evsys_kqueue_enqueue(kq, event->fd, EVFILT_WRITE, EV_ADD | EV_ENABLE);\n  }\n\n  if (!(new_flags & ARES_EVENT_FLAG_WRITE) &&\n      old_flags & ARES_EVENT_FLAG_WRITE) {\n    ares_evsys_kqueue_enqueue(kq, event->fd, EVFILT_WRITE, EV_DELETE);\n  }\n}",
+      "fn_code_pos": [
+        [
+          133,
+          0
+        ],
+        [
+          166,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_event_process",
+        "parameters": {
+          "event": "ares_event_t",
+          "old_flags": "ares_event_flags_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_kqueue_event_add(ares_event_t *event)\n{\n  ares_evsys_kqueue_event_process(event, 0, event->flags);\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          168,
+          0
+        ],
+        [
+          172,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_event_add",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_kqueue_event_del(ares_event_t *event)\n{\n  ares_evsys_kqueue_event_process(event, event->flags, 0);\n}",
+      "fn_code_pos": [
+        [
+          174,
+          0
+        ],
+        [
+          177,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_event_del",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_kqueue_event_mod(ares_event_t      *event,\n                                        ares_event_flags_t new_flags)\n{\n  ares_evsys_kqueue_event_process(event, event->flags, new_flags);\n}",
+      "fn_code_pos": [
+        [
+          179,
+          0
+        ],
+        [
+          183,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_event_mod",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_evsys_kqueue_wait(ares_event_thread_t *e,\n                                     unsigned long        timeout_ms)\n{\n  struct kevent        events[8];\n  size_t               nevents = sizeof(events) / sizeof(*events);\n  ares_evsys_kqueue_t *kq      = e->ev_sys_data;\n  int                  rv;\n  size_t               i;\n  struct timespec      ts;\n  struct timespec     *timeout = NULL;\n  size_t               cnt     = 0;\n\n  if (timeout_ms != 0) {\n    ts.tv_sec  = (time_t)timeout_ms / 1000;\n    ts.tv_nsec = (timeout_ms % 1000) * 1000 * 1000;\n    timeout    = &ts;\n  }\n\n  memset(events, 0, sizeof(events));\n\n  rv = kevent(kq->kqueue_fd, kq->changelist, (int)kq->nchanges, events,\n              (int)nevents, timeout);\n  if (rv < 0) {\n    return 0;\n  }\n\n  /* Changelist was consumed */\n  kq->nchanges = 0;\n  nevents      = (size_t)rv;\n\n  for (i = 0; i < nevents; i++) {\n    ares_event_t      *ev;\n    ares_event_flags_t flags = 0;\n\n    ev = ares_htable_asvp_get_direct(e->ev_sock_handles,\n                                     (ares_socket_t)events[i].ident);\n    if (ev == NULL || ev->cb == NULL) {\n      continue;\n    }\n\n    cnt++;\n\n    if (events[i].filter == EVFILT_READ ||\n        events[i].flags & (EV_EOF | EV_ERROR)) {\n      flags |= ARES_EVENT_FLAG_READ;\n    } else {\n      flags |= ARES_EVENT_FLAG_WRITE;\n    }\n\n    ev->cb(e, ev->fd, ev->data, flags);\n  }\n\n  return cnt;\n}",
+      "fn_code_pos": [
+        [
+          185,
+          0
+        ],
+        [
+          238,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_kqueue_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  int            kqueue_fd;\n  struct kevent *changelist;\n  size_t         nchanges;\n  size_t         nchanges_alloc;\n} ares_evsys_kqueue_t;",
+      {
+        "kqueue_fd": "int",
+        "*changelist": "struct kevent",
+        "nchanges": "size_t",
+        "nchanges_alloc": "size_t"
+      },
+      "ares_evsys_kqueue_t",
+      [
+        43,
+        0
+      ],
+      [
+        48,
+        22
+      ]
+    ],
+    [
+      "typedef struct {\n  int            kqueue_fd;\n  struct kevent *changelist;\n  size_t         nchanges;\n  size_t         nchanges_alloc;\n} ares_evsys_kqueue_t;",
+      {
+        "kqueue_fd": "int",
+        "*changelist": "struct kevent",
+        "nchanges": "size_t",
+        "nchanges_alloc": "size_t"
+      },
+      "ares_evsys_kqueue_t",
+      [
+        43,
+        0
+      ],
+      [
+        48,
+        22
+      ]
+    ],
+    [
+      "struct kevent",
+      {},
+      "",
+      [
+        45,
+        2
+      ],
+      [
+        45,
+        15
+      ]
+    ],
+    [
+      "struct kevent",
+      {},
+      "",
+      [
+        188,
+        2
+      ],
+      [
+        188,
+        15
+      ]
+    ],
+    [
+      "struct timespec",
+      {},
+      "",
+      [
+        193,
+        2
+      ],
+      [
+        193,
+        17
+      ]
+    ],
+    [
+      "struct timespec",
+      {},
+      "",
+      [
+        194,
+        2
+      ],
+      [
+        194,
+        17
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/event.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/time.h>\n",
+      [
+        37,
+        0
+      ],
+      [
+        38,
+        0
+      ]
+    ],
+    [
+      "#  include <fcntl.h>\n",
+      [
+        40,
+        0
+      ],
+      [
+        41,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

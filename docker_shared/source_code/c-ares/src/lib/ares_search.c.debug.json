@@ -1,0 +1,577 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void squery_free(struct search_query *squery)\n{\n  if (squery == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  ares_strsplit_free(squery->names, squery->names_cnt);\n  ares_dns_record_destroy(squery->dnsrec);\n  ares_free(squery);\n}",
+      "fn_code_pos": [
+        [
+          52,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "squery_free",
+        "parameters": {
+          "squery": "struct search_query"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void end_squery(struct search_query *squery, ares_status_t status,\n                       const ares_dns_record_t *dnsrec)\n{\n  squery->callback(squery->arg, status, squery->timeouts, dnsrec);\n  squery_free(squery);\n}",
+      "fn_code_pos": [
+        [
+          65,
+          0
+        ],
+        [
+          70,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "end_squery",
+        "parameters": {
+          "squery": "struct search_query",
+          "status": "ares_status_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_search_next(ares_channel_t      *channel,\n                                      struct search_query *squery,\n                                      ares_bool_t         *skip_cleanup)\n{\n  ares_status_t status;\n\n  *skip_cleanup = ARES_FALSE;\n\n  /* Misuse check */\n  if (squery->next_name_idx >= squery->names_cnt) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  status = ares_dns_record_query_set_name(\n    squery->dnsrec, 0, squery->names[squery->next_name_idx++]);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_send_nolock(channel, NULL, 0, squery->dnsrec, search_callback,\n                            squery, NULL);\n\n  if (status != ARES_EFORMERR) {\n    *skip_cleanup = ARES_TRUE;\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          75,
+          0
+        ],
+        [
+          102,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_next",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "squery": "struct search_query",
+          "skip_cleanup": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void search_callback(void *arg, ares_status_t status, size_t timeouts,\n                            const ares_dns_record_t *dnsrec)\n{\n  struct search_query *squery  = (struct search_query *)arg;\n  ares_channel_t      *channel = squery->channel;\n\n  ares_status_t        mystatus;\n  ares_bool_t          skip_cleanup = ARES_FALSE;\n\n  squery->timeouts += timeouts;\n\n  if (dnsrec) {\n    ares_dns_rcode_t rcode = ares_dns_record_get_rcode(dnsrec);\n    size_t ancount = ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER);\n    mystatus       = ares_dns_query_reply_tostatus(rcode, ancount);\n  } else {\n    mystatus = status;\n  }\n\n  switch (mystatus) {\n    case ARES_ENODATA:\n    case ARES_ENOTFOUND:\n      break;\n    case ARES_ESERVFAIL:\n    case ARES_EREFUSED:\n      /* Issue #852, systemd-resolved may return SERVFAIL or REFUSED on a\n       * single label domain name. */\n      if (ares_name_label_cnt(squery->names[squery->next_name_idx - 1]) != 1) {\n        end_squery(squery, mystatus, dnsrec);\n        return;\n      }\n      break;\n    default:\n      end_squery(squery, mystatus, dnsrec);\n      return;\n  }\n\n  /* If we ever get ARES_ENODATA along the way, record that; if the search\n   * should run to the very end and we got at least one ARES_ENODATA,\n   * then callers like ares_gethostbyname() may want to try a T_A search\n   * even if the last domain we queried for T_AAAA resource records\n   * returned ARES_ENOTFOUND.\n   */\n  if (mystatus == ARES_ENODATA) {\n    squery->ever_got_nodata = ARES_TRUE;\n  }\n\n  if (squery->next_name_idx < squery->names_cnt) {\n    mystatus = ares_search_next(channel, squery, &skip_cleanup);\n    if (mystatus != ARES_SUCCESS && !skip_cleanup) {\n      end_squery(squery, mystatus, NULL);\n    }\n    return;\n  }\n\n  /* We have no more domains to search, return an appropriate response. */\n  if (mystatus == ARES_ENOTFOUND && squery->ever_got_nodata) {\n    end_squery(squery, ARES_ENODATA, NULL);\n    return;\n  }\n\n  end_squery(squery, mystatus, NULL);\n}",
+      "fn_code_pos": [
+        [
+          104,
+          0
+        ],
+        [
+          166,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "search_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_search_eligible(const ares_channel_t *channel,\n                                        const char           *name)\n{\n  size_t len = ares_strlen(name);\n\n  /* Name ends in '.', cannot search */\n  if (len && name[len - 1] == '.') {\n    return ARES_FALSE;\n  }\n\n  if (channel->flags & ARES_FLAG_NOSEARCH) {\n    return ARES_FALSE;\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          170,
+          0
+        ],
+        [
+          185,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_eligible",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_name_label_cnt(const char *name)\n{\n  const char *p;\n  size_t      ndots = 0;\n\n  if (name == NULL) {\n    return 0;\n  }\n\n  for (p = name; p != NULL && *p != 0; p++) {\n    if (*p == '.') {\n      ndots++;\n    }\n  }\n\n  /* Label count is 1 greater than ndots */\n  return ndots + 1;\n}",
+      "fn_code_pos": [
+        [
+          187,
+          0
+        ],
+        [
+          204,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_name_label_cnt",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_search_name_list(const ares_channel_t *channel,\n                                    const char *name, char ***names,\n                                    size_t *names_len)\n{\n  ares_status_t status;\n  char        **list     = NULL;\n  size_t        list_len = 0;\n  char         *alias    = NULL;\n  size_t        ndots    = 0;\n  size_t        idx      = 0;\n  size_t        i;\n\n  /* Perform HOSTALIASES resolution */\n  status = ares_lookup_hostaliases(channel, name, &alias);\n  if (status == ARES_SUCCESS) {\n    /* If hostalias succeeds, there is no searching, it is used as-is */\n    list_len = 1;\n    list     = ares_malloc_zero(sizeof(*list) * list_len);\n    if (list == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    list[0] = alias;\n    alias   = NULL;\n    goto done;\n  } else if (status != ARES_ENOTFOUND) {\n    goto done;\n  }\n\n  /* See if searching is eligible at all, if not, look up as-is only */\n  if (!ares_search_eligible(channel, name)) {\n    list_len = 1;\n    list     = ares_malloc_zero(sizeof(*list) * list_len);\n    if (list == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    list[0] = ares_strdup(name);\n    if (list[0] == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    } else {\n      status = ARES_SUCCESS;\n    }\n    goto done;\n  }\n\n  /* Count the number of dots in name, 1 less than label count */\n  ndots = ares_name_label_cnt(name);\n  if (ndots > 0) {\n    ndots--;\n  }\n\n  /* Allocate an entry for each search domain, plus one for as-is */\n  list_len = channel->ndomains + 1;\n  list     = ares_malloc_zero(sizeof(*list) * list_len);\n  if (list == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  /* Set status here, its possible there are no search domains at all, so\n   * status may be ARES_ENOTFOUND from ares_lookup_hostaliases(). */\n  status = ARES_SUCCESS;\n\n  /* Try as-is first */\n  if (ndots >= channel->ndots) {\n    list[idx] = ares_strdup(name);\n    if (list[idx] == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    }\n    idx++;\n  }\n\n  /* Append each search suffix to the name */\n  for (i = 0; i < channel->ndomains; i++) {\n    status = ares_cat_domain(name, channel->domains[i], &list[idx]);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n    idx++;\n  }\n\n  /* Try as-is last */\n  if (ndots < channel->ndots) {\n    list[idx] = ares_strdup(name);\n    if (list[idx] == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    }\n    idx++;\n  }\n\n\ndone:\n  if (status == ARES_SUCCESS) {\n    *names     = list;\n    *names_len = list_len;\n  } else {\n    ares_strsplit_free(list, list_len);\n  }\n\n  ares_free(alias);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          206,
+          0
+        ],
+        [
+          310,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_name_list",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "names": "char",
+          "names_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_search_int(ares_channel_t          *channel,\n                                     const ares_dns_record_t *dnsrec,\n                                     ares_callback_dnsrec callback, void *arg)\n{\n  struct search_query *squery = NULL;\n  const char          *name;\n  ares_status_t        status       = ARES_SUCCESS;\n  ares_bool_t          skip_cleanup = ARES_FALSE;\n\n  /* Extract the name for the search. Note that searches are only supported for\n   * DNS records containing a single query.\n   */\n  if (ares_dns_record_query_cnt(dnsrec) != 1) {\n    status = ARES_EBADQUERY;\n    goto fail;\n  }\n\n  status = ares_dns_record_query_get(dnsrec, 0, &name, NULL, NULL);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* Per RFC 7686, reject queries for \".onion\" domain names with NXDOMAIN. */\n  if (ares_is_onion_domain(name)) {\n    status = ARES_ENOTFOUND;\n    goto fail;\n  }\n\n  /* Allocate a search_query structure to hold the state necessary for\n   * doing multiple lookups.\n   */\n  squery = ares_malloc_zero(sizeof(*squery));\n  if (squery == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  squery->channel = channel;\n\n  /* Duplicate DNS record since, name will need to be rewritten */\n  squery->dnsrec = ares_dns_record_duplicate(dnsrec);\n  if (squery->dnsrec == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  squery->callback        = callback;\n  squery->arg             = arg;\n  squery->timeouts        = 0;\n  squery->ever_got_nodata = ARES_FALSE;\n\n  status =\n    ares_search_name_list(channel, name, &squery->names, &squery->names_cnt);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  status = ares_search_next(channel, squery, &skip_cleanup);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  return status;\n\nfail:\n  if (!skip_cleanup) {\n    squery_free(squery);\n    callback(arg, status, 0, NULL);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          312,
+          0
+        ],
+        [
+          382,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_int",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "dnsrec": "ares_dns_record_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_dnsrec_convert_arg(ares_callback callback, void *arg)\n{\n  dnsrec_convert_arg_t *carg = ares_malloc_zero(sizeof(*carg));\n  if (carg == NULL) {\n    return NULL;\n  }\n  carg->callback = callback;\n  carg->arg      = arg;\n  return carg;\n}",
+      "fn_code_pos": [
+        [
+          392,
+          0
+        ],
+        [
+          401,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dnsrec_convert_arg",
+        "parameters": {
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_dnsrec_convert_cb(void *arg, ares_status_t status, size_t timeouts,\n                            const ares_dns_record_t *dnsrec)\n{\n  dnsrec_convert_arg_t *carg = arg;\n  unsigned char        *abuf = NULL;\n  size_t                alen = 0;\n\n  if (dnsrec != NULL) {\n    ares_status_t mystatus = ares_dns_write(dnsrec, &abuf, &alen);\n    if (mystatus != ARES_SUCCESS) {\n      status = mystatus;\n    }\n  }\n\n  carg->callback(carg->arg, (int)status, (int)timeouts, abuf, (int)alen);\n\n  ares_free(abuf);\n  ares_free(carg);\n}",
+      "fn_code_pos": [
+        [
+          407,
+          0
+        ],
+        [
+          425,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dnsrec_convert_cb",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_search(ares_channel_t *channel, const char *name, int dnsclass,\n                 int type, ares_callback callback, void *arg)\n{\n  ares_status_t      status;\n  ares_dns_record_t *dnsrec = NULL;\n  size_t             max_udp_size;\n  ares_dns_flags_t   rd_flag;\n  void              *carg = NULL;\n  if (channel == NULL || name == NULL) {\n    return;\n  }\n\n  /* For now, ares_search_int() uses the ares_callback prototype. We need to\n   * wrap the callback passed to this function in ares_dnsrec_convert_cb, to\n   * convert from ares_callback_dnsrec to ares_callback. Allocate the convert\n   * arg structure here.\n   */\n  carg = ares_dnsrec_convert_arg(callback, arg);\n  if (carg == NULL) {\n    callback(arg, ARES_ENOMEM, 0, NULL, 0);\n    return;\n  }\n\n  rd_flag      = !(channel->flags & ARES_FLAG_NORECURSE) ? ARES_FLAG_RD : 0;\n  max_udp_size = (channel->flags & ARES_FLAG_EDNS) ? channel->ednspsz : 0;\n  status       = ares_dns_record_create_query(\n    &dnsrec, name, (ares_dns_class_t)dnsclass, (ares_dns_rec_type_t)type, 0,\n    rd_flag, max_udp_size);\n  if (status != ARES_SUCCESS) {\n    callback(arg, (int)status, 0, NULL, 0);\n    ares_free(carg);\n    return;\n  }\n\n  ares_channel_lock(channel);\n  ares_search_int(channel, dnsrec, ares_dnsrec_convert_cb, carg);\n  ares_channel_unlock(channel);\n\n  ares_dns_record_destroy(dnsrec);\n}",
+      "fn_code_pos": [
+        [
+          430,
+          0
+        ],
+        [
+          469,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_search_dnsrec(ares_channel_t          *channel,\n                                 const ares_dns_record_t *dnsrec,\n                                 ares_callback_dnsrec callback, void *arg)\n{\n  ares_status_t status;\n\n  if (channel == NULL || dnsrec == NULL || callback == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_channel_lock(channel);\n  status = ares_search_int(channel, dnsrec, callback, arg);\n  ares_channel_unlock(channel);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          472,
+          0
+        ],
+        [
+          487,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_dnsrec",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "dnsrec": "ares_dns_record_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_cat_domain(const char *name, const char *domain, char **s)\n{\n  size_t nlen = ares_strlen(name);\n  size_t dlen = ares_strlen(domain);\n\n  *s = ares_malloc(nlen + 1 + dlen + 1);\n  if (!*s) {\n    return ARES_ENOMEM;\n  }\n  memcpy(*s, name, nlen);\n  (*s)[nlen] = '.';\n  if (ares_streq(domain, \".\")) {\n    /* Avoid appending the root domain to the separator, which would set *s to\n       an ill-formed value (ending in two consecutive dots). */\n    dlen = 0;\n  }\n  memcpy(*s + nlen + 1, domain, dlen);\n  (*s)[nlen + 1 + dlen] = 0;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          490,
+          0
+        ],
+        [
+          509,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cat_domain",
+        "parameters": {
+          "name": "char",
+          "domain": "char",
+          "s": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_lookup_hostaliases(const ares_channel_t *channel,\n                                      const char *name, char **alias)\n{\n  ares_status_t status      = ARES_SUCCESS;\n  const char   *hostaliases = NULL;\n  ares_buf_t   *buf         = NULL;\n  ares_array_t *lines       = NULL;\n  size_t        num;\n  size_t        i;\n\n  if (channel == NULL || name == NULL || alias == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *alias = NULL;\n\n  /* Configuration says to not perform alias lookup */\n  if (channel->flags & ARES_FLAG_NOALIASES) {\n    return ARES_ENOTFOUND;\n  }\n\n  /* If a domain has a '.', its not allowed to perform an alias lookup */\n  if (strchr(name, '.') != NULL) {\n    return ARES_ENOTFOUND;\n  }\n\n  hostaliases = getenv(\"HOSTALIASES\");\n  if (hostaliases == NULL) {\n    status = ARES_ENOTFOUND;\n    goto done;\n  }\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_load_file(hostaliases, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* The HOSTALIASES file is structured as one alias per line.  The first\n   * field in the line is the simple hostname with no periods, followed by\n   * whitespace, then the full domain name, e.g.:\n   *\n   * c-ares  www.c-ares.org\n   * curl    www.curl.se\n   */\n\n  status = ares_buf_split(buf, (const unsigned char *)\"\\n\", 1,\n                          ARES_BUF_SPLIT_TRIM, 0, &lines);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  num = ares_array_len(lines);\n  for (i = 0; i < num; i++) {\n    ares_buf_t **bufptr       = ares_array_at(lines, i);\n    ares_buf_t  *line         = *bufptr;\n    char         hostname[64] = \"\";\n    char         fqdn[256]    = \"\";\n\n    /* Pull off hostname */\n    ares_buf_tag(line);\n    ares_buf_consume_nonwhitespace(line);\n    if (ares_buf_tag_fetch_string(line, hostname, sizeof(hostname)) !=\n        ARES_SUCCESS) {\n      continue;\n    }\n\n    /* Match hostname */\n    if (!ares_strcaseeq(hostname, name)) {\n      continue;\n    }\n\n    /* consume whitespace */\n    ares_buf_consume_whitespace(line, ARES_TRUE);\n\n    /* pull off fqdn */\n    ares_buf_tag(line);\n    ares_buf_consume_nonwhitespace(line);\n    if (ares_buf_tag_fetch_string(line, fqdn, sizeof(fqdn)) != ARES_SUCCESS ||\n        ares_strlen(fqdn) == 0) {\n      continue;\n    }\n\n    /* Validate characterset */\n    if (!ares_is_hostname(fqdn)) {\n      continue;\n    }\n\n    *alias = ares_strdup(fqdn);\n    if (*alias == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Good! */\n    status = ARES_SUCCESS;\n    goto done;\n  }\n\n  status = ARES_ENOTFOUND;\n\ndone:\n  ares_buf_destroy(buf);\n  ares_array_destroy(lines);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          511,
+          0
+        ],
+        [
+          622,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_lookup_hostaliases",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "alias": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "search_callback(void *arg, ares_status_t status, size_t timeouts,\n                            const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          72,
+          12
+        ],
+        [
+          73,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "search_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_dnsrec_convert_arg(ares_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          392,
+          6
+        ],
+        [
+          392,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dnsrec_convert_arg",
+        "parameters": {
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct search_query {\n  /* Arguments passed to ares_search_dnsrec() */\n  ares_channel_t      *channel;\n  ares_callback_dnsrec callback;\n  void                *arg;\n\n  /* Duplicate of DNS record passed to ares_search_dnsrec() */\n  ares_dns_record_t   *dnsrec;\n\n  /* Search order for names */\n  char               **names;\n  size_t               names_cnt;\n\n  /* State tracking progress through the search query */\n  size_t               next_name_idx; /* next name index being attempted */\n  size_t      timeouts;        /* number of timeouts we saw for this request */\n  ares_bool_t ever_got_nodata; /* did we ever get ARES_ENODATA along the way? */\n}",
+      {
+        "*channel": "ares_channel_t",
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void",
+        "*dnsrec": "ares_dns_record_t",
+        "**names": "char",
+        "names_cnt": "size_t",
+        "next_name_idx": "size_t",
+        "timeouts": "size_t",
+        "ever_got_nodata": "ares_bool_t"
+      },
+      "search_query",
+      [
+        33,
+        0
+      ],
+      [
+        50,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_callback callback;\n  void         *arg;\n} dnsrec_convert_arg_t;",
+      {
+        "callback": "ares_callback",
+        "*arg": "void"
+      },
+      "dnsrec_convert_arg_t",
+      [
+        385,
+        0
+      ],
+      [
+        388,
+        23
+      ]
+    ],
+    [
+      "struct search_query {\n  /* Arguments passed to ares_search_dnsrec() */\n  ares_channel_t      *channel;\n  ares_callback_dnsrec callback;\n  void                *arg;\n\n  /* Duplicate of DNS record passed to ares_search_dnsrec() */\n  ares_dns_record_t   *dnsrec;\n\n  /* Search order for names */\n  char               **names;\n  size_t               names_cnt;\n\n  /* State tracking progress through the search query */\n  size_t               next_name_idx; /* next name index being attempted */\n  size_t      timeouts;        /* number of timeouts we saw for this request */\n  ares_bool_t ever_got_nodata; /* did we ever get ARES_ENODATA along the way? */\n}",
+      {
+        "*channel": "ares_channel_t",
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void",
+        "*dnsrec": "ares_dns_record_t",
+        "**names": "char",
+        "names_cnt": "size_t",
+        "next_name_idx": "size_t",
+        "timeouts": "size_t",
+        "ever_got_nodata": "ares_bool_t"
+      },
+      "search_query",
+      [
+        33,
+        0
+      ],
+      [
+        50,
+        1
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        52,
+        24
+      ],
+      [
+        52,
+        43
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        65,
+        23
+      ],
+      [
+        65,
+        42
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        76,
+        38
+      ],
+      [
+        76,
+        57
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        107,
+        2
+      ],
+      [
+        107,
+        21
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        107,
+        34
+      ],
+      [
+        107,
+        53
+      ]
+    ],
+    [
+      "struct search_query",
+      {},
+      "",
+      [
+        316,
+        2
+      ],
+      [
+        316,
+        21
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_callback callback;\n  void         *arg;\n} dnsrec_convert_arg_t;",
+      {
+        "callback": "ares_callback",
+        "*arg": "void"
+      },
+      "dnsrec_convert_arg_t",
+      [
+        385,
+        0
+      ],
+      [
+        388,
+        23
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <strings.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

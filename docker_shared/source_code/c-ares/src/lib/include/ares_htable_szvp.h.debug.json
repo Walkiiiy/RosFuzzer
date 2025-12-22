@@ -1,0 +1,219 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_htable_szvp_val_free_t)(void *val)",
+      "fn_dec_pos": [
+        [
+          51,
+          13
+        ],
+        [
+          51,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "val": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_htable_szvp_destroy(ares_htable_szvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          57,
+          18
+        ],
+        [
+          57,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_szvp_destroy",
+        "parameters": {
+          "htable": "ares_htable_szvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_szvp_create(ares_htable_szvp_val_free_t val_free)",
+      "fn_dec_pos": [
+        [
+          66,
+          2
+        ],
+        [
+          66,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "val_free": "ares_htable_szvp_val_free_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_szvp_insert(ares_htable_szvp_t *htable,\n                                                 size_t key, void *val)",
+      "fn_dec_pos": [
+        [
+          75,
+          13
+        ],
+        [
+          76,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_szvp_insert",
+        "parameters": {
+          "htable": "ares_htable_szvp_t",
+          "key": "size_t",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_szvp_get(const ares_htable_szvp_t *htable,\n                                              size_t key, void **val)",
+      "fn_dec_pos": [
+        [
+          85,
+          13
+        ],
+        [
+          86,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_szvp_get",
+        "parameters": {
+          "htable": "ares_htable_szvp_t",
+          "key": "size_t",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_szvp_get_direct(const ares_htable_szvp_t *htable,\n                                               size_t                    key)",
+      "fn_dec_pos": [
+        [
+          96,
+          19
+        ],
+        [
+          97,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_szvp_get_direct",
+        "parameters": {
+          "htable": "ares_htable_szvp_t",
+          "key": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_szvp_remove(ares_htable_szvp_t *htable,\n                                                 size_t              key)",
+      "fn_dec_pos": [
+        [
+          105,
+          13
+        ],
+        [
+          106,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_szvp_remove",
+        "parameters": {
+          "htable": "ares_htable_szvp_t",
+          "key": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_szvp_num_keys(const ares_htable_szvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          113,
+          20
+        ],
+        [
+          113,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_szvp_num_keys",
+        "parameters": {
+          "htable": "ares_htable_szvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable_szvp",
+      {},
+      "",
+      [
+        42,
+        0
+      ],
+      [
+        42,
+        23
+      ]
+    ],
+    [
+      "typedef struct ares_htable_szvp ares_htable_szvp_t;",
+      {},
+      "ares_htable_szvp_t",
+      [
+        45,
+        0
+      ],
+      [
+        45,
+        51
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

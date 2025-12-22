@@ -1,0 +1,675 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_conn_err_t ares_socket_deref_error(int err)\n{\n  switch (err) {\n#if defined(EWOULDBLOCK)\n    case EWOULDBLOCK:\n      return ARES_CONN_ERR_WOULDBLOCK;\n#endif\n#if defined(EAGAIN) && (!defined(EWOULDBLOCK) || EAGAIN != EWOULDBLOCK)\n    case EAGAIN:\n      return ARES_CONN_ERR_WOULDBLOCK;\n#endif\n    case EINPROGRESS:\n      return ARES_CONN_ERR_WOULDBLOCK;\n    case ENETDOWN:\n      return ARES_CONN_ERR_NETDOWN;\n    case ENETUNREACH:\n      return ARES_CONN_ERR_NETUNREACH;\n    case ECONNABORTED:\n      return ARES_CONN_ERR_CONNABORTED;\n    case ECONNRESET:\n      return ARES_CONN_ERR_CONNRESET;\n    case ECONNREFUSED:\n      return ARES_CONN_ERR_CONNREFUSED;\n    case ETIMEDOUT:\n      return ARES_CONN_ERR_CONNTIMEDOUT;\n    case EHOSTDOWN:\n      return ARES_CONN_ERR_HOSTDOWN;\n    case EHOSTUNREACH:\n      return ARES_CONN_ERR_HOSTUNREACH;\n    case EINTR:\n      return ARES_CONN_ERR_INTERRUPT;\n    case EAFNOSUPPORT:\n      return ARES_CONN_ERR_AFNOSUPPORT;\n    case EADDRNOTAVAIL:\n      return ARES_CONN_ERR_BADADDR;\n    default:\n      break;\n  }\n\n  return ARES_CONN_ERR_FAILURE;\n}",
+      "fn_code_pos": [
+        [
+          57,
+          0
+        ],
+        [
+          97,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_deref_error",
+        "parameters": {
+          "err": "int"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_sockaddr_addr_eq(const struct sockaddr  *sa,\n                                  const struct ares_addr *aa)\n{\n  const void *addr1;\n  const void *addr2;\n\n  if (sa->sa_family == aa->family) {\n    switch (aa->family) {\n      case AF_INET:\n        addr1 = &aa->addr.addr4;\n        addr2 = &(CARES_INADDR_CAST(const struct sockaddr_in *, sa))->sin_addr;\n        if (memcmp(addr1, addr2, sizeof(aa->addr.addr4)) == 0) {\n          return ARES_TRUE; /* match */\n        }\n        break;\n      case AF_INET6:\n        addr1 = &aa->addr.addr6;\n        addr2 =\n          &(CARES_INADDR_CAST(const struct sockaddr_in6 *, sa))->sin6_addr;\n        if (memcmp(addr1, addr2, sizeof(aa->addr.addr6)) == 0) {\n          return ARES_TRUE; /* match */\n        }\n        break;\n      default:\n        break; /* LCOV_EXCL_LINE */\n    }\n  }\n  return ARES_FALSE; /* different */\n}",
+      "fn_code_pos": [
+        [
+          99,
+          0
+        ],
+        [
+          127,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sockaddr_addr_eq",
+        "parameters": {
+          "sa": "struct sockaddr",
+          "aa": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_write(ares_channel_t *channel, ares_socket_t fd,\n                                  const void *data, size_t len, size_t *written,\n                                  const struct sockaddr *sa,\n                                  ares_socklen_t         salen)\n{\n  int             flags = 0;\n  ares_ssize_t    rv;\n  ares_conn_err_t err = ARES_CONN_ERR_SUCCESS;\n\n#ifdef HAVE_MSG_NOSIGNAL\n  flags |= MSG_NOSIGNAL;\n#endif\n\n  rv = channel->sock_funcs.asendto(fd, data, len, flags, sa, salen,\n                                   channel->sock_func_cb_data);\n  if (rv <= 0) {\n    err = ares_socket_deref_error(SOCKERRNO);\n  } else {\n    *written = (size_t)rv;\n  }\n  return err;\n}",
+      "fn_code_pos": [
+        [
+          129,
+          0
+        ],
+        [
+          150,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_write",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "len": "size_t",
+          "written": "size_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_recv(ares_channel_t *channel, ares_socket_t s,\n                                 ares_bool_t is_tcp, void *data,\n                                 size_t data_len, size_t *read_bytes)\n{\n  ares_ssize_t rv;\n\n  *read_bytes = 0;\n\n  rv = channel->sock_funcs.arecvfrom(s, data, data_len, 0, NULL, 0,\n                                     channel->sock_func_cb_data);\n\n  if (rv > 0) {\n    *read_bytes = (size_t)rv;\n    return ARES_CONN_ERR_SUCCESS;\n  }\n\n  if (rv == 0) {\n    /* UDP allows 0-byte packets and is connectionless, so this is success */\n    if (!is_tcp) {\n      return ARES_CONN_ERR_SUCCESS;\n    } else {\n      return ARES_CONN_ERR_CONNCLOSED;\n    }\n  }\n\n  /* If we're here, rv<0 */\n  return ares_socket_deref_error(SOCKERRNO);\n}",
+      "fn_code_pos": [
+        [
+          152,
+          0
+        ],
+        [
+          179,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_recv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t",
+          "is_tcp": "ares_bool_t",
+          "data": "void",
+          "data_len": "size_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_recvfrom(ares_channel_t *channel, ares_socket_t s,\n                                     ares_bool_t is_tcp, void *data,\n                                     size_t data_len, int flags,\n                                     struct sockaddr *from,\n                                     ares_socklen_t  *from_len,\n                                     size_t          *read_bytes)\n{\n  ares_ssize_t rv;\n\n  rv = channel->sock_funcs.arecvfrom(s, data, data_len, flags, from, from_len,\n                                     channel->sock_func_cb_data);\n\n  if (rv > 0) {\n    *read_bytes = (size_t)rv;\n    return ARES_CONN_ERR_SUCCESS;\n  }\n\n  if (rv == 0) {\n    /* UDP allows 0-byte packets and is connectionless, so this is success */\n    if (!is_tcp) {\n      return ARES_CONN_ERR_SUCCESS;\n    } else {\n      return ARES_CONN_ERR_CONNCLOSED;\n    }\n  }\n\n  /* If we're here, rv<0 */\n  return ares_socket_deref_error(SOCKERRNO);\n}",
+      "fn_code_pos": [
+        [
+          181,
+          0
+        ],
+        [
+          209,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_recvfrom",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t",
+          "is_tcp": "ares_bool_t",
+          "data": "void",
+          "data_len": "size_t",
+          "flags": "int",
+          "from": "struct sockaddr",
+          "from_len": "ares_socklen_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_enable_tfo(const ares_channel_t *channel,\n                                       ares_socket_t         fd)\n{\n  ares_bool_t opt = ARES_TRUE;\n\n  if (channel->sock_funcs.asetsockopt(fd, ARES_SOCKET_OPT_TCP_FASTOPEN,\n                                      (void *)&opt, sizeof(opt),\n                                      channel->sock_func_cb_data) != 0) {\n    return ARES_CONN_ERR_NOTIMP;\n  }\n\n  return ARES_CONN_ERR_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          211,
+          0
+        ],
+        [
+          223,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_enable_tfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_socket_configure(ares_channel_t *channel, int family,\n                                    ares_bool_t is_tcp, ares_socket_t fd)\n{\n  union {\n    struct sockaddr     sa;\n    struct sockaddr_in  sa4;\n    struct sockaddr_in6 sa6;\n  } local;\n\n  ares_socklen_t bindlen = 0;\n  int            rv;\n  unsigned int   bind_flags = 0;\n\n  /* Set the socket's send and receive buffer sizes. */\n  if (channel->socket_send_buffer_size > 0) {\n    rv = channel->sock_funcs.asetsockopt(\n      fd, ARES_SOCKET_OPT_SENDBUF_SIZE,\n      (void *)&channel->socket_send_buffer_size,\n      sizeof(channel->socket_send_buffer_size), channel->sock_func_cb_data);\n    if (rv != 0 && SOCKERRNO != ENOSYS) {\n      return ARES_ECONNREFUSED; /* LCOV_EXCL_LINE: UntestablePath */\n    }\n  }\n\n  if (channel->socket_receive_buffer_size > 0) {\n    rv = channel->sock_funcs.asetsockopt(\n      fd, ARES_SOCKET_OPT_RECVBUF_SIZE,\n      (void *)&channel->socket_receive_buffer_size,\n      sizeof(channel->socket_receive_buffer_size), channel->sock_func_cb_data);\n    if (rv != 0 && SOCKERRNO != ENOSYS) {\n      return ARES_ECONNREFUSED; /* LCOV_EXCL_LINE: UntestablePath */\n    }\n  }\n\n  /* Bind to network interface if configured */\n  if (ares_strlen(channel->local_dev_name)) {\n    /* Prior versions silently ignored failure, so we need to maintain that\n     * compatibility */\n    (void)channel->sock_funcs.asetsockopt(\n      fd, ARES_SOCKET_OPT_BIND_DEVICE, channel->local_dev_name,\n      (ares_socklen_t)ares_strlen(channel->local_dev_name),\n      channel->sock_func_cb_data);\n  }\n\n  /* Bind to ip address if configured */\n  if (family == AF_INET && channel->local_ip4) {\n    memset(&local.sa4, 0, sizeof(local.sa4));\n    local.sa4.sin_family      = AF_INET;\n    local.sa4.sin_addr.s_addr = htonl(channel->local_ip4);\n    bindlen                   = sizeof(local.sa4);\n  } else if (family == AF_INET6 &&\n             memcmp(channel->local_ip6, ares_in6addr_any._S6_un._S6_u8,\n                    sizeof(channel->local_ip6)) != 0) {\n    /* Only if not link-local and an ip other than \"::\" is specified */\n    memset(&local.sa6, 0, sizeof(local.sa6));\n    local.sa6.sin6_family = AF_INET6;\n    memcpy(&local.sa6.sin6_addr, channel->local_ip6,\n           sizeof(channel->local_ip6));\n    bindlen = sizeof(local.sa6);\n  }\n\n\n  if (bindlen && channel->sock_funcs.abind != NULL) {\n    bind_flags |= ARES_SOCKET_BIND_CLIENT;\n    if (is_tcp) {\n      bind_flags |= ARES_SOCKET_BIND_TCP;\n    }\n    if (channel->sock_funcs.abind(fd, bind_flags, &local.sa, bindlen,\n                                  channel->sock_func_cb_data) != 0) {\n      return ARES_ECONNREFUSED;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          225,
+          0
+        ],
+        [
+          299,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_configure",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "family": "int",
+          "is_tcp": "ares_bool_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_sockaddr_to_ares_addr(struct ares_addr      *ares_addr,\n                                       unsigned short        *port,\n                                       const struct sockaddr *sockaddr)\n{\n  if (sockaddr->sa_family == AF_INET) {\n    /* NOTE: memcpy sockaddr_in due to alignment issues found by UBSAN due to\n     *       dnsinfo packing on MacOS */\n    struct sockaddr_in sockaddr_in;\n    memcpy(&sockaddr_in, sockaddr, sizeof(sockaddr_in));\n\n    ares_addr->family = AF_INET;\n    memcpy(&ares_addr->addr.addr4, &(sockaddr_in.sin_addr),\n           sizeof(ares_addr->addr.addr4));\n\n    if (port) {\n      *port = ntohs(sockaddr_in.sin_port);\n    }\n    return ARES_TRUE;\n  }\n\n  if (sockaddr->sa_family == AF_INET6) {\n    /* NOTE: memcpy sockaddr_in6 due to alignment issues found by UBSAN due to\n     *       dnsinfo packing on MacOS */\n    struct sockaddr_in6 sockaddr_in6;\n    memcpy(&sockaddr_in6, sockaddr, sizeof(sockaddr_in6));\n\n    ares_addr->family = AF_INET6;\n    memcpy(&ares_addr->addr.addr6, &(sockaddr_in6.sin6_addr),\n           sizeof(ares_addr->addr.addr6));\n    if (port) {\n      *port = ntohs(sockaddr_in6.sin6_port);\n    }\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          301,
+          0
+        ],
+        [
+          337,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sockaddr_to_ares_addr",
+        "parameters": {
+          "ares_addr": "struct ares_addr",
+          "port": "unsigned short",
+          "sockaddr": "struct sockaddr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_open(ares_socket_t *sock, ares_channel_t *channel,\n                                 int af, int type, int protocol)\n{\n  ares_socket_t s;\n\n  *sock = ARES_SOCKET_BAD;\n\n  s =\n    channel->sock_funcs.asocket(af, type, protocol, channel->sock_func_cb_data);\n\n  if (s == ARES_SOCKET_BAD) {\n    return ares_socket_deref_error(SOCKERRNO);\n  }\n\n  *sock = s;\n\n  return ARES_CONN_ERR_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          339,
+          0
+        ],
+        [
+          356,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_open",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "channel": "ares_channel_t",
+          "af": "int",
+          "type": "int",
+          "protocol": "int"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_err_t ares_socket_connect(ares_channel_t *channel,\n                                    ares_socket_t sockfd, ares_bool_t is_tfo,\n                                    const struct sockaddr *addr,\n                                    ares_socklen_t         addrlen)\n{\n  ares_conn_err_t err   = ARES_CONN_ERR_SUCCESS;\n  unsigned int    flags = 0;\n\n  if (is_tfo) {\n    flags |= ARES_SOCKET_CONN_TCP_FASTOPEN;\n  }\n\n  do {\n    int rv;\n\n    rv = channel->sock_funcs.aconnect(sockfd, addr, addrlen, flags,\n                                      channel->sock_func_cb_data);\n\n    if (rv < 0) {\n      err = ares_socket_deref_error(SOCKERRNO);\n    } else {\n      err = ARES_CONN_ERR_SUCCESS;\n    }\n  } while (err == ARES_CONN_ERR_INTERRUPT);\n\n  return err;\n}",
+      "fn_code_pos": [
+        [
+          358,
+          0
+        ],
+        [
+          384,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_connect",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sockfd": "ares_socket_t",
+          "is_tfo": "ares_bool_t",
+          "addr": "struct sockaddr",
+          "addrlen": "ares_socklen_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "void ares_socket_close(ares_channel_t *channel, ares_socket_t s)\n{\n  if (channel == NULL || s == ARES_SOCKET_BAD) {\n    return;\n  }\n\n  channel->sock_funcs.aclose(s, channel->sock_func_cb_data);\n}",
+      "fn_code_pos": [
+        [
+          386,
+          0
+        ],
+        [
+          393,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_close",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_set_socket_callback(ares_channel_t           *channel,\n                              ares_sock_create_callback cb, void *data)\n{\n  if (channel == NULL) {\n    return;\n  }\n  channel->sock_create_cb      = cb;\n  channel->sock_create_cb_data = data;\n}",
+      "fn_code_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          403,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "cb": "ares_sock_create_callback",
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_set_socket_configure_callback(ares_channel_t           *channel,\n                                        ares_sock_config_callback cb,\n                                        void                     *data)\n{\n  if (channel == NULL || channel->optmask & ARES_OPT_EVENT_THREAD) {\n    return;\n  }\n  channel->sock_config_cb      = cb;\n  channel->sock_config_cb_data = data;\n}",
+      "fn_code_pos": [
+        [
+          405,
+          0
+        ],
+        [
+          414,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_configure_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "cb": "ares_sock_config_callback",
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_set_pending_write_cb(ares_channel_t       *channel,\n                               ares_pending_write_cb callback, void *user_data)\n{\n  if (channel == NULL || channel->optmask & ARES_OPT_EVENT_THREAD) {\n    return;\n  }\n  channel->notify_pending_write_cb      = callback;\n  channel->notify_pending_write_cb_data = user_data;\n}",
+      "fn_code_pos": [
+        [
+          416,
+          0
+        ],
+        [
+          424,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_pending_write_cb",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_pending_write_cb",
+          "user_data": "void"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        99,
+        40
+      ],
+      [
+        99,
+        55
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        100,
+        40
+      ],
+      [
+        100,
+        56
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        109,
+        42
+      ],
+      [
+        109,
+        60
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        117,
+        36
+      ],
+      [
+        117,
+        55
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        131,
+        40
+      ],
+      [
+        131,
+        55
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        184,
+        37
+      ],
+      [
+        184,
+        52
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        229,
+        4
+      ],
+      [
+        229,
+        19
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        230,
+        4
+      ],
+      [
+        230,
+        22
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        231,
+        4
+      ],
+      [
+        231,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        301,
+        39
+      ],
+      [
+        301,
+        55
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        303,
+        45
+      ],
+      [
+        303,
+        60
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        308,
+        4
+      ],
+      [
+        308,
+        22
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        324,
+        4
+      ],
+      [
+        324,
+        23
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        360,
+        42
+      ],
+      [
+        360,
+        57
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/uio.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/tcp.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        37,
+        0
+      ],
+      [
+        38,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        40,
+        0
+      ],
+      [
+        41,
+        0
+      ]
+    ],
+    [
+      "#  include <strings.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/ioctl.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/filio.h>\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        53,
+        0
+      ],
+      [
+        54,
+        0
+      ]
+    ],
+    [
+      "#include <fcntl.h>\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        55,
+        0
+      ],
+      [
+        56,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

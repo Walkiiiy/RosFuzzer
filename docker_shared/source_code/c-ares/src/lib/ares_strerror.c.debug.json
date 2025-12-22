@@ -1,0 +1,67 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "const char *ares_strerror(int code)\n{\n  ares_status_t status = (ares_status_t)code;\n  switch (status) {\n    case ARES_SUCCESS:\n      return \"Successful completion\";\n    case ARES_ENODATA:\n      return \"DNS server returned answer with no data\";\n    case ARES_EFORMERR:\n      return \"DNS server claims query was misformatted\";\n    case ARES_ESERVFAIL:\n      return \"DNS server returned general failure\";\n    case ARES_ENOTFOUND:\n      return \"Domain name not found\";\n    case ARES_ENOTIMP:\n      return \"DNS server does not implement requested operation\";\n    case ARES_EREFUSED:\n      return \"DNS server refused query\";\n    case ARES_EBADQUERY:\n      return \"Misformatted DNS query\";\n    case ARES_EBADNAME:\n      return \"Misformatted domain name\";\n    case ARES_EBADFAMILY:\n      return \"Unsupported address family\";\n    case ARES_EBADRESP:\n      return \"Misformatted DNS reply\";\n    case ARES_ECONNREFUSED:\n      return \"Could not contact DNS servers\";\n    case ARES_ETIMEOUT:\n      return \"Timeout while contacting DNS servers\";\n    case ARES_EOF:\n      return \"End of file\";\n    case ARES_EFILE:\n      return \"Error reading file\";\n    case ARES_ENOMEM:\n      return \"Out of memory\";\n    case ARES_EDESTRUCTION:\n      return \"Channel is being destroyed\";\n    case ARES_EBADSTR:\n      return \"Misformatted string\";\n    case ARES_EBADFLAGS:\n      return \"Illegal flags specified\";\n    case ARES_ENONAME:\n      return \"Given hostname is not numeric\";\n    case ARES_EBADHINTS:\n      return \"Illegal hints flags specified\";\n    case ARES_ENOTINITIALIZED:\n      return \"c-ares library initialization not yet performed\";\n    case ARES_ELOADIPHLPAPI:\n      return \"Error loading iphlpapi.dll\";\n    case ARES_EADDRGETNETWORKPARAMS:\n      return \"Could not find GetNetworkParams function\";\n    case ARES_ECANCELLED:\n      return \"DNS query cancelled\";\n    case ARES_ESERVICE:\n      return \"Invalid service name or number\";\n    case ARES_ENOSERVER:\n      return \"No DNS servers were configured\";\n  }\n\n  return \"unknown\";\n}",
+      "fn_code_pos": [
+        [
+          29,
+          0
+        ],
+        [
+          90,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strerror",
+        "parameters": {
+          "code": "int"
+        },
+        "return_type": "char"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_strerror(int code)",
+      "fn_dec_pos": [
+        [
+          29,
+          12
+        ],
+        [
+          29,
+          35
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strerror",
+        "parameters": {
+          "code": "int"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

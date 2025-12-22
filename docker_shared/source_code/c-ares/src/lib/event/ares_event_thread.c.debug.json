@@ -1,0 +1,540 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_event_destroy_cb(void *arg)\n{\n  ares_event_t *event = arg;\n  if (event == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Unregister from the event thread if it was registered with one */\n  if (event->e) {\n    const ares_event_thread_t *e = event->e;\n    e->ev_sys->event_del(event);\n    event->e = NULL;\n  }\n\n  if (event->free_data_cb && event->data) {\n    event->free_data_cb(event->data);\n  }\n\n  ares_free(event);\n}",
+      "fn_code_pos": [
+        [
+          29,
+          0
+        ],
+        [
+          48,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_destroy_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_signal(const ares_event_t *event)\n{\n  if (event == NULL || event->signal_cb == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  event->signal_cb(event);\n}",
+      "fn_code_pos": [
+        [
+          50,
+          0
+        ],
+        [
+          56,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_signal",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_thread_wake(const ares_event_thread_t *e)\n{\n  if (e == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_event_signal(e->ev_signal);\n}",
+      "fn_code_pos": [
+        [
+          58,
+          0
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_wake",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_event_t *ares_event_update_find(ares_event_thread_t *e,\n                                            ares_socket_t fd, const void *data)\n{\n  ares_llist_node_t *node;\n\n  for (node = ares_llist_node_first(e->ev_updates); node != NULL;\n       node = ares_llist_node_next(node)) {\n    ares_event_t *ev = ares_llist_node_val(node);\n\n    if (fd != ARES_SOCKET_BAD && fd == ev->fd && ev->flags != 0) {\n      return ev;\n    }\n\n    if (fd == ARES_SOCKET_BAD && ev->fd == ARES_SOCKET_BAD &&\n        data == ev->data && ev->flags != 0) {\n      return ev;\n    }\n  }\n\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          77,
+          0
+        ],
+        [
+          97,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_update_find",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void"
+        },
+        "return_type": "ares_event_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_update(ares_event_t **event, ares_event_thread_t *e,\n                                ares_event_flags_t flags, ares_event_cb_t cb,\n                                ares_socket_t fd, void *data,\n                                ares_event_free_data_t free_data_cb,\n                                ares_event_signal_cb_t signal_cb)\n{\n  ares_event_t *ev = NULL;\n  ares_status_t status;\n\n  if (e == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Callback must be specified if not a removal event. */\n  if (flags != ARES_EVENT_FLAG_NONE && cb == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (event != NULL) {\n    *event = NULL;\n  }\n\n  /* Validate flags */\n  if (fd == ARES_SOCKET_BAD) {\n    if (flags & (ARES_EVENT_FLAG_READ | ARES_EVENT_FLAG_WRITE)) {\n      return ARES_EFORMERR;\n    }\n    if (!(flags & ARES_EVENT_FLAG_OTHER)) {\n      return ARES_EFORMERR;\n    }\n  } else {\n    if (flags & ARES_EVENT_FLAG_OTHER) {\n      return ARES_EFORMERR;\n    }\n  }\n\n  /* That's all the validation we can really do */\n\n  ares_thread_mutex_lock(e->mutex);\n\n  /* See if we have a queued update already */\n  ev = ares_event_update_find(e, fd, data);\n  if (ev == NULL) {\n    /* Allocate a new one */\n    ev = ares_malloc_zero(sizeof(*ev));\n    if (ev == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    if (ares_llist_insert_last(e->ev_updates, ev) == NULL) {\n      ares_free(ev);        /* LCOV_EXCL_LINE: OutOfMemory */\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  ev->flags = flags;\n  ev->fd    = fd;\n  if (ev->cb == NULL) {\n    ev->cb = cb;\n  }\n  if (ev->data == NULL) {\n    ev->data = data;\n  }\n  if (ev->free_data_cb == NULL) {\n    ev->free_data_cb = free_data_cb;\n  }\n  if (ev->signal_cb == NULL) {\n    ev->signal_cb = signal_cb;\n  }\n\n  if (event != NULL) {\n    *event = ev;\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  if (status == ARES_SUCCESS) {\n    /* Wake event thread if successful so it can pull the updates */\n    ares_event_thread_wake(e);\n  }\n\n  ares_thread_mutex_unlock(e->mutex);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          99,
+          0
+        ],
+        [
+          186,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_update",
+        "parameters": {
+          "event": "ares_event_t",
+          "e": "ares_event_thread_t",
+          "flags": "ares_event_flags_t",
+          "cb": "ares_event_cb_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "free_data_cb": "ares_event_free_data_t",
+          "signal_cb": "ares_event_signal_cb_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_thread_process_fd(ares_event_thread_t *e,\n                                         ares_socket_t fd, void *data,\n                                         ares_event_flags_t flags)\n{\n  ares_fd_events_t event;\n  (void)data;\n\n  event.fd     = fd;\n  event.events = 0;\n  if (flags & ARES_EVENT_FLAG_READ) {\n    event.events |= ARES_FD_EVENT_READ;\n  }\n  if (flags & ARES_EVENT_FLAG_WRITE) {\n    event.events |= ARES_FD_EVENT_WRITE;\n  }\n  ares_process_fds(e->channel, &event, 1, ARES_PROCESS_FLAG_SKIP_NON_FD);\n}",
+      "fn_code_pos": [
+        [
+          188,
+          0
+        ],
+        [
+          204,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_process_fd",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_thread_sockstate_cb(void *data, ares_socket_t socket_fd,\n                                           int readable, int writable)\n{\n  ares_event_thread_t *e     = data;\n  ares_event_flags_t   flags = ARES_EVENT_FLAG_NONE;\n\n  if (readable) {\n    flags |= ARES_EVENT_FLAG_READ;\n  }\n\n  if (writable) {\n    flags |= ARES_EVENT_FLAG_WRITE;\n  }\n\n  /* Update channel fd.  This function will lock e->mutex and also wake the\n   * event thread to process the update */\n  ares_event_update(NULL, e, flags, ares_event_thread_process_fd, socket_fd,\n                    NULL, NULL, NULL);\n}",
+      "fn_code_pos": [
+        [
+          206,
+          0
+        ],
+        [
+          224,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_sockstate_cb",
+        "parameters": {
+          "data": "void",
+          "socket_fd": "ares_socket_t",
+          "readable": "int",
+          "writable": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void notifywrite_cb(void *data)\n{\n  ares_event_thread_t *e = data;\n\n  ares_thread_mutex_lock(e->mutex);\n  e->process_pending_write = ARES_TRUE;\n  ares_thread_mutex_unlock(e->mutex);\n\n  ares_event_thread_wake(e);\n}",
+      "fn_code_pos": [
+        [
+          226,
+          0
+        ],
+        [
+          235,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "notifywrite_cb",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void notifyenqueue_cb(void *data)\n{\n  ares_event_thread_t *e = data;\n  ares_event_thread_wake(e);\n}",
+      "fn_code_pos": [
+        [
+          237,
+          0
+        ],
+        [
+          241,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "notifyenqueue_cb",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_process_updates(ares_event_thread_t *e)\n{\n  ares_llist_node_t *node;\n\n  /* Iterate across all updates and apply to internal list, removing from update\n   * list */\n  while ((node = ares_llist_node_first(e->ev_updates)) != NULL) {\n    ares_event_t *newev = ares_llist_node_claim(node);\n    ares_event_t *oldev;\n\n    if (newev->fd == ARES_SOCKET_BAD) {\n      oldev = ares_htable_vpvp_get_direct(e->ev_cust_handles, newev->data);\n    } else {\n      oldev = ares_htable_asvp_get_direct(e->ev_sock_handles, newev->fd);\n    }\n\n    /* Adding new */\n    if (oldev == NULL) {\n      newev->e = e;\n      /* Don't try to add a new event if all flags are cleared, that's basically\n       * someone trying to delete something already deleted.  Also if it fails\n       * to add, cleanup. */\n      if (newev->flags == ARES_EVENT_FLAG_NONE ||\n          !e->ev_sys->event_add(newev)) {\n        newev->e = NULL;\n        ares_event_destroy_cb(newev);\n      } else {\n        if (newev->fd == ARES_SOCKET_BAD) {\n          ares_htable_vpvp_insert(e->ev_cust_handles, newev->data, newev);\n        } else {\n          ares_htable_asvp_insert(e->ev_sock_handles, newev->fd, newev);\n        }\n      }\n      continue;\n    }\n\n    /* Removal request */\n    if (newev->flags == ARES_EVENT_FLAG_NONE) {\n      /* the callback for the removal will call e->ev_sys->event_del(e, event)\n       */\n      if (newev->fd == ARES_SOCKET_BAD) {\n        ares_htable_vpvp_remove(e->ev_cust_handles, newev->data);\n      } else {\n        ares_htable_asvp_remove(e->ev_sock_handles, newev->fd);\n      }\n      ares_free(newev);\n      continue;\n    }\n\n    /* Modify request -- only flags can be changed */\n    e->ev_sys->event_mod(oldev, newev->flags);\n    oldev->flags = newev->flags;\n    ares_free(newev);\n  }\n}",
+      "fn_code_pos": [
+        [
+          243,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_process_updates",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_thread_cleanup(ares_event_thread_t *e)\n{\n  /* Manually free any updates that weren't processed */\n  if (e->ev_updates != NULL) {\n    ares_llist_node_t *node;\n\n    while ((node = ares_llist_node_first(e->ev_updates)) != NULL) {\n      ares_event_destroy_cb(ares_llist_node_claim(node));\n    }\n    ares_llist_destroy(e->ev_updates);\n    e->ev_updates = NULL;\n  }\n\n  if (e->ev_sock_handles != NULL) {\n    ares_htable_asvp_destroy(e->ev_sock_handles);\n    e->ev_sock_handles = NULL;\n  }\n\n  if (e->ev_cust_handles != NULL) {\n    ares_htable_vpvp_destroy(e->ev_cust_handles);\n    e->ev_cust_handles = NULL;\n  }\n\n  if (e->ev_sys != NULL && e->ev_sys->destroy != NULL) {\n    e->ev_sys->destroy(e);\n    e->ev_sys = NULL;\n  }\n}",
+      "fn_code_pos": [
+        [
+          299,
+          0
+        ],
+        [
+          326,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_cleanup",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void *ares_event_thread(void *arg)\n{\n  ares_event_thread_t *e = arg;\n  ares_thread_mutex_lock(e->mutex);\n\n  while (e->isup) {\n    struct timeval        tv;\n    const struct timeval *tvout;\n    unsigned long         timeout_ms = 0; /* 0 = unlimited */\n    ares_bool_t           process_pending_write;\n\n    ares_event_process_updates(e);\n\n    /* Don't hold a mutex while waiting on events or calling into anything\n     * that might require a c-ares channel lock since a callback could be\n     * triggered cross-thread */\n    ares_thread_mutex_unlock(e->mutex);\n\n    tvout = ares_timeout(e->channel, NULL, &tv);\n    if (tvout != NULL) {\n      timeout_ms =\n        (unsigned long)((tvout->tv_sec * 1000) + (tvout->tv_usec / 1000) + 1);\n    }\n\n    e->ev_sys->wait(e, timeout_ms);\n\n    /* Process pending write operation */\n    ares_thread_mutex_lock(e->mutex);\n    process_pending_write    = e->process_pending_write;\n    e->process_pending_write = ARES_FALSE;\n    ares_thread_mutex_unlock(e->mutex);\n    if (process_pending_write) {\n      ares_process_pending_write(e->channel);\n    }\n\n    /* Relock before we loop again */\n    ares_thread_mutex_lock(e->mutex);\n\n    /* Each iteration should do timeout processing and any other cleanup\n     * that may not have been performed */\n    if (e->isup) {\n      ares_thread_mutex_unlock(e->mutex);\n      ares_process_fds(e->channel, NULL, 0, ARES_PROCESS_FLAG_NONE);\n      ares_thread_mutex_lock(e->mutex);\n    }\n  }\n\n  /* Lets cleanup while we're in the thread itself */\n  ares_event_thread_cleanup(e);\n\n  ares_thread_mutex_unlock(e->mutex);\n\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          328,
+          0
+        ],
+        [
+          381,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_thread_destroy_int(ares_event_thread_t *e)\n{\n  /* Wake thread and tell it to shutdown if it exists */\n  ares_thread_mutex_lock(e->mutex);\n  if (e->isup) {\n    e->isup = ARES_FALSE;\n    ares_event_thread_wake(e);\n  }\n  ares_thread_mutex_unlock(e->mutex);\n\n  /* Wait for thread to shutdown */\n  if (e->thread) {\n    void *rv = NULL;\n    ares_thread_join(e->thread, &rv);\n    e->thread = NULL;\n  }\n\n  /* If the event thread ever got to the point of starting, this is a no-op\n   * as it runs this same cleanup when it shuts down */\n  ares_event_thread_cleanup(e);\n\n  ares_thread_mutex_destroy(e->mutex);\n  e->mutex = NULL;\n\n  ares_free(e);\n}",
+      "fn_code_pos": [
+        [
+          383,
+          0
+        ],
+        [
+          408,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_destroy_int",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_event_thread_destroy(ares_channel_t *channel)\n{\n  ares_event_thread_t *e = channel->sock_state_cb_data;\n\n  if (e == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_event_thread_destroy_int(e);\n  channel->sock_state_cb_data           = NULL;\n  channel->sock_state_cb                = NULL;\n  channel->notify_pending_write_cb      = NULL;\n  channel->notify_pending_write_cb_data = NULL;\n  ares_set_query_enqueue_cb(channel, NULL, NULL);\n}",
+      "fn_code_pos": [
+        [
+          410,
+          0
+        ],
+        [
+          424,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static const ares_event_sys_t *ares_event_fetch_sys(ares_evsys_t evsys)\n{\n  switch (evsys) {\n    case ARES_EVSYS_WIN32:\n#if defined(USE_WINSOCK)\n      return &ares_evsys_win32;\n#else\n      return NULL;\n#endif\n\n    case ARES_EVSYS_EPOLL:\n#if defined(HAVE_EPOLL)\n      return &ares_evsys_epoll;\n#else\n      return NULL;\n#endif\n\n    case ARES_EVSYS_KQUEUE:\n#if defined(HAVE_KQUEUE)\n      return &ares_evsys_kqueue;\n#else\n      return NULL;\n#endif\n\n    case ARES_EVSYS_POLL:\n#if defined(HAVE_POLL)\n      return &ares_evsys_poll;\n#else\n      return NULL;\n#endif\n\n    case ARES_EVSYS_SELECT:\n#if defined(HAVE_PIPE)\n      return &ares_evsys_select;\n#else\n      return NULL;\n#endif\n\n    /* case ARES_EVSYS_DEFAULT: */\n    default:\n      break;\n  }\n\n    /* default */\n#if defined(USE_WINSOCK)\n  return &ares_evsys_win32;\n#elif defined(HAVE_KQUEUE)\n  return &ares_evsys_kqueue;\n#elif defined(HAVE_EPOLL)\n  return &ares_evsys_epoll;\n#elif defined(HAVE_POLL)\n  return &ares_evsys_poll;\n#elif defined(HAVE_PIPE)\n  return &ares_evsys_select;\n#else\n  return NULL;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          426,
+          0
+        ],
+        [
+          483,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_fetch_sys",
+        "parameters": {
+          "evsys": "ares_evsys_t"
+        },
+        "return_type": "ares_event_sys_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_thread_init(ares_channel_t *channel)\n{\n  ares_event_thread_t *e;\n\n  e = ares_malloc_zero(sizeof(*e));\n  if (e == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->mutex = ares_thread_mutex_create();\n  if (e->mutex == NULL) {\n    ares_event_thread_destroy_int(e); /* LCOV_EXCL_LINE: OutOfMemory */\n    return ARES_ENOMEM;               /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->ev_updates = ares_llist_create(NULL);\n  if (e->ev_updates == NULL) {\n    ares_event_thread_destroy_int(e); /* LCOV_EXCL_LINE: OutOfMemory */\n    return ARES_ENOMEM;               /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->ev_sock_handles = ares_htable_asvp_create(ares_event_destroy_cb);\n  if (e->ev_sock_handles == NULL) {\n    ares_event_thread_destroy_int(e); /* LCOV_EXCL_LINE: OutOfMemory */\n    return ARES_ENOMEM;               /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->ev_cust_handles = ares_htable_vpvp_create(NULL, ares_event_destroy_cb);\n  if (e->ev_cust_handles == NULL) {\n    ares_event_thread_destroy_int(e); /* LCOV_EXCL_LINE: OutOfMemory */\n    return ARES_ENOMEM;               /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->channel = channel;\n  e->isup    = ARES_TRUE;\n  e->ev_sys  = ares_event_fetch_sys(channel->evsys);\n  if (e->ev_sys == NULL) {\n    ares_event_thread_destroy_int(e); /* LCOV_EXCL_LINE: UntestablePath */\n    return ARES_ENOTIMP;              /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  channel->sock_state_cb                = ares_event_thread_sockstate_cb;\n  channel->sock_state_cb_data           = e;\n  channel->notify_pending_write_cb      = notifywrite_cb;\n  channel->notify_pending_write_cb_data = e;\n  ares_set_query_enqueue_cb(channel, notifyenqueue_cb, e);\n\n  if (!e->ev_sys->init(e)) {\n    /* LCOV_EXCL_START: UntestablePath */\n    ares_event_thread_destroy_int(e);\n    channel->sock_state_cb      = NULL;\n    channel->sock_state_cb_data = NULL;\n    return ARES_ESERVFAIL;\n    /* LCOV_EXCL_STOP */\n  }\n\n  /* Before starting the thread, process any possible events the initialization\n   * might have enqueued as we may actually depend on these being valid\n   * immediately upon return, which may mean before the thread is fully spawned\n   * and processed the list itself. We don't want any sort of race conditions\n   * (like the event system wake handle itself). */\n  ares_event_process_updates(e);\n\n  /* Start thread */\n  if (ares_thread_create(&e->thread, ares_event_thread, e) != ARES_SUCCESS) {\n    /* LCOV_EXCL_START: UntestablePath */\n    ares_event_thread_destroy_int(e);\n    channel->sock_state_cb      = NULL;\n    channel->sock_state_cb_data = NULL;\n    return ARES_ESERVFAIL;\n    /* LCOV_EXCL_STOP */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          485,
+          0
+        ],
+        [
+          559,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_init",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_thread_init(ares_channel_t *channel)\n{\n  (void)channel;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          563,
+          0
+        ],
+        [
+          567,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_init",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_thread_destroy(ares_channel_t *channel)\n{\n  (void)channel;\n}",
+      "fn_code_pos": [
+        [
+          569,
+          0
+        ],
+        [
+          572,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_event_update_find(ares_event_thread_t *e,\n                                            ares_socket_t fd, const void *data)",
+      "fn_dec_pos": [
+        [
+          77,
+          21
+        ],
+        [
+          78,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_update_find",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_event_thread(void *arg)",
+      "fn_dec_pos": [
+        [
+          328,
+          13
+        ],
+        [
+          328,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_event_fetch_sys(ares_evsys_t evsys)",
+      "fn_dec_pos": [
+        [
+          426,
+          31
+        ],
+        [
+          426,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_fetch_sys",
+        "parameters": {
+          "evsys": "ares_evsys_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        334,
+        4
+      ],
+      [
+        334,
+        18
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        335,
+        10
+      ],
+      [
+        335,
+        24
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

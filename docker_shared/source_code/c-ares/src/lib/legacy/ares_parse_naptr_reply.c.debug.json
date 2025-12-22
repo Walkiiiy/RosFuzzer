@@ -1,0 +1,110 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "int ares_parse_naptr_reply(const unsigned char *abuf, int alen_int,\n                           struct ares_naptr_reply **naptr_out)\n{\n  ares_status_t            status;\n  size_t                   alen;\n  struct ares_naptr_reply *naptr_head = NULL;\n  struct ares_naptr_reply *naptr_last = NULL;\n  struct ares_naptr_reply *naptr_curr;\n  ares_dns_record_t       *dnsrec = NULL;\n  size_t                   i;\n\n  *naptr_out = NULL;\n\n  if (alen_int < 0) {\n    return ARES_EBADRESP;\n  }\n\n  alen = (size_t)alen_int;\n\n  status = ares_dns_parse(abuf, alen, 0, &dnsrec);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER) == 0) {\n    status = ARES_ENODATA;\n    goto done;\n  }\n\n  for (i = 0; i < ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER); i++) {\n    const ares_dns_rr_t *rr =\n      ares_dns_record_rr_get(dnsrec, ARES_SECTION_ANSWER, i);\n\n    if (rr == NULL) {\n      /* Shouldn't be possible */\n      status = ARES_EBADRESP; /* LCOV_EXCL_LINE: DefensiveCoding */\n      goto done;              /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    if (ares_dns_rr_get_class(rr) != ARES_CLASS_IN ||\n        ares_dns_rr_get_type(rr) != ARES_REC_TYPE_NAPTR) {\n      continue;\n    }\n\n    /* Allocate storage for this NAPTR answer appending it to the list */\n    naptr_curr = ares_malloc_data(ARES_DATATYPE_NAPTR_REPLY);\n    if (naptr_curr == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Link in the record */\n    if (naptr_last) {\n      naptr_last->next = naptr_curr;\n    } else {\n      naptr_head = naptr_curr;\n    }\n    naptr_last = naptr_curr;\n\n    naptr_curr->order      = ares_dns_rr_get_u16(rr, ARES_RR_NAPTR_ORDER);\n    naptr_curr->preference = ares_dns_rr_get_u16(rr, ARES_RR_NAPTR_PREFERENCE);\n\n    /* XXX: Why is this unsigned char * ? */\n    naptr_curr->flags = (unsigned char *)ares_strdup(\n      ares_dns_rr_get_str(rr, ARES_RR_NAPTR_FLAGS));\n    if (naptr_curr->flags == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    /* XXX: Why is this unsigned char * ? */\n    naptr_curr->service = (unsigned char *)ares_strdup(\n      ares_dns_rr_get_str(rr, ARES_RR_NAPTR_SERVICES));\n    if (naptr_curr->service == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    /* XXX: Why is this unsigned char * ? */\n    naptr_curr->regexp = (unsigned char *)ares_strdup(\n      ares_dns_rr_get_str(rr, ARES_RR_NAPTR_REGEXP));\n    if (naptr_curr->regexp == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    naptr_curr->replacement =\n      ares_strdup(ares_dns_rr_get_str(rr, ARES_RR_NAPTR_REPLACEMENT));\n    if (naptr_curr->replacement == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\ndone:\n  /* clean up on error */\n  if (status != ARES_SUCCESS) {\n    if (naptr_head) {\n      ares_free_data(naptr_head);\n    }\n  } else {\n    /* everything looks fine, return the data */\n    *naptr_out = naptr_head;\n  }\n  ares_dns_record_destroy(dnsrec);\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          28,
+          0
+        ],
+        [
+          131,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_naptr_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen_int": "int",
+          "naptr_out": "struct ares_naptr_reply"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        29,
+        27
+      ],
+      [
+        29,
+        50
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        33,
+        2
+      ],
+      [
+        33,
+        25
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        34,
+        2
+      ],
+      [
+        34,
+        25
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        35,
+        2
+      ],
+      [
+        35,
+        25
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_data.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

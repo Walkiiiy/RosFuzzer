@@ -1,0 +1,287 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "MockChannelTestAI()\n    : MockChannelOptsTest(1, GetParam().first, GetParam().second, false,\n                          nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          40,
+          2
+        ],
+        [
+          44,
+          3
+        ]
+      ],
+      "class_code": "f76e7b3c6acee26281840d0fca0aba2a562e988e4d25816f4f548e2dca4be34a",
+      "class_node_pos": [
+        [
+          36,
+          0
+        ],
+        [
+          45,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockChannelTestAI",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockUDPChannelTestAI()\n    : MockChannelOptsTest(1, GetParam(), false, false, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          50,
+          2
+        ],
+        [
+          53,
+          3
+        ]
+      ],
+      "class_code": "cf5ebc4d3f3f749d8d26f786b08530ddd5790636fccce680242950b88ca58224",
+      "class_node_pos": [
+        [
+          47,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockUDPChannelTestAI",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockTCPChannelTestAI()\n    : MockChannelOptsTest(1, GetParam(), true, false, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          59,
+          2
+        ],
+        [
+          62,
+          3
+        ]
+      ],
+      "class_code": "fd73d5a847e3f2ed1dfe98435dca348f8c1d834e3d1cde88c256c1ba39351938",
+      "class_node_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockTCPChannelTestAI",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DefaultChannelTestAI() : channel_(nullptr)\n  {\n    EXPECT_EQ(ARES_SUCCESS, ares_init(&channel_));\n    EXPECT_NE(nullptr, channel_);\n  }",
+      "fn_code_pos": [
+        [
+          68,
+          2
+        ],
+        [
+          72,
+          3
+        ]
+      ],
+      "class_code": "3a21b7bebada56bd1393eb13e93453ddbc896d49bcaab2a12366c72839572f4b",
+      "class_node_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "DefaultChannelTestAI",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~DefaultChannelTestAI()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }",
+      "fn_code_pos": [
+        [
+          74,
+          2
+        ],
+        [
+          78,
+          3
+        ]
+      ],
+      "class_code": "3a21b7bebada56bd1393eb13e93453ddbc896d49bcaab2a12366c72839572f4b",
+      "class_node_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "Process()",
+      "fn_dec_pos": [
+        [
+          81,
+          7
+        ],
+        [
+          81,
+          16
+        ]
+      ],
+      "class_code": "3a21b7bebada56bd1393eb13e93453ddbc896d49bcaab2a12366c72839572f4b",
+      "class_node_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {
+    "f76e7b3c6acee26281840d0fca0aba2a562e988e4d25816f4f548e2dca4be34a": {
+      "class_code": "class MockChannelTestAI\n  : public MockChannelOptsTest,\n    public ::testing::WithParamInterface<std::pair<int, bool>> {\npublic:\n  MockChannelTestAI()\n    : MockChannelOptsTest(1, GetParam().first, GetParam().second, false,\n                          nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockChannelTestAI",
+      "class_pos": [
+        [
+          36,
+          0
+        ],
+        [
+          45,
+          1
+        ]
+      ]
+    },
+    "cf5ebc4d3f3f749d8d26f786b08530ddd5790636fccce680242950b88ca58224": {
+      "class_code": "class MockUDPChannelTestAI : public MockChannelOptsTest,\n                             public ::testing::WithParamInterface<int> {\npublic:\n  MockUDPChannelTestAI()\n    : MockChannelOptsTest(1, GetParam(), false, false, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockUDPChannelTestAI",
+      "class_pos": [
+        [
+          47,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ]
+    },
+    "fd73d5a847e3f2ed1dfe98435dca348f8c1d834e3d1cde88c256c1ba39351938": {
+      "class_code": "class MockTCPChannelTestAI : public MockChannelOptsTest,\n                             public ::testing::WithParamInterface<int> {\npublic:\n  MockTCPChannelTestAI()\n    : MockChannelOptsTest(1, GetParam(), true, false, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockTCPChannelTestAI",
+      "class_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ]
+    },
+    "3a21b7bebada56bd1393eb13e93453ddbc896d49bcaab2a12366c72839572f4b": {
+      "class_code": "class DefaultChannelTestAI : public LibraryTest {\npublic:\n  DefaultChannelTestAI() : channel_(nullptr)\n  {\n    EXPECT_EQ(ARES_SUCCESS, ares_init(&channel_));\n    EXPECT_NE(nullptr, channel_);\n  }\n\n  ~DefaultChannelTestAI()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }\n\n  // Process all pending work on ares-owned file descriptors.\n  void Process();\n\nprotected:\n  ares_channel_t *channel_;\n}",
+      "class_name": "DefaultChannelTestAI",
+      "class_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          85,
+          1
+        ]
+      ]
+    }
+  },
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <utility>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include \"gtest/gtest.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"gmock/gmock.h\"\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

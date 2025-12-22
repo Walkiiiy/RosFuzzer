@@ -1,0 +1,342 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_timeval_remaining(ares_timeval_t       *remaining,\n                            const ares_timeval_t *now,\n                            const ares_timeval_t *tout)\n{\n  memset(remaining, 0, sizeof(*remaining));\n\n  /* Expired! */\n  if (tout->sec < now->sec ||\n      (tout->sec == now->sec && tout->usec < now->usec)) {\n    return;\n  }\n\n  remaining->sec = tout->sec - now->sec;\n  if (tout->usec < now->usec) {\n    remaining->sec  -= 1;\n    remaining->usec  = (tout->usec + 1000000) - now->usec;\n  } else {\n    remaining->usec = tout->usec - now->usec;\n  }\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          53,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeval_remaining",
+        "parameters": {
+          "remaining": "ares_timeval_t",
+          "now": "ares_timeval_t",
+          "tout": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_timeval_diff(ares_timeval_t *tvdiff, const ares_timeval_t *tvstart,\n                       const ares_timeval_t *tvstop)\n{\n  tvdiff->sec = tvstop->sec - tvstart->sec;\n  if (tvstop->usec > tvstart->usec) {\n    tvdiff->usec = tvstop->usec - tvstart->usec;\n  } else {\n    tvdiff->sec  -= 1;\n    tvdiff->usec  = tvstop->usec + 1000000 - tvstart->usec;\n  }\n}",
+      "fn_code_pos": [
+        [
+          55,
+          0
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeval_diff",
+        "parameters": {
+          "tvdiff": "ares_timeval_t",
+          "tvstart": "ares_timeval_t",
+          "tvstop": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_timeval_to_struct_timeval(struct timeval       *tv,\n                                           const ares_timeval_t *atv)\n{\n#ifdef USE_WINSOCK\n  tv->tv_sec = (long)atv->sec;\n#else\n  tv->tv_sec = (time_t)atv->sec;\n#endif\n\n  tv->tv_usec = (int)atv->usec;\n}",
+      "fn_code_pos": [
+        [
+          67,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeval_to_struct_timeval",
+        "parameters": {
+          "tv": "struct timeval",
+          "atv": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void struct_timeval_to_ares_timeval(ares_timeval_t       *atv,\n                                           const struct timeval *tv)\n{\n  atv->sec  = (ares_int64_t)tv->tv_sec;\n  atv->usec = (unsigned int)tv->tv_usec;\n}",
+      "fn_code_pos": [
+        [
+          79,
+          0
+        ],
+        [
+          84,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "struct_timeval_to_ares_timeval",
+        "parameters": {
+          "atv": "ares_timeval_t",
+          "tv": "struct timeval"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static struct timeval *ares_timeout_int(const ares_channel_t *channel,\n                                        struct timeval       *maxtv,\n                                        struct timeval       *tvbuf)\n{\n  const ares_query_t *query;\n  ares_slist_node_t  *node;\n  ares_timeval_t      now;\n  ares_timeval_t      atvbuf;\n  ares_timeval_t      amaxtv;\n\n  /* The minimum timeout of all queries is always the first entry in\n   * channel->queries_by_timeout */\n  node = ares_slist_node_first(channel->queries_by_timeout);\n  /* no queries/timeout */\n  if (node == NULL) {\n    return maxtv;\n  }\n\n  query = ares_slist_node_val(node);\n\n  ares_tvnow(&now);\n\n  ares_timeval_remaining(&atvbuf, &now, &query->timeout);\n\n  ares_timeval_to_struct_timeval(tvbuf, &atvbuf);\n\n  if (maxtv == NULL) {\n    return tvbuf;\n  }\n\n  /* Return the minimum time between maxtv and tvbuf */\n  struct_timeval_to_ares_timeval(&amaxtv, maxtv);\n\n  if (atvbuf.sec > amaxtv.sec) {\n    return maxtv;\n  }\n\n  if (atvbuf.sec < amaxtv.sec) {\n    return tvbuf;\n  }\n\n  if (atvbuf.usec > amaxtv.usec) {\n    return maxtv;\n  }\n\n  return tvbuf;\n}",
+      "fn_code_pos": [
+        [
+          86,
+          0
+        ],
+        [
+          132,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeout_int",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "maxtv": "struct timeval",
+          "tvbuf": "struct timeval"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "struct timeval *ares_timeout(const ares_channel_t *channel,\n                             struct timeval *maxtv, struct timeval *tvbuf)\n{\n  struct timeval *rv;\n\n  if (channel == NULL || tvbuf == NULL) {\n    return NULL;\n  }\n\n  ares_channel_lock(channel);\n\n  rv = ares_timeout_int(channel, maxtv, tvbuf);\n\n  ares_channel_unlock(channel);\n\n  return rv;\n}",
+      "fn_code_pos": [
+        [
+          134,
+          0
+        ],
+        [
+          150,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeout",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "maxtv": "struct timeval",
+          "tvbuf": "struct timeval"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_timeout_int(const ares_channel_t *channel,\n                                        struct timeval       *maxtv,\n                                        struct timeval       *tvbuf)",
+      "fn_dec_pos": [
+        [
+          86,
+          23
+        ],
+        [
+          88,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeout_int",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "maxtv": "struct timeval",
+          "tvbuf": "struct timeval"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_timeout(const ares_channel_t *channel,\n                             struct timeval *maxtv, struct timeval *tvbuf)",
+      "fn_dec_pos": [
+        [
+          134,
+          16
+        ],
+        [
+          135,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeout",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "maxtv": "struct timeval",
+          "tvbuf": "struct timeval"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        67,
+        43
+      ],
+      [
+        67,
+        57
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        80,
+        49
+      ],
+      [
+        80,
+        63
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        86,
+        7
+      ],
+      [
+        86,
+        21
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        87,
+        40
+      ],
+      [
+        87,
+        54
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        88,
+        40
+      ],
+      [
+        88,
+        54
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        134,
+        0
+      ],
+      [
+        134,
+        14
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        135,
+        29
+      ],
+      [
+        135,
+        43
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        135,
+        52
+      ],
+      [
+        135,
+        66
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        137,
+        2
+      ],
+      [
+        137,
+        16
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <limits.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

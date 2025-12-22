@@ -1,0 +1,3956 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "LibraryTest()\n  {\n    EXPECT_EQ(ARES_SUCCESS, ares_library_init_mem(\n                              ARES_LIB_INIT_ALL, &LibraryTest::amalloc,\n                              &LibraryTest::afree, &LibraryTest::arealloc));\n  }",
+      "fn_code_pos": [
+        [
+          127,
+          2
+        ],
+        [
+          132,
+          3
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "LibraryTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~LibraryTest()\n  {\n    ares_library_cleanup();\n    ClearFails();\n  }",
+      "fn_code_pos": [
+        [
+          134,
+          2
+        ],
+        [
+          138,
+          3
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DefaultChannelTest() : channel_(nullptr)\n  {\n    /* Enable query cache for live tests */\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.qcache_max_ttl = 300;\n    int optmask         = ARES_OPT_QUERY_CACHE;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n  }",
+      "fn_code_pos": [
+        [
+          168,
+          2
+        ],
+        [
+          177,
+          3
+        ]
+      ],
+      "class_code": "4377d3f420d85d9a41440b06b546578a96b47dca69a9447aaed7c5f542523ef7",
+      "class_node_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          190,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "DefaultChannelTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~DefaultChannelTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }",
+      "fn_code_pos": [
+        [
+          179,
+          2
+        ],
+        [
+          183,
+          3
+        ]
+      ],
+      "class_code": "4377d3f420d85d9a41440b06b546578a96b47dca69a9447aaed7c5f542523ef7",
+      "class_node_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          190,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "FileChannelTest() : channel_(nullptr)\n  {\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.lookups = strdup(\"f\");\n    int optmask  = ARES_OPT_LOOKUPS;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n    free(opts.lookups);\n  }",
+      "fn_code_pos": [
+        [
+          195,
+          2
+        ],
+        [
+          204,
+          3
+        ]
+      ],
+      "class_code": "b8dcaef941176e3eff8d31f3d714b93d0bc8364f907ff77894f000f40d7f674f",
+      "class_node_pos": [
+        [
+          193,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "FileChannelTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~FileChannelTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }",
+      "fn_code_pos": [
+        [
+          206,
+          2
+        ],
+        [
+          210,
+          3
+        ]
+      ],
+      "class_code": "b8dcaef941176e3eff8d31f3d714b93d0bc8364f907ff77894f000f40d7f674f",
+      "class_node_pos": [
+        [
+          193,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DefaultChannelModeTest() : channel_(nullptr)\n  {\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.lookups = strdup(GetParam().c_str());\n    int optmask  = ARES_OPT_LOOKUPS;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n    free(opts.lookups);\n  }",
+      "fn_code_pos": [
+        [
+          224,
+          2
+        ],
+        [
+          233,
+          3
+        ]
+      ],
+      "class_code": "f1ed14826e6b3f8b7597523acf7a8b20d120521ee2c855a7cf7cb79fe709318b",
+      "class_node_pos": [
+        [
+          220,
+          0
+        ],
+        [
+          246,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "DefaultChannelModeTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~DefaultChannelModeTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }",
+      "fn_code_pos": [
+        [
+          235,
+          2
+        ],
+        [
+          239,
+          3
+        ]
+      ],
+      "class_code": "f1ed14826e6b3f8b7597523acf7a8b20d120521ee2c855a7cf7cb79fe709318b",
+      "class_node_pos": [
+        [
+          220,
+          0
+        ],
+        [
+          246,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void SetReplyData(const std::vector<byte> &reply)\n  {\n    exact_reply_ = reply;\n    reply_       = nullptr;\n  }",
+      "fn_code_pos": [
+        [
+          260,
+          2
+        ],
+        [
+          264,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetReplyData",
+        "parameters": {
+          "reply": "std::vector<byte>"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void SetReply(const DNSPacket *reply)\n  {\n    reply_ = reply;\n    exact_reply_.clear();\n  }",
+      "fn_code_pos": [
+        [
+          266,
+          2
+        ],
+        [
+          270,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetReply",
+        "parameters": {
+          "reply": "DNSPacket"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void SetReplyExpRequest(const DNSPacket *reply, const std::string &request)\n  {\n    expected_request_ = request;\n    reply_            = reply;\n  }",
+      "fn_code_pos": [
+        [
+          275,
+          2
+        ],
+        [
+          279,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetReplyExpRequest",
+        "parameters": {
+          "reply": "DNSPacket",
+          "request": "std::string"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void SetReplyQID(int qid)\n  {\n    qid_ = qid;\n  }",
+      "fn_code_pos": [
+        [
+          281,
+          2
+        ],
+        [
+          284,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetReplyQID",
+        "parameters": {
+          "qid": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void Disconnect()\n  {\n    reply_ = nullptr;\n    exact_reply_.clear();\n    for (ares_socket_t fd : connfds_) {\n      sclose(fd);\n    }\n    connfds_.clear();\n    free(tcp_data_);\n    tcp_data_     = NULL;\n    tcp_data_len_ = 0;\n  }",
+      "fn_code_pos": [
+        [
+          286,
+          2
+        ],
+        [
+          297,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Disconnect",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "unsigned short          udpport() const\n  {\n    return udpport_;\n  }",
+      "fn_code_pos": [
+        [
+          306,
+          2
+        ],
+        [
+          309,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "udpport",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned short tcpport() const\n  {\n    return tcpport_;\n  }",
+      "fn_code_pos": [
+        [
+          311,
+          2
+        ],
+        [
+          314,
+          3
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "tcpport",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockChannelTest()\n    : MockChannelOptsTest(1, GetParam().first, GetParam().second, false,\n                          nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          370,
+          2
+        ],
+        [
+          374,
+          3
+        ]
+      ],
+      "class_code": "f335b4a3a1118096497e85cfdb83714340a8db552cf8abdee5390d19f098a4ad",
+      "class_node_pos": [
+        [
+          366,
+          0
+        ],
+        [
+          375,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockChannelTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockUDPChannelTest()\n    : MockChannelOptsTest(1, GetParam(), false, false, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          380,
+          2
+        ],
+        [
+          383,
+          3
+        ]
+      ],
+      "class_code": "bbb79b17a40fc1490b6dffa8c5db9e5f1f978448f98d6d43878ca851dc420ba4",
+      "class_node_pos": [
+        [
+          377,
+          0
+        ],
+        [
+          384,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockUDPChannelTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockTCPChannelTest()\n    : MockChannelOptsTest(1, GetParam(), true, false, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          389,
+          2
+        ],
+        [
+          392,
+          3
+        ]
+      ],
+      "class_code": "6749df7c8d2fe134d112ad9b8d5e42d42a448adab936865acd7afb4ed5f5f137",
+      "class_node_pos": [
+        [
+          386,
+          0
+        ],
+        [
+          393,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockTCPChannelTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockEventThreadOptsTest(int count, ares_evsys_t evsys, int family,\n                          bool force_tcp, struct ares_options *givenopts,\n                          int optmask)\n    : MockChannelOptsTest(count, family, force_tcp, false,\n                          FillOptionsET(&evopts_, givenopts, evsys),\n                          optmask | ARES_OPT_EVENT_THREAD)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          397,
+          2
+        ],
+        [
+          404,
+          3
+        ]
+      ],
+      "class_code": "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb",
+      "class_node_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockEventThreadOptsTest",
+        "parameters": {
+          "count": "int",
+          "evsys": "ares_evsys_t",
+          "family": "int",
+          "force_tcp": "bool",
+          "givenopts": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~MockEventThreadOptsTest()\n  {\n  }",
+      "fn_code_pos": [
+        [
+          406,
+          2
+        ],
+        [
+          408,
+          3
+        ]
+      ],
+      "class_code": "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb",
+      "class_node_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static struct ares_options *FillOptionsET(struct ares_options *opts,\n                                            struct ares_options *givenopts,\n                                            ares_evsys_t         evsys)\n  {\n    if (givenopts) {\n      memcpy(opts, givenopts, sizeof(*opts));\n    } else {\n      memset(opts, 0, sizeof(*opts));\n    }\n    opts->evsys = evsys;\n    return opts;\n  }",
+      "fn_code_pos": [
+        [
+          410,
+          2
+        ],
+        [
+          421,
+          3
+        ]
+      ],
+      "class_code": "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb",
+      "class_node_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "FillOptionsET",
+        "parameters": {
+          "opts": "struct ares_options",
+          "givenopts": "struct ares_options",
+          "evsys": "ares_evsys_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), std::get<2>(GetParam()),\n                              nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          433,
+          2
+        ],
+        [
+          438,
+          3
+        ]
+      ],
+      "class_code": "416df76708421d9b1b63f219e598c1d99434e60b86be545c567df10e27f71449",
+      "class_node_pos": [
+        [
+          429,
+          0
+        ],
+        [
+          439,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockEventThreadTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockUDPEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), false, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          445,
+          2
+        ],
+        [
+          449,
+          3
+        ]
+      ],
+      "class_code": "ddf7729b016031b17cc0a730a53d015b716a3935fd4cf39b978858f1547bd8b3",
+      "class_node_pos": [
+        [
+          441,
+          0
+        ],
+        [
+          450,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockUDPEventThreadTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MockTCPEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), true, nullptr, 0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          456,
+          2
+        ],
+        [
+          460,
+          3
+        ]
+      ],
+      "class_code": "a013685d30abc31cef70628484c6c9542dcd713933a40d979c6c516fddd3bd28",
+      "class_node_pos": [
+        [
+          452,
+          0
+        ],
+        [
+          461,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockTCPEventThreadTest",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P2(SetReplyData, mockserver, data)\n{\n  mockserver->SetReplyData(data);\n}",
+      "fn_code_pos": [
+        [
+          464,
+          0
+        ],
+        [
+          467,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P2",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P2(SetReplyAndFailSend, mockserver, reply)\n{\n  mockserver->SetReply(reply);\n  LibraryTest::SetFailSend();\n}",
+      "fn_code_pos": [
+        [
+          469,
+          0
+        ],
+        [
+          473,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P2",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P2(SetReply, mockserver, reply)\n{\n  mockserver->SetReply(reply);\n}",
+      "fn_code_pos": [
+        [
+          475,
+          0
+        ],
+        [
+          478,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P2",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P3(SetReplyExpRequest, mockserver, reply, request)\n{\n  mockserver->SetReplyExpRequest(reply, request);\n}",
+      "fn_code_pos": [
+        [
+          482,
+          0
+        ],
+        [
+          485,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P3",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P2(SetReplyQID, mockserver, qid)\n{\n  mockserver->SetReplyQID(qid);\n}",
+      "fn_code_pos": [
+        [
+          487,
+          0
+        ],
+        [
+          490,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P2",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P2(CancelChannel, mockserver, channel)\n{\n  ares_cancel(channel);\n}",
+      "fn_code_pos": [
+        [
+          493,
+          0
+        ],
+        [
+          496,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P2",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ACTION_P(Disconnect, mockserver)\n{\n  mockserver->Disconnect();\n}",
+      "fn_code_pos": [
+        [
+          499,
+          0
+        ],
+        [
+          502,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ACTION_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "HostEnt() : addrtype_(-1)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          506,
+          2
+        ],
+        [
+          508,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HostEnt",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "HostResult() : done_(false), status_(0), timeouts_(0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          521,
+          2
+        ],
+        [
+          523,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HostResult",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~AresDnsRecord()\n  {\n    ares_dns_record_destroy(dnsrec_);\n    dnsrec_ = NULL;\n  }",
+      "fn_code_pos": [
+        [
+          538,
+          2
+        ],
+        [
+          542,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "AresDnsRecord() : dnsrec_(NULL)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          544,
+          2
+        ],
+        [
+          546,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "AresDnsRecord",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void SetDnsRecord(const ares_dns_record_t *dnsrec)\n  {\n    if (dnsrec_ != NULL) {\n      ares_dns_record_destroy(dnsrec_);\n    }\n    if (dnsrec == NULL) {\n      return;\n    }\n    dnsrec_ = ares_dns_record_duplicate(dnsrec);\n  }",
+      "fn_code_pos": [
+        [
+          548,
+          2
+        ],
+        [
+          557,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "SetDnsRecord",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "QueryResult() : done_(false), status_(ARES_SUCCESS), timeouts_(0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          566,
+          2
+        ],
+        [
+          568,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "QueryResult",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void operator()(ares_addrinfo *ptr)\n  {\n    if (ptr) {\n      ares_freeaddrinfo(ptr);\n    }\n  }",
+      "fn_code_pos": [
+        [
+          607,
+          2
+        ],
+        [
+          612,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "AddrInfoResult() : done_(false), status_(-1), timeouts_(0)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          622,
+          2
+        ],
+        [
+          624,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "AddrInfoResult",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "const char *filename() const\n  {\n    return filename_.c_str();\n  }",
+      "fn_code_pos": [
+        [
+          683,
+          2
+        ],
+        [
+          686,
+          3
+        ]
+      ],
+      "class_code": "2cc16f98fce1852edef7d3c48f8e921cce4d6c66e0c0d3fee230c5b716b9d89b",
+      "class_node_pos": [
+        [
+          679,
+          0
+        ],
+        [
+          687,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "filename",
+        "parameters": {},
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static int setenv(const char *name, const char *value, int overwrite)\n{\n  char  *buffer;\n  size_t buf_size;\n\n  if (name == NULL) {\n    return -1;\n  }\n\n  if (value == NULL) {\n    value = \"\"; /* For unset */\n  }\n\n  if (!overwrite && getenv(name) != NULL) {\n    return -1;\n  }\n\n  buf_size = strlen(name) + strlen(value) + 1 /* = */ + 1 /* NULL */;\n  buffer   = (char *)malloc(buf_size);\n  _snprintf(buffer, buf_size, \"%s=%s\", name, value);\n  _putenv(buffer);\n  free(buffer);\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          692,
+          0
+        ],
+        [
+          715,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "setenv",
+        "parameters": {
+          "name": "char",
+          "value": "char",
+          "overwrite": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int unsetenv(const char *name)\n{\n  return setenv(name, NULL, 1);\n}",
+      "fn_code_pos": [
+        [
+          717,
+          0
+        ],
+        [
+          720,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "unsetenv",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "EnvValue(const char *name, const char *value) : name_(name), restore_(false)\n  {\n    char *original = getenv(name);\n    if (original) {\n      restore_  = true;\n      original_ = original;\n    }\n    setenv(name_.c_str(), value, 1);\n  }",
+      "fn_code_pos": [
+        [
+          728,
+          2
+        ],
+        [
+          736,
+          3
+        ]
+      ],
+      "class_code": "aff6eb4bfc699ae6929d60d45c420c9f6484b251bfb6d7759078d873544c79a4",
+      "class_node_pos": [
+        [
+          726,
+          0
+        ],
+        [
+          751,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "EnvValue",
+        "parameters": {
+          "name": "char",
+          "value": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~EnvValue()\n  {\n    if (restore_) {\n      setenv(name_.c_str(), original_.c_str(), 1);\n    } else {\n      unsetenv(name_.c_str());\n    }\n  }",
+      "fn_code_pos": [
+        [
+          738,
+          2
+        ],
+        [
+          745,
+          3
+        ]
+      ],
+      "class_code": "aff6eb4bfc699ae6929d60d45c420c9f6484b251bfb6d7759078d873544c79a4",
+      "class_node_pos": [
+        [
+          726,
+          0
+        ],
+        [
+          751,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string root() const\n  {\n    return rootdir_;\n  }",
+      "fn_code_pos": [
+        [
+          765,
+          2
+        ],
+        [
+          768,
+          3
+        ]
+      ],
+      "class_code": "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283",
+      "class_node_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "root",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "std::string mountpt() const\n  {\n    return mountpt_;\n  }",
+      "fn_code_pos": [
+        [
+          770,
+          2
+        ],
+        [
+          773,
+          3
+        ]
+      ],
+      "class_code": "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283",
+      "class_node_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "mountpt",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_sleep_time(unsigned int ms)",
+      "fn_dec_pos": [
+        [
+          107,
+          24
+        ],
+        [
+          107,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sleep_time",
+        "parameters": {
+          "ms": "unsigned int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ProcessWork(ares_channel_t                          *channel,\n                                    std::function<std::set<ares_socket_t>()> get_extrafds,\n                                    std::function<void(ares_socket_t)>       process_extra,\n                                    unsigned int                             cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          111,
+          24
+        ],
+        [
+          114,
+          91
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ProcessWork",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "get_extrafds": "std::function<std::set<ares_socket_t>()>",
+          "process_extra": "std::function<void(ares_socket_t)>"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "NoExtraFDs()",
+      "fn_dec_pos": [
+        [
+          115,
+          24
+        ],
+        [
+          115,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "NoExtraFDs",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "af_tostr(int af)",
+      "fn_dec_pos": [
+        [
+          117,
+          24
+        ],
+        [
+          117,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "af_tostr",
+        "parameters": {
+          "af": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "mode_tostr(bool mode)",
+      "fn_dec_pos": [
+        [
+          118,
+          24
+        ],
+        [
+          118,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "mode_tostr",
+        "parameters": {
+          "mode": "bool"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "PrintFamilyMode(const testing::TestParamInfo<std::pair<int, bool>> &info)",
+      "fn_dec_pos": [
+        [
+          120,
+          2
+        ],
+        [
+          120,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PrintFamilyMode",
+        "parameters": {
+          "info": "testing::TestParamInfo<std::pair<int, bool>>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "PrintFamily(const testing::TestParamInfo<int> &info)",
+      "fn_dec_pos": [
+        [
+          121,
+          12
+        ],
+        [
+          121,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PrintFamily",
+        "parameters": {
+          "info": "testing::TestParamInfo<int>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "SetAllocFail(int nth)",
+      "fn_dec_pos": [
+        [
+          142,
+          15
+        ],
+        [
+          142,
+          36
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetAllocFail",
+        "parameters": {
+          "nth": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "SetAllocSizeFail(size_t size)",
+      "fn_dec_pos": [
+        [
+          144,
+          15
+        ],
+        [
+          144,
+          44
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetAllocSizeFail",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ClearFails()",
+      "fn_dec_pos": [
+        [
+          146,
+          15
+        ],
+        [
+          146,
+          27
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ClearFails",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "amalloc(size_t size)",
+      "fn_dec_pos": [
+        [
+          148,
+          15
+        ],
+        [
+          148,
+          35
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "amalloc",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "arealloc(void *ptr, size_t size)",
+      "fn_dec_pos": [
+        [
+          149,
+          15
+        ],
+        [
+          149,
+          47
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "arealloc",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "afree(void *ptr)",
+      "fn_dec_pos": [
+        [
+          150,
+          15
+        ],
+        [
+          150,
+          31
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "afree",
+        "parameters": {
+          "ptr": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "SetFailSend(void)",
+      "fn_dec_pos": [
+        [
+          152,
+          14
+        ],
+        [
+          152,
+          31
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "SetFailSend",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_sendv_fail(ares_socket_t socket, const struct iovec *vec, int len,\n                                      void *user_data)",
+      "fn_dec_pos": [
+        [
+          153,
+          22
+        ],
+        [
+          154,
+          54
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ares_sendv_fail",
+        "parameters": {
+          "socket": "ares_socket_t",
+          "vec": "struct iovec",
+          "len": "int",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "ShouldAllocFail(size_t size)",
+      "fn_dec_pos": [
+        [
+          158,
+          31
+        ],
+        [
+          158,
+          59
+        ]
+      ],
+      "class_code": "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f",
+      "class_node_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ShouldAllocFail",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "Process(unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          186,
+          7
+        ],
+        [
+          186,
+          42
+        ]
+      ],
+      "class_code": "4377d3f420d85d9a41440b06b546578a96b47dca69a9447aaed7c5f542523ef7",
+      "class_node_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          190,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "Process(unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          213,
+          7
+        ],
+        [
+          213,
+          42
+        ]
+      ],
+      "class_code": "b8dcaef941176e3eff8d31f3d714b93d0bc8364f907ff77894f000f40d7f674f",
+      "class_node_pos": [
+        [
+          193,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "Process(unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          242,
+          7
+        ],
+        [
+          242,
+          42
+        ]
+      ],
+      "class_code": "f1ed14826e6b3f8b7597523acf7a8b20d120521ee2c855a7cf7cb79fe709318b",
+      "class_node_pos": [
+        [
+          220,
+          0
+        ],
+        [
+          246,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "MockServer(int family, unsigned short port)",
+      "fn_dec_pos": [
+        [
+          251,
+          2
+        ],
+        [
+          251,
+          45
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockServer",
+        "parameters": {
+          "family": "int",
+          "port": "unsigned short"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~MockServer()",
+      "fn_dec_pos": [
+        [
+          252,
+          2
+        ],
+        [
+          252,
+          15
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "MOCK_METHOD2(OnRequest, void(const std::string &name, int rrtype))",
+      "fn_dec_pos": [
+        [
+          256,
+          2
+        ],
+        [
+          256,
+          68
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MOCK_METHOD2",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "fds() const",
+      "fn_dec_pos": [
+        [
+          300,
+          26
+        ],
+        [
+          300,
+          37
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "fds",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ProcessFD(ares_socket_t fd)",
+      "fn_dec_pos": [
+        [
+          303,
+          26
+        ],
+        [
+          303,
+          53
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ProcessFD",
+        "parameters": {
+          "fd": "ares_socket_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ProcessRequest(ares_socket_t fd, struct sockaddr_storage *addr,\n                                ares_socklen_t addrlen, const std::vector<byte> &req,\n                                const std::string &reqstr, int qid, const char *name,\n                                int rrtype)",
+      "fn_dec_pos": [
+        [
+          317,
+          17
+        ],
+        [
+          320,
+          43
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ProcessRequest",
+        "parameters": {
+          "fd": "ares_socket_t",
+          "addr": "struct sockaddr_storage",
+          "addrlen": "ares_socklen_t",
+          "req": "std::vector<byte>",
+          "reqstr": "std::string",
+          "qid": "int",
+          "name": "char",
+          "rrtype": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ProcessPacket(ares_socket_t fd, struct sockaddr_storage *addr,\n                               ares_socklen_t addrlen, byte *data, int len)",
+      "fn_dec_pos": [
+        [
+          321,
+          17
+        ],
+        [
+          322,
+          75
+        ]
+      ],
+      "class_code": "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4",
+      "class_node_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ProcessPacket",
+        "parameters": {
+          "fd": "ares_socket_t",
+          "addr": "struct sockaddr_storage",
+          "addrlen": "ares_socklen_t",
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "MockChannelOptsTest(int count, int family, bool force_tcp,\n                      bool honor_sysconfig, struct ares_options *givenopts,\n                      int optmask)",
+      "fn_dec_pos": [
+        [
+          339,
+          2
+        ],
+        [
+          341,
+          34
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MockChannelOptsTest",
+        "parameters": {
+          "count": "int",
+          "family": "int",
+          "force_tcp": "bool",
+          "honor_sysconfig": "bool",
+          "givenopts": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~MockChannelOptsTest()",
+      "fn_dec_pos": [
+        [
+          342,
+          2
+        ],
+        [
+          342,
+          24
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ProcessAltChannel(ares_channel_t *chan, unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          346,
+          7
+        ],
+        [
+          346,
+          74
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ProcessAltChannel",
+        "parameters": {
+          "chan": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "Process(unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          347,
+          7
+        ],
+        [
+          347,
+          42
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "fds() const",
+      "fn_dec_pos": [
+        [
+          354,
+          55
+        ],
+        [
+          354,
+          66
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "fds",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ProcessFD(ares_socket_t fd)",
+      "fn_dec_pos": [
+        [
+          355,
+          25
+        ],
+        [
+          355,
+          52
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ProcessFD",
+        "parameters": {
+          "fd": "ares_socket_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "BuildServers(int count, int family,\n                                      unsigned short base_port)",
+      "fn_dec_pos": [
+        [
+          357,
+          25
+        ],
+        [
+          358,
+          63
+        ]
+      ],
+      "class_code": "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3",
+      "class_node_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "BuildServers",
+        "parameters": {
+          "count": "int",
+          "family": "int",
+          "base_port": "unsigned short"
+        },
+        "return_type": "NiceMockServers"
+      }
+    },
+    {
+      "fn_code": "FillOptionsET(struct ares_options *opts,\n                                            struct ares_options *givenopts,\n                                            ares_evsys_t         evsys)",
+      "fn_dec_pos": [
+        [
+          410,
+          30
+        ],
+        [
+          412,
+          71
+        ]
+      ],
+      "class_code": "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb",
+      "class_node_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "FillOptionsET",
+        "parameters": {
+          "opts": "struct ares_options",
+          "givenopts": "struct ares_options",
+          "evsys": "ares_evsys_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "Process(unsigned int cancel_ms = 0)",
+      "fn_dec_pos": [
+        [
+          423,
+          7
+        ],
+        [
+          423,
+          42
+        ]
+      ],
+      "class_code": "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb",
+      "class_node_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "Process",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "HostEnt(const struct hostent *hostent)",
+      "fn_dec_pos": [
+        [
+          510,
+          2
+        ],
+        [
+          510,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HostEnt",
+        "parameters": {
+          "hostent": "struct hostent"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const HostEnt &result)",
+      "fn_dec_pos": [
+        [
+          517,
+          14
+        ],
+        [
+          517,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "HostEnt"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const HostResult &result)",
+      "fn_dec_pos": [
+        [
+          534,
+          14
+        ],
+        [
+          534,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "HostResult"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const AresDnsRecord &result)",
+      "fn_dec_pos": [
+        [
+          562,
+          14
+        ],
+        [
+          562,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "AresDnsRecord"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const QueryResult &result)",
+      "fn_dec_pos": [
+        [
+          579,
+          14
+        ],
+        [
+          579,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "QueryResult"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const SearchResult &result)",
+      "fn_dec_pos": [
+        [
+          591,
+          14
+        ],
+        [
+          591,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "SearchResult"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const NameInfoResult &result)",
+      "fn_dec_pos": [
+        [
+          604,
+          14
+        ],
+        [
+          604,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "NameInfoResult"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const AddrInfo &result)",
+      "fn_dec_pos": [
+        [
+          618,
+          14
+        ],
+        [
+          618,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "AddrInfo"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "operator<<(std::ostream &os, const AddrInfoResult &result)",
+      "fn_dec_pos": [
+        [
+          635,
+          14
+        ],
+        [
+          635,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "os": "std::ostream",
+          "result": "AddrInfoResult"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "HostCallback(void *data, int status, int timeouts,\n                           struct hostent *hostent)",
+      "fn_dec_pos": [
+        [
+          639,
+          14
+        ],
+        [
+          640,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HostCallback",
+        "parameters": {
+          "data": "void",
+          "status": "int",
+          "timeouts": "int",
+          "hostent": "struct hostent"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "QueryCallback(void *data, ares_status_t status, size_t timeouts,\n                            const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          641,
+          14
+        ],
+        [
+          642,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "QueryCallback",
+        "parameters": {
+          "data": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "SearchCallback(void *data, int status, int timeouts, unsigned char *abuf,\n                    int alen)",
+      "fn_dec_pos": [
+        [
+          643,
+          5
+        ],
+        [
+          644,
+          29
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "SearchCallback",
+        "parameters": {
+          "data": "void",
+          "status": "int",
+          "timeouts": "int",
+          "abuf": "unsigned char",
+          "alen": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "SearchCallbackDnsRec(void *data, ares_status_t status, size_t timeouts,\n                          const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          645,
+          5
+        ],
+        [
+          646,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "SearchCallbackDnsRec",
+        "parameters": {
+          "data": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "NameInfoCallback(void *data, int status, int timeouts, char *node,\n                      char *service)",
+      "fn_dec_pos": [
+        [
+          647,
+          5
+        ],
+        [
+          648,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "NameInfoCallback",
+        "parameters": {
+          "data": "void",
+          "status": "int",
+          "timeouts": "int",
+          "node": "char",
+          "service": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "AddrInfoCallback(void *data, int status, int timeouts,\n                      struct ares_addrinfo *res)",
+      "fn_dec_pos": [
+        [
+          649,
+          5
+        ],
+        [
+          650,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "AddrInfoCallback",
+        "parameters": {
+          "data": "void",
+          "status": "int",
+          "timeouts": "int",
+          "res": "struct ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "GetNameServers(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          653,
+          12
+        ],
+        [
+          653,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "GetNameServers",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TransientDir(const std::string &dirname)",
+      "fn_dec_pos": [
+        [
+          658,
+          2
+        ],
+        [
+          658,
+          42
+        ]
+      ],
+      "class_code": "f4000971275b5ab39b02fc25980d8c6168bd5ff4fc5ad590f06bc43c3d2086cc",
+      "class_node_pos": [
+        [
+          656,
+          0
+        ],
+        [
+          663,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "TransientDir",
+        "parameters": {
+          "dirname": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~TransientDir()",
+      "fn_dec_pos": [
+        [
+          659,
+          2
+        ],
+        [
+          659,
+          17
+        ]
+      ],
+      "class_code": "f4000971275b5ab39b02fc25980d8c6168bd5ff4fc5ad590f06bc43c3d2086cc",
+      "class_node_pos": [
+        [
+          656,
+          0
+        ],
+        [
+          663,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TempNam(const char *dir, const char *prefix)",
+      "fn_dec_pos": [
+        [
+          666,
+          12
+        ],
+        [
+          666,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TempNam",
+        "parameters": {
+          "dir": "char",
+          "prefix": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TransientFile(const std::string &filename, const std::string &contents)",
+      "fn_dec_pos": [
+        [
+          671,
+          2
+        ],
+        [
+          671,
+          73
+        ]
+      ],
+      "class_code": "c29cae8889cb2f9c7a834d78235fdbbbf3060e3fddc198058d4f47776778b696",
+      "class_node_pos": [
+        [
+          669,
+          0
+        ],
+        [
+          676,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "TransientFile",
+        "parameters": {
+          "filename": "std::string",
+          "contents": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~TransientFile()",
+      "fn_dec_pos": [
+        [
+          672,
+          2
+        ],
+        [
+          672,
+          18
+        ]
+      ],
+      "class_code": "c29cae8889cb2f9c7a834d78235fdbbbf3060e3fddc198058d4f47776778b696",
+      "class_node_pos": [
+        [
+          669,
+          0
+        ],
+        [
+          676,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TempFile(const std::string &contents)",
+      "fn_dec_pos": [
+        [
+          681,
+          2
+        ],
+        [
+          681,
+          39
+        ]
+      ],
+      "class_code": "2cc16f98fce1852edef7d3c48f8e921cce4d6c66e0c0d3fee230c5b716b9d89b",
+      "class_node_pos": [
+        [
+          679,
+          0
+        ],
+        [
+          687,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "TempFile",
+        "parameters": {
+          "contents": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "filename() const",
+      "fn_dec_pos": [
+        [
+          683,
+          14
+        ],
+        [
+          683,
+          30
+        ]
+      ],
+      "class_code": "2cc16f98fce1852edef7d3c48f8e921cce4d6c66e0c0d3fee230c5b716b9d89b",
+      "class_node_pos": [
+        [
+          679,
+          0
+        ],
+        [
+          687,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "filename",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ContainerFilesystem(NameContentList files, const std::string &mountpt)",
+      "fn_dec_pos": [
+        [
+          762,
+          2
+        ],
+        [
+          762,
+          72
+        ]
+      ],
+      "class_code": "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283",
+      "class_node_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "ContainerFilesystem",
+        "parameters": {
+          "files": "NameContentList",
+          "mountpt": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~ContainerFilesystem()",
+      "fn_dec_pos": [
+        [
+          763,
+          2
+        ],
+        [
+          763,
+          24
+        ]
+      ],
+      "class_code": "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283",
+      "class_node_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "EnsureDirExists(const std::string &dir)",
+      "fn_dec_pos": [
+        [
+          776,
+          25
+        ],
+        [
+          776,
+          64
+        ]
+      ],
+      "class_code": "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283",
+      "class_node_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "EnsureDirExists",
+        "parameters": {
+          "dir": "std::string"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "RunInContainer(ContainerFilesystem *fs, const std::string &hostname,\n                   const std::string &domainname, VoidToIntFn fn)",
+      "fn_dec_pos": [
+        [
+          783,
+          4
+        ],
+        [
+          784,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RunInContainer",
+        "parameters": {
+          "fs": "ContainerFilesystem",
+          "hostname": "std::string",
+          "domainname": "std::string",
+          "fn": "VoidToIntFn"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "VirtualizeIO(ares_channel)",
+      "fn_dec_pos": [
+        [
+          863,
+          2
+        ],
+        [
+          863,
+          28
+        ]
+      ],
+      "class_code": "e856eee93a2c9edd8becd9b9f3bbd8f02b31a545dcdd4ce2a4f82a54999c8677",
+      "class_node_pos": [
+        [
+          861,
+          0
+        ],
+        [
+          870,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "VirtualizeIO",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~VirtualizeIO()",
+      "fn_dec_pos": [
+        [
+          864,
+          2
+        ],
+        [
+          864,
+          17
+        ]
+      ],
+      "class_code": "e856eee93a2c9edd8becd9b9f3bbd8f02b31a545dcdd4ce2a4f82a54999c8677",
+      "class_node_pos": [
+        [
+          861,
+          0
+        ],
+        [
+          870,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {
+    "d2ecc79f2899de93e3141eb0ef705ba85abc96753565e768e217959dd31ce12f": {
+      "class_code": "class LibraryTest : public ::testing::Test {\npublic:\n  LibraryTest()\n  {\n    EXPECT_EQ(ARES_SUCCESS, ares_library_init_mem(\n                              ARES_LIB_INIT_ALL, &LibraryTest::amalloc,\n                              &LibraryTest::afree, &LibraryTest::arealloc));\n  }\n\n  ~LibraryTest()\n  {\n    ares_library_cleanup();\n    ClearFails();\n  }\n\n  // Set the n-th malloc call (of any size) from the library to fail.\n  // (nth == 1 means the next call)\n  static void  SetAllocFail(int nth);\n  // Set the next malloc call for the given size to fail.\n  static void  SetAllocSizeFail(size_t size);\n  // Remove any pending alloc failures.\n  static void  ClearFails();\n\n  static void *amalloc(size_t size);\n  static void *arealloc(void *ptr, size_t size);\n  static void  afree(void *ptr);\n\n  static void SetFailSend(void);\n  static ares_ssize_t ares_sendv_fail(ares_socket_t socket, const struct iovec *vec, int len,\n                                      void *user_data);\n\n\nprivate:\n  static bool                  ShouldAllocFail(size_t size);\n  static unsigned long long    fails_;\n  static std::map<size_t, int> size_fails_;\n  static std::mutex            lock_;\n  static bool                  failsend_;\n}",
+      "class_name": "LibraryTest",
+      "class_pos": [
+        [
+          125,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ]
+    },
+    "4377d3f420d85d9a41440b06b546578a96b47dca69a9447aaed7c5f542523ef7": {
+      "class_code": "class DefaultChannelTest : public LibraryTest {\npublic:\n  DefaultChannelTest() : channel_(nullptr)\n  {\n    /* Enable query cache for live tests */\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.qcache_max_ttl = 300;\n    int optmask         = ARES_OPT_QUERY_CACHE;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n  }\n\n  ~DefaultChannelTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }\n\n  // Process all pending work on ares-owned file descriptors.\n  void Process(unsigned int cancel_ms = 0);\n\nprotected:\n  ares_channel_t *channel_;\n}",
+      "class_name": "DefaultChannelTest",
+      "class_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          190,
+          1
+        ]
+      ]
+    },
+    "b8dcaef941176e3eff8d31f3d714b93d0bc8364f907ff77894f000f40d7f674f": {
+      "class_code": "class FileChannelTest : public LibraryTest {\npublic:\n  FileChannelTest() : channel_(nullptr)\n  {\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.lookups = strdup(\"f\");\n    int optmask  = ARES_OPT_LOOKUPS;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n    free(opts.lookups);\n  }\n\n  ~FileChannelTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }\n\n  // Process all pending work on ares-owned file descriptors.\n  void Process(unsigned int cancel_ms = 0);\n\nprotected:\n  ares_channel_t *channel_;\n}",
+      "class_name": "FileChannelTest",
+      "class_pos": [
+        [
+          193,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ]
+    },
+    "f1ed14826e6b3f8b7597523acf7a8b20d120521ee2c855a7cf7cb79fe709318b": {
+      "class_code": "class DefaultChannelModeTest\n  : public LibraryTest,\n    public ::testing::WithParamInterface<std::string> {\npublic:\n  DefaultChannelModeTest() : channel_(nullptr)\n  {\n    struct ares_options opts;\n    memset(&opts, 0, sizeof(opts));\n    opts.lookups = strdup(GetParam().c_str());\n    int optmask  = ARES_OPT_LOOKUPS;\n    EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel_, &opts, optmask));\n    EXPECT_NE(nullptr, channel_);\n    free(opts.lookups);\n  }\n\n  ~DefaultChannelModeTest()\n  {\n    ares_destroy(channel_);\n    channel_ = nullptr;\n  }\n\n  // Process all pending work on ares-owned file descriptors.\n  void Process(unsigned int cancel_ms = 0);\n\nprotected:\n  ares_channel_t *channel_;\n}",
+      "class_name": "DefaultChannelModeTest",
+      "class_pos": [
+        [
+          220,
+          0
+        ],
+        [
+          246,
+          1
+        ]
+      ]
+    },
+    "12acb55a33bb3f5a4e061db16372fee4c53297232ede53f8ad252d1a4309c2b4": {
+      "class_code": "class MockServer {\npublic:\n  MockServer(int family, unsigned short port);\n  ~MockServer();\n\n  // Mock method indicating the processing of a particular <name, RRtype>\n  // request.\n  MOCK_METHOD2(OnRequest, void(const std::string &name, int rrtype));\n\n  // Set the reply to be sent next; the query ID field will be overwritten\n  // with the value from the request.\n  void SetReplyData(const std::vector<byte> &reply)\n  {\n    exact_reply_ = reply;\n    reply_       = nullptr;\n  }\n\n  void SetReply(const DNSPacket *reply)\n  {\n    reply_ = reply;\n    exact_reply_.clear();\n  }\n\n  // Set the reply to be sent next as well as the request (in string form) that\n  // the server should expect to receive; the query ID field in the reply will\n  // be overwritten with the value from the request.\n  void SetReplyExpRequest(const DNSPacket *reply, const std::string &request)\n  {\n    expected_request_ = request;\n    reply_            = reply;\n  }\n\n  void SetReplyQID(int qid)\n  {\n    qid_ = qid;\n  }\n\n  void Disconnect()\n  {\n    reply_ = nullptr;\n    exact_reply_.clear();\n    for (ares_socket_t fd : connfds_) {\n      sclose(fd);\n    }\n    connfds_.clear();\n    free(tcp_data_);\n    tcp_data_     = NULL;\n    tcp_data_len_ = 0;\n  }\n\n  // The set of file descriptors that the server handles.\n  std::set<ares_socket_t> fds() const;\n\n  // Process activity on a file descriptor.\n  void                    ProcessFD(ares_socket_t fd);\n\n  // Ports the server is responding to\n  unsigned short          udpport() const\n  {\n    return udpport_;\n  }\n\n  unsigned short tcpport() const\n  {\n    return tcpport_;\n  }\n\nprivate:\n  void           ProcessRequest(ares_socket_t fd, struct sockaddr_storage *addr,\n                                ares_socklen_t addrlen, const std::vector<byte> &req,\n                                const std::string &reqstr, int qid, const char *name,\n                                int rrtype);\n  void           ProcessPacket(ares_socket_t fd, struct sockaddr_storage *addr,\n                               ares_socklen_t addrlen, byte *data, int len);\n  unsigned short udpport_;\n  unsigned short tcpport_;\n  ares_socket_t  udpfd_;\n  ares_socket_t  tcpfd_;\n  std::set<ares_socket_t> connfds_;\n  std::vector<byte>       exact_reply_;\n  const DNSPacket        *reply_;\n  std::string             expected_request_;\n  int                     qid_;\n  unsigned char          *tcp_data_;\n  size_t                  tcp_data_len_;\n}",
+      "class_name": "MockServer",
+      "class_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ]
+    },
+    "f8613c5205842c7db643e5a9b84796701a2fe6498e9f1e727bf88fff39da47b3": {
+      "class_code": "class MockChannelOptsTest : public LibraryTest {\npublic:\n  MockChannelOptsTest(int count, int family, bool force_tcp,\n                      bool honor_sysconfig, struct ares_options *givenopts,\n                      int optmask);\n  ~MockChannelOptsTest();\n\n  // Process all pending work on ares-owned and mock-server-owned file\n  // descriptors.\n  void ProcessAltChannel(ares_channel_t *chan, unsigned int cancel_ms = 0);\n  void Process(unsigned int cancel_ms = 0);\n\nprotected:\n  // NiceMockServer doesn't complain about uninteresting calls.\n  typedef testing::NiceMock<MockServer>                NiceMockServer;\n  typedef std::vector<std::unique_ptr<NiceMockServer>> NiceMockServers;\n\n  std::set<ares_socket_t>                              fds() const;\n  void                   ProcessFD(ares_socket_t fd);\n\n  static NiceMockServers BuildServers(int count, int family,\n                                      unsigned short base_port);\n\n  NiceMockServers        servers_;\n  // Convenience reference to first server.\n  NiceMockServer        &server_;\n  ares_channel_t        *channel_;\n}",
+      "class_name": "MockChannelOptsTest",
+      "class_pos": [
+        [
+          337,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ]
+    },
+    "f335b4a3a1118096497e85cfdb83714340a8db552cf8abdee5390d19f098a4ad": {
+      "class_code": "class MockChannelTest\n  : public MockChannelOptsTest,\n    public ::testing::WithParamInterface<std::pair<int, bool>> {\npublic:\n  MockChannelTest()\n    : MockChannelOptsTest(1, GetParam().first, GetParam().second, false,\n                          nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockChannelTest",
+      "class_pos": [
+        [
+          366,
+          0
+        ],
+        [
+          375,
+          1
+        ]
+      ]
+    },
+    "bbb79b17a40fc1490b6dffa8c5db9e5f1f978448f98d6d43878ca851dc420ba4": {
+      "class_code": "class MockUDPChannelTest : public MockChannelOptsTest,\n                           public ::testing::WithParamInterface<int> {\npublic:\n  MockUDPChannelTest()\n    : MockChannelOptsTest(1, GetParam(), false, false, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockUDPChannelTest",
+      "class_pos": [
+        [
+          377,
+          0
+        ],
+        [
+          384,
+          1
+        ]
+      ]
+    },
+    "6749df7c8d2fe134d112ad9b8d5e42d42a448adab936865acd7afb4ed5f5f137": {
+      "class_code": "class MockTCPChannelTest : public MockChannelOptsTest,\n                           public ::testing::WithParamInterface<int> {\npublic:\n  MockTCPChannelTest()\n    : MockChannelOptsTest(1, GetParam(), true, false, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockTCPChannelTest",
+      "class_pos": [
+        [
+          386,
+          0
+        ],
+        [
+          393,
+          1
+        ]
+      ]
+    },
+    "29fb68852689845a74a7323a37c71544ef644918b700310176720517d4d00ecb": {
+      "class_code": "class MockEventThreadOptsTest : public MockChannelOptsTest {\npublic:\n  MockEventThreadOptsTest(int count, ares_evsys_t evsys, int family,\n                          bool force_tcp, struct ares_options *givenopts,\n                          int optmask)\n    : MockChannelOptsTest(count, family, force_tcp, false,\n                          FillOptionsET(&evopts_, givenopts, evsys),\n                          optmask | ARES_OPT_EVENT_THREAD)\n  {\n  }\n\n  ~MockEventThreadOptsTest()\n  {\n  }\n\n  static struct ares_options *FillOptionsET(struct ares_options *opts,\n                                            struct ares_options *givenopts,\n                                            ares_evsys_t         evsys)\n  {\n    if (givenopts) {\n      memcpy(opts, givenopts, sizeof(*opts));\n    } else {\n      memset(opts, 0, sizeof(*opts));\n    }\n    opts->evsys = evsys;\n    return opts;\n  }\n\n  void Process(unsigned int cancel_ms = 0);\n\nprivate:\n  struct ares_options evopts_;\n}",
+      "class_name": "MockEventThreadOptsTest",
+      "class_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ]
+    },
+    "416df76708421d9b1b63f219e598c1d99434e60b86be545c567df10e27f71449": {
+      "class_code": "class MockEventThreadTest\n  : public MockEventThreadOptsTest,\n    public ::testing::WithParamInterface<std::tuple<ares_evsys_t, int, bool>> {\npublic:\n  MockEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), std::get<2>(GetParam()),\n                              nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockEventThreadTest",
+      "class_pos": [
+        [
+          429,
+          0
+        ],
+        [
+          439,
+          1
+        ]
+      ]
+    },
+    "ddf7729b016031b17cc0a730a53d015b716a3935fd4cf39b978858f1547bd8b3": {
+      "class_code": "class MockUDPEventThreadTest\n  : public MockEventThreadOptsTest,\n    public ::testing::WithParamInterface<std::tuple<ares_evsys_t, int>> {\npublic:\n  MockUDPEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), false, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockUDPEventThreadTest",
+      "class_pos": [
+        [
+          441,
+          0
+        ],
+        [
+          450,
+          1
+        ]
+      ]
+    },
+    "a013685d30abc31cef70628484c6c9542dcd713933a40d979c6c516fddd3bd28": {
+      "class_code": "class MockTCPEventThreadTest\n  : public MockEventThreadOptsTest,\n    public ::testing::WithParamInterface<std::tuple<ares_evsys_t, int>> {\npublic:\n  MockTCPEventThreadTest()\n    : MockEventThreadOptsTest(1, std::get<0>(GetParam()),\n                              std::get<1>(GetParam()), true, nullptr, 0)\n  {\n  }\n}",
+      "class_name": "MockTCPEventThreadTest",
+      "class_pos": [
+        [
+          452,
+          0
+        ],
+        [
+          461,
+          1
+        ]
+      ]
+    },
+    "f4000971275b5ab39b02fc25980d8c6168bd5ff4fc5ad590f06bc43c3d2086cc": {
+      "class_code": "class TransientDir {\npublic:\n  TransientDir(const std::string &dirname);\n  ~TransientDir();\n\nprivate:\n  std::string dirname_;\n}",
+      "class_name": "TransientDir",
+      "class_pos": [
+        [
+          656,
+          0
+        ],
+        [
+          663,
+          1
+        ]
+      ]
+    },
+    "c29cae8889cb2f9c7a834d78235fdbbbf3060e3fddc198058d4f47776778b696": {
+      "class_code": "class TransientFile {\npublic:\n  TransientFile(const std::string &filename, const std::string &contents);\n  ~TransientFile();\n\nprotected:\n  std::string filename_;\n}",
+      "class_name": "TransientFile",
+      "class_pos": [
+        [
+          669,
+          0
+        ],
+        [
+          676,
+          1
+        ]
+      ]
+    },
+    "2cc16f98fce1852edef7d3c48f8e921cce4d6c66e0c0d3fee230c5b716b9d89b": {
+      "class_code": "class TempFile : public TransientFile {\npublic:\n  TempFile(const std::string &contents);\n\n  const char *filename() const\n  {\n    return filename_.c_str();\n  }\n}",
+      "class_name": "TempFile",
+      "class_pos": [
+        [
+          679,
+          0
+        ],
+        [
+          687,
+          1
+        ]
+      ]
+    },
+    "aff6eb4bfc699ae6929d60d45c420c9f6484b251bfb6d7759078d873544c79a4": {
+      "class_code": "class EnvValue {\npublic:\n  EnvValue(const char *name, const char *value) : name_(name), restore_(false)\n  {\n    char *original = getenv(name);\n    if (original) {\n      restore_  = true;\n      original_ = original;\n    }\n    setenv(name_.c_str(), value, 1);\n  }\n\n  ~EnvValue()\n  {\n    if (restore_) {\n      setenv(name_.c_str(), original_.c_str(), 1);\n    } else {\n      unsetenv(name_.c_str());\n    }\n  }\n\nprivate:\n  std::string name_;\n  bool        restore_;\n  std::string original_;\n}",
+      "class_name": "EnvValue",
+      "class_pos": [
+        [
+          726,
+          0
+        ],
+        [
+          751,
+          1
+        ]
+      ]
+    },
+    "38a918808dee139aad1e467a522b1f196532e9693c1b2036b5d78a0b118ff283": {
+      "class_code": "class ContainerFilesystem {\npublic:\n  ContainerFilesystem(NameContentList files, const std::string &mountpt);\n  ~ContainerFilesystem();\n\n  std::string root() const\n  {\n    return rootdir_;\n  }\n\n  std::string mountpt() const\n  {\n    return mountpt_;\n  }\n\nprivate:\n  void                   EnsureDirExists(const std::string &dir);\n  std::string            rootdir_;\n  std::string            mountpt_;\n  std::list<std::string> dirs_;\n  std::vector<std::unique_ptr<TransientFile>> files_;\n}",
+      "class_name": "ContainerFilesystem",
+      "class_pos": [
+        [
+          760,
+          0
+        ],
+        [
+          781,
+          1
+        ]
+      ]
+    },
+    "e856eee93a2c9edd8becd9b9f3bbd8f02b31a545dcdd4ce2a4f82a54999c8677": {
+      "class_code": "class VirtualizeIO {\npublic:\n  VirtualizeIO(ares_channel);\n  ~VirtualizeIO();\n\n  static const ares_socket_functions default_functions;\n\nprivate:\n  ares_channel_t *channel_;\n}",
+      "class_name": "VirtualizeIO",
+      "class_pos": [
+        [
+          861,
+          0
+        ],
+        [
+          870,
+          1
+        ]
+      ]
+    }
+  },
+  "struct_node_list": [
+    [
+      "struct iovec {\n  void  *iov_base; /* Pointer to data. */\n  size_t iov_len;  /* Length of data.  */\n}",
+      {
+        "*iov_base": "void",
+        "iov_len": "size_t"
+      },
+      "iovec",
+      [
+        66,
+        0
+      ],
+      [
+        69,
+        1
+      ]
+    ],
+    [
+      "struct HostEnt {\n  HostEnt() : addrtype_(-1)\n  {\n  }\n\n  HostEnt(const struct hostent *hostent);\n  std::string              name_;\n  std::vector<std::string> aliases_;\n  int                      addrtype_;  // AF_INET or AF_INET6\n  std::vector<std::string> addrs_;\n}",
+      {
+        "name_": "std::string",
+        "aliases_": "std::vector<std::string>",
+        "addrtype_": "int",
+        "addrs_": "std::vector<std::string>"
+      },
+      "HostEnt",
+      [
+        505,
+        0
+      ],
+      [
+        515,
+        1
+      ]
+    ],
+    [
+      "struct HostResult {\n  HostResult() : done_(false), status_(0), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool    done_;\n  // Explicitly provided result information.\n  int     status_;\n  int     timeouts_;\n  // Contents of the hostent structure, if provided.\n  HostEnt host_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "host_": "HostEnt"
+      },
+      "HostResult",
+      [
+        520,
+        0
+      ],
+      [
+        532,
+        1
+      ]
+    ],
+    [
+      "struct AresDnsRecord {\n  ~AresDnsRecord()\n  {\n    ares_dns_record_destroy(dnsrec_);\n    dnsrec_ = NULL;\n  }\n\n  AresDnsRecord() : dnsrec_(NULL)\n  {\n  }\n\n  void SetDnsRecord(const ares_dns_record_t *dnsrec)\n  {\n    if (dnsrec_ != NULL) {\n      ares_dns_record_destroy(dnsrec_);\n    }\n    if (dnsrec == NULL) {\n      return;\n    }\n    dnsrec_ = ares_dns_record_duplicate(dnsrec);\n  }\n\n  ares_dns_record_t *dnsrec_ = NULL;\n}",
+      {
+        "*dnsrec_": "ares_dns_record_t"
+      },
+      "AresDnsRecord",
+      [
+        537,
+        0
+      ],
+      [
+        560,
+        1
+      ]
+    ],
+    [
+      "struct QueryResult {\n  QueryResult() : done_(false), status_(ARES_SUCCESS), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool          done_;\n  // Explicitly provided result information.\n  ares_status_t status_;\n  size_t        timeouts_;\n  // Contents of the ares_dns_record_t structure if provided\n  AresDnsRecord dnsrec_;\n}",
+      {
+        "done_": "bool",
+        "status_": "ares_status_t",
+        "timeouts_": "size_t",
+        "dnsrec_": "AresDnsRecord"
+      },
+      "QueryResult",
+      [
+        565,
+        0
+      ],
+      [
+        577,
+        1
+      ]
+    ],
+    [
+      "struct SearchResult {\n  // Whether the callback has been invoked.\n  bool              done_;\n  // Explicitly provided result information.\n  int               status_;\n  int               timeouts_;\n  std::vector<byte> data_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "data_": "std::vector<byte>"
+      },
+      "SearchResult",
+      [
+        582,
+        0
+      ],
+      [
+        589,
+        1
+      ]
+    ],
+    [
+      "struct NameInfoResult {\n  // Whether the callback has been invoked.\n  bool        done_;\n  // Explicitly provided result information.\n  int         status_;\n  int         timeouts_;\n  std::string node_;\n  std::string service_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "node_": "std::string",
+        "service_": "std::string"
+      },
+      "NameInfoResult",
+      [
+        594,
+        0
+      ],
+      [
+        602,
+        1
+      ]
+    ],
+    [
+      "struct AddrInfoDeleter {\n  void operator()(ares_addrinfo *ptr)\n  {\n    if (ptr) {\n      ares_freeaddrinfo(ptr);\n    }\n  }\n}",
+      {},
+      "AddrInfoDeleter",
+      [
+        606,
+        0
+      ],
+      [
+        613,
+        1
+      ]
+    ],
+    [
+      "struct AddrInfoResult {\n  AddrInfoResult() : done_(false), status_(-1), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool     done_;\n  // Explicitly provided result information.\n  int      status_;\n  int      timeouts_;\n  // Contents of the ares_addrinfo structure, if provided.\n  AddrInfo ai_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "ai_": "AddrInfo"
+      },
+      "AddrInfoResult",
+      [
+        621,
+        0
+      ],
+      [
+        633,
+        1
+      ]
+    ],
+    [
+      "struct iovec {\n  void  *iov_base; /* Pointer to data. */\n  size_t iov_len;  /* Length of data.  */\n}",
+      {
+        "*iov_base": "void",
+        "iov_len": "size_t"
+      },
+      "iovec",
+      [
+        66,
+        0
+      ],
+      [
+        69,
+        1
+      ]
+    ],
+    [
+      "struct iovec",
+      {},
+      "",
+      [
+        153,
+        66
+      ],
+      [
+        153,
+        78
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        171,
+        4
+      ],
+      [
+        171,
+        23
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        197,
+        4
+      ],
+      [
+        197,
+        23
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        226,
+        4
+      ],
+      [
+        226,
+        23
+      ]
+    ],
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        317,
+        50
+      ],
+      [
+        317,
+        73
+      ]
+    ],
+    [
+      "struct sockaddr_storage",
+      {},
+      "",
+      [
+        321,
+        49
+      ],
+      [
+        321,
+        72
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        340,
+        44
+      ],
+      [
+        340,
+        63
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        398,
+        42
+      ],
+      [
+        398,
+        61
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        410,
+        9
+      ],
+      [
+        410,
+        28
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        410,
+        44
+      ],
+      [
+        410,
+        63
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        411,
+        44
+      ],
+      [
+        411,
+        63
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        426,
+        2
+      ],
+      [
+        426,
+        21
+      ]
+    ],
+    [
+      "struct HostEnt {\n  HostEnt() : addrtype_(-1)\n  {\n  }\n\n  HostEnt(const struct hostent *hostent);\n  std::string              name_;\n  std::vector<std::string> aliases_;\n  int                      addrtype_;  // AF_INET or AF_INET6\n  std::vector<std::string> addrs_;\n}",
+      {
+        "name_": "std::string",
+        "aliases_": "std::vector<std::string>",
+        "addrtype_": "int",
+        "addrs_": "std::vector<std::string>"
+      },
+      "HostEnt",
+      [
+        505,
+        0
+      ],
+      [
+        515,
+        1
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        510,
+        16
+      ],
+      [
+        510,
+        30
+      ]
+    ],
+    [
+      "struct HostResult {\n  HostResult() : done_(false), status_(0), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool    done_;\n  // Explicitly provided result information.\n  int     status_;\n  int     timeouts_;\n  // Contents of the hostent structure, if provided.\n  HostEnt host_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "host_": "HostEnt"
+      },
+      "HostResult",
+      [
+        520,
+        0
+      ],
+      [
+        532,
+        1
+      ]
+    ],
+    [
+      "struct AresDnsRecord {\n  ~AresDnsRecord()\n  {\n    ares_dns_record_destroy(dnsrec_);\n    dnsrec_ = NULL;\n  }\n\n  AresDnsRecord() : dnsrec_(NULL)\n  {\n  }\n\n  void SetDnsRecord(const ares_dns_record_t *dnsrec)\n  {\n    if (dnsrec_ != NULL) {\n      ares_dns_record_destroy(dnsrec_);\n    }\n    if (dnsrec == NULL) {\n      return;\n    }\n    dnsrec_ = ares_dns_record_duplicate(dnsrec);\n  }\n\n  ares_dns_record_t *dnsrec_ = NULL;\n}",
+      {
+        "*dnsrec_": "ares_dns_record_t"
+      },
+      "AresDnsRecord",
+      [
+        537,
+        0
+      ],
+      [
+        560,
+        1
+      ]
+    ],
+    [
+      "struct QueryResult {\n  QueryResult() : done_(false), status_(ARES_SUCCESS), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool          done_;\n  // Explicitly provided result information.\n  ares_status_t status_;\n  size_t        timeouts_;\n  // Contents of the ares_dns_record_t structure if provided\n  AresDnsRecord dnsrec_;\n}",
+      {
+        "done_": "bool",
+        "status_": "ares_status_t",
+        "timeouts_": "size_t",
+        "dnsrec_": "AresDnsRecord"
+      },
+      "QueryResult",
+      [
+        565,
+        0
+      ],
+      [
+        577,
+        1
+      ]
+    ],
+    [
+      "struct SearchResult {\n  // Whether the callback has been invoked.\n  bool              done_;\n  // Explicitly provided result information.\n  int               status_;\n  int               timeouts_;\n  std::vector<byte> data_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "data_": "std::vector<byte>"
+      },
+      "SearchResult",
+      [
+        582,
+        0
+      ],
+      [
+        589,
+        1
+      ]
+    ],
+    [
+      "struct NameInfoResult {\n  // Whether the callback has been invoked.\n  bool        done_;\n  // Explicitly provided result information.\n  int         status_;\n  int         timeouts_;\n  std::string node_;\n  std::string service_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "node_": "std::string",
+        "service_": "std::string"
+      },
+      "NameInfoResult",
+      [
+        594,
+        0
+      ],
+      [
+        602,
+        1
+      ]
+    ],
+    [
+      "struct AddrInfoDeleter {\n  void operator()(ares_addrinfo *ptr)\n  {\n    if (ptr) {\n      ares_freeaddrinfo(ptr);\n    }\n  }\n}",
+      {},
+      "AddrInfoDeleter",
+      [
+        606,
+        0
+      ],
+      [
+        613,
+        1
+      ]
+    ],
+    [
+      "struct AddrInfoResult {\n  AddrInfoResult() : done_(false), status_(-1), timeouts_(0)\n  {\n  }\n\n  // Whether the callback has been invoked.\n  bool     done_;\n  // Explicitly provided result information.\n  int      status_;\n  int      timeouts_;\n  // Contents of the ares_addrinfo structure, if provided.\n  AddrInfo ai_;\n}",
+      {
+        "done_": "bool",
+        "status_": "int",
+        "timeouts_": "int",
+        "ai_": "AddrInfo"
+      },
+      "AddrInfoResult",
+      [
+        621,
+        0
+      ],
+      [
+        633,
+        1
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        640,
+        27
+      ],
+      [
+        640,
+        41
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        650,
+        22
+      ],
+      [
+        650,
+        42
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_setup.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"dns-proto.h\"\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include \"gtest/gtest.h\"\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#include \"gmock/gmock.h\"\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#include <functional>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    [
+      "#include <list>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#include <map>\n",
+      [
+        43,
+        0
+      ],
+      [
+        44,
+        0
+      ]
+    ],
+    [
+      "#include <memory>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#include <set>\n",
+      [
+        45,
+        0
+      ],
+      [
+        46,
+        0
+      ]
+    ],
+    [
+      "#include <string>\n",
+      [
+        46,
+        0
+      ],
+      [
+        47,
+        0
+      ]
+    ],
+    [
+      "#include <mutex>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#include <thread>\n",
+      [
+        48,
+        0
+      ],
+      [
+        49,
+        0
+      ]
+    ],
+    [
+      "#include <utility>\n",
+      [
+        49,
+        0
+      ],
+      [
+        50,
+        0
+      ]
+    ],
+    [
+      "#include <vector>\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include <chrono>\n",
+      [
+        51,
+        0
+      ],
+      [
+        52,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

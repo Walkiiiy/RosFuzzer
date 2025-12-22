@@ -1,0 +1,600 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_llist_destructor_t)(void *data)",
+      "fn_dec_pos": [
+        [
+          54,
+          13
+        ],
+        [
+          54,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_llist_create(ares_llist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          61,
+          27
+        ],
+        [
+          61,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "destruct": "ares_llist_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_replace_destructor(ares_llist_t           *list,\n                                ares_llist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          70,
+          2
+        ],
+        [
+          71,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_replace_destructor",
+        "parameters": {
+          "list": "ares_llist_t",
+          "destruct": "ares_llist_destructor_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_first(ares_llist_t *list,\n                                                        void         *val)",
+      "fn_dec_pos": [
+        [
+          80,
+          32
+        ],
+        [
+          81,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_last(ares_llist_t *list,\n                                                       void         *val)",
+      "fn_dec_pos": [
+        [
+          90,
+          32
+        ],
+        [
+          91,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_before(ares_llist_node_t *node, void *val)",
+      "fn_dec_pos": [
+        [
+          101,
+          2
+        ],
+        [
+          101,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_after(ares_llist_node_t *node,\n                                                        void              *val)",
+      "fn_dec_pos": [
+        [
+          110,
+          32
+        ],
+        [
+          111,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_first(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          118,
+          32
+        ],
+        [
+          118,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_last(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          125,
+          32
+        ],
+        [
+          125,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_idx(ares_llist_t *list,\n                                                    size_t        idx)",
+      "fn_dec_pos": [
+        [
+          133,
+          32
+        ],
+        [
+          134,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "list": "ares_llist_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_next(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          141,
+          32
+        ],
+        [
+          141,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_prev(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          148,
+          32
+        ],
+        [
+          148,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_val(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          156,
+          32
+        ],
+        [
+          156,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_val",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_len(const ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          163,
+          32
+        ],
+        [
+          163,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_len",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_clear(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          169,
+          32
+        ],
+        [
+          169,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_clear",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_parent(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          176,
+          32
+        ],
+        [
+          176,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_first_val(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          183,
+          32
+        ],
+        [
+          183,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_first_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_last_val(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          190,
+          32
+        ],
+        [
+          190,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_last_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_claim(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          198,
+          32
+        ],
+        [
+          198,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_claim",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_replace(ares_llist_node_t *node, void *val)",
+      "fn_dec_pos": [
+        [
+          205,
+          18
+        ],
+        [
+          205,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_replace",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_destroy(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          211,
+          18
+        ],
+        [
+          211,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_destroy",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_destroy(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          217,
+          18
+        ],
+        [
+          217,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_destroy",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_mvparent_last(ares_llist_node_t *node,\n                                                ares_llist_t      *new_parent)",
+      "fn_dec_pos": [
+        [
+          225,
+          18
+        ],
+        [
+          226,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_mvparent_last",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "new_parent": "ares_llist_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_mvparent_first(ares_llist_node_t *node,\n                                                 ares_llist_t      *new_parent)",
+      "fn_dec_pos": [
+        [
+          234,
+          18
+        ],
+        [
+          235,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_mvparent_first",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "new_parent": "ares_llist_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_llist",
+      {},
+      "",
+      [
+        40,
+        0
+      ],
+      [
+        40,
+        17
+      ]
+    ],
+    [
+      "typedef struct ares_llist ares_llist_t;",
+      {},
+      "ares_llist_t",
+      [
+        43,
+        0
+      ],
+      [
+        43,
+        39
+      ]
+    ],
+    [
+      "struct ares_llist_node",
+      {},
+      "",
+      [
+        45,
+        0
+      ],
+      [
+        45,
+        22
+      ]
+    ],
+    [
+      "typedef struct ares_llist_node ares_llist_node_t;",
+      {},
+      "ares_llist_node_t",
+      [
+        48,
+        0
+      ],
+      [
+        48,
+        49
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

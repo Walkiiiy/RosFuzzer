@@ -1,0 +1,46 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "int ares_fds(const ares_channel_t *channel, fd_set *read_fds, fd_set *write_fds)\n{\n  ares_socket_t      nfds;\n  ares_slist_node_t *snode;\n  /* Are there any active queries? */\n  size_t             active_queries;\n\n  if (channel == NULL || read_fds == NULL || write_fds == NULL) {\n    return 0;\n  }\n\n  ares_channel_lock(channel);\n\n  active_queries = ares_llist_len(channel->all_queries);\n\n  nfds = 0;\n  for (snode = ares_slist_node_first(channel->servers); snode != NULL;\n       snode = ares_slist_node_next(snode)) {\n    ares_server_t     *server = ares_slist_node_val(snode);\n    ares_llist_node_t *node;\n\n    for (node = ares_llist_node_first(server->connections); node != NULL;\n         node = ares_llist_node_next(node)) {\n      const ares_conn_t *conn = ares_llist_node_val(node);\n\n      if (!active_queries && !(conn->flags & ARES_CONN_FLAG_TCP)) {\n        continue;\n      }\n\n      /* Silence coverity, shouldn't be possible */\n      if (conn->fd == ARES_SOCKET_BAD) {\n        continue;\n      }\n\n      /* Always wait on read */\n      FD_SET(conn->fd, read_fds);\n\n      if (conn->fd >= nfds) {\n        nfds = conn->fd + 1;\n      }\n\n      /* TCP only wait on write if we have the flag set */\n      if (conn->state_flags & ARES_CONN_STATE_WRITE) {\n        FD_SET(conn->fd, write_fds);\n      }\n    }\n  }\n\n  ares_channel_unlock(channel);\n  return (int)nfds;\n}",
+      "fn_code_pos": [
+        [
+          29,
+          0
+        ],
+        [
+          79,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_fds",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "read_fds": "fd_set",
+          "write_fds": "fd_set"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

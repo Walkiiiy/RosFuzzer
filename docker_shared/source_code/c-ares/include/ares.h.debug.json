@@ -1,0 +1,4767 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_sock_state_cb)(void *data, ares_socket_t socket_fd,\n                                   int readable, int writable)",
+      "fn_dec_pos": [
+        [
+          336,
+          13
+        ],
+        [
+          337,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void",
+          "socket_fd": "ares_socket_t",
+          "readable": "int",
+          "writable": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_callback)(void *arg, int status, int timeouts,\n                              unsigned char *abuf, int alen)",
+      "fn_dec_pos": [
+        [
+          436,
+          13
+        ],
+        [
+          437,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "abuf": "unsigned char",
+          "alen": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_callback_dnsrec)(void *arg, ares_status_t status,\n                                     size_t                   timeouts,\n                                     const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          439,
+          13
+        ],
+        [
+          441,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_host_callback)(void *arg, int status, int timeouts,\n                                   struct hostent *hostent)",
+      "fn_dec_pos": [
+        [
+          443,
+          13
+        ],
+        [
+          444,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "hostent": "struct hostent"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_nameinfo_callback)(void *arg, int status, int timeouts,\n                                       char *node, char *service)",
+      "fn_dec_pos": [
+        [
+          446,
+          13
+        ],
+        [
+          447,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "node": "char",
+          "service": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_sock_create_callback)(ares_socket_t socket_fd, int type,\n                                         void *data)",
+      "fn_dec_pos": [
+        [
+          449,
+          12
+        ],
+        [
+          450,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "socket_fd": "ares_socket_t",
+          "type": "int",
+          "data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*ares_sock_config_callback)(ares_socket_t socket_fd, int type,\n                                         void *data)",
+      "fn_dec_pos": [
+        [
+          452,
+          12
+        ],
+        [
+          453,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "socket_fd": "ares_socket_t",
+          "type": "int",
+          "data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*ares_addrinfo_callback)(void *arg, int status, int timeouts,\n                                       struct ares_addrinfo *res)",
+      "fn_dec_pos": [
+        [
+          455,
+          13
+        ],
+        [
+          456,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "res": "struct ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_server_state_callback)(const char *server_string,\n                                           ares_bool_t success, int flags,\n                                           void *data)",
+      "fn_dec_pos": [
+        [
+          458,
+          13
+        ],
+        [
+          460,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "server_string": "char",
+          "success": "ares_bool_t",
+          "flags": "int",
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_pending_write_cb)(void *data)",
+      "fn_dec_pos": [
+        [
+          462,
+          13
+        ],
+        [
+          462,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_query_enqueue_cb)(void *data)",
+      "fn_dec_pos": [
+        [
+          464,
+          13
+        ],
+        [
+          464,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_library_init(int flags)",
+      "fn_dec_pos": [
+        [
+          466,
+          17
+        ],
+        [
+          466,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init",
+        "parameters": {
+          "flags": "int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_library_init_mem(int flags, void *(*amalloc)(size_t size),\n                                       void (*afree)(void *ptr),\n                                       void *(*arealloc)(void  *ptr,\n                                                         size_t size))",
+      "fn_dec_pos": [
+        [
+          468,
+          17
+        ],
+        [
+          471,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_mem",
+        "parameters": {
+          "flags": "int",
+          "amalloc": "void",
+          "size": "size_t",
+          "afree": "void",
+          "ptr": "void",
+          "arealloc": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "(*amalloc)(size_t size)",
+      "fn_dec_pos": [
+        [
+          468,
+          56
+        ],
+        [
+          468,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*afree)(void *ptr)",
+      "fn_dec_pos": [
+        [
+          469,
+          44
+        ],
+        [
+          469,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*arealloc)(void  *ptr,\n                                                         size_t size)",
+      "fn_dec_pos": [
+        [
+          470,
+          45
+        ],
+        [
+          471,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_library_init_jvm(JavaVM *jvm)",
+      "fn_dec_pos": [
+        [
+          474,
+          18
+        ],
+        [
+          474,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_jvm",
+        "parameters": {
+          "jvm": "JavaVM"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_library_init_android(jobject connectivity_manager)",
+      "fn_dec_pos": [
+        [
+          475,
+          18
+        ],
+        [
+          475,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_android",
+        "parameters": {
+          "connectivity_manager": "jobject"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_library_android_initialized(void)",
+      "fn_dec_pos": [
+        [
+          476,
+          18
+        ],
+        [
+          476,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_android_initialized",
+        "parameters": {},
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_library_initialized(void)",
+      "fn_dec_pos": [
+        [
+          482,
+          25
+        ],
+        [
+          482,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_initialized",
+        "parameters": {},
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_library_cleanup(void)",
+      "fn_dec_pos": [
+        [
+          484,
+          25
+        ],
+        [
+          484,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_cleanup",
+        "parameters": {},
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_version(int *version)",
+      "fn_dec_pos": [
+        [
+          486,
+          25
+        ],
+        [
+          486,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_version",
+        "parameters": {
+          "version": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_init(\n  ares_channel_t **channelptr)",
+      "fn_dec_pos": [
+        [
+          488,
+          69
+        ],
+        [
+          489,
+          30
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init",
+        "parameters": {
+          "channelptr": "ares_channel_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_init_options(ares_channel_t           **channelptr,\n                                    const struct ares_options *options,\n                                    int                        optmask)",
+      "fn_dec_pos": [
+        [
+          491,
+          18
+        ],
+        [
+          493,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_options",
+        "parameters": {
+          "channelptr": "ares_channel_t",
+          "options": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_save_options(const ares_channel_t *channel,\n                                    struct ares_options *options, int *optmask)",
+      "fn_dec_pos": [
+        [
+          495,
+          18
+        ],
+        [
+          496,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_save_options",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "options": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_destroy_options(struct ares_options *options)",
+      "fn_dec_pos": [
+        [
+          498,
+          18
+        ],
+        [
+          498,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_options",
+        "parameters": {
+          "options": "struct ares_options"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_dup(ares_channel_t **dest, const ares_channel_t *src)",
+      "fn_dec_pos": [
+        [
+          500,
+          18
+        ],
+        [
+          500,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dup",
+        "parameters": {
+          "dest": "ares_channel_t",
+          "src": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_reinit(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          502,
+          13
+        ],
+        [
+          502,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_reinit",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_destroy(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          504,
+          27
+        ],
+        [
+          504,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_cancel(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          506,
+          27
+        ],
+        [
+          506,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cancel",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_local_ip4(ares_channel_t *channel,\n                                              unsigned int    local_ip)",
+      "fn_dec_pos": [
+        [
+          512,
+          27
+        ],
+        [
+          513,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_local_ip4",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "local_ip": "unsigned int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_local_ip6(ares_channel_t      *channel,\n                                              const unsigned char *local_ip6)",
+      "fn_dec_pos": [
+        [
+          516,
+          27
+        ],
+        [
+          517,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_local_ip6",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "local_ip6": "unsigned char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_local_dev(ares_channel_t *channel,\n                                              const char     *local_dev_name)",
+      "fn_dec_pos": [
+        [
+          520,
+          27
+        ],
+        [
+          521,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_local_dev",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "local_dev_name": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_socket_callback(ares_channel_t           *channel,\n                                                    ares_sock_create_callback callback,\n                                                    void                     *user_data)",
+      "fn_dec_pos": [
+        [
+          523,
+          27
+        ],
+        [
+          525,
+          88
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_sock_create_callback",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_socket_configure_callback(\n           ares_channel_t *channel, ares_sock_config_callback callback, void *user_data)",
+      "fn_dec_pos": [
+        [
+          527,
+          27
+        ],
+        [
+          528,
+          88
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_configure_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_sock_config_callback",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_server_state_callback(ares_channel_t            *channel,\n                                                 ares_server_state_callback callback,\n                                                 void                      *user_data)",
+      "fn_dec_pos": [
+        [
+          531,
+          18
+        ],
+        [
+          533,
+          86
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_server_state_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_server_state_callback",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_pending_write_cb(ares_channel_t       *channel,\n                                            ares_pending_write_cb callback,\n                                            void                 *user_data)",
+      "fn_dec_pos": [
+        [
+          535,
+          18
+        ],
+        [
+          537,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_pending_write_cb",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_pending_write_cb",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_query_enqueue_cb(ares_channel_t       *channel,\n                                            ares_query_enqueue_cb callback,\n                                            void                 *user_data)",
+      "fn_dec_pos": [
+        [
+          539,
+          18
+        ],
+        [
+          541,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_query_enqueue_cb",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "callback": "ares_query_enqueue_cb",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_process_pending_write(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          543,
+          18
+        ],
+        [
+          543,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_process_pending_write",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_sortlist(ares_channel_t *channel,\n                                    const char     *sortstr)",
+      "fn_dec_pos": [
+        [
+          545,
+          18
+        ],
+        [
+          546,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_sortlist",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sortstr": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_getaddrinfo(ares_channel_t *channel, const char *node,\n                                   const char                       *service,\n                                   const struct ares_addrinfo_hints *hints,\n                                   ares_addrinfo_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          548,
+          18
+        ],
+        [
+          551,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getaddrinfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "node": "char",
+          "service": "char",
+          "hints": "struct ares_addrinfo_hints",
+          "callback": "ares_addrinfo_callback",
+          "arg": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_freeaddrinfo(struct ares_addrinfo *ai)",
+      "fn_dec_pos": [
+        [
+          553,
+          18
+        ],
+        [
+          553,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo",
+        "parameters": {
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "(*asocket)(int, int, int, void *)",
+      "fn_dec_pos": [
+        [
+          566,
+          16
+        ],
+        [
+          566,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "(*aclose)(ares_socket_t, void *)",
+      "fn_dec_pos": [
+        [
+          567,
+          6
+        ],
+        [
+          567,
+          38
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*aconnect)(ares_socket_t, const struct sockaddr *, ares_socklen_t,\n                  void *)",
+      "fn_dec_pos": [
+        [
+          568,
+          6
+        ],
+        [
+          569,
+          25
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*arecvfrom)(ares_socket_t, void *, size_t, int,\n                            struct sockaddr *, ares_socklen_t *, void *)",
+      "fn_dec_pos": [
+        [
+          570,
+          15
+        ],
+        [
+          571,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "(*asendv)(ares_socket_t, const struct iovec *, int, void *)",
+      "fn_dec_pos": [
+        [
+          572,
+          15
+        ],
+        [
+          572,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "ares_set_socket_functions(ares_channel_t\n                                                                 *channel,\n                                                               const struct\n                                                               ares_socket_functions\n                                                                    *funcs,\n                                                               void *user_data)",
+      "fn_dec_pos": [
+        [
+          576,
+          37
+        ],
+        [
+          581,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_functions",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "funcs": "struct\n                                                               ares_socket_functions",
+          "user_data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*asocket)(int domain, int type, int protocol, void *user_data)",
+      "fn_dec_pos": [
+        [
+          648,
+          16
+        ],
+        [
+          648,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "domain": "int",
+          "type": "int",
+          "protocol": "int",
+          "user_data": "void"
+        },
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "(*aclose)(ares_socket_t sock, void *user_data)",
+      "fn_dec_pos": [
+        [
+          655,
+          6
+        ],
+        [
+          655,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*asetsockopt)(ares_socket_t sock, ares_socket_opt_t opt, const void *val,\n                     ares_socklen_t val_size, void *user_data)",
+      "fn_dec_pos": [
+        [
+          674,
+          6
+        ],
+        [
+          675,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "opt": "ares_socket_opt_t",
+          "val": "void",
+          "val_size": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*aconnect)(ares_socket_t sock, const struct sockaddr *address,\n                  ares_socklen_t address_len, unsigned int flags,\n                  void *user_data)",
+      "fn_dec_pos": [
+        [
+          696,
+          6
+        ],
+        [
+          698,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "flags": "unsigned int",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*arecvfrom)(ares_socket_t sock, void *buffer, size_t length,\n                            int flags, struct sockaddr *address,\n                            ares_socklen_t *address_len, void *user_data)",
+      "fn_dec_pos": [
+        [
+          717,
+          15
+        ],
+        [
+          719,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "(*asendto)(ares_socket_t sock, const void *buffer, size_t length,\n                          int flags, const struct sockaddr *address,\n                          ares_socklen_t address_len, void *user_data)",
+      "fn_dec_pos": [
+        [
+          740,
+          15
+        ],
+        [
+          742,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "buffer": "void",
+          "length": "size_t",
+          "flags": "int",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "ares_ssize_t"
+      }
+    },
+    {
+      "fn_code": "(*agetsockname)(ares_socket_t sock, struct sockaddr *address,\n                      ares_socklen_t *address_len, void *user_data)",
+      "fn_dec_pos": [
+        [
+          755,
+          6
+        ],
+        [
+          756,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "address": "struct sockaddr",
+          "address_len": "ares_socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*abind)(ares_socket_t sock, unsigned int flags,\n               const struct sockaddr *address, socklen_t address_len,\n               void *user_data)",
+      "fn_dec_pos": [
+        [
+          772,
+          6
+        ],
+        [
+          774,
+          31
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "flags": "unsigned int",
+          "address": "struct sockaddr",
+          "address_len": "socklen_t",
+          "user_data": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "(*aif_nametoindex)(const char *ifname, void *user_data)",
+      "fn_dec_pos": [
+        [
+          784,
+          15
+        ],
+        [
+          784,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ifname": "char",
+          "user_data": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*aif_indextoname)(unsigned int ifindex, char *ifname_buf,\n                                 size_t ifname_buf_len, void *user_data)",
+      "fn_dec_pos": [
+        [
+          798,
+          14
+        ],
+        [
+          799,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ifindex": "unsigned int",
+          "ifname_buf": "char",
+          "ifname_buf_len": "size_t",
+          "user_data": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_set_socket_functions_ex(\n  ares_channel_t *channel, const struct ares_socket_functions_ex *funcs,\n  void *user_data)",
+      "fn_dec_pos": [
+        [
+          816,
+          13
+        ],
+        [
+          818,
+          18
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_set_socket_functions_ex",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "funcs": "struct ares_socket_functions_ex",
+          "user_data": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_send(\n  ares_channel_t *channel, const unsigned char *qbuf, int qlen,\n  ares_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          821,
+          57
+        ],
+        [
+          823,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_send",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "qbuf": "unsigned char",
+          "qlen": "int",
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_send_dnsrec(ares_channel_t          *channel,\n                                            const ares_dns_record_t *dnsrec,\n                                            ares_callback_dnsrec     callback,\n                                            void *arg, unsigned short *qid)",
+      "fn_dec_pos": [
+        [
+          836,
+          13
+        ],
+        [
+          839,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_send_dnsrec",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "dnsrec": "ares_dns_record_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_query(\n  ares_channel_t *channel, const char *name, int dnsclass, int type,\n  ares_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          841,
+          58
+        ],
+        [
+          843,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_query_dnsrec(ares_channel_t      *channel,\n                                             const char          *name,\n                                             ares_dns_class_t     dnsclass,\n                                             ares_dns_rec_type_t  type,\n                                             ares_callback_dnsrec callback,\n                                             void *arg, unsigned short *qid)",
+      "fn_dec_pos": [
+        [
+          857,
+          13
+        ],
+        [
+          862,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_query_dnsrec",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_search(\n  ares_channel_t *channel, const char *name, int dnsclass, int type,\n  ares_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          864,
+          59
+        ],
+        [
+          866,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_search_dnsrec(ares_channel_t          *channel,\n                                              const ares_dns_record_t *dnsrec,\n                                              ares_callback_dnsrec     callback,\n                                              void                    *arg)",
+      "fn_dec_pos": [
+        [
+          879,
+          13
+        ],
+        [
+          882,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_search_dnsrec",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "dnsrec": "ares_dns_record_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_gethostbyname(\n  ares_channel_t *channel, const char *name, int family,\n  ares_host_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          884,
+          57
+        ],
+        [
+          886,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "family": "int",
+          "callback": "ares_host_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_gethostbyname_file(ares_channel_t *channel,\n                                          const char *name, int family,\n                                          struct hostent **host)",
+      "fn_dec_pos": [
+        [
+          888,
+          18
+        ],
+        [
+          890,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname_file",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_gethostbyaddr(ares_channel_t *channel, const void *addr,\n                                     int addrlen, int family,\n                                     ares_host_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          892,
+          18
+        ],
+        [
+          894,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyaddr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "addr": "void",
+          "addrlen": "int",
+          "family": "int",
+          "callback": "ares_host_callback",
+          "arg": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_getnameinfo(ares_channel_t        *channel,\n                                   const struct sockaddr *sa,\n                                   ares_socklen_t salen, int flags,\n                                   ares_nameinfo_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          896,
+          18
+        ],
+        [
+          899,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getnameinfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t",
+          "flags": "int",
+          "callback": "ares_nameinfo_callback",
+          "arg": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_fds(const ares_channel_t *channel,\n                                            fd_set *read_fds, fd_set *write_fds)",
+      "fn_dec_pos": [
+        [
+          903,
+          30
+        ],
+        [
+          904,
+          80
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_fds",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "read_fds": "fd_set",
+          "write_fds": "fd_set"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_getsock(const ares_channel_t *channel,\n                                           ares_socket_t *socks, int numsocks)",
+      "fn_dec_pos": [
+        [
+          908,
+          30
+        ],
+        [
+          909,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getsock",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "socks": "ares_socket_t",
+          "numsocks": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_timeout(const ares_channel_t *channel,\n                                          struct timeval       *maxtv,\n                                          struct timeval       *tv)",
+      "fn_dec_pos": [
+        [
+          911,
+          29
+        ],
+        [
+          913,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeout",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "maxtv": "struct timeval",
+          "tv": "struct timeval"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_process(\n  ares_channel_t *channel, fd_set *read_fds, fd_set *write_fds)",
+      "fn_dec_pos": [
+        [
+          915,
+          57
+        ],
+        [
+          916,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_process",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "read_fds": "fd_set",
+          "write_fds": "fd_set"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_process_fds(ares_channel_t         *channel,\n                                            const ares_fd_events_t *events,\n                                            size_t nevents, unsigned int flags)",
+      "fn_dec_pos": [
+        [
+          954,
+          13
+        ],
+        [
+          956,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_process_fds",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "events": "ares_fd_events_t",
+          "nevents": "size_t",
+          "flags": "unsigned int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_process_fd(ares_channel_t *channel,\n                                           ares_socket_t   read_fd,\n                                           ares_socket_t   write_fd)",
+      "fn_dec_pos": [
+        [
+          958,
+          27
+        ],
+        [
+          960,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_process_fd",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "read_fd": "ares_socket_t",
+          "write_fd": "ares_socket_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_create_query(\n  const char *name, int dnsclass, int type, unsigned short id, int rd,\n  unsigned char **buf, int *buflen, int max_udp_size)",
+      "fn_dec_pos": [
+        [
+          962,
+          62
+        ],
+        [
+          964,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_create_query",
+        "parameters": {
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "id": "unsigned short",
+          "rd": "int",
+          "buf": "unsigned char",
+          "buflen": "int",
+          "max_udp_size": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_mkquery(\n  const char *name, int dnsclass, int type, unsigned short id, int rd,\n  unsigned char **buf, int *buflen)",
+      "fn_dec_pos": [
+        [
+          966,
+          62
+        ],
+        [
+          968,
+          35
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_mkquery",
+        "parameters": {
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "id": "unsigned short",
+          "rd": "int",
+          "buf": "unsigned char",
+          "buflen": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_expand_name(const unsigned char *encoded,\n                                  const unsigned char *abuf, int alen, char **s,\n                                  long *enclen)",
+      "fn_dec_pos": [
+        [
+          970,
+          17
+        ],
+        [
+          972,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_name",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "int",
+          "s": "char",
+          "enclen": "long"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_expand_string(const unsigned char *encoded,\n                                    const unsigned char *abuf, int alen,\n                                    unsigned char **s, long *enclen)",
+      "fn_dec_pos": [
+        [
+          974,
+          17
+        ],
+        [
+          976,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_string",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "int",
+          "s": "unsigned char",
+          "enclen": "long"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_parse_a_reply(\n  const unsigned char *abuf, int alen, struct hostent **host,\n  struct ares_addrttl *addrttls, int *naddrttls)",
+      "fn_dec_pos": [
+        [
+          1103,
+          54
+        ],
+        [
+          1105,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_a_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "host": "struct hostent",
+          "addrttls": "struct ares_addrttl",
+          "naddrttls": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_aaaa_reply(\n  const unsigned char *abuf, int alen, struct hostent **host,\n  struct ares_addr6ttl *addrttls, int *naddrttls)",
+      "fn_dec_pos": [
+        [
+          1107,
+          54
+        ],
+        [
+          1109,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_aaaa_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "host": "struct hostent",
+          "addrttls": "struct ares_addr6ttl",
+          "naddrttls": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_caa_reply(\n  const unsigned char *abuf, int alen, struct ares_caa_reply **caa_out)",
+      "fn_dec_pos": [
+        [
+          1111,
+          54
+        ],
+        [
+          1112,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_caa_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "caa_out": "struct ares_caa_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_ptr_reply(\n  const unsigned char *abuf, int alen, const void *addr, int addrlen,\n  int family, struct hostent **host)",
+      "fn_dec_pos": [
+        [
+          1114,
+          54
+        ],
+        [
+          1116,
+          36
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_ptr_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "addr": "void",
+          "addrlen": "int",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_ns_reply(\n  const unsigned char *abuf, int alen, struct hostent **host)",
+      "fn_dec_pos": [
+        [
+          1118,
+          54
+        ],
+        [
+          1119,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_ns_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_srv_reply(\n  const unsigned char *abuf, int alen, struct ares_srv_reply **srv_out)",
+      "fn_dec_pos": [
+        [
+          1121,
+          54
+        ],
+        [
+          1122,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_srv_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "srv_out": "struct ares_srv_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_mx_reply(\n  const unsigned char *abuf, int alen, struct ares_mx_reply **mx_out)",
+      "fn_dec_pos": [
+        [
+          1124,
+          54
+        ],
+        [
+          1125,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_mx_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "mx_out": "struct ares_mx_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_txt_reply(\n  const unsigned char *abuf, int alen, struct ares_txt_reply **txt_out)",
+      "fn_dec_pos": [
+        [
+          1127,
+          54
+        ],
+        [
+          1128,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_txt_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "txt_out": "struct ares_txt_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_txt_reply_ext(\n  const unsigned char *abuf, int alen, struct ares_txt_ext **txt_out)",
+      "fn_dec_pos": [
+        [
+          1130,
+          54
+        ],
+        [
+          1131,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_txt_reply_ext",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "txt_out": "struct ares_txt_ext"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_naptr_reply(\n  const unsigned char *abuf, int alen, struct ares_naptr_reply **naptr_out)",
+      "fn_dec_pos": [
+        [
+          1133,
+          54
+        ],
+        [
+          1134,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_naptr_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "naptr_out": "struct ares_naptr_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_soa_reply(\n  const unsigned char *abuf, int alen, struct ares_soa_reply **soa_out)",
+      "fn_dec_pos": [
+        [
+          1136,
+          54
+        ],
+        [
+          1137,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_soa_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "soa_out": "struct ares_soa_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_parse_uri_reply(\n  const unsigned char *abuf, int alen, struct ares_uri_reply **uri_out)",
+      "fn_dec_pos": [
+        [
+          1139,
+          54
+        ],
+        [
+          1140,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_uri_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen": "int",
+          "uri_out": "struct ares_uri_reply"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_free_string(void *str)",
+      "fn_dec_pos": [
+        [
+          1142,
+          25
+        ],
+        [
+          1142,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_string",
+        "parameters": {
+          "str": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_free_hostent(struct hostent *host)",
+      "fn_dec_pos": [
+        [
+          1144,
+          25
+        ],
+        [
+          1144,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_hostent",
+        "parameters": {
+          "host": "struct hostent"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_free_data(void *dataptr)",
+      "fn_dec_pos": [
+        [
+          1146,
+          25
+        ],
+        [
+          1146,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_data",
+        "parameters": {
+          "dataptr": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strerror(int code)",
+      "fn_dec_pos": [
+        [
+          1148,
+          25
+        ],
+        [
+          1148,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strerror",
+        "parameters": {
+          "code": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_set_servers(\n  ares_channel_t *channel, const struct ares_addr_node *servers)",
+      "fn_dec_pos": [
+        [
+          1173,
+          60
+        ],
+        [
+          1174,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_set_servers_ports(ares_channel_t                   *channel,\n                                          const struct ares_addr_port_node *servers)",
+      "fn_dec_pos": [
+        [
+          1178,
+          19
+        ],
+        [
+          1179,
+          84
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_ports",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_port_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_set_servers_csv(ares_channel_t *channel,\n                                        const char     *servers)",
+      "fn_dec_pos": [
+        [
+          1182,
+          19
+        ],
+        [
+          1183,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_set_servers_ports_csv(ares_channel_t *channel,\n                                              const char     *servers)",
+      "fn_dec_pos": [
+        [
+          1184,
+          19
+        ],
+        [
+          1185,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_ports_csv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_get_servers_csv(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          1186,
+          19
+        ],
+        [
+          1186,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_get_servers(\n  const ares_channel_t *channel, struct ares_addr_node **servers)",
+      "fn_dec_pos": [
+        [
+          1188,
+          60
+        ],
+        [
+          1189,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_get_servers_ports(const ares_channel_t        *channel,\n                                                  struct ares_addr_port_node **servers)",
+      "fn_dec_pos": [
+        [
+          1193,
+          27
+        ],
+        [
+          1194,
+          87
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers_ports",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_port_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_inet_ntop(int af, const void *src, char *dst,\n                                          ares_socklen_t size)",
+      "fn_dec_pos": [
+        [
+          1196,
+          27
+        ],
+        [
+          1197,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_ntop",
+        "parameters": {
+          "af": "int",
+          "src": "void",
+          "dst": "char",
+          "size": "ares_socklen_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_inet_pton(int af, const char *src, void *dst)",
+      "fn_dec_pos": [
+        [
+          1199,
+          27
+        ],
+        [
+          1199,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_pton",
+        "parameters": {
+          "af": "int",
+          "src": "char",
+          "dst": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t   ares_threadsafety(void)",
+      "fn_dec_pos": [
+        [
+          1205,
+          13
+        ],
+        [
+          1205,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t   ares_threadsafety",
+        "parameters": {},
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_queue_wait_empty(ares_channel_t *channel,\n                                                 int             timeout_ms)",
+      "fn_dec_pos": [
+        [
+          1217,
+          13
+        ],
+        [
+          1218,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_queue_wait_empty",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "timeout_ms": "int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_queue_active_queries(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          1228,
+          20
+        ],
+        [
+          1228,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_queue_active_queries",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_server_failover_options {\n  unsigned short retry_chance;\n  size_t         retry_delay;\n}",
+      {
+        "retry_chance": "unsigned short",
+        "retry_delay": "size_t"
+      },
+      "ares_server_failover_options",
+      [
+        348,
+        0
+      ],
+      [
+        351,
+        1
+      ]
+    ],
+    [
+      "struct ares_options {\n  int            flags;\n  int            timeout; /* in seconds or milliseconds, depending on options */\n  int            tries;\n  int            ndots;\n  unsigned short udp_port; /* host byte order */\n  unsigned short tcp_port; /* host byte order */\n  int            socket_send_buffer_size;\n  int            socket_receive_buffer_size;\n  struct in_addr    *servers;\n  int                nservers;\n  char             **domains;\n  int                ndomains;\n  char              *lookups;\n  ares_sock_state_cb sock_state_cb;\n  void              *sock_state_cb_data;\n  struct apattern   *sortlist;\n  int                nsort;\n  int                ednspsz;\n  char              *resolvconf_path;\n  char              *hosts_path;\n  int                udp_max_queries;\n  int                maxtimeout; /* in milliseconds */\n  unsigned int qcache_max_ttl;   /* Maximum TTL for query cache, 0=disabled */\n  ares_evsys_t evsys;\n  struct ares_server_failover_options server_failover_opts;\n}",
+      {
+        "flags": "int",
+        "timeout": "int",
+        "tries": "int",
+        "ndots": "int",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "socket_send_buffer_size": "int",
+        "socket_receive_buffer_size": "int",
+        "*servers": "struct in_addr",
+        "nservers": "int",
+        "**domains": "char",
+        "ndomains": "int",
+        "*lookups": "char",
+        "sock_state_cb": "ares_sock_state_cb",
+        "*sock_state_cb_data": "void",
+        "*sortlist": "struct apattern",
+        "nsort": "int",
+        "ednspsz": "int",
+        "*resolvconf_path": "char",
+        "*hosts_path": "char",
+        "udp_max_queries": "int",
+        "maxtimeout": "int",
+        "qcache_max_ttl": "unsigned int",
+        "evsys": "ares_evsys_t",
+        "server_failover_opts": "struct ares_server_failover_options"
+      },
+      "ares_options",
+      [
+        370,
+        0
+      ],
+      [
+        396,
+        1
+      ]
+    ],
+    [
+      "struct ares_in6_addr {\n  union {\n    unsigned char _S6_u8[16];\n  } _S6_un;\n}",
+      {
+        "_S6_un": "union {\n    unsigned char _S6_u8[16];\n  }",
+        "_S6_u8[16]": "unsigned char"
+      },
+      "ares_in6_addr",
+      [
+        418,
+        0
+      ],
+      [
+        422,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr {\n  int family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n}",
+      {
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr"
+      },
+      "ares_addr",
+      [
+        424,
+        0
+      ],
+      [
+        431,
+        1
+      ]
+    ],
+    [
+      "struct ares_socket_functions {\n  ares_socket_t (*asocket)(int, int, int, void *);\n  int (*aclose)(ares_socket_t, void *);\n  int (*aconnect)(ares_socket_t, const struct sockaddr *, ares_socklen_t,\n                  void *);\n  ares_ssize_t (*arecvfrom)(ares_socket_t, void *, size_t, int,\n                            struct sockaddr *, ares_socklen_t *, void *);\n  ares_ssize_t (*asendv)(ares_socket_t, const struct iovec *, int, void *);\n}",
+      {
+        "(*asocket)(int, int, int, void *)": "ares_socket_t",
+        "(*aclose)(ares_socket_t, void *)": "int",
+        "(*aconnect)(ares_socket_t, const struct sockaddr *, ares_socklen_t,\n                  void *)": "int",
+        "(*arecvfrom)(ares_socket_t, void *, size_t, int,\n                            struct sockaddr *, ares_socklen_t *, void *)": "ares_ssize_t",
+        "(*asendv)(ares_socket_t, const struct iovec *, int, void *)": "ares_ssize_t"
+      },
+      "ares_socket_functions",
+      [
+        565,
+        0
+      ],
+      [
+        573,
+        1
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex {\n  /*! ABI Version: must be \"1\" */\n  unsigned int version;\n\n  /*! Flags indicating behavior of the subsystem. One or more\n   * ares_sockfunc_flags_t  */\n  unsigned int flags;\n\n  /*! REQUIRED. Create a new socket file descriptor.  The file descriptor must\n   * be opened in non-blocking mode (so that reads and writes never block).\n   * Recommended other options would be to disable signals on write errors\n   * (SO_NOSIGPIPE), Disable the Nagle algorithm on SOCK_STREAM (TCP_NODELAY),\n   * and to automatically close file descriptors on exec (FD_CLOEXEC).\n   *\n   *  \\param[in] domain      Socket domain. Valid values are AF_INET, AF_INET6.\n   *  \\param[in] type       Socket type. Valid values are SOCK_STREAM (tcp) and\n   *                        SOCK_DGRAM (udp).\n   *  \\param[in] protocol   In general this should be ignored, may be passed as\n   *                        0 (use as default for type), or may be IPPROTO_UDP\n   *                        or IPPROTO_TCP.\n   *  \\param[in] user_data  Pointer provided to ares_set_socket_functions_ex().\n   *  \\return ARES_SOCKET_BAD on error, or socket file descriptor on success.\n   *          On error, it is expected to set errno (or WSASetLastError()) to an\n   *          appropriate reason code such as EAFNOSUPPORT / WSAAFNOSUPPORT. */\n  ares_socket_t (*asocket)(int domain, int type, int protocol, void *user_data);\n\n  /*! REQUIRED. Close a socket file descriptor.\n   *  \\param[in] sock      Socket file descriptor returned from asocket.\n   *  \\param[in] user_data Pointer provided to ares_set_socket_functions_ex().\n   *  \\return 0 on success.  On failure, should set errno (or WSASetLastError)\n   *          to an appropriate code such as EBADF / WSAEBADF */\n  int (*aclose)(ares_socket_t sock, void *user_data);\n\n\n  /*! REQUIRED. Set socket option.  This shares a similar syntax to the BSD\n   *  setsockopt() call, however we use our own options.  The value is typically\n   *  a pointer to the desired value and each option has its own data type it\n   *  will express in the documentation.\n   *\n   * \\param[in] sock         Socket file descriptor returned from asocket.\n   * \\param[in] opt          Option to set.\n   * \\param[in] val          Pointer to value for option.\n   * \\param[in] val_size     Size of value.\n   * \\param[in] user_data    Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return Return 0 on success, otherwise -1 should be returned with an\n   *         appropriate errno (or WSASetLastError()) set.  If error is ENOSYS /\n   *         WSAEOPNOTSUPP an error will not be propagated as it will take it\n   *         to mean it is an intentional decision to not support the feature.\n   */\n  int (*asetsockopt)(ares_socket_t sock, ares_socket_opt_t opt, const void *val,\n                     ares_socklen_t val_size, void *user_data);\n\n  /*! REQUIRED. Connect to the remote using the supplied address.  For UDP\n   * sockets this will bind the file descriptor to only send and receive packets\n   * from the remote address provided.\n   *\n   *  \\param[in] sock         Socket file descriptor returned from asocket.\n   *  \\param[in] address      Address to connect to\n   *  \\param[in] address_len  Size of address structure passed\n   *  \\param[in] flags        One or more ares_socket_connect_flags_t\n   *  \\param[in] user_data    Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return Return 0 upon successful establishement, otherwise -1 should be\n   *          returned with an appropriate errno (or WSASetLastError()) set.  It\n   * is generally expected that most TCP connections (not using TCP Fast Open)\n   * will return -1 with an error of EINPROGRESS / WSAEINPROGRESS due to the\n   * non-blocking nature of the connection.  It is then the responsibility of\n   * the implementation to notify of writability on the socket to indicate the\n   * connection has succeeded (or readability on failure to retrieve the\n   * appropriate error).\n   */\n  int (*aconnect)(ares_socket_t sock, const struct sockaddr *address,\n                  ares_socklen_t address_len, unsigned int flags,\n                  void *user_data);\n\n  /*! REQUIRED. Attempt to read data from the remote.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket.\n   *  \\param[in,out] buffer      Allocated buffer to place data read from\n   * socket.\n   *  \\param[in]     length      Size of buffer\n   *  \\param[in]     flags       Unused, always 0.\n   *  \\param[in,out] address     Buffer to hold address data was received from.\n   *                             May be NULL if address not desired.\n   *  \\param[in,out] address_len Input size of address buffer, output actual\n   *                             written size. Must be NULL if address is NULL.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return -1 on error with appropriate errno (or WSASetLastError()) set,\n   * such as EWOULDBLOCK / EAGAIN / WSAEWOULDBLOCK, or ECONNRESET /\n   * WSAECONNRESET.\n   */\n  ares_ssize_t (*arecvfrom)(ares_socket_t sock, void *buffer, size_t length,\n                            int flags, struct sockaddr *address,\n                            ares_socklen_t *address_len, void *user_data);\n\n  /*! REQUIRED. Attempt to send data to the remote.  Optional address may be\n   * specified which may be useful on unbound UDP sockets (though currently not\n   * used), and TCP FastOpen where the connection is delayed until first write.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket.\n   *  \\param[in]     buffer      Containing data to place onto wire.\n   *  \\param[in]     length      Size of buffer\n   *  \\param[in]     flags       Flags for writing.  Currently only used flag is\n   *                             MSG_NOSIGNAL if the host OS has such a flag. In\n   *                             general flags can be ignored.\n   *  \\param[in]     address     Buffer containing address to send data to.  May\n   *                             be NULL.\n   *  \\param[in,out] address_len Size of address buffer.  Must be 0 if address\n   *                             is NULL.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return Number of bytes written. -1 on error with appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  ares_ssize_t (*asendto)(ares_socket_t sock, const void *buffer, size_t length,\n                          int flags, const struct sockaddr *address,\n                          ares_socklen_t address_len, void *user_data);\n\n  /*! Optional. Retrieve the local address of the socket.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket\n   *  \\param[in,out] address     Buffer to hold address\n   *  \\param[in,out] address_len Size of address buffer on input, written size\n   * on output.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return 0 on success. -1 on error with an appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  int (*agetsockname)(ares_socket_t sock, struct sockaddr *address,\n                      ares_socklen_t *address_len, void *user_data);\n\n  /*! Optional. Bind the socket to an address.  This can be used for client\n   *  connections to bind the source address for packets before connect, or\n   *  for server connections to bind to an address and port before listening.\n   *  Currently c-ares only supports client connections.\n   *\n   *  \\param[in] sock        Socket file descriptor returned from asocket\n   *  \\param[in] flags       ares_socket_bind_flags_t flags.\n   *  \\param[in] address     Buffer containing address.\n   *  \\param[in] address_len Size of address buffer.\n   *  \\param[in] user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return 0 on success. -1 on error with an appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  int (*abind)(ares_socket_t sock, unsigned int flags,\n               const struct sockaddr *address, socklen_t address_len,\n               void *user_data);\n\n  /* Optional. Convert an interface name into the interface index.  If this\n   * callback is not specified, then IPv6 Link-Local DNS servers cannot be used.\n   *\n   * \\param[in] ifname  Interface Name as NULL-terminated string.\n   * \\param[in] user_data Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return 0 on failure, otherwise interface index.\n   */\n  unsigned int (*aif_nametoindex)(const char *ifname, void *user_data);\n\n  /* Optional. Convert an interface index into the interface name.  If this\n   * callback is not specified, then IPv6 Link-Local DNS servers cannot be used.\n   *\n   * \\param[in] ifindex        Interface index, must be > 0\n   * \\param[in] ifname_buf     Buffer to hold interface name. Must be at least\n   *                           IFNAMSIZ in length or 32 bytes if IFNAMSIZ isn't\n   *                           defined.\n   * \\param[in] ifname_buf_len Size of ifname_buf for verification.\n   * \\param[in] user_data      Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return NULL on failure, otherwise pointer to provided ifname_buf\n   */\n  const char *(*aif_indextoname)(unsigned int ifindex, char *ifname_buf,\n                                 size_t ifname_buf_len, void *user_data);\n}",
+      {
+        "version": "unsigned int",
+        "flags": "unsigned int",
+        "(*asocket)(int domain, int type, int protocol, void *user_data)": "ares_socket_t",
+        "(*aclose)(ares_socket_t sock, void *user_data)": "int",
+        "(*asetsockopt)(ares_socket_t sock, ares_socket_opt_t opt, const void *val,\n                     ares_socklen_t val_size, void *user_data)": "int",
+        "(*aconnect)(ares_socket_t sock, const struct sockaddr *address,\n                  ares_socklen_t address_len, unsigned int flags,\n                  void *user_data)": "int",
+        "(*arecvfrom)(ares_socket_t sock, void *buffer, size_t length,\n                            int flags, struct sockaddr *address,\n                            ares_socklen_t *address_len, void *user_data)": "ares_ssize_t",
+        "(*asendto)(ares_socket_t sock, const void *buffer, size_t length,\n                          int flags, const struct sockaddr *address,\n                          ares_socklen_t address_len, void *user_data)": "ares_ssize_t",
+        "(*agetsockname)(ares_socket_t sock, struct sockaddr *address,\n                      ares_socklen_t *address_len, void *user_data)": "int",
+        "(*abind)(ares_socket_t sock, unsigned int flags,\n               const struct sockaddr *address, socklen_t address_len,\n               void *user_data)": "int",
+        "(*aif_nametoindex)(const char *ifname, void *user_data)": "unsigned int",
+        "char": "const"
+      },
+      "ares_socket_functions_ex",
+      [
+        624,
+        0
+      ],
+      [
+        800,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_socket_t fd;     /*!< File descriptor */\n  unsigned int  events; /*!< Mask of ares_fd_eventflag_t */\n} ares_fd_events_t;",
+      {
+        "fd": "ares_socket_t",
+        "events": "unsigned int"
+      },
+      "ares_fd_events_t",
+      [
+        927,
+        0
+      ],
+      [
+        930,
+        19
+      ]
+    ],
+    [
+      "struct ares_addrttl {\n  struct in_addr ipaddr;\n  int            ttl;\n}",
+      {
+        "ipaddr": "struct in_addr",
+        "ttl": "int"
+      },
+      "ares_addrttl",
+      [
+        978,
+        0
+      ],
+      [
+        981,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr6ttl {\n  struct ares_in6_addr ip6addr;\n  int                  ttl;\n}",
+      {
+        "ip6addr": "struct ares_in6_addr",
+        "ttl": "int"
+      },
+      "ares_addr6ttl",
+      [
+        983,
+        0
+      ],
+      [
+        986,
+        1
+      ]
+    ],
+    [
+      "struct ares_caa_reply {\n  struct ares_caa_reply *next;\n  int                    critical;\n  unsigned char         *property;\n  size_t                 plength; /* plength excludes null termination */\n  unsigned char         *value;\n  size_t                 length;  /* length excludes null termination */\n}",
+      {
+        "*next": "struct ares_caa_reply",
+        "critical": "int",
+        "*property": "unsigned char",
+        "plength": "size_t",
+        "*value": "unsigned char",
+        "length": "size_t"
+      },
+      "ares_caa_reply",
+      [
+        988,
+        0
+      ],
+      [
+        995,
+        1
+      ]
+    ],
+    [
+      "struct ares_srv_reply {\n  struct ares_srv_reply *next;\n  char                  *host;\n  unsigned short         priority;\n  unsigned short         weight;\n  unsigned short         port;\n}",
+      {
+        "*next": "struct ares_srv_reply",
+        "*host": "char",
+        "priority": "unsigned short",
+        "weight": "unsigned short",
+        "port": "unsigned short"
+      },
+      "ares_srv_reply",
+      [
+        997,
+        0
+      ],
+      [
+        1003,
+        1
+      ]
+    ],
+    [
+      "struct ares_mx_reply {\n  struct ares_mx_reply *next;\n  char                 *host;\n  unsigned short        priority;\n}",
+      {
+        "*next": "struct ares_mx_reply",
+        "*host": "char",
+        "priority": "unsigned short"
+      },
+      "ares_mx_reply",
+      [
+        1005,
+        0
+      ],
+      [
+        1009,
+        1
+      ]
+    ],
+    [
+      "struct ares_txt_reply {\n  struct ares_txt_reply *next;\n  unsigned char         *txt;\n  size_t                 length; /* length excludes null termination */\n}",
+      {
+        "*next": "struct ares_txt_reply",
+        "*txt": "unsigned char",
+        "length": "size_t"
+      },
+      "ares_txt_reply",
+      [
+        1011,
+        0
+      ],
+      [
+        1015,
+        1
+      ]
+    ],
+    [
+      "struct ares_txt_ext {\n  struct ares_txt_ext *next;\n  unsigned char       *txt;\n  size_t               length;\n  /* 1 - if start of new record\n   * 0 - if a chunk in the same record */\n  unsigned char        record_start;\n}",
+      {
+        "*next": "struct ares_txt_ext",
+        "*txt": "unsigned char",
+        "length": "size_t",
+        "record_start": "unsigned char"
+      },
+      "ares_txt_ext",
+      [
+        1019,
+        0
+      ],
+      [
+        1026,
+        1
+      ]
+    ],
+    [
+      "struct ares_naptr_reply {\n  struct ares_naptr_reply *next;\n  unsigned char           *flags;\n  unsigned char           *service;\n  unsigned char           *regexp;\n  char                    *replacement;\n  unsigned short           order;\n  unsigned short           preference;\n}",
+      {
+        "*next": "struct ares_naptr_reply",
+        "*flags": "unsigned char",
+        "*service": "unsigned char",
+        "*regexp": "unsigned char",
+        "*replacement": "char",
+        "order": "unsigned short",
+        "preference": "unsigned short"
+      },
+      "ares_naptr_reply",
+      [
+        1028,
+        0
+      ],
+      [
+        1036,
+        1
+      ]
+    ],
+    [
+      "struct ares_soa_reply {\n  char        *nsname;\n  char        *hostmaster;\n  unsigned int serial;\n  unsigned int refresh;\n  unsigned int retry;\n  unsigned int expire;\n  unsigned int minttl;\n}",
+      {
+        "*nsname": "char",
+        "*hostmaster": "char",
+        "serial": "unsigned int",
+        "refresh": "unsigned int",
+        "retry": "unsigned int",
+        "expire": "unsigned int",
+        "minttl": "unsigned int"
+      },
+      "ares_soa_reply",
+      [
+        1038,
+        0
+      ],
+      [
+        1046,
+        1
+      ]
+    ],
+    [
+      "struct ares_uri_reply {\n  struct ares_uri_reply *next;\n  unsigned short         priority;\n  unsigned short         weight;\n  char                  *uri;\n  int                    ttl;\n}",
+      {
+        "*next": "struct ares_uri_reply",
+        "priority": "unsigned short",
+        "weight": "unsigned short",
+        "*uri": "char",
+        "ttl": "int"
+      },
+      "ares_uri_reply",
+      [
+        1048,
+        0
+      ],
+      [
+        1054,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node {\n  int                        ai_ttl;\n  int                        ai_flags;\n  int                        ai_family;\n  int                        ai_socktype;\n  int                        ai_protocol;\n  ares_socklen_t             ai_addrlen;\n  struct sockaddr           *ai_addr;\n  struct ares_addrinfo_node *ai_next;\n}",
+      {
+        "ai_ttl": "int",
+        "ai_flags": "int",
+        "ai_family": "int",
+        "ai_socktype": "int",
+        "ai_protocol": "int",
+        "ai_addrlen": "ares_socklen_t",
+        "*ai_addr": "struct sockaddr",
+        "*ai_next": "struct ares_addrinfo_node"
+      },
+      "ares_addrinfo_node",
+      [
+        1059,
+        0
+      ],
+      [
+        1068,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname {\n  int                         ttl;\n  char                       *alias;\n  char                       *name;\n  struct ares_addrinfo_cname *next;\n}",
+      {
+        "ttl": "int",
+        "*alias": "char",
+        "*name": "char",
+        "*next": "struct ares_addrinfo_cname"
+      },
+      "ares_addrinfo_cname",
+      [
+        1075,
+        0
+      ],
+      [
+        1080,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo {\n  struct ares_addrinfo_cname *cnames;\n  struct ares_addrinfo_node  *nodes;\n  char                       *name;\n}",
+      {
+        "*cnames": "struct ares_addrinfo_cname",
+        "*nodes": "struct ares_addrinfo_node",
+        "*name": "char"
+      },
+      "ares_addrinfo",
+      [
+        1082,
+        0
+      ],
+      [
+        1086,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints {\n  int ai_flags;\n  int ai_family;\n  int ai_socktype;\n  int ai_protocol;\n}",
+      {
+        "ai_flags": "int",
+        "ai_family": "int",
+        "ai_socktype": "int",
+        "ai_protocol": "int"
+      },
+      "ares_addrinfo_hints",
+      [
+        1088,
+        0
+      ],
+      [
+        1093,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr_node {\n  struct ares_addr_node *next;\n  int                    family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n}",
+      {
+        "*next": "struct ares_addr_node",
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr"
+      },
+      "ares_addr_node",
+      [
+        1150,
+        0
+      ],
+      [
+        1158,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr_port_node {\n  struct ares_addr_port_node *next;\n  int                         family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n\n  int udp_port;\n  int tcp_port;\n}",
+      {
+        "*next": "struct ares_addr_port_node",
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr",
+        "udp_port": "int",
+        "tcp_port": "int"
+      },
+      "ares_addr_port_node",
+      [
+        1160,
+        0
+      ],
+      [
+        1171,
+        1
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        339,
+        0
+      ],
+      [
+        339,
+        15
+      ]
+    ],
+    [
+      "struct ares_server_failover_options {\n  unsigned short retry_chance;\n  size_t         retry_delay;\n}",
+      {
+        "retry_chance": "unsigned short",
+        "retry_delay": "size_t"
+      },
+      "ares_server_failover_options",
+      [
+        348,
+        0
+      ],
+      [
+        351,
+        1
+      ]
+    ],
+    [
+      "struct ares_options {\n  int            flags;\n  int            timeout; /* in seconds or milliseconds, depending on options */\n  int            tries;\n  int            ndots;\n  unsigned short udp_port; /* host byte order */\n  unsigned short tcp_port; /* host byte order */\n  int            socket_send_buffer_size;\n  int            socket_receive_buffer_size;\n  struct in_addr    *servers;\n  int                nservers;\n  char             **domains;\n  int                ndomains;\n  char              *lookups;\n  ares_sock_state_cb sock_state_cb;\n  void              *sock_state_cb_data;\n  struct apattern   *sortlist;\n  int                nsort;\n  int                ednspsz;\n  char              *resolvconf_path;\n  char              *hosts_path;\n  int                udp_max_queries;\n  int                maxtimeout; /* in milliseconds */\n  unsigned int qcache_max_ttl;   /* Maximum TTL for query cache, 0=disabled */\n  ares_evsys_t evsys;\n  struct ares_server_failover_options server_failover_opts;\n}",
+      {
+        "flags": "int",
+        "timeout": "int",
+        "tries": "int",
+        "ndots": "int",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "socket_send_buffer_size": "int",
+        "socket_receive_buffer_size": "int",
+        "*servers": "struct in_addr",
+        "nservers": "int",
+        "**domains": "char",
+        "ndomains": "int",
+        "*lookups": "char",
+        "sock_state_cb": "ares_sock_state_cb",
+        "*sock_state_cb_data": "void",
+        "*sortlist": "struct apattern",
+        "nsort": "int",
+        "ednspsz": "int",
+        "*resolvconf_path": "char",
+        "*hosts_path": "char",
+        "udp_max_queries": "int",
+        "maxtimeout": "int",
+        "qcache_max_ttl": "unsigned int",
+        "evsys": "ares_evsys_t",
+        "server_failover_opts": "struct ares_server_failover_options"
+      },
+      "ares_options",
+      [
+        370,
+        0
+      ],
+      [
+        396,
+        1
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        379,
+        2
+      ],
+      [
+        379,
+        16
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        386,
+        2
+      ],
+      [
+        386,
+        17
+      ]
+    ],
+    [
+      "struct ares_server_failover_options",
+      {},
+      "",
+      [
+        395,
+        2
+      ],
+      [
+        395,
+        37
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        398,
+        0
+      ],
+      [
+        398,
+        14
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        399,
+        0
+      ],
+      [
+        399,
+        14
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        400,
+        0
+      ],
+      [
+        400,
+        15
+      ]
+    ],
+    [
+      "struct ares_channeldata",
+      {},
+      "",
+      [
+        401,
+        0
+      ],
+      [
+        401,
+        23
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        402,
+        0
+      ],
+      [
+        402,
+        20
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        403,
+        0
+      ],
+      [
+        403,
+        26
+      ]
+    ],
+    [
+      "typedef struct ares_channeldata *ares_channel;",
+      {},
+      "ares_channel",
+      [
+        406,
+        0
+      ],
+      [
+        406,
+        46
+      ]
+    ],
+    [
+      "typedef struct ares_channeldata  ares_channel_t;",
+      {},
+      "ares_channel_t",
+      [
+        409,
+        0
+      ],
+      [
+        409,
+        48
+      ]
+    ],
+    [
+      "struct ares_in6_addr {\n  union {\n    unsigned char _S6_u8[16];\n  } _S6_un;\n}",
+      {
+        "_S6_un": "union {\n    unsigned char _S6_u8[16];\n  }",
+        "_S6_u8[16]": "unsigned char"
+      },
+      "ares_in6_addr",
+      [
+        418,
+        0
+      ],
+      [
+        422,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr {\n  int family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n}",
+      {
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr"
+      },
+      "ares_addr",
+      [
+        424,
+        0
+      ],
+      [
+        431,
+        1
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        428,
+        4
+      ],
+      [
+        428,
+        18
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        429,
+        4
+      ],
+      [
+        429,
+        24
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        444,
+        35
+      ],
+      [
+        444,
+        49
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        456,
+        39
+      ],
+      [
+        456,
+        59
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        492,
+        42
+      ],
+      [
+        492,
+        61
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        496,
+        36
+      ],
+      [
+        496,
+        55
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        498,
+        39
+      ],
+      [
+        498,
+        58
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        550,
+        41
+      ],
+      [
+        550,
+        67
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        553,
+        36
+      ],
+      [
+        553,
+        56
+      ]
+    ],
+    [
+      "struct iovec",
+      {},
+      "",
+      [
+        563,
+        0
+      ],
+      [
+        563,
+        12
+      ]
+    ],
+    [
+      "struct ares_socket_functions {\n  ares_socket_t (*asocket)(int, int, int, void *);\n  int (*aclose)(ares_socket_t, void *);\n  int (*aconnect)(ares_socket_t, const struct sockaddr *, ares_socklen_t,\n                  void *);\n  ares_ssize_t (*arecvfrom)(ares_socket_t, void *, size_t, int,\n                            struct sockaddr *, ares_socklen_t *, void *);\n  ares_ssize_t (*asendv)(ares_socket_t, const struct iovec *, int, void *);\n}",
+      {
+        "(*asocket)(int, int, int, void *)": "ares_socket_t",
+        "(*aclose)(ares_socket_t, void *)": "int",
+        "(*aconnect)(ares_socket_t, const struct sockaddr *, ares_socklen_t,\n                  void *)": "int",
+        "(*arecvfrom)(ares_socket_t, void *, size_t, int,\n                            struct sockaddr *, ares_socklen_t *, void *)": "ares_ssize_t",
+        "(*asendv)(ares_socket_t, const struct iovec *, int, void *)": "ares_ssize_t"
+      },
+      "ares_socket_functions",
+      [
+        565,
+        0
+      ],
+      [
+        573,
+        1
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        568,
+        39
+      ],
+      [
+        568,
+        54
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        571,
+        28
+      ],
+      [
+        571,
+        43
+      ]
+    ],
+    [
+      "struct iovec",
+      {},
+      "",
+      [
+        572,
+        46
+      ],
+      [
+        572,
+        58
+      ]
+    ],
+    [
+      "struct\n                                                               ares_socket_functions",
+      {},
+      "",
+      [
+        578,
+        69
+      ],
+      [
+        579,
+        84
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex {\n  /*! ABI Version: must be \"1\" */\n  unsigned int version;\n\n  /*! Flags indicating behavior of the subsystem. One or more\n   * ares_sockfunc_flags_t  */\n  unsigned int flags;\n\n  /*! REQUIRED. Create a new socket file descriptor.  The file descriptor must\n   * be opened in non-blocking mode (so that reads and writes never block).\n   * Recommended other options would be to disable signals on write errors\n   * (SO_NOSIGPIPE), Disable the Nagle algorithm on SOCK_STREAM (TCP_NODELAY),\n   * and to automatically close file descriptors on exec (FD_CLOEXEC).\n   *\n   *  \\param[in] domain      Socket domain. Valid values are AF_INET, AF_INET6.\n   *  \\param[in] type       Socket type. Valid values are SOCK_STREAM (tcp) and\n   *                        SOCK_DGRAM (udp).\n   *  \\param[in] protocol   In general this should be ignored, may be passed as\n   *                        0 (use as default for type), or may be IPPROTO_UDP\n   *                        or IPPROTO_TCP.\n   *  \\param[in] user_data  Pointer provided to ares_set_socket_functions_ex().\n   *  \\return ARES_SOCKET_BAD on error, or socket file descriptor on success.\n   *          On error, it is expected to set errno (or WSASetLastError()) to an\n   *          appropriate reason code such as EAFNOSUPPORT / WSAAFNOSUPPORT. */\n  ares_socket_t (*asocket)(int domain, int type, int protocol, void *user_data);\n\n  /*! REQUIRED. Close a socket file descriptor.\n   *  \\param[in] sock      Socket file descriptor returned from asocket.\n   *  \\param[in] user_data Pointer provided to ares_set_socket_functions_ex().\n   *  \\return 0 on success.  On failure, should set errno (or WSASetLastError)\n   *          to an appropriate code such as EBADF / WSAEBADF */\n  int (*aclose)(ares_socket_t sock, void *user_data);\n\n\n  /*! REQUIRED. Set socket option.  This shares a similar syntax to the BSD\n   *  setsockopt() call, however we use our own options.  The value is typically\n   *  a pointer to the desired value and each option has its own data type it\n   *  will express in the documentation.\n   *\n   * \\param[in] sock         Socket file descriptor returned from asocket.\n   * \\param[in] opt          Option to set.\n   * \\param[in] val          Pointer to value for option.\n   * \\param[in] val_size     Size of value.\n   * \\param[in] user_data    Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return Return 0 on success, otherwise -1 should be returned with an\n   *         appropriate errno (or WSASetLastError()) set.  If error is ENOSYS /\n   *         WSAEOPNOTSUPP an error will not be propagated as it will take it\n   *         to mean it is an intentional decision to not support the feature.\n   */\n  int (*asetsockopt)(ares_socket_t sock, ares_socket_opt_t opt, const void *val,\n                     ares_socklen_t val_size, void *user_data);\n\n  /*! REQUIRED. Connect to the remote using the supplied address.  For UDP\n   * sockets this will bind the file descriptor to only send and receive packets\n   * from the remote address provided.\n   *\n   *  \\param[in] sock         Socket file descriptor returned from asocket.\n   *  \\param[in] address      Address to connect to\n   *  \\param[in] address_len  Size of address structure passed\n   *  \\param[in] flags        One or more ares_socket_connect_flags_t\n   *  \\param[in] user_data    Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return Return 0 upon successful establishement, otherwise -1 should be\n   *          returned with an appropriate errno (or WSASetLastError()) set.  It\n   * is generally expected that most TCP connections (not using TCP Fast Open)\n   * will return -1 with an error of EINPROGRESS / WSAEINPROGRESS due to the\n   * non-blocking nature of the connection.  It is then the responsibility of\n   * the implementation to notify of writability on the socket to indicate the\n   * connection has succeeded (or readability on failure to retrieve the\n   * appropriate error).\n   */\n  int (*aconnect)(ares_socket_t sock, const struct sockaddr *address,\n                  ares_socklen_t address_len, unsigned int flags,\n                  void *user_data);\n\n  /*! REQUIRED. Attempt to read data from the remote.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket.\n   *  \\param[in,out] buffer      Allocated buffer to place data read from\n   * socket.\n   *  \\param[in]     length      Size of buffer\n   *  \\param[in]     flags       Unused, always 0.\n   *  \\param[in,out] address     Buffer to hold address data was received from.\n   *                             May be NULL if address not desired.\n   *  \\param[in,out] address_len Input size of address buffer, output actual\n   *                             written size. Must be NULL if address is NULL.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return -1 on error with appropriate errno (or WSASetLastError()) set,\n   * such as EWOULDBLOCK / EAGAIN / WSAEWOULDBLOCK, or ECONNRESET /\n   * WSAECONNRESET.\n   */\n  ares_ssize_t (*arecvfrom)(ares_socket_t sock, void *buffer, size_t length,\n                            int flags, struct sockaddr *address,\n                            ares_socklen_t *address_len, void *user_data);\n\n  /*! REQUIRED. Attempt to send data to the remote.  Optional address may be\n   * specified which may be useful on unbound UDP sockets (though currently not\n   * used), and TCP FastOpen where the connection is delayed until first write.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket.\n   *  \\param[in]     buffer      Containing data to place onto wire.\n   *  \\param[in]     length      Size of buffer\n   *  \\param[in]     flags       Flags for writing.  Currently only used flag is\n   *                             MSG_NOSIGNAL if the host OS has such a flag. In\n   *                             general flags can be ignored.\n   *  \\param[in]     address     Buffer containing address to send data to.  May\n   *                             be NULL.\n   *  \\param[in,out] address_len Size of address buffer.  Must be 0 if address\n   *                             is NULL.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return Number of bytes written. -1 on error with appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  ares_ssize_t (*asendto)(ares_socket_t sock, const void *buffer, size_t length,\n                          int flags, const struct sockaddr *address,\n                          ares_socklen_t address_len, void *user_data);\n\n  /*! Optional. Retrieve the local address of the socket.\n   *\n   *  \\param[in]     sock        Socket file descriptor returned from asocket\n   *  \\param[in,out] address     Buffer to hold address\n   *  \\param[in,out] address_len Size of address buffer on input, written size\n   * on output.\n   *  \\param[in]     user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return 0 on success. -1 on error with an appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  int (*agetsockname)(ares_socket_t sock, struct sockaddr *address,\n                      ares_socklen_t *address_len, void *user_data);\n\n  /*! Optional. Bind the socket to an address.  This can be used for client\n   *  connections to bind the source address for packets before connect, or\n   *  for server connections to bind to an address and port before listening.\n   *  Currently c-ares only supports client connections.\n   *\n   *  \\param[in] sock        Socket file descriptor returned from asocket\n   *  \\param[in] flags       ares_socket_bind_flags_t flags.\n   *  \\param[in] address     Buffer containing address.\n   *  \\param[in] address_len Size of address buffer.\n   *  \\param[in] user_data   Pointer provided to\n   * ares_set_socket_functions_ex().\n   *  \\return 0 on success. -1 on error with an appropriate errno (or\n   * WSASetLastError()) set.\n   */\n  int (*abind)(ares_socket_t sock, unsigned int flags,\n               const struct sockaddr *address, socklen_t address_len,\n               void *user_data);\n\n  /* Optional. Convert an interface name into the interface index.  If this\n   * callback is not specified, then IPv6 Link-Local DNS servers cannot be used.\n   *\n   * \\param[in] ifname  Interface Name as NULL-terminated string.\n   * \\param[in] user_data Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return 0 on failure, otherwise interface index.\n   */\n  unsigned int (*aif_nametoindex)(const char *ifname, void *user_data);\n\n  /* Optional. Convert an interface index into the interface name.  If this\n   * callback is not specified, then IPv6 Link-Local DNS servers cannot be used.\n   *\n   * \\param[in] ifindex        Interface index, must be > 0\n   * \\param[in] ifname_buf     Buffer to hold interface name. Must be at least\n   *                           IFNAMSIZ in length or 32 bytes if IFNAMSIZ isn't\n   *                           defined.\n   * \\param[in] ifname_buf_len Size of ifname_buf for verification.\n   * \\param[in] user_data      Pointer provided to\n   * ares_set_socket_functions_ex().\n   * \\return NULL on failure, otherwise pointer to provided ifname_buf\n   */\n  const char *(*aif_indextoname)(unsigned int ifindex, char *ifname_buf,\n                                 size_t ifname_buf_len, void *user_data);\n}",
+      {
+        "version": "unsigned int",
+        "flags": "unsigned int",
+        "(*asocket)(int domain, int type, int protocol, void *user_data)": "ares_socket_t",
+        "(*aclose)(ares_socket_t sock, void *user_data)": "int",
+        "(*asetsockopt)(ares_socket_t sock, ares_socket_opt_t opt, const void *val,\n                     ares_socklen_t val_size, void *user_data)": "int",
+        "(*aconnect)(ares_socket_t sock, const struct sockaddr *address,\n                  ares_socklen_t address_len, unsigned int flags,\n                  void *user_data)": "int",
+        "(*arecvfrom)(ares_socket_t sock, void *buffer, size_t length,\n                            int flags, struct sockaddr *address,\n                            ares_socklen_t *address_len, void *user_data)": "ares_ssize_t",
+        "(*asendto)(ares_socket_t sock, const void *buffer, size_t length,\n                          int flags, const struct sockaddr *address,\n                          ares_socklen_t address_len, void *user_data)": "ares_ssize_t",
+        "(*agetsockname)(ares_socket_t sock, struct sockaddr *address,\n                      ares_socklen_t *address_len, void *user_data)": "int",
+        "(*abind)(ares_socket_t sock, unsigned int flags,\n               const struct sockaddr *address, socklen_t address_len,\n               void *user_data)": "int",
+        "(*aif_nametoindex)(const char *ifname, void *user_data)": "unsigned int",
+        "char": "const"
+      },
+      "ares_socket_functions_ex",
+      [
+        624,
+        0
+      ],
+      [
+        800,
+        1
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        696,
+        44
+      ],
+      [
+        696,
+        59
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        718,
+        39
+      ],
+      [
+        718,
+        54
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        741,
+        43
+      ],
+      [
+        741,
+        58
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        755,
+        42
+      ],
+      [
+        755,
+        57
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        773,
+        21
+      ],
+      [
+        773,
+        36
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex",
+      {},
+      "",
+      [
+        817,
+        33
+      ],
+      [
+        817,
+        64
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        890,
+        42
+      ],
+      [
+        890,
+        56
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        897,
+        41
+      ],
+      [
+        897,
+        56
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        912,
+        42
+      ],
+      [
+        912,
+        56
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        913,
+        42
+      ],
+      [
+        913,
+        56
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_socket_t fd;     /*!< File descriptor */\n  unsigned int  events; /*!< Mask of ares_fd_eventflag_t */\n} ares_fd_events_t;",
+      {
+        "fd": "ares_socket_t",
+        "events": "unsigned int"
+      },
+      "ares_fd_events_t",
+      [
+        927,
+        0
+      ],
+      [
+        930,
+        19
+      ]
+    ],
+    [
+      "struct ares_addrttl {\n  struct in_addr ipaddr;\n  int            ttl;\n}",
+      {
+        "ipaddr": "struct in_addr",
+        "ttl": "int"
+      },
+      "ares_addrttl",
+      [
+        978,
+        0
+      ],
+      [
+        981,
+        1
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        979,
+        2
+      ],
+      [
+        979,
+        16
+      ]
+    ],
+    [
+      "struct ares_addr6ttl {\n  struct ares_in6_addr ip6addr;\n  int                  ttl;\n}",
+      {
+        "ip6addr": "struct ares_in6_addr",
+        "ttl": "int"
+      },
+      "ares_addr6ttl",
+      [
+        983,
+        0
+      ],
+      [
+        986,
+        1
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        984,
+        2
+      ],
+      [
+        984,
+        22
+      ]
+    ],
+    [
+      "struct ares_caa_reply {\n  struct ares_caa_reply *next;\n  int                    critical;\n  unsigned char         *property;\n  size_t                 plength; /* plength excludes null termination */\n  unsigned char         *value;\n  size_t                 length;  /* length excludes null termination */\n}",
+      {
+        "*next": "struct ares_caa_reply",
+        "critical": "int",
+        "*property": "unsigned char",
+        "plength": "size_t",
+        "*value": "unsigned char",
+        "length": "size_t"
+      },
+      "ares_caa_reply",
+      [
+        988,
+        0
+      ],
+      [
+        995,
+        1
+      ]
+    ],
+    [
+      "struct ares_caa_reply",
+      {},
+      "",
+      [
+        989,
+        2
+      ],
+      [
+        989,
+        23
+      ]
+    ],
+    [
+      "struct ares_srv_reply {\n  struct ares_srv_reply *next;\n  char                  *host;\n  unsigned short         priority;\n  unsigned short         weight;\n  unsigned short         port;\n}",
+      {
+        "*next": "struct ares_srv_reply",
+        "*host": "char",
+        "priority": "unsigned short",
+        "weight": "unsigned short",
+        "port": "unsigned short"
+      },
+      "ares_srv_reply",
+      [
+        997,
+        0
+      ],
+      [
+        1003,
+        1
+      ]
+    ],
+    [
+      "struct ares_srv_reply",
+      {},
+      "",
+      [
+        998,
+        2
+      ],
+      [
+        998,
+        23
+      ]
+    ],
+    [
+      "struct ares_mx_reply {\n  struct ares_mx_reply *next;\n  char                 *host;\n  unsigned short        priority;\n}",
+      {
+        "*next": "struct ares_mx_reply",
+        "*host": "char",
+        "priority": "unsigned short"
+      },
+      "ares_mx_reply",
+      [
+        1005,
+        0
+      ],
+      [
+        1009,
+        1
+      ]
+    ],
+    [
+      "struct ares_mx_reply",
+      {},
+      "",
+      [
+        1006,
+        2
+      ],
+      [
+        1006,
+        22
+      ]
+    ],
+    [
+      "struct ares_txt_reply {\n  struct ares_txt_reply *next;\n  unsigned char         *txt;\n  size_t                 length; /* length excludes null termination */\n}",
+      {
+        "*next": "struct ares_txt_reply",
+        "*txt": "unsigned char",
+        "length": "size_t"
+      },
+      "ares_txt_reply",
+      [
+        1011,
+        0
+      ],
+      [
+        1015,
+        1
+      ]
+    ],
+    [
+      "struct ares_txt_reply",
+      {},
+      "",
+      [
+        1012,
+        2
+      ],
+      [
+        1012,
+        23
+      ]
+    ],
+    [
+      "struct ares_txt_ext {\n  struct ares_txt_ext *next;\n  unsigned char       *txt;\n  size_t               length;\n  /* 1 - if start of new record\n   * 0 - if a chunk in the same record */\n  unsigned char        record_start;\n}",
+      {
+        "*next": "struct ares_txt_ext",
+        "*txt": "unsigned char",
+        "length": "size_t",
+        "record_start": "unsigned char"
+      },
+      "ares_txt_ext",
+      [
+        1019,
+        0
+      ],
+      [
+        1026,
+        1
+      ]
+    ],
+    [
+      "struct ares_txt_ext",
+      {},
+      "",
+      [
+        1020,
+        2
+      ],
+      [
+        1020,
+        21
+      ]
+    ],
+    [
+      "struct ares_naptr_reply {\n  struct ares_naptr_reply *next;\n  unsigned char           *flags;\n  unsigned char           *service;\n  unsigned char           *regexp;\n  char                    *replacement;\n  unsigned short           order;\n  unsigned short           preference;\n}",
+      {
+        "*next": "struct ares_naptr_reply",
+        "*flags": "unsigned char",
+        "*service": "unsigned char",
+        "*regexp": "unsigned char",
+        "*replacement": "char",
+        "order": "unsigned short",
+        "preference": "unsigned short"
+      },
+      "ares_naptr_reply",
+      [
+        1028,
+        0
+      ],
+      [
+        1036,
+        1
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        1029,
+        2
+      ],
+      [
+        1029,
+        25
+      ]
+    ],
+    [
+      "struct ares_soa_reply {\n  char        *nsname;\n  char        *hostmaster;\n  unsigned int serial;\n  unsigned int refresh;\n  unsigned int retry;\n  unsigned int expire;\n  unsigned int minttl;\n}",
+      {
+        "*nsname": "char",
+        "*hostmaster": "char",
+        "serial": "unsigned int",
+        "refresh": "unsigned int",
+        "retry": "unsigned int",
+        "expire": "unsigned int",
+        "minttl": "unsigned int"
+      },
+      "ares_soa_reply",
+      [
+        1038,
+        0
+      ],
+      [
+        1046,
+        1
+      ]
+    ],
+    [
+      "struct ares_uri_reply {\n  struct ares_uri_reply *next;\n  unsigned short         priority;\n  unsigned short         weight;\n  char                  *uri;\n  int                    ttl;\n}",
+      {
+        "*next": "struct ares_uri_reply",
+        "priority": "unsigned short",
+        "weight": "unsigned short",
+        "*uri": "char",
+        "ttl": "int"
+      },
+      "ares_uri_reply",
+      [
+        1048,
+        0
+      ],
+      [
+        1054,
+        1
+      ]
+    ],
+    [
+      "struct ares_uri_reply",
+      {},
+      "",
+      [
+        1049,
+        2
+      ],
+      [
+        1049,
+        23
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node {\n  int                        ai_ttl;\n  int                        ai_flags;\n  int                        ai_family;\n  int                        ai_socktype;\n  int                        ai_protocol;\n  ares_socklen_t             ai_addrlen;\n  struct sockaddr           *ai_addr;\n  struct ares_addrinfo_node *ai_next;\n}",
+      {
+        "ai_ttl": "int",
+        "ai_flags": "int",
+        "ai_family": "int",
+        "ai_socktype": "int",
+        "ai_protocol": "int",
+        "ai_addrlen": "ares_socklen_t",
+        "*ai_addr": "struct sockaddr",
+        "*ai_next": "struct ares_addrinfo_node"
+      },
+      "ares_addrinfo_node",
+      [
+        1059,
+        0
+      ],
+      [
+        1068,
+        1
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        1066,
+        2
+      ],
+      [
+        1066,
+        17
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        1067,
+        2
+      ],
+      [
+        1067,
+        27
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname {\n  int                         ttl;\n  char                       *alias;\n  char                       *name;\n  struct ares_addrinfo_cname *next;\n}",
+      {
+        "ttl": "int",
+        "*alias": "char",
+        "*name": "char",
+        "*next": "struct ares_addrinfo_cname"
+      },
+      "ares_addrinfo_cname",
+      [
+        1075,
+        0
+      ],
+      [
+        1080,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        1079,
+        2
+      ],
+      [
+        1079,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo {\n  struct ares_addrinfo_cname *cnames;\n  struct ares_addrinfo_node  *nodes;\n  char                       *name;\n}",
+      {
+        "*cnames": "struct ares_addrinfo_cname",
+        "*nodes": "struct ares_addrinfo_node",
+        "*name": "char"
+      },
+      "ares_addrinfo",
+      [
+        1082,
+        0
+      ],
+      [
+        1086,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        1083,
+        2
+      ],
+      [
+        1083,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        1084,
+        2
+      ],
+      [
+        1084,
+        27
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints {\n  int ai_flags;\n  int ai_family;\n  int ai_socktype;\n  int ai_protocol;\n}",
+      {
+        "ai_flags": "int",
+        "ai_family": "int",
+        "ai_socktype": "int",
+        "ai_protocol": "int"
+      },
+      "ares_addrinfo_hints",
+      [
+        1088,
+        0
+      ],
+      [
+        1093,
+        1
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        1104,
+        39
+      ],
+      [
+        1104,
+        53
+      ]
+    ],
+    [
+      "struct ares_addrttl",
+      {},
+      "",
+      [
+        1105,
+        2
+      ],
+      [
+        1105,
+        21
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        1108,
+        39
+      ],
+      [
+        1108,
+        53
+      ]
+    ],
+    [
+      "struct ares_addr6ttl",
+      {},
+      "",
+      [
+        1109,
+        2
+      ],
+      [
+        1109,
+        22
+      ]
+    ],
+    [
+      "struct ares_caa_reply",
+      {},
+      "",
+      [
+        1112,
+        39
+      ],
+      [
+        1112,
+        60
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        1116,
+        14
+      ],
+      [
+        1116,
+        28
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        1119,
+        39
+      ],
+      [
+        1119,
+        53
+      ]
+    ],
+    [
+      "struct ares_srv_reply",
+      {},
+      "",
+      [
+        1122,
+        39
+      ],
+      [
+        1122,
+        60
+      ]
+    ],
+    [
+      "struct ares_mx_reply",
+      {},
+      "",
+      [
+        1125,
+        39
+      ],
+      [
+        1125,
+        59
+      ]
+    ],
+    [
+      "struct ares_txt_reply",
+      {},
+      "",
+      [
+        1128,
+        39
+      ],
+      [
+        1128,
+        60
+      ]
+    ],
+    [
+      "struct ares_txt_ext",
+      {},
+      "",
+      [
+        1131,
+        39
+      ],
+      [
+        1131,
+        58
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        1134,
+        39
+      ],
+      [
+        1134,
+        62
+      ]
+    ],
+    [
+      "struct ares_soa_reply",
+      {},
+      "",
+      [
+        1137,
+        39
+      ],
+      [
+        1137,
+        60
+      ]
+    ],
+    [
+      "struct ares_uri_reply",
+      {},
+      "",
+      [
+        1140,
+        39
+      ],
+      [
+        1140,
+        60
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        1144,
+        43
+      ],
+      [
+        1144,
+        57
+      ]
+    ],
+    [
+      "struct ares_addr_node {\n  struct ares_addr_node *next;\n  int                    family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n}",
+      {
+        "*next": "struct ares_addr_node",
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr"
+      },
+      "ares_addr_node",
+      [
+        1150,
+        0
+      ],
+      [
+        1158,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1151,
+        2
+      ],
+      [
+        1151,
+        23
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        1155,
+        4
+      ],
+      [
+        1155,
+        18
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        1156,
+        4
+      ],
+      [
+        1156,
+        24
+      ]
+    ],
+    [
+      "struct ares_addr_port_node {\n  struct ares_addr_port_node *next;\n  int                         family;\n\n  union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  } addr;\n\n  int udp_port;\n  int tcp_port;\n}",
+      {
+        "*next": "struct ares_addr_port_node",
+        "family": "int",
+        "addr": "union {\n    struct in_addr       addr4;\n    struct ares_in6_addr addr6;\n  }",
+        "addr4": "struct in_addr",
+        "addr6": "struct ares_in6_addr",
+        "udp_port": "int",
+        "tcp_port": "int"
+      },
+      "ares_addr_port_node",
+      [
+        1160,
+        0
+      ],
+      [
+        1171,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1161,
+        2
+      ],
+      [
+        1161,
+        28
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        1165,
+        4
+      ],
+      [
+        1165,
+        18
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        1166,
+        4
+      ],
+      [
+        1166,
+        24
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1174,
+        33
+      ],
+      [
+        1174,
+        54
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1179,
+        48
+      ],
+      [
+        1179,
+        74
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1189,
+        33
+      ],
+      [
+        1189,
+        54
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1194,
+        50
+      ],
+      [
+        1194,
+        76
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_version.h\" /* c-ares version defines   */\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_build.h\"   /* c-ares build definitions */\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        40,
+        0
+      ],
+      [
+        41,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/socket.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/select.h>\n",
+      [
+        48,
+        0
+      ],
+      [
+        49,
+        0
+      ]
+    ],
+    [
+      "#  include <winsock2.h>\n",
+      [
+        52,
+        0
+      ],
+      [
+        53,
+        0
+      ]
+    ],
+    [
+      "#  include <ws2tcpip.h>\n",
+      [
+        63,
+        0
+      ],
+      [
+        64,
+        0
+      ]
+    ],
+    [
+      "#  include <windows.h>\n",
+      [
+        67,
+        0
+      ],
+      [
+        68,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/select.h>\n",
+      [
+        77,
+        0
+      ],
+      [
+        78,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/bsdskt.h>\n",
+      [
+        81,
+        0
+      ],
+      [
+        82,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        85,
+        0
+      ],
+      [
+        86,
+        0
+      ]
+    ],
+    [
+      "#  include <tcp.h>\n",
+      [
+        89,
+        0
+      ],
+      [
+        90,
+        0
+      ]
+    ],
+    [
+      "#  include <jni.h>\n",
+      [
+        93,
+        0
+      ],
+      [
+        94,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_dns_record.h\"\n",
+      [
+        434,
+        0
+      ],
+      [
+        435,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_SUCCESS = 0,\n\n  /* Server error codes (ARES_ENODATA indicates no relevant answer) */\n  ARES_ENODATA   = 1,\n  ARES_EFORMERR  = 2,\n  ARES_ESERVFAIL = 3,\n  ARES_ENOTFOUND = 4,\n  ARES_ENOTIMP   = 5,\n  ARES_EREFUSED  = 6,\n\n  /* Locally generated error codes */\n  ARES_EBADQUERY    = 7,\n  ARES_EBADNAME     = 8,\n  ARES_EBADFAMILY   = 9,\n  ARES_EBADRESP     = 10,\n  ARES_ECONNREFUSED = 11,\n  ARES_ETIMEOUT     = 12,\n  ARES_EOF          = 13,\n  ARES_EFILE        = 14,\n  ARES_ENOMEM       = 15,\n  ARES_EDESTRUCTION = 16,\n  ARES_EBADSTR      = 17,\n\n  /* ares_getnameinfo error codes */\n  ARES_EBADFLAGS = 18,\n\n  /* ares_getaddrinfo error codes */\n  ARES_ENONAME   = 19,\n  ARES_EBADHINTS = 20,\n\n  /* Uninitialized library error code */\n  ARES_ENOTINITIALIZED = 21, /* introduced in 1.7.0 */\n\n  /* ares_library_init error codes */\n  ARES_ELOADIPHLPAPI         = 22, /* introduced in 1.7.0 */\n  ARES_EADDRGETNETWORKPARAMS = 23, /* introduced in 1.7.0 */\n\n  /* More error codes */\n  ARES_ECANCELLED = 24, /* introduced in 1.7.0 */\n\n  /* More ares_getaddrinfo error codes */\n  ARES_ESERVICE = 25, /* ares_getaddrinfo() was passed a text service name that\n                       * is not recognized. introduced in 1.16.0 */\n\n  ARES_ENOSERVER = 26 /* No DNS servers were configured */\n} ares_status_t;",
+      {
+        "ARES_SUCCESS": "",
+        "ARES_ENODATA": "",
+        "ARES_EFORMERR": "",
+        "ARES_ESERVFAIL": "",
+        "ARES_ENOTFOUND": "",
+        "ARES_ENOTIMP": "",
+        "ARES_EREFUSED": "",
+        "ARES_EBADQUERY": "",
+        "ARES_EBADNAME": "",
+        "ARES_EBADFAMILY": "",
+        "ARES_EBADRESP": "",
+        "ARES_ECONNREFUSED": "",
+        "ARES_ETIMEOUT": "",
+        "ARES_EOF": "",
+        "ARES_EFILE": "",
+        "ARES_ENOMEM": "",
+        "ARES_EDESTRUCTION": "",
+        "ARES_EBADSTR": "",
+        "ARES_EBADFLAGS": "",
+        "ARES_ENONAME": "",
+        "ARES_EBADHINTS": "",
+        "ARES_ENOTINITIALIZED": "",
+        "ARES_ELOADIPHLPAPI": "",
+        "ARES_EADDRGETNETWORKPARAMS": "",
+        "ARES_ECANCELLED": "",
+        "ARES_ESERVICE": "",
+        "ARES_ENOSERVER": ""
+      },
+      "ares_status_t",
+      [
+        160,
+        0
+      ],
+      [
+        206,
+        16
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_FALSE = 0,\n  ARES_TRUE  = 1\n} ares_bool_t;",
+      {
+        "ARES_FALSE": "",
+        "ARES_TRUE": ""
+      },
+      "ares_bool_t",
+      [
+        208,
+        0
+      ],
+      [
+        211,
+        14
+      ]
+    ],
+    [
+      "typedef enum {\n  /*! Default (best choice) event system */\n  ARES_EVSYS_DEFAULT = 0,\n  /*! Win32 IOCP/AFD_POLL event system */\n  ARES_EVSYS_WIN32 = 1,\n  /*! Linux epoll */\n  ARES_EVSYS_EPOLL = 2,\n  /*! BSD/MacOS kqueue */\n  ARES_EVSYS_KQUEUE = 3,\n  /*! POSIX poll() */\n  ARES_EVSYS_POLL = 4,\n  /*! last fallback on Unix-like systems, select() */\n  ARES_EVSYS_SELECT = 5\n} ares_evsys_t;",
+      {
+        "ARES_EVSYS_DEFAULT": "",
+        "ARES_EVSYS_WIN32": "",
+        "ARES_EVSYS_EPOLL": "",
+        "ARES_EVSYS_KQUEUE": "",
+        "ARES_EVSYS_POLL": "",
+        "ARES_EVSYS_SELECT": ""
+      },
+      "ares_evsys_t",
+      [
+        214,
+        0
+      ],
+      [
+        227,
+        15
+      ]
+    ],
+    [
+      "typedef enum {\n  /*! Strongly recommended to create sockets as non-blocking and set this\n   *  flag */\n  ARES_SOCKFUNC_FLAG_NONBLOCKING = 1 << 0\n} ares_sockfunc_flags_t;",
+      {
+        "ARES_SOCKFUNC_FLAG_NONBLOCKING": ""
+      },
+      "ares_sockfunc_flags_t",
+      [
+        584,
+        0
+      ],
+      [
+        588,
+        24
+      ]
+    ],
+    [
+      "typedef enum {\n  /*! Set the send buffer size. Value is a pointer to an int. (SO_SNDBUF) */\n  ARES_SOCKET_OPT_SENDBUF_SIZE,\n  /*! Set the recv buffer size. Value is a pointer to an int. (SO_RCVBUF) */\n  ARES_SOCKET_OPT_RECVBUF_SIZE,\n  /*! Set the network interface to use as the source for communication.\n   *  Value is a C string. (SO_BINDTODEVICE) */\n  ARES_SOCKET_OPT_BIND_DEVICE,\n  /*! Enable TCP Fast Open.  Value is a pointer to an ares_bool_t.  On some\n   *  systems this could be a no-op if it is known it is on by default and\n   *  return success.  Other systems may be a no-op if known the system does\n   *  not support the feature and returns failure with errno set to ENOSYS or\n   *  WSASetLastError(WSAEOPNOTSUPP).\n   */\n  ARES_SOCKET_OPT_TCP_FASTOPEN\n} ares_socket_opt_t;",
+      {
+        "ARES_SOCKET_OPT_SENDBUF_SIZE": "",
+        "ARES_SOCKET_OPT_RECVBUF_SIZE": "",
+        "ARES_SOCKET_OPT_BIND_DEVICE": "",
+        "ARES_SOCKET_OPT_TCP_FASTOPEN": ""
+      },
+      "ares_socket_opt_t",
+      [
+        592,
+        0
+      ],
+      [
+        607,
+        20
+      ]
+    ],
+    [
+      "typedef enum {\n  /*! Connect using TCP Fast Open */\n  ARES_SOCKET_CONN_TCP_FASTOPEN = 1 << 0\n} ares_socket_connect_flags_t;",
+      {
+        "ARES_SOCKET_CONN_TCP_FASTOPEN": ""
+      },
+      "ares_socket_connect_flags_t",
+      [
+        610,
+        0
+      ],
+      [
+        613,
+        30
+      ]
+    ],
+    [
+      "typedef enum {\n  /*! Bind is for a TCP connection */\n  ARES_SOCKET_BIND_TCP = 1 << 0,\n  /*! Bind is for a client connection, not server */\n  ARES_SOCKET_BIND_CLIENT = 1 << 1\n} ares_socket_bind_flags_t;",
+      {
+        "ARES_SOCKET_BIND_TCP": "",
+        "ARES_SOCKET_BIND_CLIENT": ""
+      },
+      "ares_socket_bind_flags_t",
+      [
+        616,
+        0
+      ],
+      [
+        621,
+        27
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_FD_EVENT_NONE  = 0,      /*!< No events */\n  ARES_FD_EVENT_READ  = 1 << 0, /*!< Read event (including disconnect/error) */\n  ARES_FD_EVENT_WRITE = 1 << 1  /*!< Write event */\n} ares_fd_eventflag_t;",
+      {
+        "ARES_FD_EVENT_NONE": "",
+        "ARES_FD_EVENT_READ": "",
+        "ARES_FD_EVENT_WRITE": ""
+      },
+      "ares_fd_eventflag_t",
+      [
+        919,
+        0
+      ],
+      [
+        923,
+        22
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_PROCESS_FLAG_NONE        = 0,     /*!< No flag value */\n  ARES_PROCESS_FLAG_SKIP_NON_FD = 1 << 0 /*!< skip any processing unrelated to\n                                          *   the file descriptor events passed\n                                          *    in */\n} ares_process_flag_t;",
+      {
+        "ARES_PROCESS_FLAG_NONE": "",
+        "ARES_PROCESS_FLAG_SKIP_NON_FD": ""
+      },
+      "ares_process_flag_t",
+      [
+        933,
+        0
+      ],
+      [
+        938,
+        22
+      ]
+    ]
+  ]
+}

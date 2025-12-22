@@ -1,0 +1,242 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_htable_strvp_val_free_t)(void *val)",
+      "fn_dec_pos": [
+        [
+          51,
+          13
+        ],
+        [
+          51,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "val": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_htable_strvp_destroy(ares_htable_strvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          57,
+          18
+        ],
+        [
+          57,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_strvp_destroy",
+        "parameters": {
+          "htable": "ares_htable_strvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_strvp_create(ares_htable_strvp_val_free_t val_free)",
+      "fn_dec_pos": [
+        [
+          66,
+          2
+        ],
+        [
+          66,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "val_free": "ares_htable_strvp_val_free_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_strvp_insert(ares_htable_strvp_t *htable,\n                                                  const char *key, void *val)",
+      "fn_dec_pos": [
+        [
+          75,
+          13
+        ],
+        [
+          76,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_strvp_insert",
+        "parameters": {
+          "htable": "ares_htable_strvp_t",
+          "key": "char",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_strvp_get(\n  const ares_htable_strvp_t *htable, const char *key, void **val)",
+      "fn_dec_pos": [
+        [
+          85,
+          13
+        ],
+        [
+          86,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_strvp_get",
+        "parameters": {
+          "htable": "ares_htable_strvp_t",
+          "key": "char",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_strvp_get_direct(const ares_htable_strvp_t *htable,\n                               const char                *key)",
+      "fn_dec_pos": [
+        [
+          97,
+          2
+        ],
+        [
+          98,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_strvp_get_direct",
+        "parameters": {
+          "htable": "ares_htable_strvp_t",
+          "key": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_strvp_remove(ares_htable_strvp_t *htable,\n                                                  const char          *key)",
+      "fn_dec_pos": [
+        [
+          106,
+          13
+        ],
+        [
+          107,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_strvp_remove",
+        "parameters": {
+          "htable": "ares_htable_strvp_t",
+          "key": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_strvp_claim(ares_htable_strvp_t *htable,\n                                                 const char          *key)",
+      "fn_dec_pos": [
+        [
+          116,
+          25
+        ],
+        [
+          117,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_strvp_claim",
+        "parameters": {
+          "htable": "ares_htable_strvp_t",
+          "key": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_strvp_num_keys(const ares_htable_strvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          125,
+          2
+        ],
+        [
+          125,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_strvp_num_keys",
+        "parameters": {
+          "htable": "ares_htable_strvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable_strvp",
+      {},
+      "",
+      [
+        42,
+        0
+      ],
+      [
+        42,
+        24
+      ]
+    ],
+    [
+      "typedef struct ares_htable_strvp ares_htable_strvp_t;",
+      {},
+      "ares_htable_strvp_t",
+      [
+        45,
+        0
+      ],
+      [
+        45,
+        53
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

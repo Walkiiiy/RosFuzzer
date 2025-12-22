@@ -1,0 +1,420 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_status_t ares_init_sysconfig_mvs(const ares_channel_t *channel,\n                                             ares_sysconfig_t     *sysconfig)\n{\n  struct __res_state *res = 0;\n  size_t              count4;\n  size_t              count6;\n  int                 i;\n  __STATEEXTIPV6     *v6;\n  arse__llist_t      *sconfig = NULL;\n  ares_status_t       status;\n\n  if (0 == res) {\n    int rc = res_init();\n    while (rc == -1 && h_errno == TRY_AGAIN) {\n      rc = res_init();\n    }\n    if (rc == -1) {\n      return ARES_ENOMEM;\n    }\n    res = __res();\n  }\n\n  v6 = res->__res_extIPv6;\n  if (res->nscount > 0) {\n    count4 = (size_t)res->nscount;\n  }\n\n  if (v6 && v6->__stat_nscount > 0) {\n    count6 = (size_t)v6->__stat_nscount;\n  } else {\n    count6 = 0;\n  }\n\n  for (i = 0; i < count4; i++) {\n    struct sockaddr_in *addr_in = &(res->nsaddr_list[i]);\n    struct ares_addr    addr;\n\n    addr.addr.addr4.s_addr = addr_in->sin_addr.s_addr;\n    addr.family            = AF_INET;\n\n    status = ares_sconfig_append(channel, &sysconfig->sconfig, &addr,\n                                 htons(addr_in->sin_port),\n                                 htons(addr_in->sin_port), NULL);\n\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  for (i = 0; i < count6; i++) {\n    struct sockaddr_in6 *addr_in = &(v6->__stat_nsaddr_list[i]);\n    struct ares_addr     addr;\n\n    addr.family = AF_INET6;\n    memcpy(&(addr.addr.addr6), &(addr_in->sin6_addr),\n           sizeof(addr_in->sin6_addr));\n\n    status = ares_sconfig_append(channel, &sysconfig->sconfig, &addr,\n                                 htons(addr_in->sin_port),\n                                 htons(addr_in->sin_port), NULL);\n\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          61,
+          0
+        ],
+        [
+          128,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_mvs",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_init_sysconfig_riscos(const ares_channel_t *channel,\n                                                ares_sysconfig_t     *sysconfig)\n{\n  char         *line;\n  ares_status_t status = ARES_SUCCESS;\n\n  /* Under RISC OS, name servers are listed in the\n     system variable Inet$Resolvers, space separated. */\n  line = getenv(\"Inet$Resolvers\");\n  if (line) {\n    char *resolvers = ares_strdup(line);\n    char *pos;\n    char *space;\n\n    if (!resolvers) {\n      return ARES_ENOMEM;\n    }\n\n    pos = resolvers;\n    do {\n      space = strchr(pos, ' ');\n      if (space) {\n        *space = '\\0';\n      }\n      status = ares_sconfig_append_fromstr(channel, &sysconfig->sconfig, pos,\n                                           ARES_TRUE);\n      if (status != ARES_SUCCESS) {\n        break;\n      }\n      pos = space + 1;\n    } while (space);\n\n    ares_free(resolvers);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          132,
+          0
+        ],
+        [
+          168,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_riscos",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_init_sysconfig_watt32(const ares_channel_t *channel,\n                                                ares_sysconfig_t     *sysconfig)\n{\n  size_t        i;\n  ares_status_t status;\n\n  sock_init();\n\n  for (i = 0; def_nameservers[i]; i++) {\n    struct ares_addr addr;\n\n    addr.family            = AF_INET;\n    addr.addr.addr4.s_addr = htonl(def_nameservers[i]);\n\n    status =\n      ares_sconfig_append(channel, &sysconfig->sconfig, &addr, 0, 0, NULL);\n\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          172,
+          0
+        ],
+        [
+          195,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_watt32",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_init_sysconfig_android(const ares_channel_t *channel,\n                                                 ares_sysconfig_t *sysconfig)\n{\n  size_t        i;\n  char        **dns_servers;\n  char         *domains;\n  size_t        num_servers;\n  ares_status_t status = ARES_EFILE;\n\n  /* Use the Android connectivity manager to get a list\n   * of DNS servers. As of Android 8 (Oreo) net.dns#\n   * system properties are no longer available. Google claims this\n   * improves privacy. Apps now need the ACCESS_NETWORK_STATE\n   * permission and must use the ConnectivityManager which\n   * is Java only. */\n  dns_servers = ares_get_android_server_list(MAX_DNS_PROPERTIES, &num_servers);\n  if (dns_servers != NULL) {\n    for (i = 0; i < num_servers; i++) {\n      status = ares_sconfig_append_fromstr(channel, &sysconfig->sconfig,\n                                           dns_servers[i], ARES_TRUE);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n    for (i = 0; i < num_servers; i++) {\n      ares_free(dns_servers[i]);\n    }\n    ares_free(dns_servers);\n  }\n\n  domains            = ares_get_android_search_domains_list();\n  sysconfig->domains = ares_strsplit(domains, \", \", &sysconfig->ndomains);\n  ares_free(domains);\n\n#  ifdef HAVE___SYSTEM_PROPERTY_GET\n  /* Old way using the system property still in place as\n   * a fallback. Older android versions can still use this.\n   * it's possible for older apps not not have added the new\n   * permission and we want to try to avoid breaking those.\n   *\n   * We'll only run this if we don't have any dns servers\n   * because this will get the same ones (if it works). */\n  if (sysconfig->sconfig == NULL) {\n    char propname[PROP_NAME_MAX];\n    char propvalue[PROP_VALUE_MAX] = \"\";\n    for (i = 1; i <= MAX_DNS_PROPERTIES; i++) {\n      snprintf(propname, sizeof(propname), \"%s%zu\", DNS_PROP_NAME_PREFIX, i);\n      if (__system_property_get(propname, propvalue) < 1) {\n        break;\n      }\n      status = ares_sconfig_append_fromstr(channel, &sysconfig->sconfig,\n                                           propvalue, ARES_TRUE);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n  }\n#  endif /* HAVE___SYSTEM_PROPERTY_GET */\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          199,
+          0
+        ],
+        [
+          259,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_android",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_init_sysconfig_qnx(const ares_channel_t *channel,\n                          ares_sysconfig_t     *sysconfig)\n{\n  /* QNX:\n   *   1. use confstr(_CS_RESOLVE, ...) as primary resolv.conf data, replacing\n   *      \"_\" with \" \".  If that is empty, then do normal /etc/resolv.conf\n   *      processing.\n   *   2. We want to process /etc/nsswitch.conf as normal.\n   *   3. if confstr(_CS_DOMAIN, ...) this is the domain name.  Use this as\n   *      preference over anything else found.\n   */\n  ares_buf_t    *buf                = ares_buf_create();\n  unsigned char *data               = NULL;\n  size_t         data_size          = 0;\n  ares_bool_t    process_resolvconf = ARES_TRUE;\n  ares_status_t  status             = ARES_SUCCESS;\n\n  /* Prefer confstr(_CS_RESOLVE, ...) */\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  data_size = 1024;\n  data      = ares_buf_append_start(buf, &data_size);\n  if (data == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  data_size = confstr(_CS_RESOLVE, (char *)data, data_size);\n  if (data_size > 1) {\n    /* confstr returns byte for NULL terminator, strip */\n    data_size--;\n\n    ares_buf_append_finish(buf, data_size);\n    /* Its odd, this uses _ instead of \" \" between keywords, otherwise the\n     * format is the same as resolv.conf, replace. */\n    ares_buf_replace(buf, (const unsigned char *)\"_\", 1,\n                     (const unsigned char *)\" \", 1);\n\n    status = ares_sysconfig_process_buf(channel, sysconfig, buf,\n                                        ares_sysconfig_parse_resolv_line);\n    if (status != ARES_SUCCESS) {\n      /* ENOMEM is really the only error we'll get here */\n      goto done;\n    }\n\n    /* don't read resolv.conf if we processed *any* nameservers */\n    if (ares_llist_len(sysconfig->sconfig) != 0) {\n      process_resolvconf = ARES_FALSE;\n    }\n  }\n\n  /* Process files */\n  status = ares_init_sysconfig_files(channel, sysconfig, process_resolvconf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Read confstr(_CS_DOMAIN, ...), but if we had a search path specified with\n   * more than one domain, lets prefer that instead.  Its not exactly clear\n   * the best way to handle this. */\n  if (sysconfig->ndomains <= 1) {\n    char   domain[256];\n    size_t domain_len;\n\n    domain_len = confstr(_CS_DOMAIN, domain, sizeof(domain_len));\n    if (domain_len != 0) {\n      ares_strsplit_free(sysconfig->domains, sysconfig->ndomains);\n      sysconfig->domains = ares_strsplit(domain, \", \", &sysconfig->ndomains);\n      if (sysconfig->domains == NULL) {\n        status = ARES_ENOMEM;\n        goto done;\n      }\n    }\n  }\n\ndone:\n  ares_buf_destroy(buf);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          263,
+          0
+        ],
+        [
+          347,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_qnx",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_init_sysconfig_libresolv(const ares_channel_t *channel,\n                                ares_sysconfig_t     *sysconfig)\n{\n  struct __res_state       res;\n  ares_status_t            status = ARES_SUCCESS;\n  union res_sockaddr_union addr[MAXNS];\n  int                      nscount;\n  size_t                   i;\n  size_t                   entries = 0;\n  ares_buf_t              *ipbuf   = NULL;\n\n  memset(&res, 0, sizeof(res));\n\n  if (res_ninit(&res) != 0 || !(res.options & RES_INIT)) {\n    return ARES_EFILE;\n  }\n\n  nscount = res_getservers(&res, addr, MAXNS);\n\n  for (i = 0; i < (size_t)nscount; ++i) {\n    char           ipaddr[INET6_ADDRSTRLEN] = \"\";\n    char          *ipstr                    = NULL;\n    unsigned short port                     = 0;\n    unsigned int   ll_scope                 = 0;\n\n    sa_family_t    family = addr[i].sin.sin_family;\n    if (family == AF_INET) {\n      ares_inet_ntop(family, &addr[i].sin.sin_addr, ipaddr, sizeof(ipaddr));\n      port = ntohs(addr[i].sin.sin_port);\n    } else if (family == AF_INET6) {\n      ares_inet_ntop(family, &addr[i].sin6.sin6_addr, ipaddr, sizeof(ipaddr));\n      port     = ntohs(addr[i].sin6.sin6_port);\n      ll_scope = addr[i].sin6.sin6_scope_id;\n    } else {\n      continue;\n    }\n\n\n    /* [ip]:port%iface */\n    ipbuf = ares_buf_create();\n    if (ipbuf == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    }\n\n    status = ares_buf_append_str(ipbuf, \"[\");\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_buf_append_str(ipbuf, ipaddr);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_buf_append_str(ipbuf, \"]\");\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    if (port) {\n      status = ares_buf_append_str(ipbuf, \":\");\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n      status = ares_buf_append_num_dec(ipbuf, port, 0);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n\n    if (ll_scope) {\n      status = ares_buf_append_str(ipbuf, \"%\");\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n      status = ares_buf_append_num_dec(ipbuf, ll_scope, 0);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n\n    ipstr = ares_buf_finish_str(ipbuf, NULL);\n    ipbuf = NULL;\n    if (ipstr == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    }\n\n    status = ares_sconfig_append_fromstr(channel, &sysconfig->sconfig, ipstr,\n                                         ARES_TRUE);\n\n    ares_free(ipstr);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n  }\n\n  while ((entries < MAXDNSRCH) && res.dnsrch[entries]) {\n    entries++;\n  }\n\n  if (entries) {\n    sysconfig->domains = ares_malloc_zero(entries * sizeof(char *));\n    if (sysconfig->domains == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    } else {\n      sysconfig->ndomains = entries;\n      for (i = 0; i < sysconfig->ndomains; i++) {\n        sysconfig->domains[i] = ares_strdup(res.dnsrch[i]);\n        if (sysconfig->domains[i] == NULL) {\n          status = ARES_ENOMEM;\n          goto done;\n        }\n      }\n    }\n  }\n\n  if (res.ndots >= 0) {\n    sysconfig->ndots = (size_t)res.ndots;\n  }\n/* Apple does not allow configuration of retry, so this is a static dummy\n * value, ignore */\n#  ifndef __APPLE__\n  if (res.retry > 0) {\n    sysconfig->tries = (size_t)res.retry;\n  }\n#  endif\n  if (res.options & RES_ROTATE) {\n    sysconfig->rotate = ARES_TRUE;\n  }\n\n  if (res.retrans > 0) {\n/* Apple does not allow configuration of retrans, so this is a dummy value\n * that is extremely high (5s) */\n#  ifndef __APPLE__\n    if (res.retrans > 0) {\n      sysconfig->timeout_ms = (unsigned int)res.retrans * 1000;\n    }\n#  endif\n  }\n\ndone:\n  ares_buf_destroy(ipbuf);\n  res_ndestroy(&res);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          351,
+          0
+        ],
+        [
+          499,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_libresolv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_sysconfig_free(ares_sysconfig_t *sysconfig)\n{\n  ares_llist_destroy(sysconfig->sconfig);\n  ares_strsplit_free(sysconfig->domains, sysconfig->ndomains);\n  ares_free(sysconfig->sortlist);\n  ares_free(sysconfig->lookups);\n  memset(sysconfig, 0, sizeof(*sysconfig));\n}",
+      "fn_code_pos": [
+        [
+          502,
+          0
+        ],
+        [
+          509,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sysconfig_free",
+        "parameters": {
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_sysconfig_apply(ares_channel_t         *channel,\n                                          const ares_sysconfig_t *sysconfig)\n{\n  ares_status_t status;\n\n  if (sysconfig->sconfig && !(channel->optmask & ARES_OPT_SERVERS)) {\n    status = ares_servers_update(channel, sysconfig->sconfig, ARES_FALSE);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  if (sysconfig->domains && !(channel->optmask & ARES_OPT_DOMAINS)) {\n    /* Make sure we duplicate first then replace so even if there is\n     * ARES_ENOMEM, the channel stays in a good state */\n    char **temp =\n      ares_strsplit_duplicate(sysconfig->domains, sysconfig->ndomains);\n    if (temp == NULL) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    ares_strsplit_free(channel->domains, channel->ndomains);\n    channel->domains  = temp;\n    channel->ndomains = sysconfig->ndomains;\n  }\n\n  if (sysconfig->lookups && !(channel->optmask & ARES_OPT_LOOKUPS)) {\n    char *temp = ares_strdup(sysconfig->lookups);\n    if (temp == NULL) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    ares_free(channel->lookups);\n    channel->lookups = temp;\n  }\n\n  if (sysconfig->sortlist && !(channel->optmask & ARES_OPT_SORTLIST)) {\n    struct apattern *temp =\n      ares_malloc(sizeof(*channel->sortlist) * sysconfig->nsortlist);\n    if (temp == NULL) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    memcpy(temp, sysconfig->sortlist,\n           sizeof(*channel->sortlist) * sysconfig->nsortlist);\n\n    ares_free(channel->sortlist);\n    channel->sortlist = temp;\n    channel->nsort    = sysconfig->nsortlist;\n  }\n\n  if (!(channel->optmask & ARES_OPT_NDOTS)) {\n    channel->ndots = sysconfig->ndots;\n  }\n\n  if (sysconfig->tries && !(channel->optmask & ARES_OPT_TRIES)) {\n    channel->tries = sysconfig->tries;\n  }\n\n  if (sysconfig->timeout_ms && !(channel->optmask & ARES_OPT_TIMEOUTMS)) {\n    channel->timeout = sysconfig->timeout_ms;\n  }\n\n  if (!(channel->optmask & (ARES_OPT_ROTATE | ARES_OPT_NOROTATE))) {\n    channel->rotate = sysconfig->rotate;\n  }\n\n  if (sysconfig->usevc) {\n    channel->flags |= ARES_FLAG_USEVC;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          511,
+          0
+        ],
+        [
+          582,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sysconfig_apply",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_init_by_sysconfig(ares_channel_t *channel)\n{\n  ares_status_t    status;\n  ares_sysconfig_t sysconfig;\n\n  memset(&sysconfig, 0, sizeof(sysconfig));\n  sysconfig.ndots = 1; /* Default value if not otherwise set */\n\n#if defined(USE_WINSOCK)\n  status = ares_init_sysconfig_windows(channel, &sysconfig);\n#elif defined(__MVS__)\n  status = ares_init_sysconfig_mvs(channel, &sysconfig);\n#elif defined(__riscos__)\n  status = ares_init_sysconfig_riscos(channel, &sysconfig);\n#elif defined(WATT32)\n  status = ares_init_sysconfig_watt32(channel, &sysconfig);\n#elif defined(ANDROID) || defined(__ANDROID__)\n  status = ares_init_sysconfig_android(channel, &sysconfig);\n#elif defined(__APPLE__)\n  status = ares_init_sysconfig_macos(channel, &sysconfig);\n#elif defined(CARES_USE_LIBRESOLV)\n  status = ares_init_sysconfig_libresolv(channel, &sysconfig);\n#elif defined(__QNX__)\n  status = ares_init_sysconfig_qnx(channel, &sysconfig);\n#else\n  status = ares_init_sysconfig_files(channel, &sysconfig, ARES_TRUE);\n#endif\n\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Environment is supposed to override sysconfig */\n  status = ares_init_by_environment(&sysconfig);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Lock when applying the configuration to the channel.  Don't need to\n   * lock prior to this. */\n\n  ares_channel_lock(channel);\n\n  status = ares_sysconfig_apply(channel, &sysconfig);\n  ares_channel_unlock(channel);\n\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_sysconfig_free(&sysconfig);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          584,
+          0
+        ],
+        [
+          638,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_by_sysconfig",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct __res_state",
+      {},
+      "",
+      [
+        64,
+        2
+      ],
+      [
+        64,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        95,
+        4
+      ],
+      [
+        95,
+        22
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        96,
+        4
+      ],
+      [
+        96,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        111,
+        4
+      ],
+      [
+        111,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        112,
+        4
+      ],
+      [
+        112,
+        20
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        181,
+        4
+      ],
+      [
+        181,
+        20
+      ]
+    ],
+    [
+      "struct __res_state",
+      {},
+      "",
+      [
+        355,
+        2
+      ],
+      [
+        355,
+        20
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        548,
+        4
+      ],
+      [
+        548,
+        19
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/param.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/system_properties.h>\n",
+      [
+        46,
+        0
+      ],
+      [
+        47,
+        0
+      ]
+    ],
+    [
+      "#  include \"ares_android.h\"\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#  include <resolv.h>\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_inet_net_pton.h\"\n",
+      [
+        57,
+        0
+      ],
+      [
+        58,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

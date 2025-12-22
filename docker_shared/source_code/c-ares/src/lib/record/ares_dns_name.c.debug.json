@@ -1,0 +1,472 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_nameoffset_free(void *arg)\n{\n  ares_nameoffset_t *off = arg;\n  if (off == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  ares_free(off->name);\n  ares_free(off);\n}",
+      "fn_code_pos": [
+        [
+          33,
+          0
+        ],
+        [
+          41,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_nameoffset_free",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_nameoffset_create(ares_llist_t **list,\n                                            const char *name, size_t idx)\n{\n  ares_status_t      status;\n  ares_nameoffset_t *off = NULL;\n\n  if (list == NULL || name == NULL || ares_strlen(name) == 0 ||\n      ares_strlen(name) > 255) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (*list == NULL) {\n    *list = ares_llist_create(ares_nameoffset_free);\n  }\n  if (*list == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  off = ares_malloc_zero(sizeof(*off));\n  if (off == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  off->name     = ares_strdup(name);\n  off->name_len = ares_strlen(off->name);\n  off->idx      = idx;\n\n  if (ares_llist_insert_last(*list, off) == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  ares_nameoffset_free(off);\n  return status;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          43,
+          0
+        ],
+        [
+          83,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_nameoffset_create",
+        "parameters": {
+          "list": "ares_llist_t",
+          "name": "char",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static const ares_nameoffset_t *ares_nameoffset_find(ares_llist_t *list,\n                                                     const char   *name)\n{\n  size_t                   name_len = ares_strlen(name);\n  ares_llist_node_t       *node;\n  const ares_nameoffset_t *longest_match = NULL;\n\n  if (list == NULL || name == NULL || name_len == 0) {\n    return NULL;\n  }\n\n  for (node = ares_llist_node_first(list); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const ares_nameoffset_t *val = ares_llist_node_val(node);\n    size_t                   prefix_len;\n\n    /* Can't be a match if the stored name is longer */\n    if (val->name_len > name_len) {\n      continue;\n    }\n\n    /* Can't be the longest match if our existing longest match is longer */\n    if (longest_match != NULL && longest_match->name_len > val->name_len) {\n      continue;\n    }\n\n    prefix_len = name_len - val->name_len;\n\n    /* Due to DNS 0x20, lets not inadvertently mangle things, use case-sensitive\n     * matching instead of case-insensitive.  This may result in slightly\n     * larger DNS queries overall. */\n    if (!ares_streq(val->name, name + prefix_len)) {\n      continue;\n    }\n\n    /* We need to make sure if `val->name` is \"example.com\" that name is\n     * is separated by a label, e.g. \"myexample.com\" is not ok, however\n     * \"my.example.com\" is, so we look for the preceding \".\" */\n    if (prefix_len != 0 && name[prefix_len - 1] != '.') {\n      continue;\n    }\n\n    longest_match = val;\n  }\n\n  return longest_match;\n}",
+      "fn_code_pos": [
+        [
+          85,
+          0
+        ],
+        [
+          131,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_nameoffset_find",
+        "parameters": {
+          "list": "ares_llist_t",
+          "name": "char"
+        },
+        "return_type": "ares_nameoffset_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_dns_labels_free_cb(void *arg)\n{\n  ares_buf_t **buf = arg;\n  if (buf == NULL) {\n    return;\n  }\n\n  ares_buf_destroy(*buf);\n}",
+      "fn_code_pos": [
+        [
+          133,
+          0
+        ],
+        [
+          141,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_free_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_buf_t *ares_dns_labels_add(ares_array_t *labels)\n{\n  ares_buf_t **buf;\n\n  if (labels == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (ares_array_insert_last((void **)&buf, labels) != ARES_SUCCESS) {\n    return NULL;\n  }\n\n  *buf = ares_buf_create();\n  if (*buf == NULL) {\n    ares_array_remove_last(labels);\n    return NULL;\n  }\n\n  return *buf;\n}",
+      "fn_code_pos": [
+        [
+          143,
+          0
+        ],
+        [
+          162,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_add",
+        "parameters": {
+          "labels": "ares_array_t"
+        },
+        "return_type": "ares_buf_t"
+      }
+    },
+    {
+      "fn_code": "static ares_buf_t *ares_dns_labels_get_last(ares_array_t *labels)\n{\n  ares_buf_t **buf = ares_array_last(labels);\n\n  if (buf == NULL) {\n    return NULL;\n  }\n\n  return *buf;\n}",
+      "fn_code_pos": [
+        [
+          164,
+          0
+        ],
+        [
+          173,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_get_last",
+        "parameters": {
+          "labels": "ares_array_t"
+        },
+        "return_type": "ares_buf_t"
+      }
+    },
+    {
+      "fn_code": "static ares_buf_t *ares_dns_labels_get_at(ares_array_t *labels, size_t idx)\n{\n  ares_buf_t **buf = ares_array_at(labels, idx);\n\n  if (buf == NULL) {\n    return NULL;\n  }\n\n  return *buf;\n}",
+      "fn_code_pos": [
+        [
+          175,
+          0
+        ],
+        [
+          184,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_get_at",
+        "parameters": {
+          "labels": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_buf_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_dns_name_labels_del_last(ares_array_t *labels)\n{\n  ares_array_remove_last(labels);\n}",
+      "fn_code_pos": [
+        [
+          186,
+          0
+        ],
+        [
+          189,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_name_labels_del_last",
+        "parameters": {
+          "labels": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_parse_dns_name_escape(ares_buf_t *namebuf,\n                                                ares_buf_t *label,\n                                                ares_bool_t validate_hostname)\n{\n  ares_status_t status;\n  unsigned char c;\n\n  status = ares_buf_fetch_bytes(namebuf, &c, 1);\n  if (status != ARES_SUCCESS) {\n    return ARES_EBADNAME;\n  }\n\n  /* If next character is a digit, read 2 more digits */\n  if (ares_isdigit(c)) {\n    size_t       i;\n    unsigned int val = 0;\n\n    val = c - '0';\n\n    for (i = 0; i < 2; i++) {\n      status = ares_buf_fetch_bytes(namebuf, &c, 1);\n      if (status != ARES_SUCCESS) {\n        return ARES_EBADNAME;\n      }\n\n      if (!ares_isdigit(c)) {\n        return ARES_EBADNAME;\n      }\n      val *= 10;\n      val += c - '0';\n    }\n\n    /* Out of range */\n    if (val > 255) {\n      return ARES_EBADNAME;\n    }\n\n    if (validate_hostname && !ares_is_hostnamech((unsigned char)val)) {\n      return ARES_EBADNAME;\n    }\n\n    return ares_buf_append_byte(label, (unsigned char)val);\n  }\n\n  /* We can just output the character */\n  if (validate_hostname && !ares_is_hostnamech(c)) {\n    return ARES_EBADNAME;\n  }\n\n  return ares_buf_append_byte(label, c);\n}",
+      "fn_code_pos": [
+        [
+          191,
+          0
+        ],
+        [
+          241,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_dns_name_escape",
+        "parameters": {
+          "namebuf": "ares_buf_t",
+          "label": "ares_buf_t",
+          "validate_hostname": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_split_dns_name(ares_array_t *labels,\n                                         ares_bool_t   validate_hostname,\n                                         const char   *name)\n{\n  ares_status_t status;\n  ares_buf_t   *label   = NULL;\n  ares_buf_t   *namebuf = NULL;\n  size_t        i;\n  size_t        total_len = 0;\n  unsigned char c;\n\n  if (name == NULL || labels == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Put name into a buffer for parsing */\n  namebuf = ares_buf_create();\n  if (namebuf == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (*name != '\\0') {\n    status =\n      ares_buf_append(namebuf, (const unsigned char *)name, ares_strlen(name));\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  /* Start with 1 label */\n  label = ares_dns_labels_add(labels);\n  if (label == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  while (ares_buf_fetch_bytes(namebuf, &c, 1) == ARES_SUCCESS) {\n    /* New label */\n    if (c == '.') {\n      label = ares_dns_labels_add(labels);\n      if (label == NULL) {\n        status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n        goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n      continue;\n    }\n\n    /* Escape */\n    if (c == '\\\\') {\n      status = ares_parse_dns_name_escape(namebuf, label, validate_hostname);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n      continue;\n    }\n\n    /* Output direct character */\n    if (validate_hostname && !ares_is_hostnamech(c)) {\n      status = ARES_EBADNAME;\n      goto done;\n    }\n\n    status = ares_buf_append_byte(label, c);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  /* Remove trailing blank label */\n  if (ares_buf_len(ares_dns_labels_get_last(labels)) == 0) {\n    ares_dns_name_labels_del_last(labels);\n  }\n\n  /* If someone passed in \".\" there could have been 2 blank labels, check for\n   * that */\n  if (ares_array_len(labels) == 1 &&\n      ares_buf_len(ares_dns_labels_get_last(labels)) == 0) {\n    ares_dns_name_labels_del_last(labels);\n  }\n\n  /* Scan to make sure label lengths are valid */\n  for (i = 0; i < ares_array_len(labels); i++) {\n    const ares_buf_t *buf = ares_dns_labels_get_at(labels, i);\n    size_t            len = ares_buf_len(buf);\n    /* No 0-length labels, and no labels over 63 bytes */\n    if (len == 0 || len > 63) {\n      status = ARES_EBADNAME;\n      goto done;\n    }\n    total_len += len;\n  }\n\n  /* Can't exceed maximum (unescaped) length */\n  if (ares_array_len(labels) && total_len + ares_array_len(labels) - 1 > 255) {\n    status = ARES_EBADNAME;\n    goto done;\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  ares_buf_destroy(namebuf);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          243,
+          0
+        ],
+        [
+          347,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_split_dns_name",
+        "parameters": {
+          "labels": "ares_array_t",
+          "validate_hostname": "ares_bool_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_name_write(ares_buf_t *buf, ares_llist_t **list,\n                                  ares_bool_t validate_hostname,\n                                  const char *name)\n{\n  const ares_nameoffset_t *off = NULL;\n  size_t                   name_len;\n  size_t                   orig_name_len;\n  size_t                   pos    = ares_buf_len(buf);\n  ares_array_t            *labels = NULL;\n  char                     name_copy[512];\n  ares_status_t            status;\n\n  if (buf == NULL || name == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  labels = ares_array_create(sizeof(ares_buf_t *), ares_dns_labels_free_cb);\n  if (labels == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  /* NOTE: due to possible escaping, name_copy buffer is > 256 to allow for\n   *       this */\n  name_len      = ares_strcpy(name_copy, name, sizeof(name_copy));\n  orig_name_len = name_len;\n\n  /* Find longest match */\n  if (list != NULL) {\n    off = ares_nameoffset_find(*list, name_copy);\n    if (off != NULL && off->name_len != name_len) {\n      /* truncate */\n      name_len            -= (off->name_len + 1);\n      name_copy[name_len]  = 0;\n    }\n  }\n\n  /* Output labels */\n  if (off == NULL || off->name_len != orig_name_len) {\n    size_t i;\n\n    status = ares_split_dns_name(labels, validate_hostname, name_copy);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    for (i = 0; i < ares_array_len(labels); i++) {\n      size_t               len  = 0;\n      const ares_buf_t    *lbuf = ares_dns_labels_get_at(labels, i);\n      const unsigned char *ptr  = ares_buf_peek(lbuf, &len);\n\n      status = ares_buf_append_byte(buf, (unsigned char)(len & 0xFF));\n      if (status != ARES_SUCCESS) {\n        goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n\n      status = ares_buf_append(buf, ptr, len);\n      if (status != ARES_SUCCESS) {\n        goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n\n    /* If we are NOT jumping to another label, output terminator */\n    if (off == NULL) {\n      status = ares_buf_append_byte(buf, 0);\n      if (status != ARES_SUCCESS) {\n        goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  /* Output name compression offset jump */\n  if (off != NULL) {\n    unsigned short u16 =\n      (unsigned short)0xC000 | (unsigned short)(off->idx & 0x3FFF);\n    status = ares_buf_append_be16(buf, u16);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  /* Store pointer for future jumps as long as its not an exact match for\n   * a prior entry */\n  if (list != NULL && (off == NULL || off->name_len != orig_name_len) &&\n      name_len > 0) {\n    status = ares_nameoffset_create(list, name /* not truncated copy! */, pos);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  ares_array_destroy(labels);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          349,
+          0
+        ],
+        [
+          444,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_name_write",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "list": "ares_llist_t",
+          "validate_hostname": "ares_bool_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t is_reservedch(int ch)\n{\n  switch (ch) {\n    case '\"':\n    case '.':\n    case ';':\n    case '\\\\':\n    case '(':\n    case ')':\n    case '@':\n    case '$':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          447,
+          0
+        ],
+        [
+          464,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "is_reservedch",
+        "parameters": {
+          "ch": "int"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_fetch_dnsname_into_buf(ares_buf_t *buf,\n                                                 ares_buf_t *dest, size_t len,\n                                                 ares_bool_t is_hostname)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_peek(buf, &remaining_len);\n  ares_status_t        status;\n  size_t               i;\n\n  if (buf == NULL || len == 0 || remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  for (i = 0; i < len; i++) {\n    unsigned char c = ptr[i];\n\n    /* Hostnames have a very specific allowed character set.  Anything outside\n     * of that (non-printable and reserved included) are disallowed */\n    if (is_hostname && !ares_is_hostnamech(c)) {\n      status = ARES_EBADRESP;\n      goto fail;\n    }\n\n    /* NOTE: dest may be NULL if the user is trying to skip the name. validation\n     *       still occurs above. */\n    if (dest == NULL) {\n      continue;\n    }\n\n    /* Non-printable characters need to be output as \\DDD */\n    if (!ares_isprint(c)) {\n      unsigned char escape[4];\n\n      escape[0] = '\\\\';\n      escape[1] = '0' + (c / 100);\n      escape[2] = '0' + ((c % 100) / 10);\n      escape[3] = '0' + (c % 10);\n\n      status = ares_buf_append(dest, escape, sizeof(escape));\n      if (status != ARES_SUCCESS) {\n        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n\n      continue;\n    }\n\n    /* Reserved characters need to be escaped, otherwise normal */\n    if (is_reservedch(c)) {\n      status = ares_buf_append_byte(dest, '\\\\');\n      if (status != ARES_SUCCESS) {\n        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n\n    status = ares_buf_append_byte(dest, c);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ares_buf_consume(buf, len);\n\nfail:\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          466,
+          0
+        ],
+        [
+          530,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_fetch_dnsname_into_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "dest": "ares_buf_t",
+          "len": "size_t",
+          "is_hostname": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_name_parse(ares_buf_t *buf, char **name,\n                                  ares_bool_t is_hostname)\n{\n  size_t        save_offset = 0;\n  unsigned char c;\n  ares_status_t status;\n  ares_buf_t   *namebuf     = NULL;\n  size_t        label_start = ares_buf_get_position(buf);\n\n  if (buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (name != NULL) {\n    namebuf = ares_buf_create();\n    if (namebuf == NULL) {\n      status = ARES_ENOMEM;\n      goto fail;\n    }\n  }\n\n  /* The compression scheme allows a domain name in a message to be\n   * represented as either:\n   *\n   * - a sequence of labels ending in a zero octet\n   * - a pointer\n   * - a sequence of labels ending with a pointer\n   */\n  while (1) {\n    /* Keep track of the minimum label starting position to prevent forward\n     * jumping */\n    if (label_start > ares_buf_get_position(buf)) {\n      label_start = ares_buf_get_position(buf);\n    }\n\n    status = ares_buf_fetch_bytes(buf, &c, 1);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n\n    /* Pointer/Redirect */\n    if ((c & 0xc0) == 0xc0) {\n      /* The pointer takes the form of a two octet sequence:\n       *\n       *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n       *   | 1  1|                OFFSET                   |\n       *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n       *\n       * The first two bits are ones.  This allows a pointer to be distinguished\n       * from a label, since the label must begin with two zero bits because\n       * labels are restricted to 63 octets or less.  (The 10 and 01\n       * combinations are reserved for future use.)  The OFFSET field specifies\n       * an offset from the start of the message (i.e., the first octet of the\n       * ID field in the domain header).  A zero offset specifies the first byte\n       * of the ID field, etc.\n       */\n      size_t offset = (size_t)((c & 0x3F) << 8);\n\n      /* Fetch second byte of the redirect length */\n      status = ares_buf_fetch_bytes(buf, &c, 1);\n      if (status != ARES_SUCCESS) {\n        goto fail;\n      }\n\n      offset |= ((size_t)c);\n\n      /* According to RFC 1035 4.1.4:\n       *    In this scheme, an entire domain name or a list of labels at\n       *    the end of a domain name is replaced with a pointer to a prior\n       *    occurrence of the same name.\n       * Note the word \"prior\", meaning it must go backwards.  This was\n       * confirmed via the ISC BIND code that it also prevents forward\n       * pointers.\n       */\n      if (offset >= label_start) {\n        status = ARES_EBADNAME;\n        goto fail;\n      }\n\n      /* First time we make a jump, save the current position */\n      if (save_offset == 0) {\n        save_offset = ares_buf_get_position(buf);\n      }\n\n      status = ares_buf_set_position(buf, offset);\n      if (status != ARES_SUCCESS) {\n        status = ARES_EBADNAME;\n        goto fail;\n      }\n\n      continue;\n    } else if ((c & 0xc0) != 0) {\n      /* 10 and 01 are reserved */\n      status = ARES_EBADNAME;\n      goto fail;\n    } else if (c == 0) {\n      /* termination via zero octet*/\n      break;\n    }\n\n    /* New label */\n\n    /* Labels are separated by periods */\n    if (ares_buf_len(namebuf) != 0 && name != NULL) {\n      status = ares_buf_append_byte(namebuf, '.');\n      if (status != ARES_SUCCESS) {\n        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n\n    status = ares_fetch_dnsname_into_buf(buf, namebuf, c, is_hostname);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  /* Restore offset read after first redirect/pointer as this is where the DNS\n   * message continues */\n  if (save_offset) {\n    ares_buf_set_position(buf, save_offset);\n  }\n\n  if (name != NULL) {\n    *name = ares_buf_finish_str(namebuf, NULL);\n    if (*name == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ARES_SUCCESS;\n\nfail:\n  /* We want badname response if we couldn't parse */\n  if (status == ARES_EBADRESP) {\n    status = ARES_EBADNAME;\n  }\n\n  ares_buf_destroy(namebuf);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          532,
+          0
+        ],
+        [
+          672,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_name_parse",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "name": "char",
+          "is_hostname": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_nameoffset_find(ares_llist_t *list,\n                                                     const char   *name)",
+      "fn_dec_pos": [
+        [
+          85,
+          32
+        ],
+        [
+          86,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_nameoffset_find",
+        "parameters": {
+          "list": "ares_llist_t",
+          "name": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_labels_add(ares_array_t *labels)",
+      "fn_dec_pos": [
+        [
+          143,
+          19
+        ],
+        [
+          143,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_add",
+        "parameters": {
+          "labels": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_labels_get_last(ares_array_t *labels)",
+      "fn_dec_pos": [
+        [
+          164,
+          19
+        ],
+        [
+          164,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_get_last",
+        "parameters": {
+          "labels": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_labels_get_at(ares_array_t *labels, size_t idx)",
+      "fn_dec_pos": [
+        [
+          175,
+          19
+        ],
+        [
+          175,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_labels_get_at",
+        "parameters": {
+          "labels": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  char  *name;\n  size_t name_len;\n  size_t idx;\n} ares_nameoffset_t;",
+      {
+        "*name": "char",
+        "name_len": "size_t",
+        "idx": "size_t"
+      },
+      "ares_nameoffset_t",
+      [
+        27,
+        0
+      ],
+      [
+        31,
+        20
+      ]
+    ],
+    [
+      "typedef struct {\n  char  *name;\n  size_t name_len;\n  size_t idx;\n} ares_nameoffset_t;",
+      {
+        "*name": "char",
+        "name_len": "size_t",
+        "idx": "size_t"
+      },
+      "ares_nameoffset_t",
+      [
+        27,
+        0
+      ],
+      [
+        31,
+        20
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

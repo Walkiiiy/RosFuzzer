@@ -1,0 +1,393 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static char *ares_qcache_calc_key(const ares_dns_record_t *dnsrec)\n{\n  ares_buf_t      *buf = ares_buf_create();\n  size_t           i;\n  ares_status_t    status;\n  ares_dns_flags_t flags;\n\n  if (dnsrec == NULL || buf == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Format is OPCODE|FLAGS[|QTYPE1|QCLASS1|QNAME1]... */\n\n  status = ares_buf_append_str(\n    buf, ares_dns_opcode_tostr(ares_dns_record_get_opcode(dnsrec)));\n  if (status != ARES_SUCCESS) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_byte(buf, '|');\n  if (status != ARES_SUCCESS) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  flags = ares_dns_record_get_flags(dnsrec);\n  /* Only care about RD and CD */\n  if (flags & ARES_FLAG_RD) {\n    status = ares_buf_append_str(buf, \"rd\");\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n  if (flags & ARES_FLAG_CD) {\n    status = ares_buf_append_str(buf, \"cd\");\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  for (i = 0; i < ares_dns_record_query_cnt(dnsrec); i++) {\n    const char         *name;\n    size_t              name_len;\n    ares_dns_rec_type_t qtype;\n    ares_dns_class_t    qclass;\n\n    status = ares_dns_record_query_get(dnsrec, i, &name, &qtype, &qclass);\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    status = ares_buf_append_byte(buf, '|');\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_str(buf, ares_dns_rec_type_tostr(qtype));\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_byte(buf, '|');\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_str(buf, ares_dns_class_tostr(qclass));\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_byte(buf, '|');\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* On queries, a '.' may be appended to the name to indicate an explicit\n     * name lookup without performing a search.  Strip this since its not part\n     * of a cached response. */\n    name_len = ares_strlen(name);\n    if (name_len && name[name_len - 1] == '.') {\n      name_len--;\n    }\n\n    if (name_len > 0) {\n      status = ares_buf_append(buf, (const unsigned char *)name, name_len);\n      if (status != ARES_SUCCESS) {\n        goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  return ares_buf_finish_str(buf, NULL);\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  ares_buf_destroy(buf);\n  return NULL;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          40,
+          0
+        ],
+        [
+          138,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_calc_key",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static void ares_qcache_expire(ares_qcache_t *cache, const ares_timeval_t *now)\n{\n  ares_slist_node_t *node;\n\n  if (cache == NULL) {\n    return;\n  }\n\n  while ((node = ares_slist_node_first(cache->expire)) != NULL) {\n    const ares_qcache_entry_t *entry = ares_slist_node_val(node);\n\n    /* If now is NULL, we're flushing everything, so don't break */\n    if (now != NULL && entry->expire_ts > now->sec) {\n      break;\n    }\n\n    ares_htable_strvp_remove(cache->cache, entry->key);\n    ares_slist_node_destroy(node);\n  }\n}",
+      "fn_code_pos": [
+        [
+          140,
+          0
+        ],
+        [
+          159,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_expire",
+        "parameters": {
+          "cache": "ares_qcache_t",
+          "now": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_qcache_flush(ares_qcache_t *cache)\n{\n  ares_qcache_expire(cache, NULL /* flush all */);\n}",
+      "fn_code_pos": [
+        [
+          161,
+          0
+        ],
+        [
+          164,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_flush",
+        "parameters": {
+          "cache": "ares_qcache_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_qcache_destroy(ares_qcache_t *cache)\n{\n  if (cache == NULL) {\n    return;\n  }\n\n  ares_htable_strvp_destroy(cache->cache);\n  ares_slist_destroy(cache->expire);\n  ares_free(cache);\n}",
+      "fn_code_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          175,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_destroy",
+        "parameters": {
+          "cache": "ares_qcache_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static int ares_qcache_entry_sort_cb(const void *arg1, const void *arg2)\n{\n  const ares_qcache_entry_t *entry1 = arg1;\n  const ares_qcache_entry_t *entry2 = arg2;\n\n  if (entry1->expire_ts > entry2->expire_ts) {\n    return 1;\n  }\n\n  if (entry1->expire_ts < entry2->expire_ts) {\n    return -1;\n  }\n\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          177,
+          0
+        ],
+        [
+          191,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_entry_sort_cb",
+        "parameters": {
+          "arg1": "void",
+          "arg2": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static void ares_qcache_entry_destroy_cb(void *arg)\n{\n  ares_qcache_entry_t *entry = arg;\n  if (entry == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_free(entry->key);\n  ares_dns_record_destroy(entry->dnsrec);\n  ares_free(entry);\n}",
+      "fn_code_pos": [
+        [
+          193,
+          0
+        ],
+        [
+          203,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_entry_destroy_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_qcache_create(ares_rand_state *rand_state,\n                                 unsigned int     max_ttl,\n                                 ares_qcache_t  **cache_out)\n{\n  ares_status_t  status = ARES_SUCCESS;\n  ares_qcache_t *cache;\n\n  cache = ares_malloc_zero(sizeof(*cache));\n  if (cache == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  cache->cache = ares_htable_strvp_create(NULL);\n  if (cache->cache == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  cache->expire = ares_slist_create(rand_state, ares_qcache_entry_sort_cb,\n                                    ares_qcache_entry_destroy_cb);\n  if (cache->expire == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  cache->max_ttl = max_ttl;\n\ndone:\n  if (status != ARES_SUCCESS) {\n    *cache_out = NULL;\n    ares_qcache_destroy(cache);\n    return status;\n  }\n\n  *cache_out = cache;\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          205,
+          0
+        ],
+        [
+          242,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_create",
+        "parameters": {
+          "rand_state": "ares_rand_state",
+          "max_ttl": "unsigned int",
+          "cache_out": "ares_qcache_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static unsigned int ares_qcache_calc_minttl(ares_dns_record_t *dnsrec)\n{\n  unsigned int minttl = 0xFFFFFFFF;\n  size_t       sect;\n\n  for (sect = ARES_SECTION_ANSWER; sect <= ARES_SECTION_ADDITIONAL; sect++) {\n    size_t i;\n    for (i = 0; i < ares_dns_record_rr_cnt(dnsrec, (ares_dns_section_t)sect);\n         i++) {\n      const ares_dns_rr_t *rr =\n        ares_dns_record_rr_get(dnsrec, (ares_dns_section_t)sect, i);\n      ares_dns_rec_type_t type = ares_dns_rr_get_type(rr);\n      unsigned int        ttl  = ares_dns_rr_get_ttl(rr);\n\n      /* TTL is meaningless on these record types */\n      if (type == ARES_REC_TYPE_OPT || type == ARES_REC_TYPE_SOA ||\n          type == ARES_REC_TYPE_SIG) {\n        continue;\n      }\n\n      if (ttl < minttl) {\n        minttl = ttl;\n      }\n    }\n  }\n\n  return minttl;\n}",
+      "fn_code_pos": [
+        [
+          244,
+          0
+        ],
+        [
+          271,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_calc_minttl",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static unsigned int ares_qcache_soa_minimum(ares_dns_record_t *dnsrec)\n{\n  size_t i;\n\n  /* RFC 2308 Section 5 says its the minimum of MINIMUM and the TTL of the\n   * record. */\n  for (i = 0; i < ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_AUTHORITY); i++) {\n    const ares_dns_rr_t *rr =\n      ares_dns_record_rr_get(dnsrec, ARES_SECTION_AUTHORITY, i);\n    ares_dns_rec_type_t type = ares_dns_rr_get_type(rr);\n    unsigned int        ttl;\n    unsigned int        minimum;\n\n    if (type != ARES_REC_TYPE_SOA) {\n      continue;\n    }\n\n    minimum = ares_dns_rr_get_u32(rr, ARES_RR_SOA_MINIMUM);\n    ttl     = ares_dns_rr_get_ttl(rr);\n\n    if (ttl > minimum) {\n      return minimum;\n    }\n    return ttl;\n  }\n\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          273,
+          0
+        ],
+        [
+          300,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_soa_minimum",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_qcache_insert_int(ares_qcache_t           *qcache,\n                                            ares_dns_record_t       *qresp,\n                                            const ares_dns_record_t *qreq,\n                                            const ares_timeval_t    *now)\n{\n  ares_qcache_entry_t *entry;\n  unsigned int         ttl;\n  ares_dns_rcode_t     rcode = ares_dns_record_get_rcode(qresp);\n  ares_dns_flags_t     flags = ares_dns_record_get_flags(qresp);\n\n  if (qcache == NULL || qresp == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* Only save NOERROR or NXDOMAIN */\n  if (rcode != ARES_RCODE_NOERROR && rcode != ARES_RCODE_NXDOMAIN) {\n    return ARES_ENOTIMP;\n  }\n\n  /* Don't save truncated queries */\n  if (flags & ARES_FLAG_TC) {\n    return ARES_ENOTIMP;\n  }\n\n  /* Look at SOA for NXDOMAIN for minimum */\n  if (rcode == ARES_RCODE_NXDOMAIN) {\n    ttl = ares_qcache_soa_minimum(qresp);\n  } else {\n    ttl = ares_qcache_calc_minttl(qresp);\n  }\n\n  if (ttl > qcache->max_ttl) {\n    ttl = qcache->max_ttl;\n  }\n\n  /* Don't cache something that is already expired */\n  if (ttl == 0) {\n    return ARES_EREFUSED;\n  }\n\n  entry = ares_malloc_zero(sizeof(*entry));\n  if (entry == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  entry->dnsrec    = qresp;\n  entry->expire_ts = (time_t)now->sec + (time_t)ttl;\n  entry->insert_ts = (time_t)now->sec;\n\n  /* We can't guarantee the server responded with the same flags as the\n   * request had, so we have to re-parse the request in order to generate the\n   * key for caching, but we'll only do this once we know for sure we really\n   * want to cache it */\n  entry->key = ares_qcache_calc_key(qreq);\n  if (entry->key == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (!ares_htable_strvp_insert(qcache->cache, entry->key, entry)) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (ares_slist_insert(qcache->expire, entry) == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  if (entry != NULL && entry->key != NULL) {\n    ares_htable_strvp_remove(qcache->cache, entry->key);\n    ares_free(entry->key);\n    ares_free(entry);\n  }\n  return ARES_ENOMEM;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          303,
+          0
+        ],
+        [
+          380,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_insert_int",
+        "parameters": {
+          "qcache": "ares_qcache_t",
+          "qresp": "ares_dns_record_t",
+          "qreq": "ares_dns_record_t",
+          "now": "ares_timeval_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_qcache_fetch(ares_channel_t           *channel,\n                                const ares_timeval_t     *now,\n                                const ares_dns_record_t  *dnsrec,\n                                const ares_dns_record_t **dnsrec_resp)\n{\n  char                *key = NULL;\n  ares_qcache_entry_t *entry;\n  ares_status_t        status = ARES_SUCCESS;\n\n  if (channel == NULL || dnsrec == NULL || dnsrec_resp == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (channel->qcache == NULL) {\n    return ARES_ENOTFOUND;\n  }\n\n  ares_qcache_expire(channel->qcache, now);\n\n  key = ares_qcache_calc_key(dnsrec);\n  if (key == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  entry = ares_htable_strvp_get_direct(channel->qcache->cache, key);\n  if (entry == NULL) {\n    status = ARES_ENOTFOUND;\n    goto done;\n  }\n\n  ares_dns_record_ttl_decrement(entry->dnsrec,\n                                (unsigned int)(now->sec - entry->insert_ts));\n\n  *dnsrec_resp = entry->dnsrec;\n\ndone:\n  ares_free(key);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          382,
+          0
+        ],
+        [
+          421,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_fetch",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "now": "ares_timeval_t",
+          "dnsrec": "ares_dns_record_t",
+          "dnsrec_resp": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_qcache_insert(ares_channel_t          *channel,\n                                 const ares_timeval_t    *now,\n                                 const ares_query_t      *query,\n                                 const ares_dns_record_t *dnsrec)\n{\n  ares_dns_record_t *dupdns = ares_dns_record_duplicate(dnsrec);\n  ares_status_t      status;\n\n  if (dupdns == NULL) {\n    return ARES_ENOMEM;\n  }\n  status = ares_qcache_insert_int(channel->qcache, dupdns, query->query, now);\n  if (status != ARES_SUCCESS) {\n    ares_dns_record_destroy(dupdns);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          423,
+          0
+        ],
+        [
+          439,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_insert",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "now": "ares_timeval_t",
+          "query": "ares_query_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_qcache_calc_key(const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          40,
+          13
+        ],
+        [
+          40,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_calc_key",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_qcache {\n  ares_htable_strvp_t *cache;\n  ares_slist_t        *expire;\n  unsigned int         max_ttl;\n}",
+      {
+        "*cache": "ares_htable_strvp_t",
+        "*expire": "ares_slist_t",
+        "max_ttl": "unsigned int"
+      },
+      "ares_qcache",
+      [
+        27,
+        0
+      ],
+      [
+        31,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  char              *key;\n  ares_dns_record_t *dnsrec;\n  time_t             expire_ts;\n  time_t             insert_ts;\n} ares_qcache_entry_t;",
+      {
+        "*key": "char",
+        "*dnsrec": "ares_dns_record_t",
+        "expire_ts": "time_t",
+        "insert_ts": "time_t"
+      },
+      "ares_qcache_entry_t",
+      [
+        33,
+        0
+      ],
+      [
+        38,
+        22
+      ]
+    ],
+    [
+      "struct ares_qcache {\n  ares_htable_strvp_t *cache;\n  ares_slist_t        *expire;\n  unsigned int         max_ttl;\n}",
+      {
+        "*cache": "ares_htable_strvp_t",
+        "*expire": "ares_slist_t",
+        "max_ttl": "unsigned int"
+      },
+      "ares_qcache",
+      [
+        27,
+        0
+      ],
+      [
+        31,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  char              *key;\n  ares_dns_record_t *dnsrec;\n  time_t             expire_ts;\n  time_t             insert_ts;\n} ares_qcache_entry_t;",
+      {
+        "*key": "char",
+        "*dnsrec": "ares_dns_record_t",
+        "expire_ts": "time_t",
+        "insert_ts": "time_t"
+      },
+      "ares_qcache_entry_t",
+      [
+        33,
+        0
+      ],
+      [
+        38,
+        22
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

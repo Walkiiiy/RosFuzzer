@@ -1,0 +1,343 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_sockaddr_addr_eq(const struct sockaddr  *sa,\n                                      const struct ares_addr *aa)",
+      "fn_dec_pos": [
+        [
+          141,
+          16
+        ],
+        [
+          142,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sockaddr_addr_eq",
+        "parameters": {
+          "sa": "struct sockaddr",
+          "aa": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_configure(ares_channel_t *channel, int family,\n                                      ares_bool_t is_tcp, ares_socket_t fd)",
+      "fn_dec_pos": [
+        [
+          143,
+          16
+        ],
+        [
+          144,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_configure",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "family": "int",
+          "is_tcp": "ares_bool_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_enable_tfo(const ares_channel_t *channel,\n                                       ares_socket_t         fd)",
+      "fn_dec_pos": [
+        [
+          145,
+          16
+        ],
+        [
+          146,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_enable_tfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_open(ares_socket_t *sock, ares_channel_t *channel,\n                                 int af, int type, int protocol)",
+      "fn_dec_pos": [
+        [
+          147,
+          16
+        ],
+        [
+          148,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_open",
+        "parameters": {
+          "sock": "ares_socket_t",
+          "channel": "ares_channel_t",
+          "af": "int",
+          "type": "int",
+          "protocol": "int"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_try_again(int errnum)",
+      "fn_dec_pos": [
+        [
+          149,
+          16
+        ],
+        [
+          149,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_try_again",
+        "parameters": {
+          "errnum": "int"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_close(ares_channel_t *channel, ares_socket_t s)",
+      "fn_dec_pos": [
+        [
+          150,
+          16
+        ],
+        [
+          150,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_close",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_socket_connect(ares_channel_t *channel,\n                                    ares_socket_t sockfd, ares_bool_t is_tfo,\n                                    const struct sockaddr *addr,\n                                    ares_socklen_t         addrlen)",
+      "fn_dec_pos": [
+        [
+          151,
+          16
+        ],
+        [
+          154,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_connect",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sockfd": "ares_socket_t",
+          "is_tfo": "ares_bool_t",
+          "addr": "struct sockaddr",
+          "addrlen": "ares_socklen_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_sockaddr_to_ares_addr(struct ares_addr      *ares_addr,\n                                           unsigned short        *port,\n                                           const struct sockaddr *sockaddr)",
+      "fn_dec_pos": [
+        [
+          155,
+          16
+        ],
+        [
+          157,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sockaddr_to_ares_addr",
+        "parameters": {
+          "ares_addr": "struct ares_addr",
+          "port": "unsigned short",
+          "sockaddr": "struct sockaddr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_write(ares_channel_t *channel, ares_socket_t fd,\n                                  const void *data, size_t len, size_t *written,\n                                  const struct sockaddr *sa,\n                                  ares_socklen_t         salen)",
+      "fn_dec_pos": [
+        [
+          158,
+          16
+        ],
+        [
+          161,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_write",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "len": "size_t",
+          "written": "size_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        141,
+        44
+      ],
+      [
+        141,
+        59
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        142,
+        44
+      ],
+      [
+        142,
+        60
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        153,
+        42
+      ],
+      [
+        153,
+        57
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        155,
+        43
+      ],
+      [
+        155,
+        59
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        157,
+        49
+      ],
+      [
+        157,
+        64
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        160,
+        40
+      ],
+      [
+        160,
+        55
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_CONN_ERR_SUCCESS      = 0,  /*!< Success */\n  ARES_CONN_ERR_WOULDBLOCK   = 1,  /*!< Operation would block */\n  ARES_CONN_ERR_CONNCLOSED   = 2,  /*!< Connection closed (gracefully) */\n  ARES_CONN_ERR_CONNABORTED  = 3,  /*!< Connection Aborted */\n  ARES_CONN_ERR_CONNRESET    = 4,  /*!< Connection Reset */\n  ARES_CONN_ERR_CONNREFUSED  = 5,  /*!< Connection Refused */\n  ARES_CONN_ERR_CONNTIMEDOUT = 6,  /*!< Connection Timed Out */\n  ARES_CONN_ERR_HOSTDOWN     = 7,  /*!< Host Down */\n  ARES_CONN_ERR_HOSTUNREACH  = 8,  /*!< Host Unreachable */\n  ARES_CONN_ERR_NETDOWN      = 9,  /*!< Network Down */\n  ARES_CONN_ERR_NETUNREACH   = 10, /*!< Network Unreachable */\n  ARES_CONN_ERR_INTERRUPT    = 11, /*!< Call interrupted by signal, repeat */\n  ARES_CONN_ERR_AFNOSUPPORT  = 12, /*!< Address family not supported */\n  ARES_CONN_ERR_BADADDR      = 13, /*!< Bad Address / Unavailable */\n  ARES_CONN_ERR_NOMEM        = 14, /*!< Out of memory */\n  ARES_CONN_ERR_INVALID      = 15, /*!< Invalid Usage */\n  ARES_CONN_ERR_TOOLARGE     = 16, /*!< Request size too large */\n  ARES_CONN_ERR_NOTIMP       = 17, /*!< Not implemented */\n  ARES_CONN_ERR_FAILURE      = 99  /*!< Generic failure */\n} ares_conn_err_t;",
+      {
+        "ARES_CONN_ERR_SUCCESS": "",
+        "ARES_CONN_ERR_WOULDBLOCK": "",
+        "ARES_CONN_ERR_CONNCLOSED": "",
+        "ARES_CONN_ERR_CONNABORTED": "",
+        "ARES_CONN_ERR_CONNRESET": "",
+        "ARES_CONN_ERR_CONNREFUSED": "",
+        "ARES_CONN_ERR_CONNTIMEDOUT": "",
+        "ARES_CONN_ERR_HOSTDOWN": "",
+        "ARES_CONN_ERR_HOSTUNREACH": "",
+        "ARES_CONN_ERR_NETDOWN": "",
+        "ARES_CONN_ERR_NETUNREACH": "",
+        "ARES_CONN_ERR_INTERRUPT": "",
+        "ARES_CONN_ERR_AFNOSUPPORT": "",
+        "ARES_CONN_ERR_BADADDR": "",
+        "ARES_CONN_ERR_NOMEM": "",
+        "ARES_CONN_ERR_INVALID": "",
+        "ARES_CONN_ERR_TOOLARGE": "",
+        "ARES_CONN_ERR_NOTIMP": "",
+        "ARES_CONN_ERR_FAILURE": ""
+      },
+      "ares_conn_err_t",
+      [
+        119,
+        0
+      ],
+      [
+        139,
+        18
+      ]
+    ]
+  ]
+}

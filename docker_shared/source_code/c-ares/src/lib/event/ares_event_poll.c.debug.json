@@ -1,0 +1,192 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_bool_t ares_evsys_poll_init(ares_event_thread_t *e)\n{\n  e->ev_signal = ares_pipeevent_create(e);\n  if (e->ev_signal == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          41,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_init",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_poll_destroy(ares_event_thread_t *e)\n{\n  (void)e;\n}",
+      "fn_code_pos": [
+        [
+          43,
+          0
+        ],
+        [
+          46,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_destroy",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_poll_event_add(ares_event_t *event)\n{\n  (void)event;\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          48,
+          0
+        ],
+        [
+          52,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_event_add",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_poll_event_del(ares_event_t *event)\n{\n  (void)event;\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_event_del",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_poll_event_mod(ares_event_t      *event,\n                                      ares_event_flags_t new_flags)\n{\n  (void)event;\n  (void)new_flags;\n}",
+      "fn_code_pos": [
+        [
+          59,
+          0
+        ],
+        [
+          64,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_event_mod",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_evsys_poll_wait(ares_event_thread_t *e,\n                                   unsigned long        timeout_ms)\n{\n  size_t         num_fds = 0;\n  ares_socket_t *fdlist  = ares_htable_asvp_keys(e->ev_sock_handles, &num_fds);\n  struct pollfd *pollfd  = NULL;\n  int            rv;\n  size_t         cnt = 0;\n  size_t         i;\n\n  if (fdlist != NULL && num_fds) {\n    pollfd = ares_malloc_zero(sizeof(*pollfd) * num_fds);\n    if (pollfd == NULL) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    for (i = 0; i < num_fds; i++) {\n      const ares_event_t *ev =\n        ares_htable_asvp_get_direct(e->ev_sock_handles, fdlist[i]);\n      pollfd[i].fd = ev->fd;\n      if (ev->flags & ARES_EVENT_FLAG_READ) {\n        pollfd[i].events |= POLLIN;\n      }\n      if (ev->flags & ARES_EVENT_FLAG_WRITE) {\n        pollfd[i].events |= POLLOUT;\n      }\n    }\n  }\n  ares_free(fdlist);\n\n  rv = poll(pollfd, (nfds_t)num_fds, (timeout_ms == 0) ? -1 : (int)timeout_ms);\n  if (rv <= 0) {\n    goto done;\n  }\n\n  for (i = 0; pollfd != NULL && i < num_fds; i++) {\n    ares_event_t      *ev;\n    ares_event_flags_t flags = 0;\n\n    if (pollfd[i].revents == 0) {\n      continue;\n    }\n\n    cnt++;\n\n    ev = ares_htable_asvp_get_direct(e->ev_sock_handles, pollfd[i].fd);\n    if (ev == NULL || ev->cb == NULL) {\n      continue; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    if (pollfd[i].revents & (POLLERR | POLLHUP | POLLIN)) {\n      flags |= ARES_EVENT_FLAG_READ;\n    }\n\n    if (pollfd[i].revents & POLLOUT) {\n      flags |= ARES_EVENT_FLAG_WRITE;\n    }\n\n    ev->cb(e, pollfd[i].fd, ev->data, flags);\n  }\n\ndone:\n  ares_free(pollfd);\n  return cnt;\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          129,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_poll_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct pollfd",
+      {},
+      "",
+      [
+        71,
+        2
+      ],
+      [
+        71,
+        15
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <poll.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

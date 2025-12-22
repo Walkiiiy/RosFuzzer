@@ -1,0 +1,165 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_freeaddrinfo_cnames(struct ares_addrinfo_cname *head)\n{\n  struct ares_addrinfo_cname *current;\n  while (head) {\n    current = head;\n    head    = head->next;\n    ares_free(current->alias);\n    ares_free(current->name);\n    ares_free(current);\n  }\n}",
+      "fn_code_pos": [
+        [
+          33,
+          0
+        ],
+        [
+          43,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo_cnames",
+        "parameters": {
+          "head": "struct ares_addrinfo_cname"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_freeaddrinfo_nodes(struct ares_addrinfo_node *head)\n{\n  struct ares_addrinfo_node *current;\n  while (head) {\n    current = head;\n    head    = head->ai_next;\n    ares_free(current->ai_addr);\n    ares_free(current);\n  }\n}",
+      "fn_code_pos": [
+        [
+          45,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo_nodes",
+        "parameters": {
+          "head": "struct ares_addrinfo_node"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_freeaddrinfo(struct ares_addrinfo *ai)\n{\n  if (ai == NULL) {\n    return;\n  }\n  ares_freeaddrinfo_cnames(ai->cnames);\n  ares_freeaddrinfo_nodes(ai->nodes);\n\n  ares_free(ai->name);\n  ares_free(ai);\n}",
+      "fn_code_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          66,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo",
+        "parameters": {
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        33,
+        30
+      ],
+      [
+        33,
+        56
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        35,
+        2
+      ],
+      [
+        35,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        45,
+        29
+      ],
+      [
+        45,
+        54
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        47,
+        2
+      ],
+      [
+        47,
+        27
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        56,
+        23
+      ],
+      [
+        56,
+        43
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

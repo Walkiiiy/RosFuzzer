@@ -1,0 +1,273 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static int ares_inet_net_pton_ipv4(const char *src, unsigned char *dst,\n                                   size_t size)\n{\n  static const char    xdigits[] = \"0123456789abcdef\";\n  static const char    digits[]  = \"0123456789\";\n  int                  n;\n  int                  ch;\n  int                  tmp = 0;\n  int                  dirty;\n  int                  bits;\n  const unsigned char *odst = dst;\n\n  memset(dst, 0, size);\n  ch = *src++;\n  if (ch == '0' && (src[0] == 'x' || src[0] == 'X') && ares_isascii(src[1]) &&\n      ares_isxdigit(src[1])) {\n    /* Hexadecimal: Eat nybble string. */\n    if (!size) {\n      goto emsgsize;\n    }\n    dirty = 0;\n    src++; /* skip x or X. */\n    while ((ch = *src++) != '\\0' && ares_isascii(ch) && ares_isxdigit(ch)) {\n      if (ares_isupper(ch)) {\n        ch = ares_tolower((unsigned char)ch);\n      }\n      n = (int)(strchr(xdigits, ch) - xdigits);\n      if (dirty == 0) {\n        tmp = n;\n      } else {\n        tmp = (tmp << 4) | n;\n      }\n      if (++dirty == 2) {\n        if (!size--) {\n          goto emsgsize;\n        }\n        *dst++ = (unsigned char)tmp;\n        dirty  = 0;\n      }\n    }\n    if (dirty) { /* Odd trailing nybble? */\n      if (!size--) {\n        goto emsgsize;\n      }\n      *dst++ = (unsigned char)(tmp << 4);\n    }\n  } else if (ares_isascii(ch) && ares_isdigit(ch)) {\n    /* Decimal: eat dotted digit string. */\n    for (;;) {\n      tmp = 0;\n      do {\n        n    = (int)(strchr(digits, ch) - digits);\n        tmp *= 10;\n        tmp += n;\n        if (tmp > 255) {\n          goto enoent;\n        }\n      } while ((ch = *src++) != '\\0' && ares_isascii(ch) && ares_isdigit(ch));\n      if (!size--) {\n        goto emsgsize;\n      }\n      *dst++ = (unsigned char)tmp;\n      if (ch == '\\0' || ch == '/') {\n        break;\n      }\n      if (ch != '.') {\n        goto enoent;\n      }\n      ch = *src++;\n      if (!ares_isascii(ch) || !ares_isdigit(ch)) {\n        goto enoent;\n      }\n    }\n  } else {\n    goto enoent;\n  }\n\n  bits = -1;\n  if (ch == '/' && ares_isascii(src[0]) && ares_isdigit(src[0]) && dst > odst) {\n    /* CIDR width specifier.  Nothing can follow it. */\n    ch   = *src++; /* Skip over the /. */\n    bits = 0;\n    do {\n      n     = (int)(strchr(digits, ch) - digits);\n      bits *= 10;\n      bits += n;\n      if (bits > 32) {\n        goto enoent;\n      }\n    } while ((ch = *src++) != '\\0' && ares_isascii(ch) && ares_isdigit(ch));\n    if (ch != '\\0') {\n      goto enoent;\n    }\n  }\n\n  /* Firey death and destruction unless we prefetched EOS. */\n  if (ch != '\\0') {\n    goto enoent;\n  }\n\n  /* If nothing was written to the destination, we found no address. */\n  if (dst == odst) {\n    goto enoent; /* LCOV_EXCL_LINE: all valid paths above increment dst */\n  }\n  /* If no CIDR spec was given, infer width from net class. */\n  if (bits == -1) {\n    if (*odst >= 240) {        /* Class E */\n      bits = 32;\n    } else if (*odst >= 224) { /* Class D */\n      bits = 8;\n    } else if (*odst >= 192) { /* Class C */\n      bits = 24;\n    } else if (*odst >= 128) { /* Class B */\n      bits = 16;\n    } else {                   /* Class A */\n      bits = 8;\n    }\n    /* If imputed mask is narrower than specified octets, widen. */\n    if (bits < ((dst - odst) * 8)) {\n      bits = (int)(dst - odst) * 8;\n    }\n    /*\n     * If there are no additional bits specified for a class D\n     * address adjust bits to 4.\n     */\n    if (bits == 8 && *odst == 224) {\n      bits = 4;\n    }\n  }\n  /* Extend network to cover the actual mask. */\n  while (bits > ((dst - odst) * 8)) {\n    if (!size--) {\n      goto emsgsize;\n    }\n    *dst++ = '\\0';\n  }\n  return bits;\n\nenoent:\n  SET_SOCKERRNO(ENOENT);\n  return -1;\n\nemsgsize:\n  SET_SOCKERRNO(EMSGSIZE);\n  return -1;\n}",
+      "fn_code_pos": [
+        [
+          72,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_net_pton_ipv4",
+        "parameters": {
+          "src": "char",
+          "dst": "unsigned char",
+          "size": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int getbits(const char *src, size_t *bitsp)\n{\n  static const char digits[] = \"0123456789\";\n  size_t            n;\n  size_t            val;\n  char              ch;\n\n  val = 0;\n  n   = 0;\n  while ((ch = *src++) != '\\0') {\n    const char *pch;\n\n    pch = strchr(digits, ch);\n    if (pch != NULL) {\n      if (n++ != 0 && val == 0) { /* no leading zeros */\n        return 0;\n      }\n      val *= 10;\n      val += (size_t)(pch - digits);\n      if (val > 128) { /* range */\n        return 0;\n      }\n      continue;\n    }\n    return 0;\n  }\n  if (n == 0) {\n    return 0;\n  }\n  *bitsp = val;\n  return 1;\n}",
+      "fn_code_pos": [
+        [
+          219,
+          0
+        ],
+        [
+          250,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "getbits",
+        "parameters": {
+          "src": "char",
+          "bitsp": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int ares_inet_pton6(const char *src, unsigned char *dst)\n{\n  static const char xdigits_l[] = \"0123456789abcdef\";\n  static const char xdigits_u[] = \"0123456789ABCDEF\";\n  unsigned char     tmp[NS_IN6ADDRSZ];\n  unsigned char    *tp;\n  unsigned char    *endp;\n  unsigned char    *colonp;\n  const char       *xdigits;\n  const char       *curtok;\n  int               ch;\n  int               saw_xdigit;\n  int               count_xdigit;\n  unsigned int      val;\n\n  memset((tp = tmp), '\\0', NS_IN6ADDRSZ);\n  endp   = tp + NS_IN6ADDRSZ;\n  colonp = NULL;\n  /* Leading :: requires some special handling. */\n  if (*src == ':') {\n    if (*++src != ':') {\n      goto enoent;\n    }\n  }\n  curtok     = src;\n  saw_xdigit = count_xdigit = 0;\n  val                       = 0;\n  while ((ch = *src++) != '\\0') {\n    const char *pch;\n\n    if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL) {\n      pch = strchr((xdigits = xdigits_u), ch);\n    }\n    if (pch != NULL) {\n      if (count_xdigit >= 4) {\n        goto enoent;\n      }\n      val <<= 4;\n      val  |= (unsigned int)(pch - xdigits);\n      if (val > 0xffff) {\n        goto enoent;\n      }\n      saw_xdigit = 1;\n      count_xdigit++;\n      continue;\n    }\n    if (ch == ':') {\n      curtok = src;\n      if (!saw_xdigit) {\n        if (colonp) {\n          goto enoent;\n        }\n        colonp = tp;\n        continue;\n      } else if (*src == '\\0') {\n        goto enoent;\n      }\n      if (tp + NS_INT16SZ > endp) {\n        goto enoent;\n      }\n      *tp++        = (unsigned char)(val >> 8) & 0xff;\n      *tp++        = (unsigned char)val & 0xff;\n      saw_xdigit   = 0;\n      count_xdigit = 0;\n      val          = 0;\n      continue;\n    }\n    if (ch == '.' && ((tp + NS_INADDRSZ) <= endp) &&\n        ares_inet_net_pton_ipv4(curtok, tp, NS_INADDRSZ) > 0) {\n      tp         += NS_INADDRSZ;\n      saw_xdigit  = 0;\n      break; /* '\\0' was seen by inet_pton4(). */\n    }\n    goto enoent;\n  }\n  if (saw_xdigit) {\n    if (tp + NS_INT16SZ > endp) {\n      goto enoent;\n    }\n    *tp++ = (unsigned char)(val >> 8) & 0xff;\n    *tp++ = (unsigned char)val & 0xff;\n  }\n  if (colonp != NULL) {\n    /*\n     * Since some memmove()'s erroneously fail to handle\n     * overlapping regions, we'll do the shift by hand.\n     */\n    const int n = (int)(tp - colonp);\n    int       i;\n\n    if (tp == endp) {\n      goto enoent;\n    }\n    for (i = 1; i <= n; i++) {\n      endp[-i]      = colonp[n - i];\n      colonp[n - i] = 0;\n    }\n    tp = endp;\n  }\n  if (tp != endp) {\n    goto enoent;\n  }\n\n  memcpy(dst, tmp, NS_IN6ADDRSZ);\n  return 1;\n\nenoent:\n  SET_SOCKERRNO(ENOENT);\n  return -1;\n}",
+      "fn_code_pos": [
+        [
+          252,
+          0
+        ],
+        [
+          361,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_pton6",
+        "parameters": {
+          "src": "char",
+          "dst": "unsigned char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int ares_inet_net_pton_ipv6(const char *src, unsigned char *dst,\n                                   size_t size)\n{\n  struct ares_in6_addr in6;\n  int                  ret;\n  size_t               bits;\n  size_t               bytes;\n  char                 buf[INET6_ADDRSTRLEN + sizeof(\"/128\")];\n  char                *sep;\n\n  if (ares_strlen(src) >= sizeof buf) {\n    SET_SOCKERRNO(EMSGSIZE);\n    return -1;\n  }\n  ares_strcpy(buf, src, sizeof buf);\n\n  sep = strchr(buf, '/');\n  if (sep != NULL) {\n    *sep++ = '\\0';\n  }\n\n  ret = ares_inet_pton6(buf, (unsigned char *)&in6);\n  if (ret != 1) {\n    return -1;\n  }\n\n  if (sep == NULL) {\n    bits = 128;\n  } else {\n    if (!getbits(sep, &bits)) {\n      SET_SOCKERRNO(ENOENT);\n      return -1;\n    }\n  }\n\n  bytes = (bits + 7) / 8;\n  if (bytes > size) {\n    SET_SOCKERRNO(EMSGSIZE);\n    return -1;\n  }\n  memcpy(dst, &in6, bytes);\n  return (int)bits;\n}",
+      "fn_code_pos": [
+        [
+          363,
+          0
+        ],
+        [
+          405,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_net_pton_ipv6",
+        "parameters": {
+          "src": "char",
+          "dst": "unsigned char",
+          "size": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_inet_net_pton(int af, const char *src, void *dst, size_t size)\n{\n  switch (af) {\n    case AF_INET:\n      return ares_inet_net_pton_ipv4(src, dst, size);\n    case AF_INET6:\n      return ares_inet_net_pton_ipv6(src, dst, size);\n    default:\n      return -1;\n  }\n}",
+      "fn_code_pos": [
+        [
+          421,
+          0
+        ],
+        [
+          431,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_net_pton",
+        "parameters": {
+          "af": "int",
+          "src": "char",
+          "dst": "void",
+          "size": "size_t"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_inet_pton(int af, const char *src, void *dst)\n{\n  int    result;\n  size_t size;\n\n  if (af == AF_INET) {\n    size = sizeof(struct in_addr);\n  } else if (af == AF_INET6) {\n    size = sizeof(struct ares_in6_addr);\n  } else {\n    SET_SOCKERRNO(EAFNOSUPPORT);\n    return -1;\n  }\n  result = ares_inet_net_pton(af, src, dst, size);\n  if (result == -1 && SOCKERRNO == ENOENT) {\n    return 0;\n  }\n  return (result > -1) ? 1 : -1;\n}",
+      "fn_code_pos": [
+        [
+          433,
+          0
+        ],
+        [
+          451,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_inet_pton",
+        "parameters": {
+          "af": "int",
+          "src": "char",
+          "dst": "void"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        48,
+        6
+      ],
+      [
+        48,
+        26
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        366,
+        2
+      ],
+      [
+        366,
+        22
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        439,
+        18
+      ],
+      [
+        439,
+        32
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        441,
+        18
+      ],
+      [
+        441,
+        38
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        20,
+        0
+      ],
+      [
+        21,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        23,
+        0
+      ],
+      [
+        24,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_ipv6.h\"\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_inet_net_pton.h\"\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

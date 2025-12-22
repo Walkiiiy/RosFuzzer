@@ -1,0 +1,119 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "int ares_parse_ns_reply(const unsigned char *abuf, int alen_int,\n                        struct hostent **host)\n{\n  ares_status_t      status;\n  size_t             alen;\n  size_t             nscount  = 0;\n  struct hostent    *hostent  = NULL;\n  const char        *hostname = NULL;\n  ares_dns_record_t *dnsrec   = NULL;\n  size_t             i;\n  size_t             ancount;\n\n  *host = NULL;\n\n  if (alen_int < 0) {\n    return ARES_EBADRESP;\n  }\n\n  alen = (size_t)alen_int;\n\n  status = ares_dns_parse(abuf, alen, 0, &dnsrec);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  ancount = ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER);\n  if (ancount == 0) {\n    status = ARES_ENODATA;\n    goto done;\n  }\n\n  /* Response structure */\n  hostent = ares_malloc(sizeof(*hostent));\n  if (hostent == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  memset(hostent, 0, sizeof(*hostent));\n\n  hostent->h_addr_list = ares_malloc(sizeof(*hostent->h_addr_list));\n  if (hostent->h_addr_list == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  hostent->h_addr_list[0] = NULL;\n  hostent->h_addrtype     = AF_INET;\n  hostent->h_length       = sizeof(struct in_addr);\n\n  /* Fill in hostname */\n  status = ares_dns_record_query_get(dnsrec, 0, &hostname, NULL, NULL);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  hostent->h_name = ares_strdup(hostname);\n  if (hostent->h_name == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Preallocate the maximum number + 1 */\n  hostent->h_aliases = ares_malloc((ancount + 1) * sizeof(*hostent->h_aliases));\n  if (hostent->h_aliases == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  memset(hostent->h_aliases, 0, (ancount + 1) * sizeof(*hostent->h_aliases));\n\n  for (i = 0; i < ancount; i++) {\n    const ares_dns_rr_t *rr =\n      ares_dns_record_rr_get(dnsrec, ARES_SECTION_ANSWER, i);\n\n    if (rr == NULL) {\n      /* Shouldn't be possible */\n      status = ARES_EBADRESP; /* LCOV_EXCL_LINE: DefensiveCoding */\n      goto done;              /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    if (ares_dns_rr_get_class(rr) != ARES_CLASS_IN ||\n        ares_dns_rr_get_type(rr) != ARES_REC_TYPE_NS) {\n      continue;\n    }\n\n    hostname = ares_dns_rr_get_str(rr, ARES_RR_NS_NSDNAME);\n    if (hostname == NULL) {\n      status = ARES_EBADRESP; /* LCOV_EXCL_LINE: DefensiveCoding */\n      goto done;              /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    hostent->h_aliases[nscount] = ares_strdup(hostname);\n    if (hostent->h_aliases[nscount] == NULL) {\n      status = ARES_ENOMEM;\n      goto done;\n    }\n    nscount++;\n  }\n\n  if (nscount == 0) {\n    status = ARES_ENODATA;\n  } else {\n    status = ARES_SUCCESS;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_free_hostent(hostent);\n    /* Compatibility */\n    if (status == ARES_EBADNAME) {\n      status = ARES_EBADRESP;\n    }\n  } else {\n    *host = hostent;\n  }\n  ares_dns_record_destroy(dnsrec);\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          38,
+          0
+        ],
+        [
+          153,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_ns_reply",
+        "parameters": {
+          "abuf": "unsigned char",
+          "alen_int": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        39,
+        24
+      ],
+      [
+        39,
+        38
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        44,
+        2
+      ],
+      [
+        44,
+        16
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        85,
+        35
+      ],
+      [
+        85,
+        49
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

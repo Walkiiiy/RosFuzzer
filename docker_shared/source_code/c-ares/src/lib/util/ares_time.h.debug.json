@@ -1,0 +1,136 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_timedout(const ares_timeval_t *now,\n                          const ares_timeval_t *check)",
+      "fn_dec_pos": [
+        [
+          37,
+          12
+        ],
+        [
+          38,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timedout",
+        "parameters": {
+          "now": "ares_timeval_t",
+          "check": "ares_timeval_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_tvnow(ares_timeval_t *now)",
+      "fn_dec_pos": [
+        [
+          40,
+          12
+        ],
+        [
+          40,
+          43
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tvnow",
+        "parameters": {
+          "now": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_timeval_remaining(ares_timeval_t       *remaining,\n                                   const ares_timeval_t *now,\n                                   const ares_timeval_t *tout)",
+      "fn_dec_pos": [
+        [
+          41,
+          12
+        ],
+        [
+          43,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeval_remaining",
+        "parameters": {
+          "remaining": "ares_timeval_t",
+          "now": "ares_timeval_t",
+          "tout": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_timeval_diff(ares_timeval_t *tvdiff, const ares_timeval_t *tvstart,\n                       const ares_timeval_t *tvstop)",
+      "fn_dec_pos": [
+        [
+          44,
+          5
+        ],
+        [
+          45,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timeval_diff",
+        "parameters": {
+          "tvdiff": "ares_timeval_t",
+          "tvstart": "ares_timeval_t",
+          "tvstop": "ares_timeval_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  ares_int64_t sec;  /*!< Seconds */\n  unsigned int usec; /*!< Microseconds. Can't be negative. */\n} ares_timeval_t;",
+      {
+        "sec": "ares_int64_t",
+        "usec": "unsigned int"
+      },
+      "ares_timeval_t",
+      [
+        31,
+        0
+      ],
+      [
+        34,
+        17
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_int64_t sec;  /*!< Seconds */\n  unsigned int usec; /*!< Microseconds. Can't be negative. */\n} ares_timeval_t;",
+      {
+        "sec": "ares_int64_t",
+        "usec": "unsigned int"
+      },
+      "ares_timeval_t",
+      [
+        31,
+        0
+      ],
+      [
+        34,
+        17
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

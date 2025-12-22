@@ -1,0 +1,1686 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_subdelim(char x)\n{\n  switch (x) {\n    case '!':\n      return ARES_TRUE;\n    case '$':\n      return ARES_TRUE;\n    case '&':\n      return ARES_TRUE;\n    case '\\'':\n      return ARES_TRUE;\n    case '(':\n      return ARES_TRUE;\n    case ')':\n      return ARES_TRUE;\n    case '*':\n      return ARES_TRUE;\n    case '+':\n      return ARES_TRUE;\n    case ',':\n      return ARES_TRUE;\n    case ';':\n      return ARES_TRUE;\n    case '=':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          67,
+          0
+        ],
+        [
+          96,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_subdelim",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_gendelim(char x)\n{\n  switch (x) {\n    case ':':\n      return ARES_TRUE;\n    case '/':\n      return ARES_TRUE;\n    case '?':\n      return ARES_TRUE;\n    case '#':\n      return ARES_TRUE;\n    case '[':\n      return ARES_TRUE;\n    case ']':\n      return ARES_TRUE;\n    case '@':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          100,
+          0
+        ],
+        [
+          121,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_gendelim",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_reserved(char x)\n{\n  return ares_uri_chis_gendelim(x) || ares_uri_chis_subdelim(x);\n}",
+      "fn_code_pos": [
+        [
+          124,
+          0
+        ],
+        [
+          127,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_reserved",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_unreserved(char x)\n{\n  switch (x) {\n    case '-':\n      return ARES_TRUE;\n    case '.':\n      return ARES_TRUE;\n    case '_':\n      return ARES_TRUE;\n    case '~':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ares_isalpha(x) || ares_isdigit(x);\n}",
+      "fn_code_pos": [
+        [
+          130,
+          0
+        ],
+        [
+          145,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_unreserved",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_scheme(char x)\n{\n  switch (x) {\n    case '+':\n      return ARES_TRUE;\n    case '-':\n      return ARES_TRUE;\n    case '.':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ares_isalpha(x) || ares_isdigit(x);\n}",
+      "fn_code_pos": [
+        [
+          147,
+          0
+        ],
+        [
+          160,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_scheme",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_authority(char x)\n{\n  /* This one here isn't well defined.  We are going to include the valid\n   * characters of the subfields plus known delimiters */\n  return ares_uri_chis_unreserved(x) || ares_uri_chis_subdelim(x) || x == '%' ||\n         x == '[' || x == ']' || x == '@' || x == ':';\n}",
+      "fn_code_pos": [
+        [
+          162,
+          0
+        ],
+        [
+          168,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_authority",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_userinfo(char x)\n{\n  /* NOTE: we don't include ':' here since we are using that as our\n   *       username/password delimiter */\n  return ares_uri_chis_unreserved(x) || ares_uri_chis_subdelim(x);\n}",
+      "fn_code_pos": [
+        [
+          170,
+          0
+        ],
+        [
+          175,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_userinfo",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_path(char x)\n{\n  switch (x) {\n    case ':':\n      return ARES_TRUE;\n    case '@':\n      return ARES_TRUE;\n    /* '/' isn't in the spec as a path character since its technically a\n     * delimiter but we're not splitting on '/' so we accept it as valid */\n    case '/':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ares_uri_chis_unreserved(x) || ares_uri_chis_subdelim(x);\n}",
+      "fn_code_pos": [
+        [
+          177,
+          0
+        ],
+        [
+          192,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_path",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_path_enc(char x)\n{\n  return ares_uri_chis_path(x) || x == '%';\n}",
+      "fn_code_pos": [
+        [
+          194,
+          0
+        ],
+        [
+          197,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_path_enc",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_query(char x)\n{\n  switch (x) {\n    case '/':\n      return ARES_TRUE;\n    case '?':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n\n  /* Exclude & and = used as delimiters, they're valid characters in the\n   * set, just not for the individual pieces */\n  return ares_uri_chis_path(x) && x != '&' && x != '=';\n}",
+      "fn_code_pos": [
+        [
+          199,
+          0
+        ],
+        [
+          213,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_query",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_query_enc(char x)\n{\n  return ares_uri_chis_query(x) || x == '%';\n}",
+      "fn_code_pos": [
+        [
+          215,
+          0
+        ],
+        [
+          218,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_query_enc",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_fragment(char x)\n{\n  switch (x) {\n    case '/':\n      return ARES_TRUE;\n    case '?':\n      return ARES_TRUE;\n    default:\n      break;\n  }\n  return ares_uri_chis_path(x);\n}",
+      "fn_code_pos": [
+        [
+          220,
+          0
+        ],
+        [
+          231,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_fragment",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_chis_fragment_enc(char x)\n{\n  return ares_uri_chis_fragment(x) || x == '%';\n}",
+      "fn_code_pos": [
+        [
+          233,
+          0
+        ],
+        [
+          236,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_chis_fragment_enc",
+        "parameters": {
+          "x": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_t *ares_uri_create(void)\n{\n  ares_uri_t *uri = ares_malloc_zero(sizeof(*uri));\n\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  uri->query = ares_htable_dict_create();\n  if (uri->query == NULL) {\n    ares_free(uri);\n    return NULL;\n  }\n\n  return uri;\n}",
+      "fn_code_pos": [
+        [
+          238,
+          0
+        ],
+        [
+          253,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_create",
+        "parameters": {},
+        "return_type": "ares_uri_t"
+      }
+    },
+    {
+      "fn_code": "void ares_uri_destroy(ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return;\n  }\n\n  ares_free(uri->username);\n  ares_free(uri->password);\n  ares_free(uri->path);\n  ares_free(uri->fragment);\n  ares_htable_dict_destroy(uri->query);\n  ares_free(uri);\n}",
+      "fn_code_pos": [
+        [
+          255,
+          0
+        ],
+        [
+          267,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_destroy",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_scheme_is_valid(const char *uri)\n{\n  size_t i;\n\n  if (ares_strlen(uri) == 0) {\n    return ARES_FALSE;\n  }\n\n  if (!ares_isalpha(*uri)) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; uri[i] != 0; i++) {\n    if (!ares_uri_chis_scheme(uri[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          269,
+          0
+        ],
+        [
+          287,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_scheme_is_valid",
+        "parameters": {
+          "uri": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_uri_str_isvalid(const char *str, size_t max_len,\n                                        ares_bool_t (*ischr)(char))\n{\n  size_t i;\n\n  if (str == NULL) {\n    return ARES_FALSE;\n  }\n\n  for (i = 0; i != max_len && str[i] != 0; i++) {\n    if (!ischr(str[i])) {\n      return ARES_FALSE;\n    }\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          289,
+          0
+        ],
+        [
+          304,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_str_isvalid",
+        "parameters": {
+          "str": "char",
+          "max_len": "size_t",
+          "ischr": "ares_bool_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_scheme(ares_uri_t *uri, const char *scheme)\n{\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (!ares_uri_scheme_is_valid(scheme)) {\n    return ARES_EBADSTR;\n  }\n\n  ares_strcpy(uri->scheme, scheme, sizeof(uri->scheme));\n  ares_str_lower(uri->scheme);\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          306,
+          0
+        ],
+        [
+          320,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_scheme",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "scheme": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_scheme(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  return uri->scheme;\n}",
+      "fn_code_pos": [
+        [
+          322,
+          0
+        ],
+        [
+          329,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_scheme",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_set_username_own(ares_uri_t *uri, char *username)\n{\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (username != NULL && (!ares_str_isprint(username, ares_strlen(username)) ||\n                           ares_strlen(username) == 0)) {\n    return ARES_EBADSTR;\n  }\n\n\n  ares_free(uri->username);\n  uri->username = username;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          331,
+          0
+        ],
+        [
+          346,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_username_own",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "username": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_username(ares_uri_t *uri, const char *username)\n{\n  ares_status_t status;\n  char         *temp = NULL;\n\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (username != NULL) {\n    temp = ares_strdup(username);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  status = ares_uri_set_username_own(uri, temp);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          348,
+          0
+        ],
+        [
+          370,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_username",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "username": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_username(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  return uri->username;\n}",
+      "fn_code_pos": [
+        [
+          372,
+          0
+        ],
+        [
+          379,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_username",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_set_password_own(ares_uri_t *uri, char *password)\n{\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (password != NULL && !ares_str_isprint(password, ares_strlen(password))) {\n    return ARES_EBADSTR;\n  }\n\n  ares_free(uri->password);\n  uri->password = password;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          381,
+          0
+        ],
+        [
+          394,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_password_own",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "password": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_password(ares_uri_t *uri, const char *password)\n{\n  ares_status_t status;\n  char         *temp = NULL;\n\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (password != NULL) {\n    temp = ares_strdup(password);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  status = ares_uri_set_password_own(uri, temp);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          396,
+          0
+        ],
+        [
+          418,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_password",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "password": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_password(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  return uri->password;\n}",
+      "fn_code_pos": [
+        [
+          420,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_password",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_host(ares_uri_t *uri, const char *host)\n{\n  struct ares_addr addr;\n  size_t           addrlen;\n  char             hoststr[256];\n  char            *ll_scope;\n\n  if (uri == NULL || ares_strlen(host) == 0 ||\n      ares_strlen(host) >= sizeof(hoststr)) {\n    return ARES_EFORMERR;\n  }\n\n  ares_strcpy(hoststr, host, sizeof(hoststr));\n\n  /* Look for '%' which could be a link-local scope for ipv6 addresses and\n   * parse it off */\n  ll_scope = strchr(hoststr, '%');\n  if (ll_scope != NULL) {\n    *ll_scope = 0;\n    ll_scope++;\n    if (!ares_str_isalnum(ll_scope)) {\n      return ARES_EBADNAME;\n    }\n  }\n\n  /* If its an IP address, normalize it */\n  memset(&addr, 0, sizeof(addr));\n  addr.family = AF_UNSPEC;\n  if (ares_dns_pton(hoststr, &addr, &addrlen) != NULL) {\n    char ipaddr[INET6_ADDRSTRLEN];\n    ares_inet_ntop(addr.family, &addr.addr, ipaddr, sizeof(ipaddr));\n    /* Only IPv6 is allowed to have a scope */\n    if (ll_scope != NULL && addr.family != AF_INET6) {\n      return ARES_EBADNAME;\n    }\n\n    if (ll_scope != NULL) {\n      snprintf(uri->host, sizeof(uri->host), \"%s%%%s\", ipaddr, ll_scope);\n    } else {\n      ares_strcpy(uri->host, ipaddr, sizeof(uri->host));\n    }\n    return ARES_SUCCESS;\n  }\n\n  /* If its a hostname, make sure its a valid charset */\n  if (!ares_is_hostname(host)) {\n    return ARES_EBADNAME;\n  }\n\n  ares_strcpy(uri->host, host, sizeof(uri->host));\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          429,
+          0
+        ],
+        [
+          480,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_host",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "host": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_host(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  return uri->host;\n}",
+      "fn_code_pos": [
+        [
+          482,
+          0
+        ],
+        [
+          489,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_host",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_port(ares_uri_t *uri, unsigned short port)\n{\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n  uri->port = port;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          491,
+          0
+        ],
+        [
+          498,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_port",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "port": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "unsigned short ares_uri_get_port(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return 0;\n  }\n  return uri->port;\n}",
+      "fn_code_pos": [
+        [
+          500,
+          0
+        ],
+        [
+          506,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_port",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static char *ares_uri_path_normalize(const char *path)\n{\n  ares_status_t status;\n  ares_array_t *arr     = NULL;\n  ares_buf_t   *outpath = NULL;\n  ares_buf_t   *inpath  = NULL;\n  ares_ssize_t  i;\n  size_t        j;\n  size_t        len;\n\n  inpath =\n    ares_buf_create_const((const unsigned char *)path, ares_strlen(path));\n  if (inpath == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  outpath = ares_buf_create();\n  if (outpath == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  status = ares_buf_split_str_array(inpath, (const unsigned char *)\"/\", 1,\n                                    ARES_BUF_SPLIT_TRIM, 0, &arr);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  for (i = 0; i < (ares_ssize_t)ares_array_len(arr); i++) {\n    const char **strptr = ares_array_at(arr, (size_t)i);\n    const char  *str    = *strptr;\n\n    if (ares_streq(str, \".\")) {\n      ares_array_remove_at(arr, (size_t)i);\n      i--;\n    } else if (ares_streq(str, \"..\")) {\n      if (i != 0) {\n        ares_array_remove_at(arr, (size_t)i - 1);\n        i--;\n      }\n      ares_array_remove_at(arr, (size_t)i);\n      i--;\n    }\n  }\n\n  status = ares_buf_append_byte(outpath, '/');\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  len = ares_array_len(arr);\n  for (j = 0; j < len; j++) {\n    const char **strptr = ares_array_at(arr, j);\n    const char  *str    = *strptr;\n    status              = ares_buf_append_str(outpath, str);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    /* Path separator, but on the last entry, we need to check if it was\n     * originally terminated or not because they have different meanings */\n    if (j != len - 1 || path[ares_strlen(path) - 1] == '/') {\n      status = ares_buf_append_byte(outpath, '/');\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n  }\n\ndone:\n  ares_array_destroy(arr);\n  ares_buf_destroy(inpath);\n  if (status != ARES_SUCCESS) {\n    ares_buf_destroy(outpath);\n    return NULL;\n  }\n\n  return ares_buf_finish_str(outpath, NULL);\n}",
+      "fn_code_pos": [
+        [
+          509,
+          0
+        ],
+        [
+          588,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_path_normalize",
+        "parameters": {
+          "path": "char"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_path(ares_uri_t *uri, const char *path)\n{\n  char *temp = NULL;\n\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (path != NULL && !ares_str_isprint(path, ares_strlen(path))) {\n    return ARES_EBADSTR;\n  }\n\n  if (path != NULL) {\n    temp = ares_uri_path_normalize(path);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  ares_free(uri->path);\n  uri->path = temp;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          590,
+          0
+        ],
+        [
+          613,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_path",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "path": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_path(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n\n  return uri->path;\n}",
+      "fn_code_pos": [
+        [
+          615,
+          0
+        ],
+        [
+          622,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_path",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_query_key(ares_uri_t *uri, const char *key,\n                                     const char *val)\n{\n  if (uri == NULL || key == NULL || *key == 0) {\n    return ARES_EFORMERR;\n  }\n\n  if (!ares_str_isprint(key, ares_strlen(key)) ||\n      (val != NULL && !ares_str_isprint(val, ares_strlen(val)))) {\n    return ARES_EBADSTR;\n  }\n\n  if (!ares_htable_dict_insert(uri->query, key, val)) {\n    return ARES_ENOMEM;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          624,
+          0
+        ],
+        [
+          640,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char",
+          "val": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_del_query_key(ares_uri_t *uri, const char *key)\n{\n  if (uri == NULL || key == NULL || *key == 0 ||\n      !ares_str_isprint(key, ares_strlen(key))) {\n    return ARES_EFORMERR;\n  }\n\n  if (!ares_htable_dict_remove(uri->query, key)) {\n    return ARES_ENOTFOUND;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          642,
+          0
+        ],
+        [
+          654,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_del_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_query_key(const ares_uri_t *uri, const char *key)\n{\n  if (uri == NULL || key == NULL || *key == 0 ||\n      !ares_str_isprint(key, ares_strlen(key))) {\n    return NULL;\n  }\n\n  return ares_htable_dict_get_direct(uri->query, key);\n}",
+      "fn_code_pos": [
+        [
+          656,
+          0
+        ],
+        [
+          664,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "char **ares_uri_get_query_keys(const ares_uri_t *uri, size_t *num)\n{\n  if (uri == NULL || num == NULL) {\n    return NULL;\n  }\n\n  return ares_htable_dict_keys(uri->query, num);\n}",
+      "fn_code_pos": [
+        [
+          666,
+          0
+        ],
+        [
+          673,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_set_fragment_own(ares_uri_t *uri, char *fragment)\n{\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (fragment != NULL && !ares_str_isprint(fragment, ares_strlen(fragment))) {\n    return ARES_EBADSTR;\n  }\n\n  ares_free(uri->fragment);\n  uri->fragment = fragment;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          675,
+          0
+        ],
+        [
+          688,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_fragment_own",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "fragment": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_set_fragment(ares_uri_t *uri, const char *fragment)\n{\n  ares_status_t status;\n  char         *temp = NULL;\n\n  if (uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (fragment != NULL) {\n    temp = ares_strdup(fragment);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  status = ares_uri_set_fragment_own(uri, temp);\n  if (status != ARES_SUCCESS) {\n    ares_free(temp);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          690,
+          0
+        ],
+        [
+          712,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_fragment",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "fragment": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_uri_get_fragment(const ares_uri_t *uri)\n{\n  if (uri == NULL) {\n    return NULL;\n  }\n  return uri->fragment;\n}",
+      "fn_code_pos": [
+        [
+          714,
+          0
+        ],
+        [
+          720,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_fragment",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_encode_buf(ares_buf_t *buf, const char *str,\n                                         ares_bool_t (*ischr)(char))\n{\n  size_t i;\n\n  if (buf == NULL || str == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  for (i = 0; str[i] != 0; i++) {\n    if (ischr(str[i])) {\n      if (ares_buf_append_byte(buf, (unsigned char)str[i]) != ARES_SUCCESS) {\n        return ARES_ENOMEM;\n      }\n    } else {\n      if (ares_buf_append_byte(buf, '%') != ARES_SUCCESS) {\n        return ARES_ENOMEM;\n      }\n      if (ares_buf_append_num_hex(buf, (size_t)str[i], 2) != ARES_SUCCESS) {\n        return ARES_ENOMEM;\n      }\n    }\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          722,
+          0
+        ],
+        [
+          746,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_encode_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char",
+          "ischr": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_write_scheme(const ares_uri_t *uri,\n                                           ares_buf_t       *buf)\n{\n  ares_status_t status;\n\n  status = ares_buf_append_str(buf, uri->scheme);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_buf_append_str(buf, \"://\");\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          748,
+          0
+        ],
+        [
+          761,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_scheme",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_write_authority(const ares_uri_t *uri,\n                                              ares_buf_t       *buf)\n{\n  ares_status_t status;\n  ares_bool_t   is_ipv6 = ARES_FALSE;\n\n  if (ares_strlen(uri->username)) {\n    status = ares_uri_encode_buf(buf, uri->username, ares_uri_chis_userinfo);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  if (ares_strlen(uri->password)) {\n    status = ares_buf_append_byte(buf, ':');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    status = ares_uri_encode_buf(buf, uri->password, ares_uri_chis_userinfo);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  if (ares_strlen(uri->username) || ares_strlen(uri->password)) {\n    status = ares_buf_append_byte(buf, '@');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  /* We need to write ipv6 addresses with [ ] */\n  if (strchr(uri->host, '%') != NULL) {\n    /* If we have a % in the name, it must be ipv6 link local scope, so we\n     * don't need to check anything else */\n    is_ipv6 = ARES_TRUE;\n  } else {\n    /* Parse the host to see if it is an ipv6 address */\n    struct ares_addr addr;\n    size_t           addrlen;\n    memset(&addr, 0, sizeof(addr));\n    addr.family = AF_INET6;\n    if (ares_dns_pton(uri->host, &addr, &addrlen) != NULL) {\n      is_ipv6 = ARES_TRUE;\n    }\n  }\n\n  if (is_ipv6) {\n    status = ares_buf_append_byte(buf, '[');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  status = ares_buf_append_str(buf, uri->host);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (is_ipv6) {\n    status = ares_buf_append_byte(buf, ']');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  if (uri->port > 0) {\n    status = ares_buf_append_byte(buf, ':');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n    status = ares_buf_append_num_dec(buf, uri->port, 0);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          763,
+          0
+        ],
+        [
+          842,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_authority",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_write_path(const ares_uri_t *uri, ares_buf_t *buf)\n{\n  ares_status_t status;\n\n  if (ares_strlen(uri->path) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  if (*uri->path != '/') {\n    status = ares_buf_append_byte(buf, '/');\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  status = ares_uri_encode_buf(buf, uri->path, ares_uri_chis_path);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          844,
+          0
+        ],
+        [
+          865,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_path",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_write_query(const ares_uri_t *uri,\n                                          ares_buf_t       *buf)\n{\n  ares_status_t status;\n  char        **keys;\n  size_t        num_keys = 0;\n  size_t        i;\n\n  if (ares_htable_dict_num_keys(uri->query) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  keys = ares_uri_get_query_keys(uri, &num_keys);\n  if (keys == NULL || num_keys == 0) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_buf_append_byte(buf, '?');\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  for (i = 0; i < num_keys; i++) {\n    const char *val;\n\n    if (i != 0) {\n      status = ares_buf_append_byte(buf, '&');\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n\n    status = ares_uri_encode_buf(buf, keys[i], ares_uri_chis_query);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    val = ares_uri_get_query_key(uri, keys[i]);\n    if (val != NULL) {\n      status = ares_buf_append_byte(buf, '=');\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n\n      status = ares_uri_encode_buf(buf, val, ares_uri_chis_query);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n  }\n\ndone:\n  ares_free_array(keys, num_keys, ares_free);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          867,
+          0
+        ],
+        [
+          921,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_query",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_write_fragment(const ares_uri_t *uri,\n                                             ares_buf_t       *buf)\n{\n  ares_status_t status;\n\n  if (!ares_strlen(uri->fragment)) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_append_byte(buf, '#');\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_uri_encode_buf(buf, uri->fragment, ares_uri_chis_fragment);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          923,
+          0
+        ],
+        [
+          943,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_fragment",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_write_buf(const ares_uri_t *uri, ares_buf_t *buf)\n{\n  ares_status_t status;\n  size_t        orig_len;\n\n  if (uri == NULL || buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (ares_strlen(uri->scheme) == 0 || ares_strlen(uri->host) == 0) {\n    return ARES_ENODATA;\n  }\n\n  orig_len = ares_buf_len(buf);\n\n  status = ares_uri_write_scheme(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_write_authority(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_write_path(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_write_query(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_write_fragment(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_buf_set_length(buf, orig_len);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          945,
+          0
+        ],
+        [
+          990,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_buf",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_write(char **out, const ares_uri_t *uri)\n{\n  ares_buf_t   *buf;\n  ares_status_t status;\n\n  if (out == NULL || uri == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *out = NULL;\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_uri_write_buf(uri, buf);\n  if (status != ARES_SUCCESS) {\n    ares_buf_destroy(buf);\n    return status;\n  }\n\n  *out = ares_buf_finish_str(buf, NULL);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          992,
+          0
+        ],
+        [
+          1016,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write",
+        "parameters": {
+          "out": "char",
+          "uri": "ares_uri_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_decode_inplace(char *str, ares_bool_t is_query,\n                                             ares_bool_t must_be_printable,\n                                             size_t     *out_len)\n{\n  size_t i;\n  size_t len = 0;\n\n  for (i = 0; str[i] != 0; i++) {\n    if (is_query && str[i] == '+') {\n      str[len++] = ' ';\n      continue;\n    }\n\n    if (str[i] != '%') {\n      str[len++] = str[i];\n      continue;\n    }\n\n    if (!ares_isxdigit(str[i + 1]) || !ares_isxdigit(str[i + 2])) {\n      return ARES_EBADSTR;\n    }\n\n    str[len] = (char)(xdigit_val(str[i + 1]) << 4 | xdigit_val(str[i + 2]));\n\n    if (must_be_printable && !ares_isprint(str[len])) {\n      return ARES_EBADSTR;\n    }\n\n    len++;\n\n    i += 2;\n  }\n\n  str[len] = 0;\n\n  *out_len = len;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1023,
+          0
+        ],
+        [
+          1060,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_decode_inplace",
+        "parameters": {
+          "str": "char",
+          "is_query": "ares_bool_t",
+          "must_be_printable": "ares_bool_t",
+          "out_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_scheme(ares_uri_t *uri, ares_buf_t *buf)\n{\n  ares_status_t status;\n  size_t        bytes;\n  char          scheme[sizeof(uri->scheme)];\n\n  ares_buf_tag(buf);\n\n  bytes =\n    ares_buf_consume_until_seq(buf, (const unsigned char *)\"://\", 3, ARES_TRUE);\n  if (bytes == SIZE_MAX || bytes > sizeof(uri->scheme)) {\n    return ARES_EBADSTR;\n  }\n\n  status = ares_buf_tag_fetch_string(buf, scheme, sizeof(scheme));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_uri_set_scheme(uri, scheme);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Consume :// */\n  ares_buf_consume(buf, 3);\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1062,
+          0
+        ],
+        [
+          1090,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_scheme",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_userinfo(ares_uri_t *uri, ares_buf_t *buf)\n{\n  size_t        userinfo_len;\n  size_t        username_len;\n  ares_bool_t   has_password = ARES_FALSE;\n  char         *temp         = NULL;\n  ares_status_t status;\n  size_t        len;\n\n  ares_buf_tag(buf);\n\n  /* Search for @, if its not found, return */\n  userinfo_len = ares_buf_consume_until_charset(buf, (const unsigned char *)\"@\",\n                                                1, ARES_TRUE);\n\n  if (userinfo_len == SIZE_MAX) {\n    return ARES_SUCCESS;\n  }\n\n  /* Rollback since now we know there really is userinfo */\n  ares_buf_tag_rollback(buf);\n\n  /* Search for ':', if it isn't found or its past the '@' then we only have\n   * a username and no password */\n  ares_buf_tag(buf);\n  username_len = ares_buf_consume_until_charset(buf, (const unsigned char *)\":\",\n                                                1, ARES_TRUE);\n  if (username_len < userinfo_len) {\n    has_password = ARES_TRUE;\n    status       = ares_buf_tag_fetch_strdup(buf, &temp);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_uri_decode_inplace(temp, ARES_FALSE, ARES_TRUE, &len);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_uri_set_username_own(uri, temp);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n    temp = NULL;\n\n    /* Consume : */\n    ares_buf_consume(buf, 1);\n  }\n\n  ares_buf_tag(buf);\n  ares_buf_consume_until_charset(buf, (const unsigned char *)\"@\", 1, ARES_TRUE);\n  status = ares_buf_tag_fetch_strdup(buf, &temp);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_decode_inplace(temp, ARES_FALSE, ARES_TRUE, &len);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (has_password) {\n    status = ares_uri_set_password_own(uri, temp);\n  } else {\n    status = ares_uri_set_username_own(uri, temp);\n  }\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  temp = NULL;\n\n  /* Consume @ */\n  ares_buf_consume(buf, 1);\n\ndone:\n  ares_free(temp);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1092,
+          0
+        ],
+        [
+          1169,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_userinfo",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_hostport(ares_uri_t *uri, ares_buf_t *buf)\n{\n  unsigned char b;\n  char          host[256];\n  char          port[6];\n  size_t        len;\n  ares_status_t status;\n\n  status = ares_buf_peek_byte(buf, &b);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Bracketed syntax for ipv6 addresses */\n  if (b == '[') {\n    ares_buf_consume(buf, 1);\n    ares_buf_tag(buf);\n    len = ares_buf_consume_until_charset(buf, (const unsigned char *)\"]\", 1,\n                                         ARES_TRUE);\n    if (len == SIZE_MAX) {\n      return ARES_EBADSTR;\n    }\n\n    status = ares_buf_tag_fetch_string(buf, host, sizeof(host));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n    /* Consume ']' */\n    ares_buf_consume(buf, 1);\n  } else {\n    /* Either ipv4 or hostname */\n    ares_buf_tag(buf);\n    ares_buf_consume_until_charset(buf, (const unsigned char *)\":\", 1,\n                                   ARES_FALSE);\n\n    status = ares_buf_tag_fetch_string(buf, host, sizeof(host));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  status = ares_uri_set_host(uri, host);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* No port if nothing left to consume */\n  if (!ares_buf_len(buf)) {\n    return status;\n  }\n\n  status = ares_buf_peek_byte(buf, &b);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Only valid extra character at this point is ':' */\n  if (b != ':') {\n    return ARES_EBADSTR;\n  }\n  ares_buf_consume(buf, 1);\n\n  len = ares_buf_len(buf);\n  if (len == 0 || len > sizeof(port) - 1) {\n    return ARES_EBADSTR;\n  }\n\n  status = ares_buf_fetch_bytes(buf, (unsigned char *)port, len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n  port[len] = 0;\n\n  if (!ares_str_isnum(port)) {\n    return ARES_EBADSTR;\n  }\n\n  status = ares_uri_set_port(uri, (unsigned short)atoi(port));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1171,
+          0
+        ],
+        [
+          1254,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_hostport",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_authority(ares_uri_t *uri, ares_buf_t *buf)\n{\n  ares_status_t        status;\n  size_t               bytes;\n  ares_buf_t          *auth = NULL;\n  const unsigned char *ptr;\n  size_t               ptr_len;\n\n  ares_buf_tag(buf);\n\n  bytes = ares_buf_consume_until_charset(buf, (const unsigned char *)\"/?#\", 3,\n                                         ARES_FALSE);\n  if (bytes == 0) {\n    return ARES_EBADSTR;\n  }\n\n  status = ares_buf_tag_fetch_constbuf(buf, &auth);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  ptr = ares_buf_peek(auth, &ptr_len);\n  if (!ares_uri_str_isvalid((const char *)ptr, ptr_len,\n                            ares_uri_chis_authority)) {\n    status = ARES_EBADSTR;\n    goto done;\n  }\n\n  status = ares_uri_parse_userinfo(uri, auth);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_hostport(uri, auth);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* NOTE: the /, ?, or # is still in the buffer at this point so it can\n   *       be used to determine what parser should be called next */\n\ndone:\n  ares_buf_destroy(auth);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1256,
+          0
+        ],
+        [
+          1300,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_authority",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_path(ares_uri_t *uri, ares_buf_t *buf)\n{\n  unsigned char b;\n  char         *path = NULL;\n  ares_status_t status;\n  size_t        len;\n\n  if (ares_buf_len(buf) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_peek_byte(buf, &b);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Not a path, must be one of the others */\n  if (b != '/') {\n    return ARES_SUCCESS;\n  }\n\n  ares_buf_tag(buf);\n  ares_buf_consume_until_charset(buf, (const unsigned char *)\"?#\", 2,\n                                 ARES_FALSE);\n  status = ares_buf_tag_fetch_strdup(buf, &path);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (!ares_uri_str_isvalid(path, SIZE_MAX, ares_uri_chis_path_enc)) {\n    status = ARES_EBADSTR;\n    goto done;\n  }\n\n  status = ares_uri_decode_inplace(path, ARES_FALSE, ARES_TRUE, &len);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_set_path(uri, path);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_free(path);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1302,
+          0
+        ],
+        [
+          1349,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_path",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_query_buf(ares_uri_t *uri, ares_buf_t *buf)\n{\n  ares_status_t status = ARES_SUCCESS;\n  char         *key    = NULL;\n  char         *val    = NULL;\n\n  while (ares_buf_len(buf) > 0) {\n    unsigned char b = 0;\n    size_t        len;\n\n    ares_buf_tag(buf);\n\n    /* Its valid to have only a key with no value, so we search for both\n     * delims */\n    len = ares_buf_consume_until_charset(buf, (const unsigned char *)\"&=\", 2,\n                                         ARES_FALSE);\n    if (len == 0) {\n      /* If we're here, we have a zero length key which is invalid */\n      status = ARES_EBADSTR;\n      goto done;\n    }\n\n    if (ares_buf_len(buf) > 0) {\n      /* Determine if we stopped on & or = */\n      status = ares_buf_peek_byte(buf, &b);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n    }\n\n    status = ares_buf_tag_fetch_strdup(buf, &key);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    if (!ares_uri_str_isvalid(key, SIZE_MAX, ares_uri_chis_query_enc)) {\n      status = ARES_EBADSTR;\n      goto done;\n    }\n\n    status = ares_uri_decode_inplace(key, ARES_TRUE, ARES_TRUE, &len);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    /* Fetch Value */\n    if (b == '=') {\n      /* Skip delimiter */\n      ares_buf_consume(buf, 1);\n      ares_buf_tag(buf);\n      len = ares_buf_consume_until_charset(buf, (const unsigned char *)\"&\", 1,\n                                           ARES_FALSE);\n      if (len > 0) {\n        status = ares_buf_tag_fetch_strdup(buf, &val);\n        if (status != ARES_SUCCESS) {\n          goto done;\n        }\n\n        if (!ares_uri_str_isvalid(val, SIZE_MAX, ares_uri_chis_query_enc)) {\n          status = ARES_EBADSTR;\n          goto done;\n        }\n\n        status = ares_uri_decode_inplace(val, ARES_TRUE, ARES_TRUE, &len);\n        if (status != ARES_SUCCESS) {\n          goto done;\n        }\n      }\n    }\n\n    if (b != 0) {\n      /* Consume '&' */\n      ares_buf_consume(buf, 1);\n    }\n\n    status = ares_uri_set_query_key(uri, key, val);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    ares_free(key);\n    key = NULL;\n    ares_free(val);\n    val = NULL;\n  }\n\ndone:\n  ares_free(key);\n  ares_free(val);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1351,
+          0
+        ],
+        [
+          1441,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_query_buf",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_query(ares_uri_t *uri, ares_buf_t *buf)\n{\n  unsigned char b;\n  ares_status_t status;\n  ares_buf_t   *query = NULL;\n  size_t        len;\n\n  if (ares_buf_len(buf) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_peek_byte(buf, &b);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Not a query, must be one of the others */\n  if (b != '?') {\n    return ARES_SUCCESS;\n  }\n\n  /* Only possible terminator is fragment indicator of '#' */\n  ares_buf_consume(buf, 1);\n  ares_buf_tag(buf);\n  len = ares_buf_consume_until_charset(buf, (const unsigned char *)\"#\", 1,\n                                       ARES_FALSE);\n  if (len == 0) {\n    /* No data, return */\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_tag_fetch_constbuf(buf, &query);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_uri_parse_query_buf(uri, query);\n  ares_buf_destroy(query);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1443,
+          0
+        ],
+        [
+          1483,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_query",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_uri_parse_fragment(ares_uri_t *uri, ares_buf_t *buf)\n{\n  unsigned char b;\n  char         *fragment = NULL;\n  ares_status_t status;\n  size_t        len;\n\n  if (ares_buf_len(buf) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_peek_byte(buf, &b);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Not a fragment, must be one of the others */\n  if (b != '#') {\n    return ARES_SUCCESS;\n  }\n\n  ares_buf_consume(buf, 1);\n\n  if (ares_buf_len(buf) == 0) {\n    return ARES_SUCCESS;\n  }\n\n  /* Rest of the buffer is the fragment */\n  status = ares_buf_fetch_str_dup(buf, ares_buf_len(buf), &fragment);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (!ares_uri_str_isvalid(fragment, SIZE_MAX, ares_uri_chis_fragment_enc)) {\n    status = ARES_EBADSTR;\n    goto done;\n  }\n\n  status = ares_uri_decode_inplace(fragment, ARES_FALSE, ARES_TRUE, &len);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_set_fragment_own(uri, fragment);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  fragment = NULL;\n\ndone:\n  ares_free(fragment);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1485,
+          0
+        ],
+        [
+          1537,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_fragment",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_parse_buf(ares_uri_t **out, ares_buf_t *buf)\n{\n  ares_status_t status;\n  ares_uri_t   *uri = NULL;\n  size_t        orig_pos;\n\n  if (out == NULL || buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *out = NULL;\n\n  orig_pos = ares_buf_get_position(buf);\n\n  uri = ares_uri_create();\n  if (uri == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  status = ares_uri_parse_scheme(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_authority(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_path(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_query(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_fragment(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_buf_set_position(buf, orig_pos);\n    ares_uri_destroy(uri);\n  } else {\n    *out = uri;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1539,
+          0
+        ],
+        [
+          1592,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_buf",
+        "parameters": {
+          "out": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_uri_parse(ares_uri_t **out, const char *str)\n{\n  ares_status_t status;\n  ares_buf_t   *buf = NULL;\n\n  if (out == NULL || str == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *out = NULL;\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  status = ares_buf_append_str(buf, str);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_parse_buf(out, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_buf_destroy(buf);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1594,
+          0
+        ],
+        [
+          1625,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse",
+        "parameters": {
+          "out": "ares_uri_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_uri_create(void)",
+      "fn_dec_pos": [
+        [
+          238,
+          12
+        ],
+        [
+          238,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*ischr)(char)",
+      "fn_dec_pos": [
+        [
+          290,
+          52
+        ],
+        [
+          290,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_scheme(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          322,
+          12
+        ],
+        [
+          322,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_scheme",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_username(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          372,
+          12
+        ],
+        [
+          372,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_username",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_password(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          420,
+          12
+        ],
+        [
+          420,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_password",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_host(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          482,
+          12
+        ],
+        [
+          482,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_host",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_path_normalize(const char *path)",
+      "fn_dec_pos": [
+        [
+          509,
+          13
+        ],
+        [
+          509,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_path_normalize",
+        "parameters": {
+          "path": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_path(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          615,
+          12
+        ],
+        [
+          615,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_path",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_query_key(const ares_uri_t *uri, const char *key)",
+      "fn_dec_pos": [
+        [
+          656,
+          12
+        ],
+        [
+          656,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_query_keys(const ares_uri_t *uri, size_t *num)",
+      "fn_dec_pos": [
+        [
+          666,
+          7
+        ],
+        [
+          666,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_query_keys",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_fragment(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          714,
+          12
+        ],
+        [
+          714,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_fragment",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*ischr)(char)",
+      "fn_dec_pos": [
+        [
+          723,
+          53
+        ],
+        [
+          723,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "ares_bool_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_uri {\n  char                scheme[16];\n  char               *username;\n  char               *password;\n  unsigned short      port;\n  char                host[256];\n  char               *path;\n  ares_htable_dict_t *query;\n  char               *fragment;\n}",
+      {
+        "scheme[16]": "char",
+        "*username": "char",
+        "*password": "char",
+        "port": "unsigned short",
+        "host[256]": "char",
+        "*path": "char",
+        "*query": "ares_htable_dict_t",
+        "*fragment": "char"
+      },
+      "ares_uri",
+      [
+        33,
+        0
+      ],
+      [
+        42,
+        1
+      ]
+    ],
+    [
+      "struct ares_uri {\n  char                scheme[16];\n  char               *username;\n  char               *password;\n  unsigned short      port;\n  char                host[256];\n  char               *path;\n  ares_htable_dict_t *query;\n  char               *fragment;\n}",
+      {
+        "scheme[16]": "char",
+        "*username": "char",
+        "*password": "char",
+        "port": "unsigned short",
+        "host[256]": "char",
+        "*path": "char",
+        "*query": "ares_htable_dict_t",
+        "*fragment": "char"
+      },
+      "ares_uri",
+      [
+        33,
+        0
+      ],
+      [
+        42,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        431,
+        2
+      ],
+      [
+        431,
+        18
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        802,
+        4
+      ],
+      [
+        802,
+        20
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_uri.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

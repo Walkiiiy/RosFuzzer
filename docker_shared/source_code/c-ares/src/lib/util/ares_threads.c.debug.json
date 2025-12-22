@@ -1,0 +1,1663 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_thread_mutex_t *ares_thread_mutex_create(void)\n{\n  ares_thread_mutex_t *mut = ares_malloc_zero(sizeof(*mut));\n  if (mut == NULL) {\n    return NULL;\n  }\n\n  InitializeCriticalSection(&mut->mutex);\n  return mut;\n}",
+      "fn_code_pos": [
+        [
+          37,
+          0
+        ],
+        [
+          46,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": "ares_thread_mutex_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_destroy(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  DeleteCriticalSection(&mut->mutex);\n  ares_free(mut);\n}",
+      "fn_code_pos": [
+        [
+          48,
+          0
+        ],
+        [
+          55,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_destroy",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_lock(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  EnterCriticalSection(&mut->mutex);\n}",
+      "fn_code_pos": [
+        [
+          57,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_lock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_unlock(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  LeaveCriticalSection(&mut->mutex);\n}",
+      "fn_code_pos": [
+        [
+          65,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_unlock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_t *ares_thread_cond_create(void)\n{\n  ares_thread_cond_t *cond = ares_malloc_zero(sizeof(*cond));\n  if (cond == NULL) {\n    return NULL;\n  }\n  InitializeConditionVariable(&cond->cond);\n  return cond;\n}",
+      "fn_code_pos": [
+        [
+          79,
+          0
+        ],
+        [
+          87,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": "ares_thread_cond_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_destroy(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  ares_free(cond);\n}",
+      "fn_code_pos": [
+        [
+          89,
+          0
+        ],
+        [
+          95,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_destroy",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_signal(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  WakeConditionVariable(&cond->cond);\n}",
+      "fn_code_pos": [
+        [
+          97,
+          0
+        ],
+        [
+          103,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_signal",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_broadcast(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  WakeAllConditionVariable(&cond->cond);\n}",
+      "fn_code_pos": [
+        [
+          105,
+          0
+        ],
+        [
+          111,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_broadcast",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_wait(ares_thread_cond_t  *cond,\n                                    ares_thread_mutex_t *mut)\n{\n  if (cond == NULL || mut == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  SleepConditionVariableCS(&cond->cond, &mut->mutex, INFINITE);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          113,
+          0
+        ],
+        [
+          122,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_wait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_timedwait(ares_thread_cond_t  *cond,\n                                         ares_thread_mutex_t *mut,\n                                         size_t               timeout_ms)\n{\n  DWORD tout;\n\n  if (cond == NULL || mut == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (timeout_ms == SIZE_MAX) {\n    tout = INFINITE;\n  } else {\n    tout = (DWORD)timeout_ms;\n  }\n\n  if (!SleepConditionVariableCS(&cond->cond, &mut->mutex, tout)) {\n    return ARES_ETIMEOUT;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          124,
+          0
+        ],
+        [
+          145,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_timedwait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t",
+          "timeout_ms": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_t *ares_thread_cond_create(void)\n{\n  ares_thread_cond_t *cond;\n\n  cond = ares_malloc_zero(sizeof(*cond));\n  if (cond == NULL) {\n    return NULL;\n  }\n\n  cond->events[ARES_W32_COND_SIGNAL] = CreateEvent(NULL, FALSE, FALSE, NULL);\n  if (cond->events[ARES_W32_COND_SIGNAL] == NULL) {\n    goto fail;\n  }\n\n  cond->events[ARES_W32_COND_BROADCAST] = CreateEvent(NULL, TRUE, FALSE, NULL);\n  if (cond->events[ARES_W32_COND_BROADCAST] == NULL) {\n    goto fail;\n  }\n\n  /* Use a semaphore as a gate so we don't lose signals */\n  cond->gate = CreateSemaphore(NULL, 1, 1, NULL);\n  if (cond->gate == NULL) {\n    goto fail;\n  }\n\n  InitializeCriticalSection(&cond->mutex);\n  cond->waiters = 0;\n  cond->event   = ARES_W32_COND_NONE;\n\n  return cond;\n\nfail:\n  ares_thread_cond_destroy(cond);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          164,
+          0
+        ],
+        [
+          198,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": "ares_thread_cond_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_destroy(ares_thread_cond_t *cond)\n{\n  if (cond == NULL)\n    return;\n\n  if (cond->events[ARES_W32_COND_SIGNAL]) {\n    CloseHandle(cond->events[ARES_W32_COND_SIGNAL]);\n  }\n  if (cond->events[ARES_W32_COND_BROADCAST]) {\n    CloseHandle(cond->events[ARES_W32_COND_BROADCAST]);\n  }\n  if (cond->gate) {\n    CloseHandle(cond->gate);\n  }\n  DeleteCriticalSection(&cond->mutex);\n\n  ares_free(cond);\n}",
+      "fn_code_pos": [
+        [
+          200,
+          0
+        ],
+        [
+          217,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_destroy",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_timedwait(ares_thread_cond_t  *cond,\n                                         ares_thread_mutex_t *mut,\n                                         size_t               timeout_ms)\n{\n  DWORD rv;\n  DWORD dwMilliseconds;\n\n  if (cond == NULL || mut == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* We may only enter when no wakeups active this will prevent the lost\n   * wakeup */\n  WaitForSingleObject(cond->gate, INFINITE);\n\n  EnterCriticalSection(&cond->mutex);\n  /* count waiters passing through */\n  cond->waiters++;\n  LeaveCriticalSection(&cond->mutex);\n\n  /* Open Gate */\n  ReleaseSemaphore(cond->gate, 1, NULL);\n\n  /* Release passed in mutex */\n  ares_thread_mutex_unlock(mut);\n\n  if (timeout_ms == SIZE_MAX) {\n    dwMilliseconds = INFINITE;\n  } else {\n    dwMilliseconds = (DWORD)timeout_ms;\n  }\n  rv = WaitForMultipleObjects(ARES_W32_COND_EVMAX, cond->events, FALSE,\n                              dwMilliseconds);\n\n  /* We go into a critical section to make sure cond->waiters isn't checked\n   * while we decrement.  This is especially important for a timeout since the\n   * gate may not be closed. We need to check to see if a broadcast/signal was\n   * pending as this thread could have been preempted prior to\n   * EnterCriticalSection but after WaitForMultipleObjects() so we may be\n   * responsible for resetting the event and closing the gate */\n  EnterCriticalSection(&cond->mutex);\n  cond->waiters--;\n\n  if (cond->event != ARES_W32_COND_NONE && cond->waiters == 0) {\n    /* Last waiter needs to reset the event on(as a broadcast event is not\n     * automatic) and also re-open the gate */\n    if (cond->event == ARES_W32_COND_BROADCAST) {\n      ResetEvent(cond->events[ARES_W32_COND_BROADCAST]);\n    }\n\n    /* Open Gate (closed by ares_thread_cond_broadcast()) since there are no\n     * more waiters for the event */\n    ReleaseSemaphore(cond->gate, 1, NULL);\n    cond->event = ARES_W32_COND_NONE;\n  } else if (rv == WAIT_OBJECT_0 + ARES_W32_COND_SIGNAL) {\n    /* If specifically, this thread was signalled and there are more waiting,\n     * re-open the gate and reset the event */\n    ReleaseSemaphore(cond->gate, 1, NULL);\n    cond->event = ARES_W32_COND_NONE;\n  } else {\n    /* This could be a standard timeout with more waiters, don't do anything */\n  }\n  LeaveCriticalSection(&cond->mutex);\n\n  /* re-lock the passed in mutex */\n  ares_thread_mutex_lock(mut);\n\n  if (rv == WAIT_TIMEOUT) {\n    return ARES_ETIMEOUT;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          219,
+          0
+        ],
+        [
+          291,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_timedwait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t",
+          "timeout_ms": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_wait(ares_thread_cond_t  *cond,\n                                    ares_thread_mutex_t *mut)\n{\n  return ares_thread_cond_timedwait(cond, mut, SIZE_MAX);\n}",
+      "fn_code_pos": [
+        [
+          293,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_wait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_broadcast(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n\n  /* close gate to prevent more waiters while broadcasting */\n  WaitForSingleObject(cond->gate, INFINITE);\n\n  /* If there are waiters, send a broadcast event,\n   * otherwise, just reopen the gate */\n  EnterCriticalSection(&cond->mutex);\n\n  cond->event = ARES_W32_COND_BROADCAST;\n  if (cond->waiters) {\n    /* wake all waiters */\n    SetEvent(cond->events[ARES_W32_COND_BROADCAST]);\n  } else {\n    /* if no waiters just reopen gate */\n    ReleaseSemaphore(cond->gate, 1, NULL);\n  }\n\n  LeaveCriticalSection(&cond->mutex);\n}",
+      "fn_code_pos": [
+        [
+          299,
+          0
+        ],
+        [
+          322,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_broadcast",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_signal(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n\n  /* close gate to prevent more waiters while signalling */\n  WaitForSingleObject(cond->gate, INFINITE);\n\n  EnterCriticalSection(&cond->mutex);\n  cond->event = ARES_W32_COND_SIGNAL;\n  if (cond->waiters) {\n    /* wake one waiter */\n    SetEvent(cond->events[ARES_W32_COND_SIGNAL]);\n  } else {\n    /* no waiters, just reopen the gate */\n    ReleaseSemaphore(cond->gate, 1, NULL);\n  }\n  LeaveCriticalSection(&cond->mutex);\n}",
+      "fn_code_pos": [
+        [
+          324,
+          0
+        ],
+        [
+          343,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_signal",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static DWORD WINAPI ares_thread_func(LPVOID lpParameter)\n{\n  ares_thread_t *thread = lpParameter;\n\n  thread->rv = thread->func(thread->arg);\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          357,
+          0
+        ],
+        [
+          363,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_func",
+        "parameters": {
+          "lpParameter": "LPVOID"
+        },
+        "return_type": "DWORD"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_create(ares_thread_t    **thread,\n                                 ares_thread_func_t func, void *arg)\n{\n  ares_thread_t *thr = NULL;\n\n  if (func == NULL || thread == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  thr = ares_malloc_zero(sizeof(*thr));\n  if (thr == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  thr->func   = func;\n  thr->arg    = arg;\n  thr->thread = CreateThread(NULL, 0, ares_thread_func, thr, 0, &thr->id);\n  if (thr->thread == NULL) {\n    ares_free(thr);\n    return ARES_ESERVFAIL;\n  }\n\n  *thread = thr;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          365,
+          0
+        ],
+        [
+          389,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_create",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "func": "ares_thread_func_t",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_join(ares_thread_t *thread, void **rv)\n{\n  ares_status_t status = ARES_SUCCESS;\n\n  if (thread == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (WaitForSingleObject(thread->thread, INFINITE) != WAIT_OBJECT_0) {\n    status = ARES_ENOTFOUND;\n  } else {\n    CloseHandle(thread->thread);\n  }\n\n  if (status == ARES_SUCCESS && rv != NULL) {\n    *rv = thread->rv;\n  }\n  ares_free(thread);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          391,
+          0
+        ],
+        [
+          411,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_join",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "rv": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_t *ares_thread_mutex_create(void)\n{\n  pthread_mutexattr_t  attr;\n  ares_thread_mutex_t *mut = ares_malloc_zero(sizeof(*mut));\n  if (mut == NULL) {\n    return NULL;\n  }\n\n  if (pthread_mutexattr_init(&attr) != 0) {\n    ares_free(mut); /* LCOV_EXCL_LINE: UntestablePath */\n    return NULL;    /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  if (pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0) {\n    goto fail; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  if (pthread_mutex_init(&mut->mutex, &attr) != 0) {\n    goto fail; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  pthread_mutexattr_destroy(&attr);\n  return mut;\n\n/* LCOV_EXCL_START: UntestablePath */\nfail:\n  pthread_mutexattr_destroy(&attr);\n  ares_free(mut);\n  return NULL;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          430,
+          0
+        ],
+        [
+          460,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": "ares_thread_mutex_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_destroy(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  pthread_mutex_destroy(&mut->mutex);\n  ares_free(mut);\n}",
+      "fn_code_pos": [
+        [
+          462,
+          0
+        ],
+        [
+          469,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_destroy",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_lock(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  pthread_mutex_lock(&mut->mutex);\n}",
+      "fn_code_pos": [
+        [
+          471,
+          0
+        ],
+        [
+          477,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_lock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_unlock(ares_thread_mutex_t *mut)\n{\n  if (mut == NULL) {\n    return;\n  }\n  pthread_mutex_unlock(&mut->mutex);\n}",
+      "fn_code_pos": [
+        [
+          479,
+          0
+        ],
+        [
+          485,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_unlock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_t *ares_thread_cond_create(void)\n{\n  ares_thread_cond_t *cond = ares_malloc_zero(sizeof(*cond));\n  if (cond == NULL) {\n    return NULL;\n  }\n  pthread_cond_init(&cond->cond, NULL);\n  return cond;\n}",
+      "fn_code_pos": [
+        [
+          491,
+          0
+        ],
+        [
+          499,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": "ares_thread_cond_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_destroy(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  pthread_cond_destroy(&cond->cond);\n  ares_free(cond);\n}",
+      "fn_code_pos": [
+        [
+          501,
+          0
+        ],
+        [
+          508,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_destroy",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_signal(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  pthread_cond_signal(&cond->cond);\n}",
+      "fn_code_pos": [
+        [
+          510,
+          0
+        ],
+        [
+          516,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_signal",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_broadcast(ares_thread_cond_t *cond)\n{\n  if (cond == NULL) {\n    return;\n  }\n  pthread_cond_broadcast(&cond->cond);\n}",
+      "fn_code_pos": [
+        [
+          518,
+          0
+        ],
+        [
+          524,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_broadcast",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_wait(ares_thread_cond_t  *cond,\n                                    ares_thread_mutex_t *mut)\n{\n  if (cond == NULL || mut == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  pthread_cond_wait(&cond->cond, &mut->mutex);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          526,
+          0
+        ],
+        [
+          535,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_wait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_timespec_timeout(struct timespec *ts, size_t add_ms)\n{\n#    if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_REALTIME)\n  clock_gettime(CLOCK_REALTIME, ts);\n#    elif defined(HAVE_GETTIMEOFDAY)\n  struct timeval tv;\n  gettimeofday(&tv, NULL);\n  ts->tv_sec  = tv.tv_sec;\n  ts->tv_nsec = tv.tv_usec * 1000;\n#    else\n#      error cannot determine current system time\n#    endif\n\n  ts->tv_sec  += (time_t)(add_ms / 1000);\n  ts->tv_nsec += (long)((add_ms % 1000) * 1000000);\n\n  /* Normalize if needed */\n  if (ts->tv_nsec >= 1000000000) {\n    ts->tv_sec  += ts->tv_nsec / 1000000000;\n    ts->tv_nsec %= 1000000000;\n  }\n}",
+      "fn_code_pos": [
+        [
+          537,
+          0
+        ],
+        [
+          558,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_timespec_timeout",
+        "parameters": {
+          "ts": "struct timespec",
+          "add_ms": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_timedwait(ares_thread_cond_t  *cond,\n                                         ares_thread_mutex_t *mut,\n                                         size_t               timeout_ms)\n{\n  struct timespec ts;\n\n  if (cond == NULL || mut == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (timeout_ms == SIZE_MAX) {\n    return ares_thread_cond_wait(cond, mut);\n  }\n\n  ares_timespec_timeout(&ts, timeout_ms);\n\n  if (pthread_cond_timedwait(&cond->cond, &mut->mutex, &ts) != 0) {\n    return ARES_ETIMEOUT;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          560,
+          0
+        ],
+        [
+          581,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_timedwait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t",
+          "timeout_ms": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_create(ares_thread_t    **thread,\n                                 ares_thread_func_t func, void *arg)\n{\n  ares_thread_t *thr = NULL;\n\n  if (func == NULL || thread == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  thr = ares_malloc_zero(sizeof(*thr));\n  if (thr == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  if (pthread_create(&thr->thread, NULL, func, arg) != 0) {\n    ares_free(thr);        /* LCOV_EXCL_LINE: UntestablePath */\n    return ARES_ESERVFAIL; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  *thread = thr;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          587,
+          0
+        ],
+        [
+          607,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_create",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "func": "ares_thread_func_t",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_join(ares_thread_t *thread, void **rv)\n{\n  void         *ret    = NULL;\n  ares_status_t status = ARES_SUCCESS;\n\n  if (thread == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (pthread_join(thread->thread, &ret) != 0) {\n    status = ARES_ENOTFOUND;\n  }\n  ares_free(thread);\n\n  if (status == ARES_SUCCESS && rv != NULL) {\n    *rv = ret;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          609,
+          0
+        ],
+        [
+          627,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_join",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "rv": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_threadsafety(void)\n{\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          631,
+          0
+        ],
+        [
+          634,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_threadsafety",
+        "parameters": {},
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_t *ares_thread_mutex_create(void)\n{\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          639,
+          0
+        ],
+        [
+          642,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": "ares_thread_mutex_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_destroy(ares_thread_mutex_t *mut)\n{\n  (void)mut;\n}",
+      "fn_code_pos": [
+        [
+          644,
+          0
+        ],
+        [
+          647,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_destroy",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_lock(ares_thread_mutex_t *mut)\n{\n  (void)mut;\n}",
+      "fn_code_pos": [
+        [
+          649,
+          0
+        ],
+        [
+          652,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_lock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_mutex_unlock(ares_thread_mutex_t *mut)\n{\n  (void)mut;\n}",
+      "fn_code_pos": [
+        [
+          654,
+          0
+        ],
+        [
+          657,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_unlock",
+        "parameters": {
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_t *ares_thread_cond_create(void)\n{\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          659,
+          0
+        ],
+        [
+          662,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": "ares_thread_cond_t"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_destroy(ares_thread_cond_t *cond)\n{\n  (void)cond;\n}",
+      "fn_code_pos": [
+        [
+          664,
+          0
+        ],
+        [
+          667,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_destroy",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_signal(ares_thread_cond_t *cond)\n{\n  (void)cond;\n}",
+      "fn_code_pos": [
+        [
+          669,
+          0
+        ],
+        [
+          672,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_signal",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_thread_cond_broadcast(ares_thread_cond_t *cond)\n{\n  (void)cond;\n}",
+      "fn_code_pos": [
+        [
+          674,
+          0
+        ],
+        [
+          677,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_broadcast",
+        "parameters": {
+          "cond": "ares_thread_cond_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_wait(ares_thread_cond_t  *cond,\n                                    ares_thread_mutex_t *mut)\n{\n  (void)cond;\n  (void)mut;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          679,
+          0
+        ],
+        [
+          685,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_wait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_cond_timedwait(ares_thread_cond_t  *cond,\n                                         ares_thread_mutex_t *mut,\n                                         size_t               timeout_ms)\n{\n  (void)cond;\n  (void)mut;\n  (void)timeout_ms;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          687,
+          0
+        ],
+        [
+          695,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_timedwait",
+        "parameters": {
+          "cond": "ares_thread_cond_t",
+          "mut": "ares_thread_mutex_t",
+          "timeout_ms": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_create(ares_thread_t    **thread,\n                                 ares_thread_func_t func, void *arg)\n{\n  (void)thread;\n  (void)func;\n  (void)arg;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          697,
+          0
+        ],
+        [
+          704,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_create",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "func": "ares_thread_func_t",
+          "arg": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_thread_join(ares_thread_t *thread, void **rv)\n{\n  (void)thread;\n  (void)rv;\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          706,
+          0
+        ],
+        [
+          711,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_join",
+        "parameters": {
+          "thread": "ares_thread_t",
+          "rv": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_threadsafety(void)\n{\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          713,
+          0
+        ],
+        [
+          716,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_threadsafety",
+        "parameters": {},
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_channel_threading_init(ares_channel_t *channel)\n{\n  ares_status_t status = ARES_SUCCESS;\n\n  /* Threading is optional! */\n  if (!ares_threadsafety()) {\n    return ARES_SUCCESS;\n  }\n\n  channel->lock = ares_thread_mutex_create();\n  if (channel->lock == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  channel->cond_empty = ares_thread_cond_create();\n  if (channel->cond_empty == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_channel_threading_destroy(channel);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          720,
+          0
+        ],
+        [
+          746,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_threading_init",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_channel_threading_destroy(ares_channel_t *channel)\n{\n  ares_thread_mutex_destroy(channel->lock);\n  channel->lock = NULL;\n  ares_thread_cond_destroy(channel->cond_empty);\n  channel->cond_empty = NULL;\n}",
+      "fn_code_pos": [
+        [
+          748,
+          0
+        ],
+        [
+          754,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_threading_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_channel_lock(const ares_channel_t *channel)\n{\n  ares_thread_mutex_lock(channel->lock);\n}",
+      "fn_code_pos": [
+        [
+          756,
+          0
+        ],
+        [
+          759,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_lock",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_channel_unlock(const ares_channel_t *channel)\n{\n  ares_thread_mutex_unlock(channel->lock);\n}",
+      "fn_code_pos": [
+        [
+          761,
+          0
+        ],
+        [
+          764,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_unlock",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_queue_wait_empty(ares_channel_t *channel, int timeout_ms)\n{\n  ares_status_t  status = ARES_SUCCESS;\n  ares_timeval_t tout;\n\n  if (!ares_threadsafety()) {\n    return ARES_ENOTIMP;\n  }\n\n  if (channel == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (timeout_ms >= 0) {\n    ares_tvnow(&tout);\n    tout.sec  += (ares_int64_t)(timeout_ms / 1000);\n    tout.usec += (unsigned int)(timeout_ms % 1000) * 1000;\n  }\n\n  ares_thread_mutex_lock(channel->lock);\n  while (ares_llist_len(channel->all_queries)) {\n    if (timeout_ms < 0) {\n      ares_thread_cond_wait(channel->cond_empty, channel->lock);\n    } else {\n      ares_timeval_t tv_remaining;\n      ares_timeval_t tv_now;\n      unsigned long  tms;\n\n      ares_tvnow(&tv_now);\n      ares_timeval_remaining(&tv_remaining, &tv_now, &tout);\n      tms =\n        (unsigned long)((tv_remaining.sec * 1000) + (tv_remaining.usec / 1000));\n      if (tms == 0) {\n        status = ARES_ETIMEOUT;\n      } else {\n        status =\n          ares_thread_cond_timedwait(channel->cond_empty, channel->lock, tms);\n      }\n\n      /* If there was a timeout, don't loop.  Otherwise, make sure this wasn't\n       * a spurious wakeup by looping and checking the condition. */\n      if (status == ARES_ETIMEOUT) {\n        break;\n      }\n    }\n  }\n  ares_thread_mutex_unlock(channel->lock);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          767,
+          0
+        ],
+        [
+          815,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_queue_wait_empty",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "timeout_ms": "int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_queue_notify_empty(ares_channel_t *channel)\n{\n  if (channel == NULL) {\n    return;\n  }\n\n  /* We are guaranteed to be holding a channel lock already */\n  if (ares_llist_len(channel->all_queries)) {\n    return;\n  }\n\n  /* Notify all waiters of the conditional */\n  ares_thread_cond_broadcast(channel->cond_empty);\n}",
+      "fn_code_pos": [
+        [
+          817,
+          0
+        ],
+        [
+          830,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_queue_notify_empty",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_thread_mutex_create(void)",
+      "fn_dec_pos": [
+        [
+          37,
+          21
+        ],
+        [
+          37,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_create(void)",
+      "fn_dec_pos": [
+        [
+          79,
+          20
+        ],
+        [
+          79,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_create(void)",
+      "fn_dec_pos": [
+        [
+          164,
+          20
+        ],
+        [
+          164,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*func)(void *arg)",
+      "fn_dec_pos": [
+        [
+          351,
+          8
+        ],
+        [
+          351,
+          26
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_create(void)",
+      "fn_dec_pos": [
+        [
+          430,
+          21
+        ],
+        [
+          430,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_create(void)",
+      "fn_dec_pos": [
+        [
+          491,
+          20
+        ],
+        [
+          491,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_mutex_create(void)",
+      "fn_dec_pos": [
+        [
+          639,
+          21
+        ],
+        [
+          639,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_mutex_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_thread_cond_create(void)",
+      "fn_dec_pos": [
+        [
+          659,
+          20
+        ],
+        [
+          659,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_thread_cond_create",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_thread_mutex {\n  CRITICAL_SECTION mutex;\n}",
+      {
+        "mutex": "CRITICAL_SECTION"
+      },
+      "ares_thread_mutex",
+      [
+        33,
+        0
+      ],
+      [
+        35,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  CONDITION_VARIABLE cond;\n}",
+      {
+        "cond": "CONDITION_VARIABLE"
+      },
+      "ares_thread_cond",
+      [
+        75,
+        0
+      ],
+      [
+        77,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  HANDLE                events[2];\n  HANDLE                gate;\n  CRITICAL_SECTION      mutex;\n  size_t                waiters;\n  ares_w32_cond_event_t event;\n}",
+      {
+        "events[2]": "HANDLE",
+        "gate": "HANDLE",
+        "mutex": "CRITICAL_SECTION",
+        "waiters": "size_t",
+        "event": "ares_w32_cond_event_t"
+      },
+      "ares_thread_cond",
+      [
+        156,
+        0
+      ],
+      [
+        162,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread {\n  HANDLE thread;\n  DWORD  id;\n\n  void *(*func)(void *arg);\n  void *arg;\n  void *rv;\n}",
+      {
+        "thread": "HANDLE",
+        "id": "DWORD",
+        "*(*func)(void *arg)": "void",
+        "*arg": "void",
+        "*rv": "void"
+      },
+      "ares_thread",
+      [
+        347,
+        0
+      ],
+      [
+        354,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_mutex {\n  pthread_mutex_t mutex;\n}",
+      {
+        "mutex": "pthread_mutex_t"
+      },
+      "ares_thread_mutex",
+      [
+        426,
+        0
+      ],
+      [
+        428,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  pthread_cond_t cond;\n}",
+      {
+        "cond": "pthread_cond_t"
+      },
+      "ares_thread_cond",
+      [
+        487,
+        0
+      ],
+      [
+        489,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread {\n  pthread_t thread;\n}",
+      {
+        "thread": "pthread_t"
+      },
+      "ares_thread",
+      [
+        583,
+        0
+      ],
+      [
+        585,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_mutex {\n  CRITICAL_SECTION mutex;\n}",
+      {
+        "mutex": "CRITICAL_SECTION"
+      },
+      "ares_thread_mutex",
+      [
+        33,
+        0
+      ],
+      [
+        35,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  CONDITION_VARIABLE cond;\n}",
+      {
+        "cond": "CONDITION_VARIABLE"
+      },
+      "ares_thread_cond",
+      [
+        75,
+        0
+      ],
+      [
+        77,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  HANDLE                events[2];\n  HANDLE                gate;\n  CRITICAL_SECTION      mutex;\n  size_t                waiters;\n  ares_w32_cond_event_t event;\n}",
+      {
+        "events[2]": "HANDLE",
+        "gate": "HANDLE",
+        "mutex": "CRITICAL_SECTION",
+        "waiters": "size_t",
+        "event": "ares_w32_cond_event_t"
+      },
+      "ares_thread_cond",
+      [
+        156,
+        0
+      ],
+      [
+        162,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread {\n  HANDLE thread;\n  DWORD  id;\n\n  void *(*func)(void *arg);\n  void *arg;\n  void *rv;\n}",
+      {
+        "thread": "HANDLE",
+        "id": "DWORD",
+        "*(*func)(void *arg)": "void",
+        "*arg": "void",
+        "*rv": "void"
+      },
+      "ares_thread",
+      [
+        347,
+        0
+      ],
+      [
+        354,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_mutex {\n  pthread_mutex_t mutex;\n}",
+      {
+        "mutex": "pthread_mutex_t"
+      },
+      "ares_thread_mutex",
+      [
+        426,
+        0
+      ],
+      [
+        428,
+        1
+      ]
+    ],
+    [
+      "struct ares_thread_cond {\n  pthread_cond_t cond;\n}",
+      {
+        "cond": "pthread_cond_t"
+      },
+      "ares_thread_cond",
+      [
+        487,
+        0
+      ],
+      [
+        489,
+        1
+      ]
+    ],
+    [
+      "struct timespec",
+      {},
+      "",
+      [
+        537,
+        34
+      ],
+      [
+        537,
+        49
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        542,
+        2
+      ],
+      [
+        542,
+        16
+      ]
+    ],
+    [
+      "struct timespec",
+      {},
+      "",
+      [
+        564,
+        2
+      ],
+      [
+        564,
+        17
+      ]
+    ],
+    [
+      "struct ares_thread {\n  pthread_t thread;\n}",
+      {
+        "thread": "pthread_t"
+      },
+      "ares_thread",
+      [
+        583,
+        0
+      ],
+      [
+        585,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#    include <pthread.h>\n",
+      [
+        414,
+        0
+      ],
+      [
+        415,
+        0
+      ]
+    ],
+    [
+      "#      include <time.h>\n",
+      [
+        418,
+        0
+      ],
+      [
+        419,
+        0
+      ]
+    ],
+    [
+      "#      include <sys/time.h>\n",
+      [
+        423,
+        0
+      ],
+      [
+        424,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_W32_COND_SIGNAL    = 0,\n  ARES_W32_COND_BROADCAST,\n  ARES_W32_COND_EVMAX,\n  ARES_W32_COND_NONE = ARES_W32_COND_EVMAX\n} ares_w32_cond_event_t;",
+      {
+        "ARES_W32_COND_SIGNAL": "",
+        "ARES_W32_COND_BROADCAST": "",
+        "ARES_W32_COND_EVMAX": "",
+        "ARES_W32_COND_NONE": ""
+      },
+      "ares_w32_cond_event_t",
+      [
+        149,
+        0
+      ],
+      [
+        154,
+        24
+      ]
+    ]
+  ]
+}

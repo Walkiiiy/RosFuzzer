@@ -1,0 +1,44 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_cancel(ares_channel_t *channel)\n{\n  if (channel == NULL) {\n    return;\n  }\n\n  ares_channel_lock(channel);\n\n  if (ares_llist_len(channel->all_queries) > 0) {\n    ares_llist_node_t *node = NULL;\n    ares_llist_node_t *next = NULL;\n\n    /* Swap list heads, so that only those queries which were present on entry\n     * into this function are cancelled. New queries added by callbacks of\n     * queries being cancelled will not be cancelled themselves.\n     */\n    ares_llist_t      *list_copy = channel->all_queries;\n    channel->all_queries         = ares_llist_create(NULL);\n\n    /* Out of memory, this function doesn't return a result code though so we\n     * can't report to caller */\n    if (channel->all_queries == NULL) {\n      channel->all_queries = list_copy; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;                        /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    node = ares_llist_node_first(list_copy);\n    while (node != NULL) {\n      ares_query_t *query;\n\n      /* Cache next since this node is being deleted */\n      next = ares_llist_node_next(node);\n\n      query                   = ares_llist_node_claim(node);\n      query->node_all_queries = NULL;\n\n      /* NOTE: its possible this may enqueue new queries */\n      query->callback(query->arg, ARES_ECANCELLED, 0, NULL);\n      ares_free_query(query);\n\n      node = next;\n    }\n\n    ares_llist_destroy(list_copy);\n  }\n\n  /* See if the connections should be cleaned up */\n  ares_check_cleanup_conns(channel);\n\n  ares_queue_notify_empty(channel);\n\ndone:\n  ares_channel_unlock(channel);\n}",
+      "fn_code_pos": [
+        [
+          33,
+          0
+        ],
+        [
+          86,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cancel",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

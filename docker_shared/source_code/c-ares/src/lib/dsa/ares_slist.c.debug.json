@@ -1,0 +1,877 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_slist_t *ares_slist_create(ares_rand_state        *rand_state,\n                                ares_slist_cmp_t        cmp,\n                                ares_slist_destructor_t destruct)\n{\n  ares_slist_t *list;\n\n  if (rand_state == NULL || cmp == NULL) {\n    return NULL;\n  }\n\n  list = ares_malloc_zero(sizeof(*list));\n\n  if (list == NULL) {\n    return NULL;\n  }\n\n  list->rand_state = rand_state;\n  list->cmp        = cmp;\n  list->destruct   = destruct;\n\n  list->levels = ARES__SLIST_START_LEVELS;\n  list->head   = ares_malloc_zero(sizeof(*list->head) * list->levels);\n  if (list->head == NULL) {\n    ares_free(list);\n    return NULL;\n  }\n\n  return list;\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          82,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_create",
+        "parameters": {
+          "rand_state": "ares_rand_state",
+          "cmp": "ares_slist_cmp_t",
+          "destruct": "ares_slist_destructor_t"
+        },
+        "return_type": "ares_slist_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_slist_coin_flip(ares_slist_t *list)\n{\n  size_t total_bits = sizeof(list->rand_data) * 8;\n  size_t bit;\n\n  /* Refill random data used for coin flips.  We pull this in 8 byte chunks.\n   * ares_rand_bytes() has some built-in caching of its own so we don't need\n   * to be excessive in caching ourselves.  Prefer to require less memory per\n   * skiplist */\n  if (list->rand_bits == 0) {\n    ares_rand_bytes(list->rand_state, list->rand_data, sizeof(list->rand_data));\n    list->rand_bits = total_bits;\n  }\n\n  bit = total_bits - list->rand_bits;\n  list->rand_bits--;\n\n  return (list->rand_data[bit / 8] & (1 << (bit % 8))) ? ARES_TRUE : ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          84,
+          0
+        ],
+        [
+          102,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_coin_flip",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void ares_slist_replace_destructor(ares_slist_t           *list,\n                                   ares_slist_destructor_t destruct)\n{\n  if (list == NULL) {\n    return;\n  }\n\n  list->destruct = destruct;\n}",
+      "fn_code_pos": [
+        [
+          104,
+          0
+        ],
+        [
+          112,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_replace_destructor",
+        "parameters": {
+          "list": "ares_slist_t",
+          "destruct": "ares_slist_destructor_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_slist_max_level(const ares_slist_t *list)\n{\n  size_t max_level = 0;\n\n  if (list->cnt + 1 <= (1 << ARES__SLIST_START_LEVELS)) {\n    max_level = ARES__SLIST_START_LEVELS;\n  } else {\n    max_level = ares_log2(ares_round_up_pow2(list->cnt + 1));\n  }\n\n  if (list->levels > max_level) {\n    max_level = list->levels;\n  }\n\n  return max_level;\n}",
+      "fn_code_pos": [
+        [
+          114,
+          0
+        ],
+        [
+          129,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_max_level",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_slist_calc_level(ares_slist_t *list)\n{\n  size_t max_level = ares_slist_max_level(list);\n  size_t level;\n\n  for (level = 1; ares_slist_coin_flip(list) && level < max_level; level++)\n    ;\n\n  return level;\n}",
+      "fn_code_pos": [
+        [
+          131,
+          0
+        ],
+        [
+          140,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_calc_level",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_slist_node_push(ares_slist_t *list, ares_slist_node_t *node)\n{\n  size_t             i;\n  ares_slist_node_t *left = NULL;\n\n  /* Scan from highest level in the slist, even if we're not using that number\n   * of levels for this entry as this is what makes it O(log n) */\n  for (i = list->levels; i-- > 0;) {\n    /* set left if left is NULL and the current node value is greater than the\n     * head at this level */\n    if (left == NULL && list->head[i] != NULL &&\n        list->cmp(node->data, list->head[i]->data) > 0) {\n      left = list->head[i];\n    }\n\n    if (left != NULL) {\n      /* scan forward to find our insertion point */\n      while (left->next[i] != NULL &&\n             list->cmp(node->data, left->next[i]->data) > 0) {\n        left = left->next[i];\n      }\n    }\n\n    /* search only as we didn't randomly select this number of levels */\n    if (i >= node->levels) {\n      continue;\n    }\n\n    if (left == NULL) {\n      /* head insertion */\n      node->next[i] = list->head[i];\n      node->prev[i] = NULL;\n      list->head[i] = node;\n    } else {\n      /* Chain */\n      node->next[i] = left->next[i];\n      node->prev[i] = left;\n      left->next[i] = node;\n    }\n\n    if (node->next[i] != NULL) {\n      /* chain prev */\n      node->next[i]->prev[i] = node;\n    } else {\n      if (i == 0) {\n        /* update tail */\n        list->tail = node;\n      }\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          142,
+          0
+        ],
+        [
+          192,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_push",
+        "parameters": {
+          "list": "ares_slist_t",
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_insert(ares_slist_t *list, void *val)\n{\n  ares_slist_node_t *node = NULL;\n\n  if (list == NULL || val == NULL) {\n    return NULL;\n  }\n\n  node = ares_malloc_zero(sizeof(*node));\n\n  if (node == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  node->data   = val;\n  node->parent = list;\n\n  /* Randomly determine the number of levels we want to use */\n  node->levels = ares_slist_calc_level(list);\n\n  /* Allocate array of next and prev nodes for linking each level */\n  node->next = ares_malloc_zero(sizeof(*node->next) * node->levels);\n  if (node->next == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  node->prev = ares_malloc_zero(sizeof(*node->prev) * node->levels);\n  if (node->prev == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* If the number of levels is greater than we currently support in the slist,\n   * increase the count */\n  if (list->levels < node->levels) {\n    void *ptr =\n      ares_realloc_zero(list->head, sizeof(*list->head) * list->levels,\n                        sizeof(*list->head) * node->levels);\n    if (ptr == NULL) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    list->head   = ptr;\n    list->levels = node->levels;\n  }\n\n  ares_slist_node_push(list, node);\n\n  list->cnt++;\n\n  return node;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  if (node) {\n    ares_free(node->prev);\n    ares_free(node->next);\n    ares_free(node);\n  }\n  return NULL;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          194,
+          0
+        ],
+        [
+          254,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_insert",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_slist_node_pop(ares_slist_node_t *node)\n{\n  ares_slist_t *list = node->parent;\n  size_t        i;\n\n  /* relink each node at each level */\n  for (i = node->levels; i-- > 0;) {\n    if (node->next[i] == NULL) {\n      if (i == 0) {\n        list->tail = node->prev[0];\n      }\n    } else {\n      node->next[i]->prev[i] = node->prev[i];\n    }\n\n    if (node->prev[i] == NULL) {\n      list->head[i] = node->next[i];\n    } else {\n      node->prev[i]->next[i] = node->next[i];\n    }\n  }\n\n  memset(node->next, 0, sizeof(*node->next) * node->levels);\n  memset(node->prev, 0, sizeof(*node->prev) * node->levels);\n}",
+      "fn_code_pos": [
+        [
+          256,
+          0
+        ],
+        [
+          280,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_pop",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_slist_node_claim(ares_slist_node_t *node)\n{\n  ares_slist_t *list;\n  void         *val;\n\n  if (node == NULL) {\n    return NULL;\n  }\n\n  list = node->parent;\n  val  = node->data;\n\n  ares_slist_node_pop(node);\n\n  ares_free(node->next);\n  ares_free(node->prev);\n  ares_free(node);\n\n  list->cnt--;\n\n  return val;\n}",
+      "fn_code_pos": [
+        [
+          282,
+          0
+        ],
+        [
+          303,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_claim",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_slist_node_reinsert(ares_slist_node_t *node)\n{\n  ares_slist_t *list;\n\n  if (node == NULL) {\n    return;\n  }\n\n  list = node->parent;\n\n  ares_slist_node_pop(node);\n  ares_slist_node_push(list, node);\n}",
+      "fn_code_pos": [
+        [
+          305,
+          0
+        ],
+        [
+          317,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_reinsert",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_node_find(const ares_slist_t *list,\n                                        const void         *val)\n{\n  size_t             i;\n  ares_slist_node_t *node = NULL;\n  int                rv   = -1;\n\n  if (list == NULL || val == NULL) {\n    return NULL;\n  }\n\n  /* Scan nodes starting at the highest level. For each level scan forward\n   * until the value is between the prior and next node, or if equal quit\n   * as we found a match */\n  for (i = list->levels; i-- > 0;) {\n    if (node == NULL) {\n      node = list->head[i];\n    }\n\n    if (node == NULL) {\n      continue;\n    }\n\n    do {\n      rv = list->cmp(val, node->data);\n\n      if (rv < 0) {\n        /* back off, our value is greater than current node reference */\n        node = node->prev[i];\n      } else if (rv > 0) {\n        /* move forward and try again. if it goes past, it will loop again and\n         * go to previous entry */\n        node = node->next[i];\n      }\n\n      /* rv == 0 will terminate loop */\n\n    } while (node != NULL && rv > 0);\n\n    /* Found a match, no need to continue */\n    if (rv == 0) {\n      break;\n    }\n  }\n\n  /* no match */\n  if (rv != 0) {\n    return NULL;\n  }\n\n  /* The list may have multiple entries that match.  They're guaranteed to be\n   * in order, but we're not guaranteed to have selected the _first_ matching\n   * node.  Lets scan backwards to find the first match */\n  while (node->prev[0] != NULL && list->cmp(node->prev[0]->data, val) == 0) {\n    node = node->prev[0];\n  }\n\n  return node;\n}",
+      "fn_code_pos": [
+        [
+          319,
+          0
+        ],
+        [
+          377,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_find",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_node_first(const ares_slist_t *list)\n{\n  if (list == NULL) {\n    return NULL;\n  }\n\n  return list->head[0];\n}",
+      "fn_code_pos": [
+        [
+          379,
+          0
+        ],
+        [
+          386,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_first",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_node_last(const ares_slist_t *list)\n{\n  if (list == NULL) {\n    return NULL;\n  }\n  return list->tail;\n}",
+      "fn_code_pos": [
+        [
+          388,
+          0
+        ],
+        [
+          394,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_last",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_node_next(const ares_slist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->next[0];\n}",
+      "fn_code_pos": [
+        [
+          396,
+          0
+        ],
+        [
+          402,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_next",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_t *ares_slist_node_prev(const ares_slist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->prev[0];\n}",
+      "fn_code_pos": [
+        [
+          404,
+          0
+        ],
+        [
+          410,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_prev",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_slist_node_val(ares_slist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n\n  return node->data;\n}",
+      "fn_code_pos": [
+        [
+          412,
+          0
+        ],
+        [
+          419,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_val",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "size_t ares_slist_len(const ares_slist_t *list)\n{\n  if (list == NULL) {\n    return 0;\n  }\n  return list->cnt;\n}",
+      "fn_code_pos": [
+        [
+          421,
+          0
+        ],
+        [
+          427,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_len",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_t *ares_slist_node_parent(ares_slist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->parent;\n}",
+      "fn_code_pos": [
+        [
+          429,
+          0
+        ],
+        [
+          435,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_parent",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "ares_slist_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_slist_first_val(const ares_slist_t *list)\n{\n  return ares_slist_node_val(ares_slist_node_first(list));\n}",
+      "fn_code_pos": [
+        [
+          437,
+          0
+        ],
+        [
+          440,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_first_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_slist_last_val(const ares_slist_t *list)\n{\n  return ares_slist_node_val(ares_slist_node_last(list));\n}",
+      "fn_code_pos": [
+        [
+          442,
+          0
+        ],
+        [
+          445,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_last_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_slist_node_destroy(ares_slist_node_t *node)\n{\n  ares_slist_destructor_t destruct;\n  void                   *val;\n\n  if (node == NULL) {\n    return;\n  }\n\n  destruct = node->parent->destruct;\n  val      = ares_slist_node_claim(node);\n\n  if (val != NULL && destruct != NULL) {\n    destruct(val);\n  }\n}",
+      "fn_code_pos": [
+        [
+          447,
+          0
+        ],
+        [
+          462,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_destroy",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_slist_destroy(ares_slist_t *list)\n{\n  ares_slist_node_t *node;\n\n  if (list == NULL) {\n    return;\n  }\n\n  while ((node = ares_slist_node_first(list)) != NULL) {\n    ares_slist_node_destroy(node);\n  }\n\n  ares_free(list->head);\n  ares_free(list);\n}",
+      "fn_code_pos": [
+        [
+          464,
+          0
+        ],
+        [
+          478,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_destroy",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_slist_create(ares_rand_state        *rand_state,\n                                ares_slist_cmp_t        cmp,\n                                ares_slist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          54,
+          14
+        ],
+        [
+          56,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_create",
+        "parameters": {
+          "rand_state": "ares_rand_state",
+          "cmp": "ares_slist_cmp_t",
+          "destruct": "ares_slist_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_insert(ares_slist_t *list, void *val)",
+      "fn_dec_pos": [
+        [
+          194,
+          19
+        ],
+        [
+          194,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_insert",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_claim(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          282,
+          6
+        ],
+        [
+          282,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_claim",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_find(const ares_slist_t *list,\n                                        const void         *val)",
+      "fn_dec_pos": [
+        [
+          319,
+          19
+        ],
+        [
+          320,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_find",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_first(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          379,
+          19
+        ],
+        [
+          379,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_first",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_last(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          388,
+          19
+        ],
+        [
+          388,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_last",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_next(const ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          396,
+          19
+        ],
+        [
+          396,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_next",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_prev(const ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          404,
+          19
+        ],
+        [
+          404,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_prev",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_val(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          412,
+          6
+        ],
+        [
+          412,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_val",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_parent(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          429,
+          14
+        ],
+        [
+          429,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_parent",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_first_val(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          437,
+          6
+        ],
+        [
+          437,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_first_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_last_val(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          442,
+          6
+        ],
+        [
+          442,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_last_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_slist {\n  ares_rand_state        *rand_state;\n  unsigned char           rand_data[8];\n  size_t                  rand_bits;\n\n  ares_slist_node_t     **head;\n  size_t                  levels;\n  ares_slist_node_t      *tail;\n\n  ares_slist_cmp_t        cmp;\n  ares_slist_destructor_t destruct;\n  size_t                  cnt;\n}",
+      {
+        "*rand_state": "ares_rand_state",
+        "rand_data[8]": "unsigned char",
+        "rand_bits": "size_t",
+        "**head": "ares_slist_node_t",
+        "levels": "size_t",
+        "*tail": "ares_slist_node_t",
+        "cmp": "ares_slist_cmp_t",
+        "destruct": "ares_slist_destructor_t",
+        "cnt": "size_t"
+      },
+      "ares_slist",
+      [
+        32,
+        0
+      ],
+      [
+        44,
+        1
+      ]
+    ],
+    [
+      "struct ares_slist_node {\n  void               *data;\n  ares_slist_node_t **prev;\n  ares_slist_node_t **next;\n  size_t              levels;\n  ares_slist_t       *parent;\n}",
+      {
+        "*data": "void",
+        "**prev": "ares_slist_node_t",
+        "**next": "ares_slist_node_t",
+        "levels": "size_t",
+        "*parent": "ares_slist_t"
+      },
+      "ares_slist_node",
+      [
+        46,
+        0
+      ],
+      [
+        52,
+        1
+      ]
+    ],
+    [
+      "struct ares_slist {\n  ares_rand_state        *rand_state;\n  unsigned char           rand_data[8];\n  size_t                  rand_bits;\n\n  ares_slist_node_t     **head;\n  size_t                  levels;\n  ares_slist_node_t      *tail;\n\n  ares_slist_cmp_t        cmp;\n  ares_slist_destructor_t destruct;\n  size_t                  cnt;\n}",
+      {
+        "*rand_state": "ares_rand_state",
+        "rand_data[8]": "unsigned char",
+        "rand_bits": "size_t",
+        "**head": "ares_slist_node_t",
+        "levels": "size_t",
+        "*tail": "ares_slist_node_t",
+        "cmp": "ares_slist_cmp_t",
+        "destruct": "ares_slist_destructor_t",
+        "cnt": "size_t"
+      },
+      "ares_slist",
+      [
+        32,
+        0
+      ],
+      [
+        44,
+        1
+      ]
+    ],
+    [
+      "struct ares_slist_node {\n  void               *data;\n  ares_slist_node_t **prev;\n  ares_slist_node_t **next;\n  size_t              levels;\n  ares_slist_t       *parent;\n}",
+      {
+        "*data": "void",
+        "**prev": "ares_slist_node_t",
+        "**next": "ares_slist_node_t",
+        "levels": "size_t",
+        "*parent": "ares_slist_t"
+      },
+      "ares_slist_node",
+      [
+        46,
+        0
+      ],
+      [
+        52,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_slist.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

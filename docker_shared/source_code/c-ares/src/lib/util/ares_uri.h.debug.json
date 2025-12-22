@@ -1,0 +1,579 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_uri_create(void)",
+      "fn_dec_pos": [
+        [
+          51,
+          24
+        ],
+        [
+          51,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_destroy(ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          57,
+          24
+        ],
+        [
+          57,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_destroy",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_scheme(ares_uri_t *uri, const char *scheme)",
+      "fn_dec_pos": [
+        [
+          67,
+          15
+        ],
+        [
+          67,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_scheme",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "scheme": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_scheme(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          74,
+          15
+        ],
+        [
+          74,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_scheme",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_username(ares_uri_t *uri, const char *username)",
+      "fn_dec_pos": [
+        [
+          82,
+          15
+        ],
+        [
+          82,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_username",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "username": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_username(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          89,
+          15
+        ],
+        [
+          89,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_username",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_password(ares_uri_t *uri, const char *password)",
+      "fn_dec_pos": [
+        [
+          97,
+          15
+        ],
+        [
+          97,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_password",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "password": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_password(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          104,
+          15
+        ],
+        [
+          104,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_password",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_host(ares_uri_t *uri, const char *host)",
+      "fn_dec_pos": [
+        [
+          113,
+          15
+        ],
+        [
+          113,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_host",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "host": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_host(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          121,
+          15
+        ],
+        [
+          121,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_host",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_port(ares_uri_t *uri, unsigned short port)",
+      "fn_dec_pos": [
+        [
+          130,
+          15
+        ],
+        [
+          130,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_port",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "port": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_port(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          137,
+          15
+        ],
+        [
+          137,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_port",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_path(ares_uri_t *uri, const char *path)",
+      "fn_dec_pos": [
+        [
+          146,
+          15
+        ],
+        [
+          146,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_path",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "path": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_path(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          154,
+          15
+        ],
+        [
+          154,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_path",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_query_key(ares_uri_t *uri, const char *key,\n                                      const char *val)",
+      "fn_dec_pos": [
+        [
+          166,
+          15
+        ],
+        [
+          167,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char",
+          "val": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_del_query_key(ares_uri_t *uri, const char *key)",
+      "fn_dec_pos": [
+        [
+          175,
+          15
+        ],
+        [
+          175,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_del_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_query_key(const ares_uri_t *uri, const char *key)",
+      "fn_dec_pos": [
+        [
+          185,
+          15
+        ],
+        [
+          185,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_query_key",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "key": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_query_keys(const ares_uri_t *uri, size_t *num)",
+      "fn_dec_pos": [
+        [
+          194,
+          15
+        ],
+        [
+          194,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_query_keys",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_set_fragment(ares_uri_t *uri, const char *fragment)",
+      "fn_dec_pos": [
+        [
+          203,
+          15
+        ],
+        [
+          203,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_set_fragment",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "fragment": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_get_fragment(const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          211,
+          15
+        ],
+        [
+          211,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_get_fragment",
+        "parameters": {
+          "uri": "ares_uri_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_uri_parse_buf(ares_uri_t **out, ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          221,
+          15
+        ],
+        [
+          221,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse_buf",
+        "parameters": {
+          "out": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_parse(ares_uri_t **out, const char *uri)",
+      "fn_dec_pos": [
+        [
+          229,
+          15
+        ],
+        [
+          229,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_parse",
+        "parameters": {
+          "out": "ares_uri_t",
+          "uri": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_write(char **out, const ares_uri_t *uri)",
+      "fn_dec_pos": [
+        [
+          238,
+          15
+        ],
+        [
+          238,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write",
+        "parameters": {
+          "out": "char",
+          "uri": "ares_uri_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_uri_write_buf(const ares_uri_t *uri, ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          247,
+          15
+        ],
+        [
+          247,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_uri_write_buf",
+        "parameters": {
+          "uri": "ares_uri_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_uri",
+      {},
+      "",
+      [
+        42,
+        0
+      ],
+      [
+        42,
+        15
+      ]
+    ],
+    [
+      "typedef struct ares_uri ares_uri_t;",
+      {},
+      "ares_uri_t",
+      [
+        45,
+        0
+      ],
+      [
+        45,
+        35
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

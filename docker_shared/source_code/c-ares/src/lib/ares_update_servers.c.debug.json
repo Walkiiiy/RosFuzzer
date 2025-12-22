@@ -1,0 +1,1307 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_bool_t ares_addr_match(const struct ares_addr *addr1,\n                                   const struct ares_addr *addr2)\n{\n  if (addr1 == NULL && addr2 == NULL) {\n    return ARES_TRUE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (addr1 == NULL || addr2 == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (addr1->family != addr2->family) {\n    return ARES_FALSE;\n  }\n\n  if (addr1->family == AF_INET && memcmp(&addr1->addr.addr4, &addr2->addr.addr4,\n                                         sizeof(addr1->addr.addr4)) == 0) {\n    return ARES_TRUE;\n  }\n\n  if (addr1->family == AF_INET6 &&\n      memcmp(&addr1->addr.addr6._S6_un._S6_u8, &addr2->addr.addr6._S6_un._S6_u8,\n             sizeof(addr1->addr.addr6._S6_un._S6_u8)) == 0) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          93,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addr_match",
+        "parameters": {
+          "addr1": "struct ares_addr",
+          "addr2": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_subnet_match(const struct ares_addr *addr,\n                              const struct ares_addr *subnet,\n                              unsigned char           netmask)\n{\n  const unsigned char *addr_ptr;\n  const unsigned char *subnet_ptr;\n  size_t               len;\n  size_t               i;\n\n  if (addr == NULL || subnet == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (addr->family != subnet->family) {\n    return ARES_FALSE;\n  }\n\n  if (addr->family == AF_INET) {\n    addr_ptr   = (const unsigned char *)&addr->addr.addr4;\n    subnet_ptr = (const unsigned char *)&subnet->addr.addr4;\n    len        = 4;\n\n    if (netmask > 32) {\n      return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n  } else if (addr->family == AF_INET6) {\n    addr_ptr   = (const unsigned char *)&addr->addr.addr6;\n    subnet_ptr = (const unsigned char *)&subnet->addr.addr6;\n    len        = 16;\n\n    if (netmask > 128) {\n      return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n  } else {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  for (i = 0; i < len && netmask > 0; i++) {\n    unsigned char mask = 0xff;\n    if (netmask < 8) {\n      mask    <<= (8 - netmask);\n      netmask   = 0;\n    } else {\n      netmask -= 8;\n    }\n\n    if ((addr_ptr[i] & mask) != (subnet_ptr[i] & mask)) {\n      return ARES_FALSE;\n    }\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          95,
+          0
+        ],
+        [
+          147,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_subnet_match",
+        "parameters": {
+          "addr": "struct ares_addr",
+          "subnet": "struct ares_addr",
+          "netmask": "unsigned char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_addr_is_linklocal(const struct ares_addr *addr)\n{\n  struct ares_addr    subnet;\n  const unsigned char subnetaddr[16] = { 0xfe, 0x80, 0x00, 0x00, 0x00, 0x00,\n                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\n                                         0x00, 0x00, 0x00, 0x00 };\n\n  /* fe80::/10 */\n  subnet.family = AF_INET6;\n  memcpy(&subnet.addr.addr6, subnetaddr, 16);\n\n  return ares_subnet_match(addr, &subnet, 10);\n}",
+      "fn_code_pos": [
+        [
+          149,
+          0
+        ],
+        [
+          161,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addr_is_linklocal",
+        "parameters": {
+          "addr": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_server_blacklisted(const struct ares_addr *addr)\n{\n  /* A list of blacklisted IPv6 subnets. */\n  const struct {\n    const unsigned char netbase[16];\n    unsigned char       netmask;\n  } blacklist_v6[] = {\n    /* fec0::/10 was deprecated by [RFC3879] in September 2004. Formerly a\n     * Site-Local scoped address prefix.  These are never valid DNS servers,\n     * but are known to be returned at least sometimes on Windows and Android.\n     */\n    { { 0xfe, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\n        0x00, 0x00, 0x00, 0x00 },\n     10 }\n  };\n\n  size_t i;\n\n  if (addr->family != AF_INET6) {\n    return ARES_FALSE;\n  }\n\n  /* See if ipaddr matches any of the entries in the blacklist. */\n  for (i = 0; i < sizeof(blacklist_v6) / sizeof(*blacklist_v6); i++) {\n    struct ares_addr subnet;\n    subnet.family = AF_INET6;\n    memcpy(&subnet.addr.addr6, blacklist_v6[i].netbase, 16);\n    if (ares_subnet_match(addr, &subnet, blacklist_v6[i].netmask)) {\n      return ARES_TRUE;\n    }\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          163,
+          0
+        ],
+        [
+          195,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_blacklisted",
+        "parameters": {
+          "addr": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t parse_nameserver_uri(ares_buf_t     *buf,\n                                          ares_sconfig_t *sconfig)\n{\n  ares_uri_t   *uri    = NULL;\n  ares_status_t status = ARES_SUCCESS;\n  const char   *port;\n  char         *ll_scope;\n  char          hoststr[256];\n  size_t        addrlen;\n\n  status = ares_uri_parse_buf(&uri, buf);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (!ares_streq(\"dns\", ares_uri_get_scheme(uri))) {\n    status = ARES_EBADSTR;\n    goto done;\n  }\n\n  ares_strcpy(hoststr, ares_uri_get_host(uri), sizeof(hoststr));\n  ll_scope = strchr(hoststr, '%');\n  if (ll_scope != NULL) {\n    *ll_scope = 0;\n    ll_scope++;\n    ares_strcpy(sconfig->ll_iface, ll_scope, sizeof(sconfig->ll_iface));\n  }\n\n  /* Convert ip address from string to network byte order */\n  sconfig->addr.family = AF_UNSPEC;\n  if (ares_dns_pton(hoststr, &sconfig->addr, &addrlen) == NULL) {\n    status = ARES_EBADSTR;\n    goto done;\n  }\n\n  sconfig->udp_port = ares_uri_get_port(uri);\n  sconfig->tcp_port = sconfig->udp_port;\n  port              = ares_uri_get_query_key(uri, \"tcpport\");\n  if (port != NULL) {\n    sconfig->tcp_port = (unsigned short)atoi(port);\n  }\n\ndone:\n  ares_uri_destroy(uri);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          197,
+          0
+        ],
+        [
+          242,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "parse_nameserver_uri",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "sconfig": "ares_sconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t parse_nameserver(ares_buf_t *buf, ares_sconfig_t *sconfig)\n{\n  ares_status_t status;\n  char          ipaddr[INET6_ADDRSTRLEN] = \"\";\n  size_t        addrlen;\n\n  memset(sconfig, 0, sizeof(*sconfig));\n\n  /* Consume any leading whitespace */\n  ares_buf_consume_whitespace(buf, ARES_TRUE);\n\n  /* pop off IP address.  If it is in [ ] then it can be ipv4 or ipv6.  If\n   * not, ipv4 only */\n  if (ares_buf_begins_with(buf, (const unsigned char *)\"[\", 1)) {\n    /* Consume [ */\n    ares_buf_consume(buf, 1);\n\n    ares_buf_tag(buf);\n\n    /* Consume until ] */\n    if (ares_buf_consume_until_charset(buf, (const unsigned char *)\"]\", 1,\n                                       ARES_TRUE) == SIZE_MAX) {\n      return ARES_EBADSTR;\n    }\n\n    status = ares_buf_tag_fetch_string(buf, ipaddr, sizeof(ipaddr));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Skip over ] */\n    ares_buf_consume(buf, 1);\n  } else {\n    size_t offset;\n\n    /* Not in [ ], see if '.' is in first 4 characters, if it is, then its ipv4,\n     * otherwise treat as ipv6 */\n    ares_buf_tag(buf);\n\n    offset = ares_buf_consume_until_charset(buf, (const unsigned char *)\".\", 1,\n                                            ARES_TRUE);\n    ares_buf_tag_rollback(buf);\n    ares_buf_tag(buf);\n\n    if (offset > 0 && offset < 4) {\n      /* IPv4 */\n      if (ares_buf_consume_charset(buf, (const unsigned char *)\"0123456789.\",\n                                   11) == 0) {\n        return ARES_EBADSTR;\n      }\n    } else {\n      /* IPv6 */\n      const unsigned char ipv6_charset[] = \"ABCDEFabcdef0123456789.:\";\n      if (ares_buf_consume_charset(buf, ipv6_charset,\n                                   sizeof(ipv6_charset) - 1) == 0) {\n        return ARES_EBADSTR;\n      }\n    }\n\n    status = ares_buf_tag_fetch_string(buf, ipaddr, sizeof(ipaddr));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  /* Convert ip address from string to network byte order */\n  sconfig->addr.family = AF_UNSPEC;\n  if (ares_dns_pton(ipaddr, &sconfig->addr, &addrlen) == NULL) {\n    return ARES_EBADSTR;\n  }\n\n  /* Pull off port */\n  if (ares_buf_begins_with(buf, (const unsigned char *)\":\", 1)) {\n    char portstr[6];\n\n    /* Consume : */\n    ares_buf_consume(buf, 1);\n\n    ares_buf_tag(buf);\n\n    /* Read numbers */\n    if (ares_buf_consume_charset(buf, (const unsigned char *)\"0123456789\",\n                                 10) == 0) {\n      return ARES_EBADSTR;\n    }\n\n    status = ares_buf_tag_fetch_string(buf, portstr, sizeof(portstr));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    sconfig->udp_port = (unsigned short)atoi(portstr);\n    sconfig->tcp_port = sconfig->udp_port;\n  }\n\n  /* Pull off interface modifier */\n  if (ares_buf_begins_with(buf, (const unsigned char *)\"%\", 1)) {\n    const unsigned char iface_charset[] = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"\n                                          \"abcdefghijklmnopqrstuvwxyz\"\n                                          \"0123456789.-_\\\\:{}\";\n    /* Consume % */\n    ares_buf_consume(buf, 1);\n\n    ares_buf_tag(buf);\n\n    if (ares_buf_consume_charset(buf, iface_charset,\n                                 sizeof(iface_charset) - 1) == 0) {\n      return ARES_EBADSTR;\n    }\n\n    status = ares_buf_tag_fetch_string(buf, sconfig->ll_iface,\n                                       sizeof(sconfig->ll_iface));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  /* Consume any trailing whitespace so we can bail out if there is something\n   * after we didn't read */\n  ares_buf_consume_whitespace(buf, ARES_TRUE);\n\n  if (ares_buf_len(buf) != 0) {\n    return ARES_EBADSTR;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          263,
+          0
+        ],
+        [
+          389,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "parse_nameserver",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "sconfig": "ares_sconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_sconfig_linklocal(const ares_channel_t *channel,\n                                            ares_sconfig_t       *s,\n                                            const char           *ll_iface)\n{\n  unsigned int ll_scope = 0;\n\n\n  if (ares_str_isnum(ll_iface)) {\n    char ifname[IF_NAMESIZE] = \"\";\n    ll_scope                 = (unsigned int)atoi(ll_iface);\n    if (channel->sock_funcs.aif_indextoname == NULL ||\n        channel->sock_funcs.aif_indextoname(ll_scope, ifname, sizeof(ifname),\n                                            channel->sock_func_cb_data) ==\n          NULL) {\n      DEBUGF(fprintf(stderr, \"Interface %s for ipv6 Link Local not found\\n\",\n                     ll_iface));\n      return ARES_ENOTFOUND;\n    }\n    ares_strcpy(s->ll_iface, ifname, sizeof(s->ll_iface));\n    s->ll_scope = ll_scope;\n    return ARES_SUCCESS;\n  }\n\n  if (channel->sock_funcs.aif_nametoindex != NULL) {\n    ll_scope =\n      channel->sock_funcs.aif_nametoindex(ll_iface, channel->sock_func_cb_data);\n  }\n  if (ll_scope == 0) {\n    DEBUGF(fprintf(stderr, \"Interface %s for ipv6 Link Local not found\\n\",\n                   ll_iface));\n    return ARES_ENOTFOUND;\n  }\n  ares_strcpy(s->ll_iface, ll_iface, sizeof(s->ll_iface));\n  s->ll_scope = ll_scope;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          391,
+          0
+        ],
+        [
+          426,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_linklocal",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_sconfig_t",
+          "ll_iface": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_sconfig_append(const ares_channel_t   *channel,\n                                  ares_llist_t          **sconfig,\n                                  const struct ares_addr *addr,\n                                  unsigned short          udp_port,\n                                  unsigned short tcp_port, const char *ll_iface)\n{\n  ares_sconfig_t *s;\n  ares_status_t   status;\n\n  if (sconfig == NULL || addr == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Silently skip blacklisted IPv6 servers. */\n  if (ares_server_blacklisted(addr)) {\n    return ARES_SUCCESS;\n  }\n\n  s = ares_malloc_zero(sizeof(*s));\n  if (s == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (*sconfig == NULL) {\n    *sconfig = ares_llist_create(ares_free);\n    if (*sconfig == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  memcpy(&s->addr, addr, sizeof(s->addr));\n  s->udp_port = udp_port;\n  s->tcp_port = tcp_port;\n\n  /* Handle link-local enumeration. If an interface is specified on a\n   * non-link-local address, we'll simply end up ignoring that */\n  if (ares_addr_is_linklocal(&s->addr)) {\n    if (ares_strlen(ll_iface) == 0) {\n      /* Silently ignore this entry, we require an interface */\n      status = ARES_SUCCESS;\n      goto fail;\n    }\n    status = ares_sconfig_linklocal(channel, s, ll_iface);\n    /* Silently ignore this entry, we can't validate the interface */\n    if (status != ARES_SUCCESS) {\n      status = ARES_SUCCESS;\n      goto fail;\n    }\n  }\n\n  if (ares_llist_insert_last(*sconfig, s) == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto fail;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n\nfail:\n  ares_free(s);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          428,
+          0
+        ],
+        [
+          490,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_append",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sconfig": "ares_llist_t",
+          "addr": "struct ares_addr",
+          "udp_port": "unsigned short",
+          "tcp_port": "unsigned short",
+          "ll_iface": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_sconfig_append_fromstr(const ares_channel_t *channel,\n                                          ares_llist_t        **sconfig,\n                                          const char           *str,\n                                          ares_bool_t           ignore_invalid)\n{\n  ares_status_t status = ARES_SUCCESS;\n  ares_buf_t   *buf    = NULL;\n  ares_array_t *list   = NULL;\n  size_t        num;\n  size_t        i;\n\n  /* On Windows, there may be more than one nameserver specified in the same\n   * registry key, so we parse input as a space or comma separated list.\n   */\n  buf = ares_buf_create_const((const unsigned char *)str, ares_strlen(str));\n  if (buf == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  status = ares_buf_split(buf, (const unsigned char *)\" ,\", 2,\n                          ARES_BUF_SPLIT_NONE, 0, &list);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  num = ares_array_len(list);\n  for (i = 0; i < num; i++) {\n    ares_buf_t   **bufptr = ares_array_at(list, i);\n    ares_buf_t    *entry  = *bufptr;\n    ares_sconfig_t s;\n\n    status = parse_nameserver_uri(entry, &s);\n    if (status != ARES_SUCCESS) {\n      status = parse_nameserver(entry, &s);\n    }\n\n    if (status != ARES_SUCCESS) {\n      if (ignore_invalid) {\n        continue;\n      } else {\n        goto done;\n      }\n    }\n\n    status = ares_sconfig_append(channel, sconfig, &s.addr, s.udp_port,\n                                 s.tcp_port, s.ll_iface);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  ares_array_destroy(list);\n  ares_buf_destroy(buf);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          508,
+          0
+        ],
+        [
+          566,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_append_fromstr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sconfig": "ares_llist_t",
+          "str": "char",
+          "ignore_invalid": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static unsigned short ares_sconfig_get_port(const ares_channel_t *channel,\n                                            const ares_sconfig_t *s,\n                                            ares_bool_t           is_tcp)\n{\n  unsigned short port = is_tcp ? s->tcp_port : s->udp_port;\n\n  if (port == 0) {\n    port = is_tcp ? channel->tcp_port : channel->udp_port;\n  }\n\n  if (port == 0) {\n    port = 53;\n  }\n\n  return port;\n}",
+      "fn_code_pos": [
+        [
+          568,
+          0
+        ],
+        [
+          583,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_get_port",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_sconfig_t",
+          "is_tcp": "ares_bool_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static ares_slist_node_t *ares_server_find(const ares_channel_t *channel,\n                                           const ares_sconfig_t *s)\n{\n  ares_slist_node_t *node;\n\n  for (node = ares_slist_node_first(channel->servers); node != NULL;\n       node = ares_slist_node_next(node)) {\n    const ares_server_t *server = ares_slist_node_val(node);\n\n    if (!ares_addr_match(&server->addr, &s->addr)) {\n      continue;\n    }\n\n    if (server->tcp_port != ares_sconfig_get_port(channel, s, ARES_TRUE)) {\n      continue;\n    }\n\n    if (server->udp_port != ares_sconfig_get_port(channel, s, ARES_FALSE)) {\n      continue;\n    }\n\n    return node;\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          585,
+          0
+        ],
+        [
+          609,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_find",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_sconfig_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_server_isdup(const ares_channel_t *channel,\n                                     ares_llist_node_t    *s)\n{\n  /* Scan backwards to see if this is a duplicate */\n  ares_llist_node_t    *prev;\n  const ares_sconfig_t *server = ares_llist_node_val(s);\n\n  for (prev = ares_llist_node_prev(s); prev != NULL;\n       prev = ares_llist_node_prev(prev)) {\n    const ares_sconfig_t *p = ares_llist_node_val(prev);\n\n    if (!ares_addr_match(&server->addr, &p->addr)) {\n      continue;\n    }\n\n    if (ares_sconfig_get_port(channel, server, ARES_TRUE) !=\n        ares_sconfig_get_port(channel, p, ARES_TRUE)) {\n      continue;\n    }\n\n    if (ares_sconfig_get_port(channel, server, ARES_FALSE) !=\n        ares_sconfig_get_port(channel, p, ARES_FALSE)) {\n      continue;\n    }\n\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          611,
+          0
+        ],
+        [
+          640,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_isdup",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_llist_node_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_server_create(ares_channel_t       *channel,\n                                        const ares_sconfig_t *sconfig,\n                                        size_t                idx)\n{\n  ares_status_t  status;\n  ares_server_t *server = ares_malloc_zero(sizeof(*server));\n\n  if (server == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  server->idx         = idx;\n  server->channel     = channel;\n  server->udp_port    = ares_sconfig_get_port(channel, sconfig, ARES_FALSE);\n  server->tcp_port    = ares_sconfig_get_port(channel, sconfig, ARES_TRUE);\n  server->addr.family = sconfig->addr.family;\n  server->next_retry_time.sec  = 0;\n  server->next_retry_time.usec = 0;\n\n  if (sconfig->addr.family == AF_INET) {\n    memcpy(&server->addr.addr.addr4, &sconfig->addr.addr.addr4,\n           sizeof(server->addr.addr.addr4));\n  } else if (sconfig->addr.family == AF_INET6) {\n    memcpy(&server->addr.addr.addr6, &sconfig->addr.addr.addr6,\n           sizeof(server->addr.addr.addr6));\n  }\n\n  /* Copy over link-local settings */\n  if (ares_strlen(sconfig->ll_iface)) {\n    ares_strcpy(server->ll_iface, sconfig->ll_iface, sizeof(server->ll_iface));\n    server->ll_scope = sconfig->ll_scope;\n  }\n\n  server->connections = ares_llist_create(NULL);\n  if (server->connections == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (ares_slist_insert(channel->servers, server) == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_destroy_server(server); /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          642,
+          0
+        ],
+        [
+          694,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_create",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sconfig": "ares_sconfig_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_server_in_newconfig(const ares_server_t *server,\n                                            ares_llist_t        *srvlist)\n{\n  ares_llist_node_t    *node;\n  const ares_channel_t *channel = server->channel;\n\n  for (node = ares_llist_node_first(srvlist); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const ares_sconfig_t *s = ares_llist_node_val(node);\n\n    if (!ares_addr_match(&server->addr, &s->addr)) {\n      continue;\n    }\n\n    if (server->tcp_port != ares_sconfig_get_port(channel, s, ARES_TRUE)) {\n      continue;\n    }\n\n    if (server->udp_port != ares_sconfig_get_port(channel, s, ARES_FALSE)) {\n      continue;\n    }\n\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          696,
+          0
+        ],
+        [
+          722,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_in_newconfig",
+        "parameters": {
+          "server": "ares_server_t",
+          "srvlist": "ares_llist_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_servers_remove_stale(ares_channel_t *channel,\n                                             ares_llist_t   *srvlist)\n{\n  ares_bool_t        stale_removed = ARES_FALSE;\n  ares_slist_node_t *snode         = ares_slist_node_first(channel->servers);\n\n  while (snode != NULL) {\n    ares_slist_node_t   *snext  = ares_slist_node_next(snode);\n    const ares_server_t *server = ares_slist_node_val(snode);\n    if (!ares_server_in_newconfig(server, srvlist)) {\n      /* This will clean up all server state via the destruction callback and\n       * move any queries to new servers */\n      ares_slist_node_destroy(snode);\n      stale_removed = ARES_TRUE;\n    }\n    snode = snext;\n  }\n  return stale_removed;\n}",
+      "fn_code_pos": [
+        [
+          724,
+          0
+        ],
+        [
+          742,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_servers_remove_stale",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "srvlist": "ares_llist_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_servers_trim_single(ares_channel_t *channel)\n{\n  while (ares_slist_len(channel->servers) > 1) {\n    ares_slist_node_destroy(ares_slist_node_last(channel->servers));\n  }\n}",
+      "fn_code_pos": [
+        [
+          744,
+          0
+        ],
+        [
+          749,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_servers_trim_single",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_servers_update(ares_channel_t *channel,\n                                  ares_llist_t   *server_list,\n                                  ares_bool_t     user_specified)\n{\n  ares_llist_node_t *node;\n  size_t             idx = 0;\n  ares_status_t      status;\n  ares_bool_t        list_changed = ARES_FALSE;\n\n  if (channel == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* NOTE: a NULL or zero entry server list is considered valid due to\n   *       real-world people needing support for this for their test harnesses\n   */\n\n  /* Add new entries */\n  for (node = ares_llist_node_first(server_list); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const ares_sconfig_t *sconfig = ares_llist_node_val(node);\n    ares_slist_node_t    *snode;\n\n    /* If a server has already appeared in the list of new servers, skip it. */\n    if (ares_server_isdup(channel, node)) {\n      continue;\n    }\n\n    snode = ares_server_find(channel, sconfig);\n    if (snode != NULL) {\n      ares_server_t *server = ares_slist_node_val(snode);\n\n      /* Copy over link-local settings.  Its possible some of this data has\n       * changed, maybe ...  */\n      if (ares_strlen(sconfig->ll_iface)) {\n        ares_strcpy(server->ll_iface, sconfig->ll_iface,\n                    sizeof(server->ll_iface));\n        server->ll_scope = sconfig->ll_scope;\n      }\n\n      if (server->idx != idx) {\n        server->idx = idx;\n        /* Index changed, reinsert node, doesn't require any memory\n         * allocations so can't fail. */\n        ares_slist_node_reinsert(snode);\n      }\n    } else {\n      status = ares_server_create(channel, sconfig, idx);\n      if (status != ARES_SUCCESS) {\n        goto done;\n      }\n\n      list_changed = ARES_TRUE;\n    }\n\n    idx++;\n  }\n\n  /* Remove any servers that don't exist in the current configuration */\n  if (ares_servers_remove_stale(channel, server_list)) {\n    list_changed = ARES_TRUE;\n  }\n\n  /* Trim to one server if ARES_FLAG_PRIMARY is set. */\n  if (channel->flags & ARES_FLAG_PRIMARY) {\n    ares_servers_trim_single(channel);\n  }\n\n  if (user_specified) {\n    /* Save servers as if they were passed in as an option */\n    channel->optmask |= ARES_OPT_SERVERS;\n  }\n\n  /* Clear any cached query results only if the server list changed */\n  if (list_changed) {\n    ares_qcache_flush(channel->qcache);\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          751,
+          0
+        ],
+        [
+          833,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_servers_update",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "server_list": "ares_llist_t",
+          "user_specified": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_addr_node_to_sconfig_llist(const struct ares_addr_node *servers,\n                                  ares_llist_t               **llist)\n{\n  const struct ares_addr_node *node;\n  ares_llist_t                *s;\n\n  *llist = NULL;\n\n  s = ares_llist_create(ares_free);\n  if (s == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (node = servers; node != NULL; node = node->next) {\n    ares_sconfig_t *sconfig;\n\n    /* Invalid entry */\n    if (node->family != AF_INET && node->family != AF_INET6) {\n      continue;\n    }\n\n    sconfig = ares_malloc_zero(sizeof(*sconfig));\n    if (sconfig == NULL) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    sconfig->addr.family = node->family;\n    if (node->family == AF_INET) {\n      memcpy(&sconfig->addr.addr.addr4, &node->addr.addr4,\n             sizeof(sconfig->addr.addr.addr4));\n    } else if (sconfig->addr.family == AF_INET6) {\n      memcpy(&sconfig->addr.addr.addr6, &node->addr.addr6,\n             sizeof(sconfig->addr.addr.addr6));\n    }\n\n    if (ares_llist_insert_last(s, sconfig) == NULL) {\n      ares_free(sconfig); /* LCOV_EXCL_LINE: OutOfMemory */\n      goto fail;          /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  *llist = s;\n  return ARES_SUCCESS;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  ares_llist_destroy(s);\n  return ARES_ENOMEM;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          835,
+          0
+        ],
+        [
+          885,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addr_node_to_sconfig_llist",
+        "parameters": {
+          "servers": "struct ares_addr_node",
+          "llist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_addrpnode_to_sconfig_llist(const struct ares_addr_port_node *servers,\n                                  ares_llist_t                    **llist)\n{\n  const struct ares_addr_port_node *node;\n  ares_llist_t                     *s;\n\n  *llist = NULL;\n\n  s = ares_llist_create(ares_free);\n  if (s == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (node = servers; node != NULL; node = node->next) {\n    ares_sconfig_t *sconfig;\n\n    /* Invalid entry */\n    if (node->family != AF_INET && node->family != AF_INET6) {\n      continue;\n    }\n\n    sconfig = ares_malloc_zero(sizeof(*sconfig));\n    if (sconfig == NULL) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    sconfig->addr.family = node->family;\n    if (node->family == AF_INET) {\n      memcpy(&sconfig->addr.addr.addr4, &node->addr.addr4,\n             sizeof(sconfig->addr.addr.addr4));\n    } else if (sconfig->addr.family == AF_INET6) {\n      memcpy(&sconfig->addr.addr.addr6, &node->addr.addr6,\n             sizeof(sconfig->addr.addr.addr6));\n    }\n\n    sconfig->tcp_port = (unsigned short)node->tcp_port;\n    sconfig->udp_port = (unsigned short)node->udp_port;\n\n    if (ares_llist_insert_last(s, sconfig) == NULL) {\n      ares_free(sconfig); /* LCOV_EXCL_LINE: OutOfMemory */\n      goto fail;          /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  *llist = s;\n  return ARES_SUCCESS;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  ares_llist_destroy(s);\n  return ARES_ENOMEM;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          887,
+          0
+        ],
+        [
+          940,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrpnode_to_sconfig_llist",
+        "parameters": {
+          "servers": "struct ares_addr_port_node",
+          "llist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_in_addr_to_sconfig_llist(const struct in_addr *servers,\n                                            size_t                nservers,\n                                            ares_llist_t        **llist)\n{\n  size_t        i;\n  ares_llist_t *s;\n\n  *llist = NULL;\n\n  s = ares_llist_create(ares_free);\n  if (s == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; servers != NULL && i < nservers; i++) {\n    ares_sconfig_t *sconfig;\n\n    sconfig = ares_malloc_zero(sizeof(*sconfig));\n    if (sconfig == NULL) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    sconfig->addr.family = AF_INET;\n    memcpy(&sconfig->addr.addr.addr4, &servers[i],\n           sizeof(sconfig->addr.addr.addr4));\n\n    if (ares_llist_insert_last(s, sconfig) == NULL) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  *llist = s;\n  return ARES_SUCCESS;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  ares_llist_destroy(s);\n  return ARES_ENOMEM;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          942,
+          0
+        ],
+        [
+          981,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_in_addr_to_sconfig_llist",
+        "parameters": {
+          "servers": "struct in_addr",
+          "nservers": "size_t",
+          "llist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_server_use_uri(const ares_server_t *server)\n{\n  /* Currently only reason to use new format is if the ports for udp and tcp\n   * are different */\n  if (server->tcp_port != server->udp_port) {\n    return ARES_TRUE;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          983,
+          0
+        ],
+        [
+          991,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_use_uri",
+        "parameters": {
+          "server": "ares_server_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_get_server_addr_uri(const ares_server_t *server,\n                                              ares_buf_t          *buf)\n{\n  ares_uri_t   *uri = NULL;\n  ares_status_t status;\n  char          addr[INET6_ADDRSTRLEN];\n\n  uri = ares_uri_create();\n  if (uri == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_uri_set_scheme(uri, \"dns\");\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  ares_inet_ntop(server->addr.family, &server->addr.addr, addr, sizeof(addr));\n\n  if (ares_strlen(server->ll_iface)) {\n    char addr_iface[256];\n\n    snprintf(addr_iface, sizeof(addr_iface), \"%s%%%s\", addr, server->ll_iface);\n    status = ares_uri_set_host(uri, addr_iface);\n  } else {\n    status = ares_uri_set_host(uri, addr);\n  }\n\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_uri_set_port(uri, server->udp_port);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (server->udp_port != server->tcp_port) {\n    char port[6];\n    snprintf(port, sizeof(port), \"%d\", server->tcp_port);\n    status = ares_uri_set_query_key(uri, \"tcpport\", port);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n  }\n\n  status = ares_uri_write_buf(uri, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_uri_destroy(uri);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          993,
+          0
+        ],
+        [
+          1047,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_server_addr_uri",
+        "parameters": {
+          "server": "ares_server_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_get_server_addr(const ares_server_t *server, ares_buf_t *buf)\n{\n  ares_status_t status;\n  char          addr[INET6_ADDRSTRLEN];\n\n  if (ares_server_use_uri(server)) {\n    return ares_get_server_addr_uri(server, buf);\n  }\n\n  /* ipv4addr or [ipv6addr] */\n  if (server->addr.family == AF_INET6) {\n    status = ares_buf_append_byte(buf, '[');\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  ares_inet_ntop(server->addr.family, &server->addr.addr, addr, sizeof(addr));\n\n  status = ares_buf_append_str(buf, addr);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (server->addr.family == AF_INET6) {\n    status = ares_buf_append_byte(buf, ']');\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  /* :port */\n  status = ares_buf_append_byte(buf, ':');\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_num_dec(buf, server->udp_port, 0);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* %iface */\n  if (ares_strlen(server->ll_iface)) {\n    status = ares_buf_append_byte(buf, '%');\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_str(buf, server->ll_iface);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1050,
+          0
+        ],
+        [
+          1106,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_server_addr",
+        "parameters": {
+          "server": "ares_server_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "int ares_get_servers(const ares_channel_t   *channel,\n                     struct ares_addr_node **servers)\n{\n  struct ares_addr_node *srvr_head = NULL;\n  struct ares_addr_node *srvr_last = NULL;\n  struct ares_addr_node *srvr_curr;\n  ares_status_t          status = ARES_SUCCESS;\n  ares_slist_node_t     *node;\n\n  if (channel == NULL) {\n    return ARES_ENODATA;\n  }\n\n  ares_channel_lock(channel);\n\n  for (node = ares_slist_node_first(channel->servers); node != NULL;\n       node = ares_slist_node_next(node)) {\n    const ares_server_t *server = ares_slist_node_val(node);\n\n    /* Allocate storage for this server node appending it to the list */\n    srvr_curr = ares_malloc_data(ARES_DATATYPE_ADDR_NODE);\n    if (!srvr_curr) {\n      status = ARES_ENOMEM;\n      break;\n    }\n    if (srvr_last) {\n      srvr_last->next = srvr_curr;\n    } else {\n      srvr_head = srvr_curr;\n    }\n    srvr_last = srvr_curr;\n\n    /* Fill this server node data */\n    srvr_curr->family = server->addr.family;\n    if (srvr_curr->family == AF_INET) {\n      memcpy(&srvr_curr->addr.addr4, &server->addr.addr.addr4,\n             sizeof(srvr_curr->addr.addr4));\n    } else {\n      memcpy(&srvr_curr->addr.addr6, &server->addr.addr.addr6,\n             sizeof(srvr_curr->addr.addr6));\n    }\n  }\n\n  if (status != ARES_SUCCESS) {\n    ares_free_data(srvr_head);\n    srvr_head = NULL;\n  }\n\n  *servers = srvr_head;\n\n  ares_channel_unlock(channel);\n\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          1108,
+          0
+        ],
+        [
+          1161,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_get_servers_ports(const ares_channel_t        *channel,\n                           struct ares_addr_port_node **servers)\n{\n  struct ares_addr_port_node *srvr_head = NULL;\n  struct ares_addr_port_node *srvr_last = NULL;\n  struct ares_addr_port_node *srvr_curr;\n  ares_status_t               status = ARES_SUCCESS;\n  ares_slist_node_t          *node;\n\n  if (channel == NULL) {\n    return ARES_ENODATA;\n  }\n\n  ares_channel_lock(channel);\n\n  for (node = ares_slist_node_first(channel->servers); node != NULL;\n       node = ares_slist_node_next(node)) {\n    const ares_server_t *server = ares_slist_node_val(node);\n\n    /* Allocate storage for this server node appending it to the list */\n    srvr_curr = ares_malloc_data(ARES_DATATYPE_ADDR_PORT_NODE);\n    if (!srvr_curr) {\n      status = ARES_ENOMEM;\n      break;\n    }\n    if (srvr_last) {\n      srvr_last->next = srvr_curr;\n    } else {\n      srvr_head = srvr_curr;\n    }\n    srvr_last = srvr_curr;\n\n    /* Fill this server node data */\n    srvr_curr->family   = server->addr.family;\n    srvr_curr->udp_port = server->udp_port;\n    srvr_curr->tcp_port = server->tcp_port;\n\n    if (srvr_curr->family == AF_INET) {\n      memcpy(&srvr_curr->addr.addr4, &server->addr.addr.addr4,\n             sizeof(srvr_curr->addr.addr4));\n    } else {\n      memcpy(&srvr_curr->addr.addr6, &server->addr.addr.addr6,\n             sizeof(srvr_curr->addr.addr6));\n    }\n  }\n\n  if (status != ARES_SUCCESS) {\n    ares_free_data(srvr_head);\n    srvr_head = NULL;\n  }\n\n  *servers = srvr_head;\n\n  ares_channel_unlock(channel);\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          1163,
+          0
+        ],
+        [
+          1218,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers_ports",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_port_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_set_servers(ares_channel_t              *channel,\n                     const struct ares_addr_node *servers)\n{\n  ares_llist_t *slist;\n  ares_status_t status;\n\n  if (channel == NULL) {\n    return ARES_ENODATA;\n  }\n\n  status = ares_addr_node_to_sconfig_llist(servers, &slist);\n  if (status != ARES_SUCCESS) {\n    return (int)status;\n  }\n\n  ares_channel_lock(channel);\n  status = ares_servers_update(channel, slist, ARES_TRUE);\n  ares_channel_unlock(channel);\n\n  ares_llist_destroy(slist);\n\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          1220,
+          0
+        ],
+        [
+          1242,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_set_servers_ports(ares_channel_t                   *channel,\n                           const struct ares_addr_port_node *servers)\n{\n  ares_llist_t *slist;\n  ares_status_t status;\n\n  if (channel == NULL) {\n    return ARES_ENODATA;\n  }\n\n  status = ares_addrpnode_to_sconfig_llist(servers, &slist);\n  if (status != ARES_SUCCESS) {\n    return (int)status;\n  }\n\n  ares_channel_lock(channel);\n  status = ares_servers_update(channel, slist, ARES_TRUE);\n  ares_channel_unlock(channel);\n\n  ares_llist_destroy(slist);\n\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          1244,
+          0
+        ],
+        [
+          1266,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_ports",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct ares_addr_port_node"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t set_servers_csv(ares_channel_t *channel, const char *_csv)\n{\n  ares_status_t status;\n  ares_llist_t *slist = NULL;\n\n  if (channel == NULL) {\n    return ARES_ENODATA;\n  }\n\n  if (ares_strlen(_csv) == 0) {\n    /* blank all servers */\n    ares_channel_lock(channel);\n    status = ares_servers_update(channel, NULL, ARES_TRUE);\n    ares_channel_unlock(channel);\n    return status;\n  }\n\n  status = ares_sconfig_append_fromstr(channel, &slist, _csv, ARES_FALSE);\n  if (status != ARES_SUCCESS) {\n    ares_llist_destroy(slist);\n    return status;\n  }\n\n  ares_channel_lock(channel);\n  status = ares_servers_update(channel, slist, ARES_TRUE);\n  ares_channel_unlock(channel);\n\n  ares_llist_destroy(slist);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1270,
+          0
+        ],
+        [
+          1300,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "_csv": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "int ares_set_servers_csv(ares_channel_t *channel, const char *_csv)\n{\n  return (int)set_servers_csv(channel, _csv);\n}",
+      "fn_code_pos": [
+        [
+          1303,
+          0
+        ],
+        [
+          1306,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "_csv": "char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_set_servers_ports_csv(ares_channel_t *channel, const char *_csv)\n{\n  return (int)set_servers_csv(channel, _csv);\n}",
+      "fn_code_pos": [
+        [
+          1308,
+          0
+        ],
+        [
+          1311,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_servers_ports_csv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "_csv": "char"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "char *ares_get_servers_csv(const ares_channel_t *channel)\n{\n  ares_buf_t        *buf = NULL;\n  char              *out = NULL;\n  ares_slist_node_t *node;\n\n  ares_channel_lock(channel);\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (node = ares_slist_node_first(channel->servers); node != NULL;\n       node = ares_slist_node_next(node)) {\n    ares_status_t        status;\n    const ares_server_t *server = ares_slist_node_val(node);\n\n    if (ares_buf_len(buf)) {\n      status = ares_buf_append_byte(buf, ',');\n      if (status != ARES_SUCCESS) {\n        goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n\n    status = ares_get_server_addr(server, buf);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  out = ares_buf_finish_str(buf, NULL);\n  buf = NULL;\n\ndone:\n  ares_channel_unlock(channel);\n  ares_buf_destroy(buf);\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          1313,
+          0
+        ],
+        [
+          1351,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "void ares_set_server_state_callback(ares_channel_t            *channel,\n                                    ares_server_state_callback cb, void *data)\n{\n  if (channel == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  channel->server_state_cb      = cb;\n  channel->server_state_cb_data = data;\n}",
+      "fn_code_pos": [
+        [
+          1353,
+          0
+        ],
+        [
+          1361,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_server_state_callback",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "cb": "ares_server_state_callback",
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_server_find(const ares_channel_t *channel,\n                                           const ares_sconfig_t *s)",
+      "fn_dec_pos": [
+        [
+          585,
+          26
+        ],
+        [
+          586,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_server_find",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_sconfig_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_get_servers_csv(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          1313,
+          6
+        ],
+        [
+          1313,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_servers_csv",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  struct ares_addr addr;\n  unsigned short   tcp_port;\n  unsigned short   udp_port;\n\n  char             ll_iface[IF_NAMESIZE];\n  unsigned int     ll_scope;\n} ares_sconfig_t;",
+      {
+        "addr": "struct ares_addr",
+        "tcp_port": "unsigned short",
+        "udp_port": "unsigned short",
+        "ll_iface[IF_NAMESIZE]": "char",
+        "ll_scope": "unsigned int"
+      },
+      "ares_sconfig_t",
+      [
+        57,
+        0
+      ],
+      [
+        64,
+        17
+      ]
+    ],
+    [
+      "struct {\n    const unsigned char netbase[16];\n    unsigned char       netmask;\n  }",
+      {
+        "unsigned char": "const",
+        "netmask": "unsigned char"
+      },
+      "",
+      [
+        166,
+        8
+      ],
+      [
+        169,
+        3
+      ]
+    ],
+    [
+      "typedef struct {\n  struct ares_addr addr;\n  unsigned short   tcp_port;\n  unsigned short   udp_port;\n\n  char             ll_iface[IF_NAMESIZE];\n  unsigned int     ll_scope;\n} ares_sconfig_t;",
+      {
+        "addr": "struct ares_addr",
+        "tcp_port": "unsigned short",
+        "udp_port": "unsigned short",
+        "ll_iface[IF_NAMESIZE]": "char",
+        "ll_scope": "unsigned int"
+      },
+      "ares_sconfig_t",
+      [
+        57,
+        0
+      ],
+      [
+        64,
+        17
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        58,
+        2
+      ],
+      [
+        58,
+        18
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        66,
+        41
+      ],
+      [
+        66,
+        57
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        67,
+        41
+      ],
+      [
+        67,
+        57
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        95,
+        36
+      ],
+      [
+        95,
+        52
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        96,
+        36
+      ],
+      [
+        96,
+        52
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        149,
+        41
+      ],
+      [
+        149,
+        57
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        151,
+        2
+      ],
+      [
+        151,
+        18
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        163,
+        49
+      ],
+      [
+        163,
+        65
+      ]
+    ],
+    [
+      "struct {\n    const unsigned char netbase[16];\n    unsigned char       netmask;\n  }",
+      {
+        "unsigned char": "const",
+        "netmask": "unsigned char"
+      },
+      "",
+      [
+        166,
+        8
+      ],
+      [
+        169,
+        3
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        187,
+        4
+      ],
+      [
+        187,
+        20
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        430,
+        40
+      ],
+      [
+        430,
+        56
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        836,
+        40
+      ],
+      [
+        836,
+        61
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        839,
+        8
+      ],
+      [
+        839,
+        29
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        888,
+        40
+      ],
+      [
+        888,
+        66
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        891,
+        8
+      ],
+      [
+        891,
+        34
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        942,
+        50
+      ],
+      [
+        942,
+        64
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1109,
+        21
+      ],
+      [
+        1109,
+        42
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1111,
+        2
+      ],
+      [
+        1111,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1112,
+        2
+      ],
+      [
+        1112,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1113,
+        2
+      ],
+      [
+        1113,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1164,
+        27
+      ],
+      [
+        1164,
+        53
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1166,
+        2
+      ],
+      [
+        1166,
+        28
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1167,
+        2
+      ],
+      [
+        1167,
+        28
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1168,
+        2
+      ],
+      [
+        1168,
+        28
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        1221,
+        27
+      ],
+      [
+        1221,
+        48
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        1245,
+        33
+      ],
+      [
+        1245,
+        59
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/socket.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <net/if.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#    include <iphlpapi.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#    include <netioapi.h>\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_data.h\"\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_inet_net_pton.h\"\n",
+      [
+        55,
+        0
+      ],
+      [
+        56,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

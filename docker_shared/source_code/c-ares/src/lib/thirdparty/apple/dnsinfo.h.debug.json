@@ -1,0 +1,717 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "DNS_PTR(char *,\t\t\tdomain)",
+      "fn_dec_pos": [
+        [
+          62,
+          1
+        ],
+        [
+          62,
+          26
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(int32_t,\t\tn_nameserver)",
+      "fn_dec_pos": [
+        [
+          63,
+          1
+        ],
+        [
+          63,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(struct sockaddr **,\tnameserver)",
+      "fn_dec_pos": [
+        [
+          64,
+          1
+        ],
+        [
+          64,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint16_t,\t\tport)",
+      "fn_dec_pos": [
+        [
+          65,
+          1
+        ],
+        [
+          65,
+          25
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(int32_t,\t\tn_search)",
+      "fn_dec_pos": [
+        [
+          66,
+          1
+        ],
+        [
+          66,
+          28
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(char **,\t\tsearch)",
+      "fn_dec_pos": [
+        [
+          67,
+          1
+        ],
+        [
+          67,
+          26
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(int32_t,\t\tn_sortaddr)",
+      "fn_dec_pos": [
+        [
+          68,
+          1
+        ],
+        [
+          68,
+          30
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(dns_sortaddr_t **,\tsortaddr)",
+      "fn_dec_pos": [
+        [
+          69,
+          1
+        ],
+        [
+          69,
+          37
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(char *,\t\t\toptions)",
+      "fn_dec_pos": [
+        [
+          70,
+          1
+        ],
+        [
+          70,
+          27
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\ttimeout)",
+      "fn_dec_pos": [
+        [
+          71,
+          1
+        ],
+        [
+          71,
+          28
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\tsearch_order)",
+      "fn_dec_pos": [
+        [
+          72,
+          1
+        ],
+        [
+          72,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\tif_index)",
+      "fn_dec_pos": [
+        [
+          73,
+          1
+        ],
+        [
+          73,
+          29
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\tflags)",
+      "fn_dec_pos": [
+        [
+          74,
+          1
+        ],
+        [
+          74,
+          26
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\treserved[6])",
+      "fn_dec_pos": [
+        [
+          76,
+          1
+        ],
+        [
+          76,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\treach_flags)",
+      "fn_dec_pos": [
+        [
+          78,
+          1
+        ],
+        [
+          78,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\treserved[5])",
+      "fn_dec_pos": [
+        [
+          79,
+          1
+        ],
+        [
+          79,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(int32_t,\t\tn_resolver)",
+      "fn_dec_pos": [
+        [
+          90,
+          1
+        ],
+        [
+          90,
+          30
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(dns_resolver_t **,\tresolver)",
+      "fn_dec_pos": [
+        [
+          91,
+          1
+        ],
+        [
+          91,
+          37
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(int32_t,\t\tn_scoped_resolver)",
+      "fn_dec_pos": [
+        [
+          92,
+          1
+        ],
+        [
+          92,
+          37
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_PTR(dns_resolver_t **,\tscoped_resolver)",
+      "fn_dec_pos": [
+        [
+          93,
+          1
+        ],
+        [
+          93,
+          44
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_PTR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNS_VAR(uint32_t,\t\treserved[5])",
+      "fn_dec_pos": [
+        [
+          94,
+          1
+        ],
+        [
+          94,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNS_VAR",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "dns_configuration_notify_key    (void)",
+      "fn_dec_pos": [
+        [
+          105,
+          0
+        ],
+        [
+          105,
+          38
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dns_configuration_notify_key",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "dns_configuration_copy\t\t(void)",
+      "fn_dec_pos": [
+        [
+          108,
+          0
+        ],
+        [
+          108,
+          30
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dns_configuration_copy",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "dns_configuration_free\t\t(dns_config_t\t*config)",
+      "fn_dec_pos": [
+        [
+          111,
+          0
+        ],
+        [
+          111,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dns_configuration_free",
+        "parameters": {
+          "config": "dns_config_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "_dns_configuration_ack\t\t(dns_config_t\t*config,\n\t\t\t\t const char\t*bundle_id)",
+      "fn_dec_pos": [
+        [
+          115,
+          0
+        ],
+        [
+          116,
+          27
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "_dns_configuration_ack",
+        "parameters": {
+          "config": "dns_config_t",
+          "bundle_id": "char"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n\tstruct in_addr\taddress;\n\tstruct in_addr\tmask;\n} dns_sortaddr_t;",
+      {
+        "address": "struct in_addr",
+        "mask": "struct in_addr"
+      },
+      "dns_sortaddr_t",
+      [
+        53,
+        0
+      ],
+      [
+        56,
+        17
+      ]
+    ],
+    [
+      "typedef struct {\n\tDNS_PTR(char *,\t\t\tdomain);\t/* domain */\n\tDNS_VAR(int32_t,\t\tn_nameserver);\t/* # nameserver */\n\tDNS_PTR(struct sockaddr **,\tnameserver);\n\tDNS_VAR(uint16_t,\t\tport);\t\t/* port (in host byte order) */\n\tDNS_VAR(int32_t,\t\tn_search);\t/* # search */\n\tDNS_PTR(char **,\t\tsearch);\n\tDNS_VAR(int32_t,\t\tn_sortaddr);\t/* # sortaddr */\n\tDNS_PTR(dns_sortaddr_t **,\tsortaddr);\n\tDNS_PTR(char *,\t\t\toptions);\t/* options */\n\tDNS_VAR(uint32_t,\t\ttimeout);\t/* timeout */\n\tDNS_VAR(uint32_t,\t\tsearch_order);\t/* search_order */\n\tDNS_VAR(uint32_t,\t\tif_index);\n\tDNS_VAR(uint32_t,\t\tflags);\n#if MAC_OS_X_VERSION_MIN_REQUIRED < 1080 /* MacOS 10.8 */\n\tDNS_VAR(uint32_t,\t\treserved[6]);\n#else\n\tDNS_VAR(uint32_t,\t\treach_flags);\t/* SCNetworkReachabilityFlags */\n\tDNS_VAR(uint32_t,\t\treserved[5]);\n#endif\n} dns_resolver_t;",
+      {},
+      "dns_resolver_t",
+      [
+        61,
+        0
+      ],
+      [
+        81,
+        17
+      ]
+    ],
+    [
+      "typedef struct {\n\tDNS_VAR(int32_t,\t\tn_resolver);\t\t/* resolver configurations */\n\tDNS_PTR(dns_resolver_t **,\tresolver);\n\tDNS_VAR(int32_t,\t\tn_scoped_resolver);\t/* \"scoped\" resolver configurations */\n\tDNS_PTR(dns_resolver_t **,\tscoped_resolver);\n\tDNS_VAR(uint32_t,\t\treserved[5]);\n} dns_config_t;",
+      {},
+      "dns_config_t",
+      [
+        89,
+        0
+      ],
+      [
+        95,
+        15
+      ]
+    ],
+    [
+      "typedef struct {\n\tstruct in_addr\taddress;\n\tstruct in_addr\tmask;\n} dns_sortaddr_t;",
+      {
+        "address": "struct in_addr",
+        "mask": "struct in_addr"
+      },
+      "dns_sortaddr_t",
+      [
+        53,
+        0
+      ],
+      [
+        56,
+        17
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        54,
+        1
+      ],
+      [
+        54,
+        15
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        55,
+        1
+      ],
+      [
+        55,
+        15
+      ]
+    ],
+    [
+      "typedef struct {\n\tDNS_PTR(char *,\t\t\tdomain);\t/* domain */\n\tDNS_VAR(int32_t,\t\tn_nameserver);\t/* # nameserver */\n\tDNS_PTR(struct sockaddr **,\tnameserver);\n\tDNS_VAR(uint16_t,\t\tport);\t\t/* port (in host byte order) */\n\tDNS_VAR(int32_t,\t\tn_search);\t/* # search */\n\tDNS_PTR(char **,\t\tsearch);\n\tDNS_VAR(int32_t,\t\tn_sortaddr);\t/* # sortaddr */\n\tDNS_PTR(dns_sortaddr_t **,\tsortaddr);\n\tDNS_PTR(char *,\t\t\toptions);\t/* options */\n\tDNS_VAR(uint32_t,\t\ttimeout);\t/* timeout */\n\tDNS_VAR(uint32_t,\t\tsearch_order);\t/* search_order */\n\tDNS_VAR(uint32_t,\t\tif_index);\n\tDNS_VAR(uint32_t,\t\tflags);\n#if MAC_OS_X_VERSION_MIN_REQUIRED < 1080 /* MacOS 10.8 */\n\tDNS_VAR(uint32_t,\t\treserved[6]);\n#else\n\tDNS_VAR(uint32_t,\t\treach_flags);\t/* SCNetworkReachabilityFlags */\n\tDNS_VAR(uint32_t,\t\treserved[5]);\n#endif\n} dns_resolver_t;",
+      {},
+      "dns_resolver_t",
+      [
+        61,
+        0
+      ],
+      [
+        81,
+        17
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        64,
+        9
+      ],
+      [
+        64,
+        24
+      ]
+    ],
+    [
+      "typedef struct {\n\tDNS_VAR(int32_t,\t\tn_resolver);\t\t/* resolver configurations */\n\tDNS_PTR(dns_resolver_t **,\tresolver);\n\tDNS_VAR(int32_t,\t\tn_scoped_resolver);\t/* \"scoped\" resolver configurations */\n\tDNS_PTR(dns_resolver_t **,\tscoped_resolver);\n\tDNS_VAR(uint32_t,\t\treserved[5]);\n} dns_config_t;",
+      {},
+      "dns_config_t",
+      [
+        89,
+        0
+      ],
+      [
+        95,
+        15
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include <Availability.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include <sys/cdefs.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#include <stdint.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include <sys/types.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#include <sys/socket.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#include <netinet/in.h>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#include <AvailabilityMacros.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

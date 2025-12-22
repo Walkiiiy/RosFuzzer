@@ -1,0 +1,702 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_close_connection(ares_conn_t *conn, ares_status_t requeue_status)",
+      "fn_dec_pos": [
+        [
+          166,
+          5
+        ],
+        [
+          166,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_close_connection",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "requeue_status": "ares_status_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_close_sockets(ares_server_t *server)",
+      "fn_dec_pos": [
+        [
+          167,
+          5
+        ],
+        [
+          167,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_close_sockets",
+        "parameters": {
+          "server": "ares_server_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_check_cleanup_conns(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          168,
+          5
+        ],
+        [
+          168,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_check_cleanup_conns",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_destroy_servers_state(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          170,
+          5
+        ],
+        [
+          170,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_servers_state",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_open_connection(ares_conn_t   **conn_out,\n                                     ares_channel_t *channel,\n                                     ares_server_t *server, ares_bool_t is_tcp)",
+      "fn_dec_pos": [
+        [
+          171,
+          16
+        ],
+        [
+          173,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_open_connection",
+        "parameters": {
+          "conn_out": "ares_conn_t",
+          "channel": "ares_channel_t",
+          "server": "ares_server_t",
+          "is_tcp": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_write(ares_conn_t *conn, const void *data, size_t len,\n                                size_t *written)",
+      "fn_dec_pos": [
+        [
+          175,
+          16
+        ],
+        [
+          176,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_write",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "data": "void",
+          "len": "size_t",
+          "written": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_flush(ares_conn_t *conn)",
+      "fn_dec_pos": [
+        [
+          177,
+          16
+        ],
+        [
+          177,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_flush",
+        "parameters": {
+          "conn": "ares_conn_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_read(ares_conn_t *conn, void *data, size_t len,\n                               size_t *read_bytes)",
+      "fn_dec_pos": [
+        [
+          178,
+          16
+        ],
+        [
+          179,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_read",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "data": "void",
+          "len": "size_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_conn_from_fd(const ares_channel_t *channel, ares_socket_t fd)",
+      "fn_dec_pos": [
+        [
+          180,
+          13
+        ],
+        [
+          180,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_from_fd",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "fd": "ares_socket_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_conn_sock_state_cb_update(ares_conn_t            *conn,\n                                            ares_conn_state_flags_t flags)",
+      "fn_dec_pos": [
+        [
+          181,
+          13
+        ],
+        [
+          182,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_conn_sock_state_cb_update",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "flags": "ares_conn_state_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_socket_recv(ares_channel_t *channel, ares_socket_t s,\n                                 ares_bool_t is_tcp, void *data,\n                                 size_t data_len, size_t *read_bytes)",
+      "fn_dec_pos": [
+        [
+          183,
+          16
+        ],
+        [
+          185,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_recv",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t",
+          "is_tcp": "ares_bool_t",
+          "data": "void",
+          "data_len": "size_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_recvfrom(ares_channel_t *channel, ares_socket_t s,\n                                     ares_bool_t is_tcp, void *data,\n                                     size_t data_len, int flags,\n                                     struct sockaddr *from,\n                                     ares_socklen_t  *from_len,\n                                     size_t          *read_bytes)",
+      "fn_dec_pos": [
+        [
+          186,
+          16
+        ],
+        [
+          191,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_socket_recvfrom",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "s": "ares_socket_t",
+          "is_tcp": "ares_bool_t",
+          "data": "void",
+          "data_len": "size_t",
+          "flags": "int",
+          "from": "struct sockaddr",
+          "from_len": "ares_socklen_t",
+          "read_bytes": "size_t"
+        },
+        "return_type": "ares_conn_err_t"
+      }
+    },
+    {
+      "fn_code": "ares_destroy_server(ares_server_t *server)",
+      "fn_dec_pos": [
+        [
+          193,
+          16
+        ],
+        [
+          193,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_server",
+        "parameters": {
+          "server": "ares_server_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_conn {\n  ares_server_t          *server;\n  ares_socket_t           fd;\n  struct ares_addr        self_ip;\n  ares_conn_flags_t       flags;\n  ares_conn_state_flags_t state_flags;\n\n  /*! Outbound buffered data that is not yet sent.  Exists as one contiguous\n   *  stream in TCP format (big endian 16bit length prefix followed by DNS\n   *  wire-format message).  For TCP this can be sent as-is, UDP this must\n   *  be sent per-packet (stripping the length prefix) */\n  ares_buf_t             *out_buf;\n\n  /*! Inbound buffered data that is not yet parsed.  Exists as one contiguous\n   *  stream in TCP format (big endian 16bit length prefix followed by DNS\n   *  wire-format message).  TCP may have partial data and this needs to be\n   *  handled gracefully, but UDP will always have a full message */\n  ares_buf_t             *in_buf;\n\n  /* total number of queries run on this connection since it was established */\n  size_t                  total_queries;\n\n  /* list of outstanding queries to this connection */\n  ares_llist_t           *queries_to_conn;\n}",
+      {
+        "*server": "ares_server_t",
+        "fd": "ares_socket_t",
+        "self_ip": "struct ares_addr",
+        "flags": "ares_conn_flags_t",
+        "state_flags": "ares_conn_state_flags_t",
+        "*out_buf": "ares_buf_t",
+        "*in_buf": "ares_buf_t",
+        "total_queries": "size_t",
+        "*queries_to_conn": "ares_llist_t"
+      },
+      "ares_conn",
+      [
+        56,
+        0
+      ],
+      [
+        80,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  time_t        ts;             /*!< Timestamp divided by bucket divisor */\n  unsigned int  latency_min_ms; /*!< Minimum latency for queries */\n  unsigned int  latency_max_ms; /*!< Maximum latency for queries */\n  ares_uint64_t total_ms;       /*!< Cumulative query time for bucket */\n  ares_uint64_t total_count;    /*!< Number of queries for bucket */\n\n  time_t        prev_ts;        /*!< Previous period bucket timestamp */\n  ares_uint64_t\n    prev_total_ms; /*!< Previous period bucket cumulative query time */\n  ares_uint64_t prev_total_count; /*!< Previous period bucket query count */\n} ares_server_metrics_t;",
+      {
+        "ts": "time_t",
+        "latency_min_ms": "unsigned int",
+        "latency_max_ms": "unsigned int",
+        "total_ms": "ares_uint64_t",
+        "total_count": "ares_uint64_t",
+        "prev_ts": "time_t",
+        "prev_total_ms": "ares_uint64_t",
+        "prev_total_count": "ares_uint64_t"
+      },
+      "ares_server_metrics_t",
+      [
+        93,
+        0
+      ],
+      [
+        104,
+        24
+      ]
+    ],
+    [
+      "typedef struct {\n  /*! starts at INITIAL, transitions as needed. */\n  ares_cookie_state_t state;\n  /*! randomly-generate client cookie */\n  unsigned char       client[8];\n  /*! timestamp client cookie was generated, used for rotation purposes */\n  ares_timeval_t      client_ts;\n  /*! IP address last used for client to connect to server.  If this changes\n   *  The client cookie gets invalidated */\n  struct ares_addr    client_ip;\n  /*! Server Cookie last received, 8-32 bytes in length */\n  unsigned char       server[32];\n  /*! Length of server cookie on file. */\n  size_t              server_len;\n  /*! Timestamp of last attempt to use cookies, but it was determined that the\n   *  server didn't support them */\n  ares_timeval_t      unsupported_ts;\n} ares_cookie_t;",
+      {
+        "state": "ares_cookie_state_t",
+        "client[8]": "unsigned char",
+        "client_ts": "ares_timeval_t",
+        "client_ip": "struct ares_addr",
+        "server[32]": "unsigned char",
+        "server_len": "size_t",
+        "unsupported_ts": "ares_timeval_t"
+      },
+      "ares_cookie_t",
+      [
+        117,
+        0
+      ],
+      [
+        134,
+        16
+      ]
+    ],
+    [
+      "struct ares_server {\n  /* Configuration */\n  size_t                idx;      /* index for server in system configuration */\n  struct ares_addr      addr;\n  unsigned short        udp_port; /* host byte order */\n  unsigned short        tcp_port; /* host byte order */\n  char                  ll_iface[64];    /* IPv6 Link Local Interface */\n  unsigned int          ll_scope;        /* IPv6 Link Local Scope */\n\n  size_t                consec_failures; /* Consecutive query failure count\n                                          * can be hard errors or timeouts\n                                          */\n  ares_bool_t           probe_pending;   /* Whether a probe is pending for this\n                                          * server due to prior failures */\n  ares_llist_t         *connections;\n  ares_conn_t          *tcp_conn;\n\n  /* The next time when we will retry this server if it has hit failures */\n  ares_timeval_t        next_retry_time;\n\n  /*! Buckets for collecting metrics about the server */\n  ares_server_metrics_t metrics[ARES_METRIC_COUNT];\n\n  /*! RFC 7873/9018 DNS Cookies */\n  ares_cookie_t         cookie;\n\n  /* Link back to owning channel */\n  ares_channel_t       *channel;\n}",
+      {
+        "idx": "size_t",
+        "addr": "struct ares_addr",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "ll_iface[64]": "char",
+        "ll_scope": "unsigned int",
+        "consec_failures": "size_t",
+        "probe_pending": "ares_bool_t",
+        "*connections": "ares_llist_t",
+        "*tcp_conn": "ares_conn_t",
+        "next_retry_time": "ares_timeval_t",
+        "metrics[ARES_METRIC_COUNT]": "ares_server_metrics_t",
+        "cookie": "ares_cookie_t",
+        "*channel": "ares_channel_t"
+      },
+      "ares_server",
+      [
+        136,
+        0
+      ],
+      [
+        164,
+        1
+      ]
+    ],
+    [
+      "struct ares_conn",
+      {},
+      "",
+      [
+        30,
+        0
+      ],
+      [
+        30,
+        16
+      ]
+    ],
+    [
+      "typedef struct ares_conn ares_conn_t;",
+      {},
+      "ares_conn_t",
+      [
+        31,
+        0
+      ],
+      [
+        31,
+        37
+      ]
+    ],
+    [
+      "struct ares_server",
+      {},
+      "",
+      [
+        33,
+        0
+      ],
+      [
+        33,
+        18
+      ]
+    ],
+    [
+      "typedef struct ares_server ares_server_t;",
+      {},
+      "ares_server_t",
+      [
+        34,
+        0
+      ],
+      [
+        34,
+        41
+      ]
+    ],
+    [
+      "struct ares_conn {\n  ares_server_t          *server;\n  ares_socket_t           fd;\n  struct ares_addr        self_ip;\n  ares_conn_flags_t       flags;\n  ares_conn_state_flags_t state_flags;\n\n  /*! Outbound buffered data that is not yet sent.  Exists as one contiguous\n   *  stream in TCP format (big endian 16bit length prefix followed by DNS\n   *  wire-format message).  For TCP this can be sent as-is, UDP this must\n   *  be sent per-packet (stripping the length prefix) */\n  ares_buf_t             *out_buf;\n\n  /*! Inbound buffered data that is not yet parsed.  Exists as one contiguous\n   *  stream in TCP format (big endian 16bit length prefix followed by DNS\n   *  wire-format message).  TCP may have partial data and this needs to be\n   *  handled gracefully, but UDP will always have a full message */\n  ares_buf_t             *in_buf;\n\n  /* total number of queries run on this connection since it was established */\n  size_t                  total_queries;\n\n  /* list of outstanding queries to this connection */\n  ares_llist_t           *queries_to_conn;\n}",
+      {
+        "*server": "ares_server_t",
+        "fd": "ares_socket_t",
+        "self_ip": "struct ares_addr",
+        "flags": "ares_conn_flags_t",
+        "state_flags": "ares_conn_state_flags_t",
+        "*out_buf": "ares_buf_t",
+        "*in_buf": "ares_buf_t",
+        "total_queries": "size_t",
+        "*queries_to_conn": "ares_llist_t"
+      },
+      "ares_conn",
+      [
+        56,
+        0
+      ],
+      [
+        80,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        59,
+        2
+      ],
+      [
+        59,
+        18
+      ]
+    ],
+    [
+      "typedef struct {\n  time_t        ts;             /*!< Timestamp divided by bucket divisor */\n  unsigned int  latency_min_ms; /*!< Minimum latency for queries */\n  unsigned int  latency_max_ms; /*!< Maximum latency for queries */\n  ares_uint64_t total_ms;       /*!< Cumulative query time for bucket */\n  ares_uint64_t total_count;    /*!< Number of queries for bucket */\n\n  time_t        prev_ts;        /*!< Previous period bucket timestamp */\n  ares_uint64_t\n    prev_total_ms; /*!< Previous period bucket cumulative query time */\n  ares_uint64_t prev_total_count; /*!< Previous period bucket query count */\n} ares_server_metrics_t;",
+      {
+        "ts": "time_t",
+        "latency_min_ms": "unsigned int",
+        "latency_max_ms": "unsigned int",
+        "total_ms": "ares_uint64_t",
+        "total_count": "ares_uint64_t",
+        "prev_ts": "time_t",
+        "prev_total_ms": "ares_uint64_t",
+        "prev_total_count": "ares_uint64_t"
+      },
+      "ares_server_metrics_t",
+      [
+        93,
+        0
+      ],
+      [
+        104,
+        24
+      ]
+    ],
+    [
+      "typedef struct {\n  /*! starts at INITIAL, transitions as needed. */\n  ares_cookie_state_t state;\n  /*! randomly-generate client cookie */\n  unsigned char       client[8];\n  /*! timestamp client cookie was generated, used for rotation purposes */\n  ares_timeval_t      client_ts;\n  /*! IP address last used for client to connect to server.  If this changes\n   *  The client cookie gets invalidated */\n  struct ares_addr    client_ip;\n  /*! Server Cookie last received, 8-32 bytes in length */\n  unsigned char       server[32];\n  /*! Length of server cookie on file. */\n  size_t              server_len;\n  /*! Timestamp of last attempt to use cookies, but it was determined that the\n   *  server didn't support them */\n  ares_timeval_t      unsupported_ts;\n} ares_cookie_t;",
+      {
+        "state": "ares_cookie_state_t",
+        "client[8]": "unsigned char",
+        "client_ts": "ares_timeval_t",
+        "client_ip": "struct ares_addr",
+        "server[32]": "unsigned char",
+        "server_len": "size_t",
+        "unsupported_ts": "ares_timeval_t"
+      },
+      "ares_cookie_t",
+      [
+        117,
+        0
+      ],
+      [
+        134,
+        16
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        126,
+        2
+      ],
+      [
+        126,
+        18
+      ]
+    ],
+    [
+      "struct ares_server {\n  /* Configuration */\n  size_t                idx;      /* index for server in system configuration */\n  struct ares_addr      addr;\n  unsigned short        udp_port; /* host byte order */\n  unsigned short        tcp_port; /* host byte order */\n  char                  ll_iface[64];    /* IPv6 Link Local Interface */\n  unsigned int          ll_scope;        /* IPv6 Link Local Scope */\n\n  size_t                consec_failures; /* Consecutive query failure count\n                                          * can be hard errors or timeouts\n                                          */\n  ares_bool_t           probe_pending;   /* Whether a probe is pending for this\n                                          * server due to prior failures */\n  ares_llist_t         *connections;\n  ares_conn_t          *tcp_conn;\n\n  /* The next time when we will retry this server if it has hit failures */\n  ares_timeval_t        next_retry_time;\n\n  /*! Buckets for collecting metrics about the server */\n  ares_server_metrics_t metrics[ARES_METRIC_COUNT];\n\n  /*! RFC 7873/9018 DNS Cookies */\n  ares_cookie_t         cookie;\n\n  /* Link back to owning channel */\n  ares_channel_t       *channel;\n}",
+      {
+        "idx": "size_t",
+        "addr": "struct ares_addr",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "ll_iface[64]": "char",
+        "ll_scope": "unsigned int",
+        "consec_failures": "size_t",
+        "probe_pending": "ares_bool_t",
+        "*connections": "ares_llist_t",
+        "*tcp_conn": "ares_conn_t",
+        "next_retry_time": "ares_timeval_t",
+        "metrics[ARES_METRIC_COUNT]": "ares_server_metrics_t",
+        "cookie": "ares_cookie_t",
+        "*channel": "ares_channel_t"
+      },
+      "ares_server",
+      [
+        136,
+        0
+      ],
+      [
+        164,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        139,
+        2
+      ],
+      [
+        139,
+        18
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        189,
+        37
+      ],
+      [
+        189,
+        52
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_socket.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  /*! No flags */\n  ARES_CONN_FLAG_NONE = 0,\n  /*! TCP connection, not UDP */\n  ARES_CONN_FLAG_TCP = 1 << 0,\n  /*! TCP Fast Open is enabled and being used if supported by the OS */\n  ARES_CONN_FLAG_TFO = 1 << 1,\n  /*! TCP Fast Open has not yet sent its first packet. Gets unset on first\n   *  write to a connection */\n  ARES_CONN_FLAG_TFO_INITIAL = 1 << 2\n} ares_conn_flags_t;",
+      {
+        "ARES_CONN_FLAG_NONE": "",
+        "ARES_CONN_FLAG_TCP": "",
+        "ARES_CONN_FLAG_TFO": "",
+        "ARES_CONN_FLAG_TFO_INITIAL": ""
+      },
+      "ares_conn_flags_t",
+      [
+        36,
+        0
+      ],
+      [
+        46,
+        20
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_CONN_STATE_NONE      = 0,\n  ARES_CONN_STATE_READ      = 1 << 0,\n  ARES_CONN_STATE_WRITE     = 1 << 1,\n  ARES_CONN_STATE_CONNECTED = 1 << 2, /* This doesn't get a callback */\n  ARES_CONN_STATE_CBFLAGS   = ARES_CONN_STATE_READ | ARES_CONN_STATE_WRITE\n} ares_conn_state_flags_t;",
+      {
+        "ARES_CONN_STATE_NONE": "",
+        "ARES_CONN_STATE_READ": "",
+        "ARES_CONN_STATE_WRITE": "",
+        "ARES_CONN_STATE_CONNECTED": "",
+        "ARES_CONN_STATE_CBFLAGS": ""
+      },
+      "ares_conn_state_flags_t",
+      [
+        48,
+        0
+      ],
+      [
+        54,
+        26
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_METRIC_1MINUTE = 0, /*!< Bucket for tracking over the last minute */\n  ARES_METRIC_15MINUTES,   /*!< Bucket for tracking over the last 15 minutes */\n  ARES_METRIC_1HOUR,       /*!< Bucket for tracking over the last hour */\n  ARES_METRIC_1DAY,        /*!< Bucket for tracking over the last day */\n  ARES_METRIC_INCEPTION,   /*!< Bucket for tracking since inception */\n  ARES_METRIC_COUNT        /*!< Count of buckets, not a real bucket */\n} ares_server_bucket_t;",
+      {
+        "ARES_METRIC_1MINUTE": "",
+        "ARES_METRIC_15MINUTES": "",
+        "ARES_METRIC_1HOUR": "",
+        "ARES_METRIC_1DAY": "",
+        "ARES_METRIC_INCEPTION": "",
+        "ARES_METRIC_COUNT": ""
+      },
+      "ares_server_bucket_t",
+      [
+        83,
+        0
+      ],
+      [
+        90,
+        23
+      ]
+    ],
+    [
+      "typedef enum {\n  ARES_COOKIE_INITIAL     = 0,\n  ARES_COOKIE_GENERATED   = 1,\n  ARES_COOKIE_SUPPORTED   = 2,\n  ARES_COOKIE_UNSUPPORTED = 3\n} ares_cookie_state_t;",
+      {
+        "ARES_COOKIE_INITIAL": "",
+        "ARES_COOKIE_GENERATED": "",
+        "ARES_COOKIE_SUPPORTED": "",
+        "ARES_COOKIE_UNSUPPORTED": ""
+      },
+      "ares_cookie_state_t",
+      [
+        106,
+        0
+      ],
+      [
+        111,
+        22
+      ]
+    ]
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_htable_hashfunc_t)(const void  *key,\n                                               unsigned int seed)",
+      "fn_dec_pos": [
+        [
+          60,
+          21
+        ],
+        [
+          61,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "key": "void",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*ares_htable_bucket_free_t)(void *bucket)",
+      "fn_dec_pos": [
+        [
+          67,
+          13
+        ],
+        [
+          67,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_htable_bucket_key_t)(const void *bucket)",
+      "fn_dec_pos": [
+        [
+          74,
+          20
+        ],
+        [
+          74,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*ares_htable_key_eq_t)(const void *key1, const void *key2)",
+      "fn_dec_pos": [
+        [
+          82,
+          20
+        ],
+        [
+          82,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "key1": "void",
+          "key2": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_destroy(ares_htable_t *htable)",
+      "fn_dec_pos": [
+        [
+          89,
+          15
+        ],
+        [
+          89,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_destroy",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_htable_create(ares_htable_hashfunc_t    hash_func,\n                                  ares_htable_bucket_key_t  bucket_key,\n                                  ares_htable_bucket_free_t bucket_free,\n                                  ares_htable_key_eq_t      key_eq)",
+      "fn_dec_pos": [
+        [
+          99,
+          15
+        ],
+        [
+          102,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_create",
+        "parameters": {
+          "hash_func": "ares_htable_hashfunc_t",
+          "bucket_key": "ares_htable_bucket_key_t",
+          "bucket_free": "ares_htable_bucket_free_t",
+          "key_eq": "ares_htable_key_eq_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_num_keys(const ares_htable_t *htable)",
+      "fn_dec_pos": [
+        [
+          109,
+          15
+        ],
+        [
+          109,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_num_keys",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_all_buckets(const ares_htable_t *htable, size_t *num)",
+      "fn_dec_pos": [
+        [
+          121,
+          13
+        ],
+        [
+          121,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_all_buckets",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_insert(ares_htable_t *htable, void *bucket)",
+      "fn_dec_pos": [
+        [
+          130,
+          13
+        ],
+        [
+          130,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_insert",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "bucket": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_get(const ares_htable_t *htable, const void *key)",
+      "fn_dec_pos": [
+        [
+          138,
+          13
+        ],
+        [
+          138,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_get",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "key": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_remove(ares_htable_t *htable, const void *key)",
+      "fn_dec_pos": [
+        [
+          146,
+          13
+        ],
+        [
+          146,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_remove",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "key": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_hash_FNV1a(const unsigned char *key, size_t key_len,\n                                    unsigned int seed)",
+      "fn_dec_pos": [
+        [
+          156,
+          13
+        ],
+        [
+          157,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_hash_FNV1a",
+        "parameters": {
+          "key": "unsigned char",
+          "key_len": "size_t",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_hash_FNV1a_casecmp(const unsigned char *key,\n                                            size_t key_len, unsigned int seed)",
+      "fn_dec_pos": [
+        [
+          168,
+          13
+        ],
+        [
+          169,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_hash_FNV1a_casecmp",
+        "parameters": {
+          "key": "unsigned char",
+          "key_len": "size_t",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable",
+      {},
+      "",
+      [
+        47,
+        0
+      ],
+      [
+        47,
+        18
+      ]
+    ],
+    [
+      "typedef struct ares_htable ares_htable_t;",
+      {},
+      "ares_htable_t",
+      [
+        50,
+        0
+      ],
+      [
+        50,
+        41
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

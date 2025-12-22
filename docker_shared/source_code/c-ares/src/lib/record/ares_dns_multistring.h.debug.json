@@ -1,0 +1,279 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_dns_multistring_create(void)",
+      "fn_dec_pos": [
+        [
+          33,
+          36
+        ],
+        [
+          33,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_clear(ares_dns_multistring_t *strs)",
+      "fn_dec_pos": [
+        [
+          34,
+          14
+        ],
+        [
+          34,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_clear",
+        "parameters": {
+          "strs": "ares_dns_multistring_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_destroy(ares_dns_multistring_t *strs)",
+      "fn_dec_pos": [
+        [
+          35,
+          14
+        ],
+        [
+          35,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_destroy",
+        "parameters": {
+          "strs": "ares_dns_multistring_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_swap_own(ares_dns_multistring_t *strs,\n                                            size_t idx, unsigned char *str,\n                                            size_t len)",
+      "fn_dec_pos": [
+        [
+          36,
+          14
+        ],
+        [
+          38,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_swap_own",
+        "parameters": {
+          "strs": "ares_dns_multistring_t",
+          "idx": "size_t",
+          "str": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_del(ares_dns_multistring_t *strs,\n                                       size_t                  idx)",
+      "fn_dec_pos": [
+        [
+          39,
+          14
+        ],
+        [
+          40,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_del",
+        "parameters": {
+          "strs": "ares_dns_multistring_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_add_own(ares_dns_multistring_t *strs,\n                                           unsigned char *str, size_t len)",
+      "fn_dec_pos": [
+        [
+          41,
+          14
+        ],
+        [
+          42,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_add_own",
+        "parameters": {
+          "strs": "ares_dns_multistring_t",
+          "str": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_cnt(const ares_dns_multistring_t *strs)",
+      "fn_dec_pos": [
+        [
+          43,
+          14
+        ],
+        [
+          43,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_cnt",
+        "parameters": {
+          "strs": "ares_dns_multistring_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_get(const ares_dns_multistring_t *strs, size_t idx,\n                           size_t *len)",
+      "fn_dec_pos": [
+        [
+          45,
+          2
+        ],
+        [
+          46,
+          39
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_get",
+        "parameters": {
+          "strs": "ares_dns_multistring_t",
+          "idx": "size_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_combined(ares_dns_multistring_t *strs,\n                                                   size_t                 *len)",
+      "fn_dec_pos": [
+        [
+          47,
+          21
+        ],
+        [
+          48,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_combined",
+        "parameters": {
+          "strs": "ares_dns_multistring_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dns_multistring_parse_buf(ares_buf_t *buf,\n                                                    size_t      remaining_len,\n                                                    ares_dns_multistring_t **strs,\n                                                    ares_bool_t validate_printable)",
+      "fn_dec_pos": [
+        [
+          66,
+          21
+        ],
+        [
+          69,
+          83
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_multistring_parse_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "strs": "ares_dns_multistring_t",
+          "validate_printable": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_dns_multistring",
+      {},
+      "",
+      [
+        30,
+        0
+      ],
+      [
+        30,
+        27
+      ]
+    ],
+    [
+      "typedef struct ares_dns_multistring ares_dns_multistring_t;",
+      {},
+      "ares_dns_multistring_t",
+      [
+        31,
+        0
+      ],
+      [
+        31,
+        59
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_buf.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

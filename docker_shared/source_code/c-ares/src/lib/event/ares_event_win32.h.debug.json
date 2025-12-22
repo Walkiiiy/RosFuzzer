@@ -1,0 +1,599 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(NTAPI *PIO_APC_ROUTINE)(PVOID            ApcContext,\n                                     PIO_STATUS_BLOCK IoStatusBlock,\n                                     ULONG            Reserved)",
+      "fn_dec_pos": [
+        [
+          57,
+          12
+        ],
+        [
+          59,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ApcContext": "PVOID",
+          "IoStatusBlock": "PIO_STATUS_BLOCK",
+          "Reserved": "ULONG"
+        },
+        "return_type": "VOID"
+      }
+    },
+    {
+      "fn_code": "(NTAPI *NtCancelIoFileEx_t)(HANDLE           FileHandle,\n                                            PIO_STATUS_BLOCK IoRequestToCancel,\n                                            PIO_STATUS_BLOCK IoStatusBlock)",
+      "fn_dec_pos": [
+        [
+          131,
+          16
+        ],
+        [
+          133,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "FileHandle": "HANDLE",
+          "IoRequestToCancel": "PIO_STATUS_BLOCK",
+          "IoStatusBlock": "PIO_STATUS_BLOCK"
+        },
+        "return_type": "NTSTATUS"
+      }
+    },
+    {
+      "fn_code": "(NTAPI *NtDeviceIoControlFile_t)(\n  HANDLE FileHandle, HANDLE Event, PIO_APC_ROUTINE ApcRoutine, PVOID ApcContext,\n  PIO_STATUS_BLOCK IoStatusBlock, ULONG IoControlCode, PVOID InputBuffer,\n  ULONG InputBufferLength, PVOID OutputBuffer, ULONG OutputBufferLength)",
+      "fn_dec_pos": [
+        [
+          134,
+          16
+        ],
+        [
+          137,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "FileHandle": "HANDLE",
+          "Event": "HANDLE",
+          "ApcRoutine": "PIO_APC_ROUTINE",
+          "ApcContext": "PVOID",
+          "IoStatusBlock": "PIO_STATUS_BLOCK",
+          "IoControlCode": "ULONG",
+          "InputBuffer": "PVOID",
+          "InputBufferLength": "ULONG",
+          "OutputBuffer": "PVOID",
+          "OutputBufferLength": "ULONG"
+        },
+        "return_type": "NTSTATUS"
+      }
+    },
+    {
+      "fn_code": "(NTAPI *NtCreateFile_t)(\n  PHANDLE FileHandle, ACCESS_MASK DesiredAccess,\n  POBJECT_ATTRIBUTES ObjectAttributes, PIO_STATUS_BLOCK IoStatusBlock,\n  PLARGE_INTEGER AllocationSize, ULONG FileAttributes, ULONG ShareAccess,\n  ULONG CreateDisposition, ULONG CreateOptions, PVOID EaBuffer, ULONG EaLength)",
+      "fn_dec_pos": [
+        [
+          139,
+          16
+        ],
+        [
+          143,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "FileHandle": "PHANDLE",
+          "DesiredAccess": "ACCESS_MASK",
+          "ObjectAttributes": "POBJECT_ATTRIBUTES",
+          "IoStatusBlock": "PIO_STATUS_BLOCK",
+          "AllocationSize": "PLARGE_INTEGER",
+          "FileAttributes": "ULONG",
+          "ShareAccess": "ULONG",
+          "CreateDisposition": "ULONG",
+          "CreateOptions": "ULONG",
+          "EaBuffer": "PVOID",
+          "EaLength": "ULONG"
+        },
+        "return_type": "NTSTATUS"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct _IO_STATUS_BLOCK {\n  union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  };\n\n  ULONG_PTR Information;\n} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;",
+      {
+        ";": "union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  }",
+        "Status": "NTSTATUS",
+        "Pointer": "PVOID",
+        "Information": "ULONG_PTR"
+      },
+      "IO_STATUS_BLOCK",
+      [
+        48,
+        0
+      ],
+      [
+        55,
+        37
+      ]
+    ],
+    [
+      "typedef struct _IO_STATUS_BLOCK {\n  union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  };\n\n  ULONG_PTR Information;\n} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;",
+      {
+        ";": "union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  }",
+        "Status": "NTSTATUS",
+        "Pointer": "PVOID",
+        "Information": "ULONG_PTR"
+      },
+      "PIO_STATUS_BLOCK",
+      [
+        48,
+        0
+      ],
+      [
+        55,
+        37
+      ]
+    ],
+    [
+      "typedef struct _UNICODE_STRING {\n  USHORT  Length;\n  USHORT  MaximumLength;\n  LPCWSTR Buffer;\n} UNICODE_STRING, *PUNICODE_STRING;",
+      {
+        "Length": "USHORT",
+        "MaximumLength": "USHORT",
+        "Buffer": "LPCWSTR"
+      },
+      "UNICODE_STRING",
+      [
+        69,
+        0
+      ],
+      [
+        73,
+        35
+      ]
+    ],
+    [
+      "typedef struct _UNICODE_STRING {\n  USHORT  Length;\n  USHORT  MaximumLength;\n  LPCWSTR Buffer;\n} UNICODE_STRING, *PUNICODE_STRING;",
+      {
+        "Length": "USHORT",
+        "MaximumLength": "USHORT",
+        "Buffer": "LPCWSTR"
+      },
+      "PUNICODE_STRING",
+      [
+        69,
+        0
+      ],
+      [
+        73,
+        35
+      ]
+    ],
+    [
+      "typedef struct _OBJECT_ATTRIBUTES {\n  ULONG           Length;\n  HANDLE          RootDirectory;\n  PUNICODE_STRING ObjectName;\n  ULONG           Attributes;\n  PVOID           SecurityDescriptor;\n  PVOID           SecurityQualityOfService;\n} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;",
+      {
+        "Length": "ULONG",
+        "RootDirectory": "HANDLE",
+        "ObjectName": "PUNICODE_STRING",
+        "Attributes": "ULONG",
+        "SecurityDescriptor": "PVOID",
+        "SecurityQualityOfService": "PVOID"
+      },
+      "OBJECT_ATTRIBUTES",
+      [
+        75,
+        0
+      ],
+      [
+        82,
+        41
+      ]
+    ],
+    [
+      "typedef struct _OBJECT_ATTRIBUTES {\n  ULONG           Length;\n  HANDLE          RootDirectory;\n  PUNICODE_STRING ObjectName;\n  ULONG           Attributes;\n  PVOID           SecurityDescriptor;\n  PVOID           SecurityQualityOfService;\n} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;",
+      {
+        "Length": "ULONG",
+        "RootDirectory": "HANDLE",
+        "ObjectName": "PUNICODE_STRING",
+        "Attributes": "ULONG",
+        "SecurityDescriptor": "PVOID",
+        "SecurityQualityOfService": "PVOID"
+      },
+      "POBJECT_ATTRIBUTES",
+      [
+        75,
+        0
+      ],
+      [
+        82,
+        41
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_HANDLE_INFO {\n  HANDLE   Handle;\n  ULONG    Events;\n  NTSTATUS Status;\n} AFD_POLL_HANDLE_INFO, *PAFD_POLL_HANDLE_INFO;",
+      {
+        "Handle": "HANDLE",
+        "Events": "ULONG",
+        "Status": "NTSTATUS"
+      },
+      "AFD_POLL_HANDLE_INFO",
+      [
+        117,
+        0
+      ],
+      [
+        121,
+        47
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_HANDLE_INFO {\n  HANDLE   Handle;\n  ULONG    Events;\n  NTSTATUS Status;\n} AFD_POLL_HANDLE_INFO, *PAFD_POLL_HANDLE_INFO;",
+      {
+        "Handle": "HANDLE",
+        "Events": "ULONG",
+        "Status": "NTSTATUS"
+      },
+      "PAFD_POLL_HANDLE_INFO",
+      [
+        117,
+        0
+      ],
+      [
+        121,
+        47
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_INFO {\n  LARGE_INTEGER        Timeout;\n  ULONG                NumberOfHandles;\n  ULONG                Exclusive;\n  AFD_POLL_HANDLE_INFO Handles[1];\n} AFD_POLL_INFO, *PAFD_POLL_INFO;",
+      {
+        "Timeout": "LARGE_INTEGER",
+        "NumberOfHandles": "ULONG",
+        "Exclusive": "ULONG",
+        "Handles[1]": "AFD_POLL_HANDLE_INFO"
+      },
+      "AFD_POLL_INFO",
+      [
+        123,
+        0
+      ],
+      [
+        128,
+        33
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_INFO {\n  LARGE_INTEGER        Timeout;\n  ULONG                NumberOfHandles;\n  ULONG                Exclusive;\n  AFD_POLL_HANDLE_INFO Handles[1];\n} AFD_POLL_INFO, *PAFD_POLL_INFO;",
+      {
+        "Timeout": "LARGE_INTEGER",
+        "NumberOfHandles": "ULONG",
+        "Exclusive": "ULONG",
+        "Handles[1]": "AFD_POLL_HANDLE_INFO"
+      },
+      "PAFD_POLL_INFO",
+      [
+        123,
+        0
+      ],
+      [
+        128,
+        33
+      ]
+    ],
+    [
+      "typedef struct _OVERLAPPED_ENTRY {\n  ULONG_PTR    lpCompletionKey;\n  LPOVERLAPPED lpOverlapped;\n  ULONG_PTR    Internal;\n  DWORD        dwNumberOfBytesTransferred;\n} OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;",
+      {
+        "lpCompletionKey": "ULONG_PTR",
+        "lpOverlapped": "LPOVERLAPPED",
+        "Internal": "ULONG_PTR",
+        "dwNumberOfBytesTransferred": "DWORD"
+      },
+      "OVERLAPPED_ENTRY",
+      [
+        160,
+        0
+      ],
+      [
+        165,
+        40
+      ]
+    ],
+    [
+      "typedef struct _OVERLAPPED_ENTRY {\n  ULONG_PTR    lpCompletionKey;\n  LPOVERLAPPED lpOverlapped;\n  ULONG_PTR    Internal;\n  DWORD        dwNumberOfBytesTransferred;\n} OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;",
+      {
+        "lpCompletionKey": "ULONG_PTR",
+        "lpOverlapped": "LPOVERLAPPED",
+        "Internal": "ULONG_PTR",
+        "dwNumberOfBytesTransferred": "DWORD"
+      },
+      "LPOVERLAPPED_ENTRY",
+      [
+        160,
+        0
+      ],
+      [
+        165,
+        40
+      ]
+    ],
+    [
+      "typedef struct _IO_STATUS_BLOCK {\n  union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  };\n\n  ULONG_PTR Information;\n} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;",
+      {
+        ";": "union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  }",
+        "Status": "NTSTATUS",
+        "Pointer": "PVOID",
+        "Information": "ULONG_PTR"
+      },
+      "IO_STATUS_BLOCK",
+      [
+        48,
+        0
+      ],
+      [
+        55,
+        37
+      ]
+    ],
+    [
+      "typedef struct _IO_STATUS_BLOCK {\n  union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  };\n\n  ULONG_PTR Information;\n} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;",
+      {
+        ";": "union {\n    NTSTATUS Status;\n    PVOID    Pointer;\n  }",
+        "Status": "NTSTATUS",
+        "Pointer": "PVOID",
+        "Information": "ULONG_PTR"
+      },
+      "PIO_STATUS_BLOCK",
+      [
+        48,
+        0
+      ],
+      [
+        55,
+        37
+      ]
+    ],
+    [
+      "typedef struct _UNICODE_STRING {\n  USHORT  Length;\n  USHORT  MaximumLength;\n  LPCWSTR Buffer;\n} UNICODE_STRING, *PUNICODE_STRING;",
+      {
+        "Length": "USHORT",
+        "MaximumLength": "USHORT",
+        "Buffer": "LPCWSTR"
+      },
+      "UNICODE_STRING",
+      [
+        69,
+        0
+      ],
+      [
+        73,
+        35
+      ]
+    ],
+    [
+      "typedef struct _UNICODE_STRING {\n  USHORT  Length;\n  USHORT  MaximumLength;\n  LPCWSTR Buffer;\n} UNICODE_STRING, *PUNICODE_STRING;",
+      {
+        "Length": "USHORT",
+        "MaximumLength": "USHORT",
+        "Buffer": "LPCWSTR"
+      },
+      "PUNICODE_STRING",
+      [
+        69,
+        0
+      ],
+      [
+        73,
+        35
+      ]
+    ],
+    [
+      "typedef struct _OBJECT_ATTRIBUTES {\n  ULONG           Length;\n  HANDLE          RootDirectory;\n  PUNICODE_STRING ObjectName;\n  ULONG           Attributes;\n  PVOID           SecurityDescriptor;\n  PVOID           SecurityQualityOfService;\n} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;",
+      {
+        "Length": "ULONG",
+        "RootDirectory": "HANDLE",
+        "ObjectName": "PUNICODE_STRING",
+        "Attributes": "ULONG",
+        "SecurityDescriptor": "PVOID",
+        "SecurityQualityOfService": "PVOID"
+      },
+      "OBJECT_ATTRIBUTES",
+      [
+        75,
+        0
+      ],
+      [
+        82,
+        41
+      ]
+    ],
+    [
+      "typedef struct _OBJECT_ATTRIBUTES {\n  ULONG           Length;\n  HANDLE          RootDirectory;\n  PUNICODE_STRING ObjectName;\n  ULONG           Attributes;\n  PVOID           SecurityDescriptor;\n  PVOID           SecurityQualityOfService;\n} OBJECT_ATTRIBUTES, *POBJECT_ATTRIBUTES;",
+      {
+        "Length": "ULONG",
+        "RootDirectory": "HANDLE",
+        "ObjectName": "PUNICODE_STRING",
+        "Attributes": "ULONG",
+        "SecurityDescriptor": "PVOID",
+        "SecurityQualityOfService": "PVOID"
+      },
+      "POBJECT_ATTRIBUTES",
+      [
+        75,
+        0
+      ],
+      [
+        82,
+        41
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_HANDLE_INFO {\n  HANDLE   Handle;\n  ULONG    Events;\n  NTSTATUS Status;\n} AFD_POLL_HANDLE_INFO, *PAFD_POLL_HANDLE_INFO;",
+      {
+        "Handle": "HANDLE",
+        "Events": "ULONG",
+        "Status": "NTSTATUS"
+      },
+      "AFD_POLL_HANDLE_INFO",
+      [
+        117,
+        0
+      ],
+      [
+        121,
+        47
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_HANDLE_INFO {\n  HANDLE   Handle;\n  ULONG    Events;\n  NTSTATUS Status;\n} AFD_POLL_HANDLE_INFO, *PAFD_POLL_HANDLE_INFO;",
+      {
+        "Handle": "HANDLE",
+        "Events": "ULONG",
+        "Status": "NTSTATUS"
+      },
+      "PAFD_POLL_HANDLE_INFO",
+      [
+        117,
+        0
+      ],
+      [
+        121,
+        47
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_INFO {\n  LARGE_INTEGER        Timeout;\n  ULONG                NumberOfHandles;\n  ULONG                Exclusive;\n  AFD_POLL_HANDLE_INFO Handles[1];\n} AFD_POLL_INFO, *PAFD_POLL_INFO;",
+      {
+        "Timeout": "LARGE_INTEGER",
+        "NumberOfHandles": "ULONG",
+        "Exclusive": "ULONG",
+        "Handles[1]": "AFD_POLL_HANDLE_INFO"
+      },
+      "AFD_POLL_INFO",
+      [
+        123,
+        0
+      ],
+      [
+        128,
+        33
+      ]
+    ],
+    [
+      "typedef struct _AFD_POLL_INFO {\n  LARGE_INTEGER        Timeout;\n  ULONG                NumberOfHandles;\n  ULONG                Exclusive;\n  AFD_POLL_HANDLE_INFO Handles[1];\n} AFD_POLL_INFO, *PAFD_POLL_INFO;",
+      {
+        "Timeout": "LARGE_INTEGER",
+        "NumberOfHandles": "ULONG",
+        "Exclusive": "ULONG",
+        "Handles[1]": "AFD_POLL_HANDLE_INFO"
+      },
+      "PAFD_POLL_INFO",
+      [
+        123,
+        0
+      ],
+      [
+        128,
+        33
+      ]
+    ],
+    [
+      "typedef struct _OVERLAPPED_ENTRY {\n  ULONG_PTR    lpCompletionKey;\n  LPOVERLAPPED lpOverlapped;\n  ULONG_PTR    Internal;\n  DWORD        dwNumberOfBytesTransferred;\n} OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;",
+      {
+        "lpCompletionKey": "ULONG_PTR",
+        "lpOverlapped": "LPOVERLAPPED",
+        "Internal": "ULONG_PTR",
+        "dwNumberOfBytesTransferred": "DWORD"
+      },
+      "OVERLAPPED_ENTRY",
+      [
+        160,
+        0
+      ],
+      [
+        165,
+        40
+      ]
+    ],
+    [
+      "typedef struct _OVERLAPPED_ENTRY {\n  ULONG_PTR    lpCompletionKey;\n  LPOVERLAPPED lpOverlapped;\n  ULONG_PTR    Internal;\n  DWORD        dwNumberOfBytesTransferred;\n} OVERLAPPED_ENTRY, *LPOVERLAPPED_ENTRY;",
+      {
+        "lpCompletionKey": "ULONG_PTR",
+        "lpOverlapped": "LPOVERLAPPED",
+        "Internal": "ULONG_PTR",
+        "dwNumberOfBytesTransferred": "DWORD"
+      },
+      "LPOVERLAPPED_ENTRY",
+      [
+        160,
+        0
+      ],
+      [
+        165,
+        40
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#    include <winsock2.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#    include <ws2tcpip.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#    include <mswsock.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#    include <windows.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

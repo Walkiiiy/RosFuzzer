@@ -1,0 +1,136 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "int LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)\n{\n  /* Null terminate the data. */\n  char          *name   = malloc(size + 1);\n  unsigned char *buf    = NULL;\n  int            buflen = 0;\n  name[size]            = '\\0';\n  memcpy(name, data, size);\n\n  ares_create_query(name, C_IN, T_AAAA, 1234, 0, &buf, &buflen, 1024);\n  free(buf);\n  free(name);\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)\n{\n  ares_channel_t *channel = NULL;\n  char           *csv;\n\n  ares_library_init(ARES_LIB_INIT_ALL);\n  ares_init(&channel);\n\n  /* Need to null-term data */\n  csv = malloc(size + 1);\n  memcpy(csv, data, size);\n  csv[size] = '\\0';\n  ares_set_servers_csv(channel, csv);\n  free(csv);\n\n  ares_destroy(channel);\n  ares_library_cleanup();\n\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          58,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)",
+      "fn_dec_pos": [
+        [
+          33,
+          4
+        ],
+        [
+          33,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <stddef.h>\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <string.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

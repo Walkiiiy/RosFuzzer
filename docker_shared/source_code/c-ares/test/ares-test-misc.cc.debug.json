@@ -1,0 +1,783 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, GetServers) {\n  std::string servers = GetNameServers(channel_);\n  if (verbose) {\n    std::cerr << \"Nameserver: \" << servers << std::endl;\n  }\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          39,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, GetServersFailures) {\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_csv(channel_, \"1.2.3.4,2.3.4.5\"));\n  struct ares_addr_node* servers = nullptr;\n  SetAllocFail(1);\n  EXPECT_EQ(ARES_ENOMEM, ares_get_servers(channel_, &servers));\n  SetAllocFail(2);\n  EXPECT_EQ(ARES_ENOMEM, ares_get_servers(channel_, &servers));\n  EXPECT_EQ(ARES_ENODATA, ares_get_servers(nullptr, &servers));\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          50,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetServers) {\n  /* NOTE: This test is because we have actual external users doing test case\n   *       simulation and removing all servers to generate various error\n   *       conditions in their own code.  It would make more sense to return\n   *       ARES_ENODATA, but due to historical users, we can't break them.\n   *       See: https://github.com/nodejs/node/pull/50800\n   */\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers(channel_, nullptr));\n  std::string expected_empty = \"\";\n  EXPECT_EQ(expected_empty, GetNameServers(channel_));\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOSERVER, result.status_);\n\n\n  struct ares_addr_node server1;\n  struct ares_addr_node server2;\n  server1.next = &server2;\n  server1.family = AF_INET;\n  server1.addr.addr4.s_addr = htonl(0x01020304);\n  server2.next = nullptr;\n  server2.family = AF_INET;\n  server2.addr.addr4.s_addr = htonl(0x02030405);\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers(nullptr, &server1));\n\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers(channel_, &server1));\n  std::string expected = \"1.2.3.4:53,2.3.4.5:53\";\n  EXPECT_EQ(expected, GetNameServers(channel_));\n}",
+      "fn_code_pos": [
+        [
+          52,
+          0
+        ],
+        [
+          82,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetServersPorts) {\n  /* NOTE: This test is because we have actual external users doing test case\n   *       simulation and removing all servers to generate various error\n   *       conditions in their own code.  It would make more sense to return\n   *       ARES_ENODATA, but due to historical users, we can't break them.\n   *       See: https://github.com/nodejs/node/pull/50800\n   */\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_ports(channel_, nullptr));\n  std::string expected_empty = \"\";\n  EXPECT_EQ(expected_empty, GetNameServers(channel_));\n\n  struct ares_addr_port_node server1;\n  struct ares_addr_port_node server2;\n  server1.next = &server2;\n  server1.family = AF_INET;\n  server1.addr.addr4.s_addr = htonl(0x01020304);\n  server1.udp_port = 111;\n  server1.tcp_port = 111;\n  server2.next = nullptr;\n  server2.family = AF_INET;\n  server2.addr.addr4.s_addr = htonl(0x02030405);\n  server2.udp_port = 0;\n  server2.tcp_port = 0;\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_ports(nullptr, &server1));\n\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_ports(channel_, &server1));\n  std::string expected = \"1.2.3.4:111,2.3.4.5:53\";\n  EXPECT_EQ(expected, GetNameServers(channel_));\n}",
+      "fn_code_pos": [
+        [
+          84,
+          0
+        ],
+        [
+          112,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetServersCSV) {\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_csv(nullptr, \"1.2.3.4\"));\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_csv(nullptr, \"xyzzy,plugh\"));\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_csv(nullptr, \"256.1.2.3\"));\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_csv(nullptr, \"1.2.3.4.5\"));\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_csv(nullptr, \"1:2:3:4:5\"));\n\n  /* NOTE: This test is because we have actual external users doing test case\n   *       simulation and removing all servers to generate various error\n   *       conditions in their own code.  It would make more sense to return\n   *       ARES_ENODATA, but due to historical users, we can't break them.\n   *       See: https://github.com/nodejs/node/pull/50800\n   */\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel_, NULL));\n  std::string expected_empty = \"\";\n  EXPECT_EQ(expected_empty, GetNameServers(channel_));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel_, \"\"));\n  EXPECT_EQ(expected_empty, GetNameServers(channel_));\n\n\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_csv(channel_, \"1.2.3.4,0102:0304:0506:0708:0910:1112:1314:1516,2.3.4.5\"));\n  std::string expected = \"1.2.3.4:53,[102:304:506:708:910:1112:1314:1516]:53,2.3.4.5:53\";\n  EXPECT_EQ(expected, GetNameServers(channel_));\n\n  // Same, with spaces\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_csv(channel_, \"1.2.3.4 , [0102:0304:0506:0708:0910:1112:1314:1516]:53, 2.3.4.5\"));\n  EXPECT_EQ(expected, GetNameServers(channel_));\n\n  // Ignore invalid link-local interface, keep rest.\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_csv(channel_, \"1.2.3.4 , [0102:0304:0506:0708:0910:1112:1314:1516]:53, [fe80::1]:53%iface0, 2.3.4.5\"));\n  EXPECT_EQ(expected, GetNameServers(channel_));\n\n  // Same, with ports\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_ports_csv(channel_, \"1.2.3.4:54,[0102:0304:0506:0708:0910:1112:1314:1516]:80,2.3.4.5:55\"));\n  std::string expected2 = {\"1.2.3.4:54,[102:304:506:708:910:1112:1314:1516]:80,2.3.4.5:55\"};\n  EXPECT_EQ(expected2, GetNameServers(channel_));\n\n  // Should survive duplication\n  ares_channel_t *channel2;\n  EXPECT_EQ(ARES_SUCCESS, ares_dup(&channel2, channel_));\n  EXPECT_EQ(expected2, GetNameServers(channel2));\n  ares_destroy(channel2);\n\n  // Allocation failure cases\n  for (int fail = 1; fail <= 5; fail++) {\n    SetAllocFail(fail);\n    EXPECT_EQ(ARES_ENOMEM,\n              ares_set_servers_csv(channel_, \"1.2.3.4,0102:0304:0506:0708:0910:1112:1314:1516,2.3.4.5\"));\n  }\n\n  EXPECT_EQ(ARES_EBADSTR, ares_set_servers_csv(channel_, \"2.3.4.5,1.2.3.4:,3.4.5.6\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_servers_csv(channel_, \"2.3.4.5,1.2.3.4:Z,3.4.5.6\"));\n}",
+      "fn_code_pos": [
+        [
+          114,
+          0
+        ],
+        [
+          170,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, TimeoutValue) {\n  struct timeval tinfo;\n  tinfo.tv_sec = 0;\n  tinfo.tv_usec = 0;\n  struct timeval tmax;\n  tmax.tv_sec = 0;\n  tmax.tv_usec = 10;\n  struct timeval* pt;\n\n  // No timers => get max back.\n  pt = ares_timeout(channel_, &tmax, &tinfo);\n  EXPECT_EQ(&tmax, pt);\n  EXPECT_EQ(0, pt->tv_sec);\n  EXPECT_EQ(10, pt->tv_usec);\n\n  pt = ares_timeout(channel_, nullptr, &tinfo);\n  EXPECT_EQ(nullptr, pt);\n\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n\n  // Now there's a timer running.\n  pt = ares_timeout(channel_, &tmax, &tinfo);\n  EXPECT_EQ(&tmax, pt);\n  EXPECT_EQ(0, pt->tv_sec);\n  EXPECT_EQ(10, pt->tv_usec);\n\n  tmax.tv_sec = 100;\n  pt = ares_timeout(channel_, &tmax, &tinfo);\n  EXPECT_EQ(&tinfo, pt);\n\n  pt = ares_timeout(channel_, nullptr, &tinfo);\n  EXPECT_EQ(&tinfo, pt);\n\n  Process();\n}",
+      "fn_code_pos": [
+        [
+          172,
+          0
+        ],
+        [
+          207,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, RecordDuplicateNull) {\n  EXPECT_EQ(ares_dns_record_duplicate(NULL), nullptr);\n}",
+      "fn_code_pos": [
+        [
+          209,
+          0
+        ],
+        [
+          211,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, InetNtoP) {\n  struct in_addr addr;\n  addr.s_addr = htonl(0x01020304);\n  char buffer[256];\n  EXPECT_EQ(buffer, ares_inet_ntop(AF_INET, &addr, buffer, sizeof(buffer)));\n  EXPECT_EQ(\"1.2.3.4\", std::string(buffer));\n}",
+      "fn_code_pos": [
+        [
+          213,
+          0
+        ],
+        [
+          219,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, Mkquery) {\n  byte* p;\n  int len;\n  ares_mkquery(\"example.com\", C_IN, T_A, 0x1234, 0, &p, &len);\n  std::vector<byte> data(p, p + len);\n  ares_free_string(p);\n\n  std::string actual = PacketToString(data);\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).add_question(new DNSQuestion(\"example.com\", T_A));\n  std::string expected = PacketToString(pkt.data());\n  EXPECT_EQ(expected, actual);\n}",
+      "fn_code_pos": [
+        [
+          221,
+          0
+        ],
+        [
+          233,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateQuery) {\n  byte* p;\n  int len;\n  // This is hard to really test with escaping since DNS names don't allow\n  // bad characters.  So we'll escape good characters.\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_create_query(\"ex\\\\097m\\\\ple.com\", C_IN, T_A, 0x1234, 0,\n                              &p, &len, 0));\n  std::vector<byte> data(p, p + len);\n  ares_free_string(p);\n\n  std::string actual = PacketToString(data);\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).add_question(new DNSQuestion(\"example.com\", T_A));\n  std::string expected = PacketToString(pkt.data());\n  EXPECT_EQ(expected, actual);\n}",
+      "fn_code_pos": [
+        [
+          235,
+          0
+        ],
+        [
+          251,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateQueryTrailingEscapedDot) {\n  byte* p;\n  int len;\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_create_query(\"example.com\\\\.\", C_IN, T_A, 0x1234, 0,\n                              &p, &len, 0));\n  std::vector<byte> data(p, p + len);\n  ares_free_string(p);\n\n  std::string actual = PacketToString(data);\n  EXPECT_EQ(\"REQ QRY  Q:{'example.com\\\\.' IN A}\", actual);\n}",
+      "fn_code_pos": [
+        [
+          253,
+          0
+        ],
+        [
+          264,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateQueryNameTooLong) {\n  byte* p;\n  int len;\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_create_query(\n              \"a1234567890123456789.b1234567890123456789.c1234567890123456789.d1234567890123456789.\"\n              \"a1234567890123456789.b1234567890123456789.c1234567890123456789.d1234567890123456789.\"\n              \"a1234567890123456789.b1234567890123456789.c1234567890123456789.d1234567890123456789.\"\n              \"x1234567890123456789.y1234567890123456789.\",\n              C_IN, T_A, 0x1234, 0, &p, &len, 0));\n}",
+      "fn_code_pos": [
+        [
+          266,
+          0
+        ],
+        [
+          276,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateQueryFailures) {\n  byte* p;\n  int len;\n  // RC1035 has a 255 byte limit on names.\n  std::string longname;\n  for (int ii = 0; ii < 17; ii++) {\n    longname += \"fedcba9876543210\";\n  }\n  p = nullptr;\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_create_query(longname.c_str(), C_IN, T_A, 0x1234, 0,\n                    &p, &len, 0));\n  if (p) ares_free_string(p);\n\n  SetAllocFail(1);\n\n  p = nullptr;\n  EXPECT_EQ(ARES_ENOMEM,\n            ares_create_query(\"example.com\", C_IN, T_A, 0x1234, 0,\n                    &p, &len, 0));\n  if (p) ares_free_string(p);\n\n  // 63-char limit on a single label\n  std::string longlabel = \"a.a123456789b123456789c123456789d123456789e123456789f123456789g123456789.org\";\n  p = nullptr;\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_create_query(longlabel.c_str(), C_IN, T_A, 0x1234, 0,\n                    &p, &len, 0));\n  if (p) ares_free_string(p);\n\n  // Empty non-terminal label\n  p = nullptr;\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_create_query(\"example..com\", C_IN, T_A, 0x1234, 0,\n                    &p, &len, 0));\n  if (p) ares_free_string(p);\n\n  EXPECT_EQ(ARES_EFORMERR,\n            ares_create_query(NULL, C_IN, T_A, 0x1234, 0, NULL, NULL, 0));\n}",
+      "fn_code_pos": [
+        [
+          278,
+          0
+        ],
+        [
+          317,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateQueryOnionDomain) {\n  byte* p;\n  int len;\n  EXPECT_EQ(ARES_ENOTFOUND,\n            ares_create_query(\"dontleak.onion\", C_IN, T_A, 0x1234, 0,\n                              &p, &len, 0));\n}",
+      "fn_code_pos": [
+        [
+          319,
+          0
+        ],
+        [
+          325,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, HostByNameOnionDomain) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"dontleak.onion\", AF_INET, HostCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTFOUND, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          327,
+          0
+        ],
+        [
+          332,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, HostByNameFileOnionDomain) {\n  struct hostent *h;\n  EXPECT_EQ(ARES_ENOTFOUND,\n            ares_gethostbyname_file(channel_, \"dontleak.onion\", AF_INET, &h));\n}",
+      "fn_code_pos": [
+        [
+          334,
+          0
+        ],
+        [
+          338,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, GetAddrinfoOnionDomain) {\n  AddrInfoResult result;\n  struct ares_addrinfo_hints hints = {0, 0, 0, 0};\n  hints.ai_family = AF_UNSPEC;\n  ares_getaddrinfo(channel_, \"dontleak.onion\", NULL, &hints, AddrInfoCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTFOUND, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          340,
+          0
+        ],
+        [
+          347,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SearchOnionDomain) {\n  SearchResult result;\n  ares_search(channel_, \"dontleak.onion\", C_IN, T_A,\n              SearchCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTFOUND, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          352,
+          0
+        ],
+        [
+          358,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SendFailure) {\n  unsigned char buf[2] = {};\n  SearchResult result;\n  ares_send(channel_, buf, sizeof(buf), SearchCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_EBADQUERY, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          360,
+          0
+        ],
+        [
+          366,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static std::string ExpandName(const std::vector<byte>& data, int offset,\n                              long *enclen) {\n  char *name = nullptr;\n  int rc = ares_expand_name(data.data() + offset, data.data(), (int)data.size(),\n                            &name, enclen);\n  EXPECT_EQ(ARES_SUCCESS, rc);\n  std::string result;\n  if (rc == ARES_SUCCESS) {\n    result = name;\n  } else {\n    result = \"<error>\";\n  }\n  ares_free_string(name);\n  return result;\n}",
+      "fn_code_pos": [
+        [
+          368,
+          0
+        ],
+        [
+          382,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ExpandName",
+        "parameters": {
+          "data": "std::vector<byte>",
+          "offset": "int",
+          "enclen": "long"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ExpandName) {\n  long enclen;\n  std::vector<byte> data1 = {1, 'a', 2, 'b', 'c', 3, 'd', 'e', 'f', 0};\n  EXPECT_EQ(\"a.bc.def\", ExpandName(data1, 0, &enclen));\n  EXPECT_EQ(data1.size(), (size_t)enclen);\n\n  std::vector<byte> data2 = {0};\n  EXPECT_EQ(\"\", ExpandName(data2, 0, &enclen));\n  EXPECT_EQ(1, enclen);\n\n  // Complete name indirection\n  std::vector<byte> data3 = {0x12, 0x23,\n                             3, 'd', 'e', 'f', 0,\n                             0xC0, 2};\n  EXPECT_EQ(\"def\", ExpandName(data3, 2, &enclen));\n  EXPECT_EQ(5, enclen);\n  EXPECT_EQ(\"def\", ExpandName(data3, 7, &enclen));\n  EXPECT_EQ(2, enclen);\n\n  // One label then indirection\n  std::vector<byte> data4 = {0x12, 0x23,\n                             3, 'd', 'e', 'f', 0,\n                             1, 'a', 0xC0, 2};\n  EXPECT_EQ(\"def\", ExpandName(data4, 2, &enclen));\n  EXPECT_EQ(5, enclen);\n  EXPECT_EQ(\"a.def\", ExpandName(data4, 7, &enclen));\n  EXPECT_EQ(4, enclen);\n\n  // Two labels then indirection\n  std::vector<byte> data5 = {0x12, 0x23,\n                             3, 'd', 'e', 'f', 0,\n                             1, 'a', 1, 'b', 0xC0, 2};\n  EXPECT_EQ(\"def\", ExpandName(data5, 2, &enclen));\n  EXPECT_EQ(5, enclen);\n  EXPECT_EQ(\"a.b.def\", ExpandName(data5, 7, &enclen));\n  EXPECT_EQ(6, enclen);\n\n  // Empty name, indirection to empty name\n  std::vector<byte> data6 = {0x12, 0x23,\n                             0,\n                             0xC0, 2};\n  EXPECT_EQ(\"\", ExpandName(data6, 2, &enclen));\n  EXPECT_EQ(1, enclen);\n  EXPECT_EQ(\"\", ExpandName(data6, 3, &enclen));\n  EXPECT_EQ(2, enclen);\n}",
+      "fn_code_pos": [
+        [
+          384,
+          0
+        ],
+        [
+          429,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ExpandNameFailure) {\n  std::vector<byte> data1 = {0x03, 'c', 'o', 'm', 0x00};\n  char *name = nullptr;\n  long enclen;\n  SetAllocFail(1);\n  EXPECT_EQ(ARES_ENOMEM,\n            ares_expand_name(data1.data(), data1.data(), (int)data1.size(),\n                             &name, &enclen));\n\n  // Empty packet\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data1.data(), data1.data(), 0, &name, &enclen));\n\n  // Start beyond enclosing data\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data1.data() + data1.size(), data1.data(), (int)data1.size(),\n                             &name, &enclen));\n\n  // Length beyond size of enclosing data\n  std::vector<byte> data2a = {0x13, 'c', 'o', 'm', 0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data2a.data(), data2a.data(), (int)data2a.size(),\n                             &name, &enclen));\n  std::vector<byte> data2b = {0x1};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data2b.data(), data2b.data(), (int)data2b.size(),\n                             &name, &enclen));\n  std::vector<byte> data2c = {0xC0};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data2c.data(), data2c.data(), (int)data2c.size(),\n                             &name, &enclen));\n\n  // Indirection beyond enclosing data\n  std::vector<byte> data3a = {0xC0, 0x02};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data3a.data(), data3a.data(), (int)data3a.size(),\n                             &name, &enclen));\n  std::vector<byte> data3b = {0xC0, 0x0A, 'c', 'o', 'm', 0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data3b.data(), data3b.data(), (int)data3b.size(),\n                             &name, &enclen));\n\n  // Invalid top bits in label length\n  std::vector<byte> data4 = {0x03, 'c', 'o', 'm', 0x00, 0x80, 0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data4.data() + 5, data4.data(), (int)data4.size(),\n                             &name, &enclen));\n\n  // Label too long: 64-byte label, with invalid top 2 bits of length (01).\n  std::vector<byte> data5 = {0x40,\n                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',\n                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',\n                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',\n                             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',\n                             0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data5.data(), data5.data(), (int)data5.size(),\n                             &name, &enclen)) << name;\n\n  // Incomplete indirect length\n  std::vector<byte> data6 = {0x03, 'c', 'o', 'm', 0x00, 0xC0};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data6.data() + 5, data6.data(), (int)data6.size(),\n                             &name, &enclen));\n\n  // Indirection loops\n  std::vector<byte> data7 = {0xC0, 0x02, 0xC0, 0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data7.data(), data7.data(), (int)data7.size(),\n                             &name, &enclen));\n  std::vector<byte> data8 = {3, 'd', 'e', 'f', 0xC0, 0x08, 0x00, 0x00,\n                             3, 'a', 'b', 'c', 0xC0, 0x00};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data8.data(), data8.data(), (int)data8.size(),\n                             &name, &enclen));\n  std::vector<byte> data9 = {0x12, 0x23,  // start 2 bytes in\n                             3, 'd', 'e', 'f', 0xC0, 0x02};\n  EXPECT_EQ(ARES_EBADNAME,\n            ares_expand_name(data9.data() + 2, data9.data(), (int)data9.size(),\n                             &name, &enclen));\n}",
+      "fn_code_pos": [
+        [
+          431,
+          0
+        ],
+        [
+          511,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateEDNSQuery) {\n  byte* p;\n  int len;\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_create_query(\"example.com\", C_IN, T_A, 0x1234, 0,\n                              &p, &len, 1280));\n  std::vector<byte> data(p, p + len);\n  ares_free_string(p);\n\n  std::string actual = PacketToString(data);\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).add_question(new DNSQuestion(\"example.com\", T_A))\n    .add_additional(new DNSOptRR(0, 0, 0, 1280, { }, { } /* No server cookie */, false));\n  std::string expected = PacketToString(pkt.data());\n  EXPECT_EQ(expected, actual);\n}",
+      "fn_code_pos": [
+        [
+          513,
+          0
+        ],
+        [
+          528,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, CreateRootQuery) {\n  byte* p;\n  int len;\n  ares_create_query(\".\", C_IN, T_A, 0x1234, 0, &p, &len, 0);\n  std::vector<byte> data(p, p + len);\n  ares_free_string(p);\n\n  std::string actual = PacketToString(data);\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).add_question(new DNSQuestion(\"\", T_A));\n  std::string expected = PacketToString(pkt.data());\n  EXPECT_EQ(expected, actual);\n}",
+      "fn_code_pos": [
+        [
+          530,
+          0
+        ],
+        [
+          542,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, Version) {\n  // Assume linked to same version\n  EXPECT_EQ(std::string(ARES_VERSION_STR),\n            std::string(ares_version(nullptr)));\n  int version;\n  ares_version(&version);\n  EXPECT_EQ(ARES_VERSION, version);\n}",
+      "fn_code_pos": [
+        [
+          544,
+          0
+        ],
+        [
+          551,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ExpandString) {\n  std::vector<byte> s1 = { 3, 'a', 'b', 'c'};\n  char* result = nullptr;\n  long len;\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_expand_string(s1.data(), s1.data(), (int)s1.size(),\n                               (unsigned char**)&result, &len));\n  EXPECT_EQ(\"abc\", std::string(result));\n  EXPECT_EQ(1 + 3, len);  // amount of data consumed includes 1 byte len\n  ares_free_string(result);\n  result = nullptr;\n  EXPECT_EQ(ARES_EBADSTR,\n            ares_expand_string(s1.data() + 1, s1.data(), (int)s1.size(),\n                               (unsigned char**)&result, &len));\n  EXPECT_EQ(ARES_EBADSTR,\n            ares_expand_string(s1.data() + 4, s1.data(), (int)s1.size(),\n                               (unsigned char**)&result, &len));\n  SetAllocFail(1);\n  EXPECT_EQ(ARES_ENOMEM,\n            ares_expand_string(s1.data(), s1.data(), (int)s1.size(),\n                               (unsigned char**)&result, &len));\n}",
+      "fn_code_pos": [
+        [
+          553,
+          0
+        ],
+        [
+          574,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, DNSMapping) {\n  ares_dns_rec_type_t types[] = {\n    ARES_REC_TYPE_A,\n    ARES_REC_TYPE_NS,\n    ARES_REC_TYPE_CNAME,\n    ARES_REC_TYPE_SOA,\n    ARES_REC_TYPE_PTR,\n    ARES_REC_TYPE_HINFO,\n    ARES_REC_TYPE_MX,\n    ARES_REC_TYPE_TXT,\n    ARES_REC_TYPE_SIG,\n    ARES_REC_TYPE_AAAA,\n    ARES_REC_TYPE_SRV,\n    ARES_REC_TYPE_NAPTR,\n    ARES_REC_TYPE_OPT,\n    ARES_REC_TYPE_TLSA,\n    ARES_REC_TYPE_SVCB,\n    ARES_REC_TYPE_HTTPS,\n    ARES_REC_TYPE_ANY,\n    ARES_REC_TYPE_URI,\n    ARES_REC_TYPE_CAA\n  };\n\n  for (size_t i=0; i<sizeof(types) / sizeof(*types); i++) {\n    ares_dns_rec_type_t type;\n    EXPECT_TRUE(ares_dns_rec_type_fromstr(&type, ares_dns_rec_type_tostr(types[i])));\n    EXPECT_EQ(types[i], type);\n    size_t cnt;\n    const ares_dns_rr_key_t *keys = ares_dns_rr_get_keys(type, &cnt);\n    for (size_t j=0; j<cnt; j++) {\n      const char *name = ares_dns_rr_key_tostr(keys[j]);\n      EXPECT_NE(nullptr, name);\n      EXPECT_NE(\"UNKNOWN\", std::string(name));\n      EXPECT_EQ(type, ares_dns_rr_key_to_rec_type(keys[j]));\n      EXPECT_NE(0, (int)ares_dns_rr_key_datatype(keys[j]));\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          576,
+          0
+        ],
+        [
+          613,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, StrError) {\n  ares_status_t status[] = {\n    ARES_SUCCESS, ARES_ENODATA, ARES_EFORMERR, ARES_ESERVFAIL, ARES_ENOTFOUND,\n    ARES_ENOTIMP, ARES_EREFUSED, ARES_EBADQUERY, ARES_EBADNAME, ARES_EBADFAMILY,\n    ARES_EBADRESP, ARES_ECONNREFUSED, ARES_ETIMEOUT, ARES_EOF, ARES_EFILE,\n    ARES_ENOMEM, ARES_EDESTRUCTION, ARES_EBADSTR, ARES_EBADFLAGS, ARES_ENONAME,\n    ARES_EBADHINTS, ARES_ENOTINITIALIZED, ARES_ELOADIPHLPAPI,\n    ARES_EADDRGETNETWORKPARAMS, ARES_ECANCELLED, ARES_ESERVICE, ARES_ENOSERVER\n  };\n  size_t i;\n  const char *str = nullptr;\n\n  for (i=0; i < sizeof(status) / sizeof(*status); i++) {\n    str = ares_strerror((int)status[i]);\n    EXPECT_NE(nullptr, str);\n    EXPECT_NE(\"unknown\", std::string(str));\n  }\n\n  /* unknown value */\n  str = ares_strerror(0x12345678);\n  EXPECT_NE(nullptr, str);\n  EXPECT_EQ(\"unknown\", std::string(str));\n}",
+      "fn_code_pos": [
+        [
+          615,
+          0
+        ],
+        [
+          637,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, UsageErrors) {\n  ares_cancel(NULL);\n  ares_set_socket_callback(NULL, NULL, NULL);\n  ares_set_socket_configure_callback(NULL, NULL, NULL);\n  ares_set_socket_functions(NULL, NULL, NULL);\n  ares_destroy(NULL);\n  ares_expand_name(NULL, NULL, 0, NULL, NULL);\n  ares_expand_string(NULL, NULL, 0, NULL, NULL);\n  ares_fds(NULL, NULL, NULL);\n  ares_getaddrinfo(NULL, NULL, NULL, NULL, NULL, NULL);\n  ares_gethostbyaddr(NULL, NULL, 0, 0, NULL, NULL);\n  ares_getnameinfo(NULL, NULL, 0, 0, NULL, NULL);\n  ares_reinit(NULL);\n  ares_dup(NULL, NULL);\n  ares_set_local_ip4(NULL, 0);\n  ares_set_local_ip6(NULL, NULL);\n  ares_set_local_dev(NULL, NULL);\n  ares_query_dnsrec(NULL, NULL, ARES_CLASS_IN, ARES_REC_TYPE_A, NULL, NULL, NULL);\n  ares_query(NULL, NULL, ARES_CLASS_IN, ARES_REC_TYPE_A, NULL, NULL);\n}",
+      "fn_code_pos": [
+        [
+          639,
+          0
+        ],
+        [
+          658,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        44,
+        2
+      ],
+      [
+        44,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        69,
+        2
+      ],
+      [
+        69,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        70,
+        2
+      ],
+      [
+        70,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        95,
+        2
+      ],
+      [
+        95,
+        28
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        96,
+        2
+      ],
+      [
+        96,
+        28
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        173,
+        2
+      ],
+      [
+        173,
+        16
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        176,
+        2
+      ],
+      [
+        176,
+        16
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        179,
+        2
+      ],
+      [
+        179,
+        16
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        214,
+        2
+      ],
+      [
+        214,
+        16
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        335,
+        2
+      ],
+      [
+        335,
+        16
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        342,
+        2
+      ],
+      [
+        342,
+        28
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"dns-proto.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <string>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include <vector>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

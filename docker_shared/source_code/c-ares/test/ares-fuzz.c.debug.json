@@ -1,0 +1,168 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ProcessFile(int fd)\n{\n  ares_ssize_t count = read(fd, afl_buffer, kMaxAflInputSize);\n  /*\n   * Make a copy of the data so that it's not part of a larger\n   * buffer (where buffer overflows would go unnoticed).\n   */\n  if (count > 0) {\n    unsigned char *copied_data = (unsigned char *)malloc((size_t)count);\n    memcpy(copied_data, afl_buffer, (size_t)count);\n    LLVMFuzzerTestOneInput(copied_data, (size_t)count);\n    free(copied_data);\n  }\n}",
+      "fn_code_pos": [
+        [
+          57,
+          0
+        ],
+        [
+          70,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ProcessFile",
+        "parameters": {
+          "fd": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int main(int argc, char *argv[])\n{\n  if (argc == 1) {\n    int count = 0;\n    while (KEEP_FUZZING(count)) {\n#ifndef STDIN_FILENO\n      ProcessFile(fileno(stdin));\n#else\n      ProcessFile(STDIN_FILENO);\n#endif\n      count++;\n    }\n  } else {\n    int ii;\n    for (ii = 1; ii < argc; ++ii) {\n      int fd = open(argv[ii], O_RDONLY);\n      if (fd < 0) {\n        fprintf(stderr, \"Failed to open '%s'\\n\", argv[ii]);\n        continue;\n      }\n      ProcessFile(fd);\n      close(fd);\n    }\n  }\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          72,
+          0
+        ],
+        [
+          97,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "main",
+        "parameters": {
+          "argc": "int",
+          "argv": "char"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)",
+      "fn_dec_pos": [
+        [
+          55,
+          4
+        ],
+        [
+          55,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <stdio.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include <sys/types.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#include <fcntl.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#include <string.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#  include <io.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <unistd.h>\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

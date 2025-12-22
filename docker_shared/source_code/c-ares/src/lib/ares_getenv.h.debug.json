@@ -1,0 +1,32 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_getenv(const char *name)",
+      "fn_dec_pos": [
+        [
+          30,
+          13
+        ],
+        [
+          30,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getenv",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

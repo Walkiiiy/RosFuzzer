@@ -1,0 +1,487 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_slist_destructor_t)(void *data)",
+      "fn_dec_pos": [
+        [
+          65,
+          13
+        ],
+        [
+          65,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_slist_cmp_t)(const void *data1, const void *data2)",
+      "fn_dec_pos": [
+        [
+          73,
+          12
+        ],
+        [
+          73,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data1": "void",
+          "data2": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_slist_create(ares_rand_state        *rand_state,\n                                     ares_slist_cmp_t        cmp,\n                                     ares_slist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          82,
+          19
+        ],
+        [
+          84,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_create",
+        "parameters": {
+          "rand_state": "ares_rand_state",
+          "cmp": "ares_slist_cmp_t",
+          "destruct": "ares_slist_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_replace_destructor(ares_slist_t           *list,\n                                                 ares_slist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          91,
+          19
+        ],
+        [
+          92,
+          82
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_replace_destructor",
+        "parameters": {
+          "list": "ares_slist_t",
+          "destruct": "ares_slist_destructor_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_slist_insert(ares_slist_t *list, void *val)",
+      "fn_dec_pos": [
+        [
+          101,
+          19
+        ],
+        [
+          101,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_insert",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_first(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          108,
+          19
+        ],
+        [
+          108,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_first",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_last(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          115,
+          19
+        ],
+        [
+          115,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_last",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_next(const ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          122,
+          19
+        ],
+        [
+          122,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_next",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_prev(const ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          129,
+          19
+        ],
+        [
+          129,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_prev",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_find(const ares_slist_t *list,\n                                        const void         *val)",
+      "fn_dec_pos": [
+        [
+          137,
+          19
+        ],
+        [
+          138,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_find",
+        "parameters": {
+          "list": "ares_slist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_val(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          146,
+          19
+        ],
+        [
+          146,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_val",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_len(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          153,
+          19
+        ],
+        [
+          153,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_len",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_parent(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          160,
+          19
+        ],
+        [
+          160,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_parent",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_first_val(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          167,
+          19
+        ],
+        [
+          167,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_first_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_last_val(const ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          174,
+          19
+        ],
+        [
+          174,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_last_val",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_claim(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          181,
+          19
+        ],
+        [
+          181,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_claim",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_reinsert(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          190,
+          19
+        ],
+        [
+          190,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_reinsert",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_slist_node_destroy(ares_slist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          196,
+          19
+        ],
+        [
+          196,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_node_destroy",
+        "parameters": {
+          "node": "ares_slist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_slist_destroy(ares_slist_t *list)",
+      "fn_dec_pos": [
+        [
+          202,
+          19
+        ],
+        [
+          202,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_slist_destroy",
+        "parameters": {
+          "list": "ares_slist_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_slist",
+      {},
+      "",
+      [
+        51,
+        0
+      ],
+      [
+        51,
+        17
+      ]
+    ],
+    [
+      "typedef struct ares_slist ares_slist_t;",
+      {},
+      "ares_slist_t",
+      [
+        54,
+        0
+      ],
+      [
+        54,
+        39
+      ]
+    ],
+    [
+      "struct ares_slist_node",
+      {},
+      "",
+      [
+        56,
+        0
+      ],
+      [
+        56,
+        22
+      ]
+    ],
+    [
+      "typedef struct ares_slist_node ares_slist_node_t;",
+      {},
+      "ares_slist_node_t",
+      [
+        59,
+        0
+      ],
+      [
+        59,
+        49
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

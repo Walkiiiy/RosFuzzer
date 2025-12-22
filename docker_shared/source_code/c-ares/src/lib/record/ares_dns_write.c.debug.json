@@ -1,0 +1,862 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_status_t ares_dns_write_header(const ares_dns_record_t *dnsrec,\n                                           ares_buf_t              *buf)\n{\n  unsigned short u16;\n  unsigned short opcode;\n  unsigned short rcode;\n\n  ares_status_t  status;\n\n  /* ID */\n  status = ares_buf_append_be16(buf, dnsrec->id);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Flags */\n  u16 = 0;\n\n  /* QR */\n  if (dnsrec->flags & ARES_FLAG_QR) {\n    u16 |= 0x8000;\n  }\n\n  /* OPCODE */\n  opcode   = (unsigned short)(dnsrec->opcode & 0xF);\n  opcode <<= 11;\n  u16     |= opcode;\n\n  /* AA */\n  if (dnsrec->flags & ARES_FLAG_AA) {\n    u16 |= 0x400;\n  }\n\n  /* TC */\n  if (dnsrec->flags & ARES_FLAG_TC) {\n    u16 |= 0x200;\n  }\n\n  /* RD */\n  if (dnsrec->flags & ARES_FLAG_RD) {\n    u16 |= 0x100;\n  }\n\n  /* RA */\n  if (dnsrec->flags & ARES_FLAG_RA) {\n    u16 |= 0x80;\n  }\n\n  /* Z -- unused */\n\n  /* AD */\n  if (dnsrec->flags & ARES_FLAG_AD) {\n    u16 |= 0x20;\n  }\n\n  /* CD */\n  if (dnsrec->flags & ARES_FLAG_CD) {\n    u16 |= 0x10;\n  }\n\n  /* RCODE */\n  if (dnsrec->rcode > 15 && ares_dns_get_opt_rr_const(dnsrec) == NULL) {\n    /* Must have OPT RR in order to write extended error codes */\n    rcode = ARES_RCODE_SERVFAIL;\n  } else {\n    rcode = (unsigned short)(dnsrec->rcode & 0xF);\n  }\n  u16 |= rcode;\n\n  status = ares_buf_append_be16(buf, u16);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* QDCOUNT */\n  status = ares_buf_append_be16(\n    buf, (unsigned short)ares_dns_record_query_cnt(dnsrec));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* ANCOUNT */\n  status = ares_buf_append_be16(\n    buf, (unsigned short)ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* NSCOUNT */\n  status = ares_buf_append_be16(buf, (unsigned short)ares_dns_record_rr_cnt(\n                                       dnsrec, ARES_SECTION_AUTHORITY));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* ARCOUNT */\n  status = ares_buf_append_be16(buf, (unsigned short)ares_dns_record_rr_cnt(\n                                       dnsrec, ARES_SECTION_ADDITIONAL));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          32,
+          0
+        ],
+        [
+          135,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_header",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_questions(const ares_dns_record_t *dnsrec,\n                                              ares_llist_t           **namelist,\n                                              ares_buf_t              *buf)\n{\n  size_t i;\n\n  for (i = 0; i < ares_dns_record_query_cnt(dnsrec); i++) {\n    ares_status_t       status;\n    const char         *name = NULL;\n    ares_dns_rec_type_t qtype;\n    ares_dns_class_t    qclass;\n\n    status = ares_dns_record_query_get(dnsrec, i, &name, &qtype, &qclass);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Name */\n    status = ares_dns_name_write(buf, namelist, ARES_TRUE, name);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Type */\n    status = ares_buf_append_be16(buf, (unsigned short)qtype);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Class */\n    status = ares_buf_append_be16(buf, (unsigned short)qclass);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          137,
+          0
+        ],
+        [
+          174,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_questions",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "namelist": "ares_llist_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_name(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_llist_t       **namelist,\n                                            ares_bool_t       validate_hostname,\n                                            ares_dns_rr_key_t key)\n{\n  const char *name;\n\n  name = ares_dns_rr_get_str(rr, key);\n  if (name == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  return ares_dns_name_write(buf, namelist, validate_hostname, name);\n}",
+      "fn_code_pos": [
+        [
+          176,
+          0
+        ],
+        [
+          190,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_name",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t",
+          "validate_hostname": "ares_bool_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_str(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_dns_rr_key_t    key)\n{\n  const char   *str;\n  size_t        len;\n  ares_status_t status;\n\n  str = ares_dns_rr_get_str(rr, key);\n  if (str == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  len = ares_strlen(str);\n  if (len > 255) {\n    return ARES_EFORMERR;\n  }\n\n  /* Write 1 byte length */\n  status = ares_buf_append_byte(buf, (unsigned char)(len & 0xFF));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  if (len == 0) {\n    return ARES_SUCCESS;\n  }\n\n  /* Write string */\n  return ares_buf_append(buf, (const unsigned char *)str, len);\n}",
+      "fn_code_pos": [
+        [
+          192,
+          0
+        ],
+        [
+          222,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_binstr(ares_buf_t          *buf,\n                                           const unsigned char *bin,\n                                           size_t               bin_len)\n{\n  const unsigned char *ptr;\n  size_t               ptr_len;\n  ares_status_t        status;\n\n  /* split into possible multiple 255-byte or less length strings */\n  ptr     = bin;\n  ptr_len = bin_len;\n  do {\n    size_t len = ptr_len;\n    if (len > 255) {\n      len = 255;\n    }\n\n    /* Length */\n    status = ares_buf_append_byte(buf, (unsigned char)(len & 0xFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* String */\n    if (len) {\n      status = ares_buf_append(buf, ptr, len);\n      if (status != ARES_SUCCESS) {\n        return status; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n\n    ptr     += len;\n    ptr_len -= len;\n  } while (ptr_len > 0);\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          224,
+          0
+        ],
+        [
+          260,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_binstr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "bin": "unsigned char",
+          "bin_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_abin(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_dns_rr_key_t    key)\n{\n  ares_status_t status = ARES_EFORMERR;\n  size_t        i;\n  size_t        cnt = ares_dns_rr_get_abin_cnt(rr, key);\n\n  if (cnt == 0) {\n    return ARES_EFORMERR;\n  }\n\n  for (i = 0; i < cnt; i++) {\n    const unsigned char *bin;\n    size_t               bin_len;\n\n    bin = ares_dns_rr_get_abin(rr, key, i, &bin_len);\n\n    status = ares_dns_write_binstr(buf, bin, bin_len);\n    if (status != ARES_SUCCESS) {\n      break;\n    }\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          262,
+          0
+        ],
+        [
+          287,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_abin",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_be32(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_dns_rr_key_t    key)\n{\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U32) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  return ares_buf_append_be32(buf, ares_dns_rr_get_u32(rr, key));\n}",
+      "fn_code_pos": [
+        [
+          289,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_be16(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_dns_rr_key_t    key)\n{\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U16) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  return ares_buf_append_be16(buf, ares_dns_rr_get_u16(rr, key));\n}",
+      "fn_code_pos": [
+        [
+          299,
+          0
+        ],
+        [
+          307,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_u8(ares_buf_t          *buf,\n                                          const ares_dns_rr_t *rr,\n                                          ares_dns_rr_key_t    key)\n{\n  if (ares_dns_rr_key_datatype(key) != ARES_DATATYPE_U8) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  return ares_buf_append_byte(buf, ares_dns_rr_get_u8(rr, key));\n}",
+      "fn_code_pos": [
+        [
+          309,
+          0
+        ],
+        [
+          317,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_u8",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_a(ares_buf_t          *buf,\n                                         const ares_dns_rr_t *rr,\n                                         ares_llist_t       **namelist)\n{\n  const struct in_addr *addr;\n  (void)namelist;\n\n  addr = ares_dns_rr_get_addr(rr, ARES_RR_A_ADDR);\n  if (addr == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  return ares_buf_append(buf, (const unsigned char *)addr, sizeof(*addr));\n}",
+      "fn_code_pos": [
+        [
+          319,
+          0
+        ],
+        [
+          332,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_a",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_ns(ares_buf_t          *buf,\n                                          const ares_dns_rr_t *rr,\n                                          ares_llist_t       **namelist)\n{\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_NS_NSDNAME);\n}",
+      "fn_code_pos": [
+        [
+          334,
+          0
+        ],
+        [
+          340,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_ns",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_cname(ares_buf_t          *buf,\n                                             const ares_dns_rr_t *rr,\n                                             ares_llist_t       **namelist)\n{\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_CNAME_CNAME);\n}",
+      "fn_code_pos": [
+        [
+          342,
+          0
+        ],
+        [
+          348,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_cname",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_soa(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  ares_status_t status;\n\n  /* MNAME */\n  status =\n    ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE, ARES_RR_SOA_MNAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* RNAME */\n  status =\n    ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE, ARES_RR_SOA_RNAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* SERIAL */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SOA_SERIAL);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* REFRESH */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SOA_REFRESH);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* RETRY */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SOA_RETRY);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* EXPIRE */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SOA_EXPIRE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* MINIMUM */\n  return ares_dns_write_rr_be32(buf, rr, ARES_RR_SOA_MINIMUM);\n}",
+      "fn_code_pos": [
+        [
+          350,
+          0
+        ],
+        [
+          396,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_soa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_ptr(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_PTR_DNAME);\n}",
+      "fn_code_pos": [
+        [
+          398,
+          0
+        ],
+        [
+          404,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_ptr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_hinfo(ares_buf_t          *buf,\n                                             const ares_dns_rr_t *rr,\n                                             ares_llist_t       **namelist)\n{\n  ares_status_t status;\n\n  (void)namelist;\n\n  /* CPU */\n  status = ares_dns_write_rr_str(buf, rr, ARES_RR_HINFO_CPU);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* OS */\n  return ares_dns_write_rr_str(buf, rr, ARES_RR_HINFO_OS);\n}",
+      "fn_code_pos": [
+        [
+          406,
+          0
+        ],
+        [
+          422,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_hinfo",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_mx(ares_buf_t          *buf,\n                                          const ares_dns_rr_t *rr,\n                                          ares_llist_t       **namelist)\n{\n  ares_status_t status;\n\n  /* PREFERENCE */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_MX_PREFERENCE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* EXCHANGE */\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_MX_EXCHANGE);\n}",
+      "fn_code_pos": [
+        [
+          424,
+          0
+        ],
+        [
+          439,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_mx",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_txt(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  (void)namelist;\n  return ares_dns_write_rr_abin(buf, rr, ARES_RR_TXT_DATA);\n}",
+      "fn_code_pos": [
+        [
+          441,
+          0
+        ],
+        [
+          447,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_txt",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_sig(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  ares_status_t        status;\n  const unsigned char *data;\n  size_t               len = 0;\n\n  (void)namelist;\n\n  /* TYPE COVERED */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SIG_TYPE_COVERED);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* ALGORITHM */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_SIG_ALGORITHM);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* LABELS */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_SIG_LABELS);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* ORIGINAL TTL */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SIG_ORIGINAL_TTL);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* EXPIRATION */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SIG_EXPIRATION);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* INCEPTION */\n  status = ares_dns_write_rr_be32(buf, rr, ARES_RR_SIG_INCEPTION);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* KEY TAG */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SIG_KEY_TAG);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* SIGNERS NAME */\n  status = ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                  ARES_RR_SIG_SIGNERS_NAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* SIGNATURE -- binary, rest of buffer, required to be non-zero length */\n  data = ares_dns_rr_get_bin(rr, ARES_RR_SIG_SIGNATURE, &len);\n  if (data == NULL || len == 0) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_buf_append(buf, data, len);\n}",
+      "fn_code_pos": [
+        [
+          449,
+          0
+        ],
+        [
+          515,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_sig",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_aaaa(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_llist_t       **namelist)\n{\n  const struct ares_in6_addr *addr;\n  (void)namelist;\n\n  addr = ares_dns_rr_get_addr6(rr, ARES_RR_AAAA_ADDR);\n  if (addr == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  return ares_buf_append(buf, (const unsigned char *)addr, sizeof(*addr));\n}",
+      "fn_code_pos": [
+        [
+          517,
+          0
+        ],
+        [
+          530,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_aaaa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_srv(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  ares_status_t status;\n\n  /* PRIORITY */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SRV_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* WEIGHT */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SRV_WEIGHT);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* PORT */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SRV_PORT);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* TARGET */\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_SRV_TARGET);\n}",
+      "fn_code_pos": [
+        [
+          532,
+          0
+        ],
+        [
+          559,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_srv",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_naptr(ares_buf_t          *buf,\n                                             const ares_dns_rr_t *rr,\n                                             ares_llist_t       **namelist)\n{\n  ares_status_t status;\n\n  /* ORDER */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_NAPTR_ORDER);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* PREFERENCE */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_NAPTR_PREFERENCE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* FLAGS */\n  status = ares_dns_write_rr_str(buf, rr, ARES_RR_NAPTR_FLAGS);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* SERVICES */\n  status = ares_dns_write_rr_str(buf, rr, ARES_RR_NAPTR_SERVICES);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* REGEXP */\n  status = ares_dns_write_rr_str(buf, rr, ARES_RR_NAPTR_REGEXP);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* REPLACEMENT */\n  return ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE,\n                                ARES_RR_NAPTR_REPLACEMENT);\n}",
+      "fn_code_pos": [
+        [
+          561,
+          0
+        ],
+        [
+          600,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_naptr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_opt(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  size_t         len = ares_buf_len(buf);\n  ares_status_t  status;\n  unsigned int   ttl = 0;\n  size_t         i;\n  unsigned short rcode = (unsigned short)((rr->parent->rcode >> 4) & 0xFF);\n\n  (void)namelist;\n\n  /* Coverity reports on this even though its not possible when taken\n   * into context */\n  if (len == 0) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* We need to go back and overwrite the class and ttl that were emitted as\n   * the OPT record overloads them for its own use (yes, very strange!) */\n  status = ares_buf_set_length(buf, len - 2 /* RDLENGTH */\n                                      - 4   /* TTL */\n                                      - 2 /* CLASS */);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Class -> UDP Size */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_OPT_UDP_SIZE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* TTL -> rcode (u8) << 24 | version (u8) << 16 | flags (u16) */\n  ttl |= (unsigned int)rcode << 24;\n  ttl |= (unsigned int)ares_dns_rr_get_u8(rr, ARES_RR_OPT_VERSION) << 16;\n  ttl |= (unsigned int)ares_dns_rr_get_u16(rr, ARES_RR_OPT_FLAGS);\n\n  status = ares_buf_append_be32(buf, ttl);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Now go back to real end */\n  status = ares_buf_set_length(buf, len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Append Options */\n  for (i = 0; i < ares_dns_rr_get_opt_cnt(rr, ARES_RR_OPT_OPTIONS); i++) {\n    unsigned short       opt;\n    size_t               val_len;\n    const unsigned char *val;\n\n    opt = ares_dns_rr_get_opt(rr, ARES_RR_OPT_OPTIONS, i, &val, &val_len);\n\n    /* BE16 option */\n    status = ares_buf_append_be16(buf, opt);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* BE16 length */\n    status = ares_buf_append_be16(buf, (unsigned short)(val_len & 0xFFFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Value */\n    if (val && val_len) {\n      status = ares_buf_append(buf, val, val_len);\n      if (status != ARES_SUCCESS) {\n        return status; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          602,
+          0
+        ],
+        [
+          681,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_opt",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_tlsa(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_llist_t       **namelist)\n{\n  ares_status_t        status;\n  const unsigned char *data;\n  size_t               len = 0;\n\n  (void)namelist;\n\n  /* CERT_USAGE */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_TLSA_CERT_USAGE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* SELECTOR */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_TLSA_SELECTOR);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* MATCH */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_TLSA_MATCH);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* DATA -- binary, rest of buffer, required to be non-zero length */\n  data = ares_dns_rr_get_bin(rr, ARES_RR_TLSA_DATA, &len);\n  if (data == NULL || len == 0) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_buf_append(buf, data, len);\n}",
+      "fn_code_pos": [
+        [
+          683,
+          0
+        ],
+        [
+          718,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_tlsa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_svcb(ares_buf_t          *buf,\n                                            const ares_dns_rr_t *rr,\n                                            ares_llist_t       **namelist)\n{\n  ares_status_t status;\n  size_t        i;\n\n  /* PRIORITY */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_SVCB_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* TARGET */\n  status =\n    ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE, ARES_RR_SVCB_TARGET);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Append Params */\n  for (i = 0; i < ares_dns_rr_get_opt_cnt(rr, ARES_RR_SVCB_PARAMS); i++) {\n    unsigned short       opt;\n    size_t               val_len;\n    const unsigned char *val;\n\n    opt = ares_dns_rr_get_opt(rr, ARES_RR_SVCB_PARAMS, i, &val, &val_len);\n\n    /* BE16 option */\n    status = ares_buf_append_be16(buf, opt);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* BE16 length */\n    status = ares_buf_append_be16(buf, (unsigned short)(val_len & 0xFFFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Value */\n    if (val && val_len) {\n      status = ares_buf_append(buf, val, val_len);\n      if (status != ARES_SUCCESS) {\n        return status; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          720,
+          0
+        ],
+        [
+          769,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_svcb",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_https(ares_buf_t          *buf,\n                                             const ares_dns_rr_t *rr,\n                                             ares_llist_t       **namelist)\n{\n  ares_status_t status;\n  size_t        i;\n\n  /* PRIORITY */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_HTTPS_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* TARGET */\n  status =\n    ares_dns_write_rr_name(buf, rr, namelist, ARES_FALSE, ARES_RR_HTTPS_TARGET);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Append Params */\n  for (i = 0; i < ares_dns_rr_get_opt_cnt(rr, ARES_RR_HTTPS_PARAMS); i++) {\n    unsigned short       opt;\n    size_t               val_len;\n    const unsigned char *val;\n\n    opt = ares_dns_rr_get_opt(rr, ARES_RR_HTTPS_PARAMS, i, &val, &val_len);\n\n    /* BE16 option */\n    status = ares_buf_append_be16(buf, opt);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* BE16 length */\n    status = ares_buf_append_be16(buf, (unsigned short)(val_len & 0xFFFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Value */\n    if (val && val_len) {\n      status = ares_buf_append(buf, val, val_len);\n      if (status != ARES_SUCCESS) {\n        return status; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          771,
+          0
+        ],
+        [
+          820,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_https",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_uri(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  ares_status_t status;\n  const char   *target;\n\n  (void)namelist;\n\n  /* PRIORITY */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_URI_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* WEIGHT */\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_URI_WEIGHT);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* TARGET -- not in DNS string format, rest of buffer, required to be\n   * non-zero length */\n  target = ares_dns_rr_get_str(rr, ARES_RR_URI_TARGET);\n  if (target == NULL || ares_strlen(target) == 0) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_buf_append(buf, (const unsigned char *)target,\n                         ares_strlen(target));\n}",
+      "fn_code_pos": [
+        [
+          822,
+          0
+        ],
+        [
+          852,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_uri",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_caa(ares_buf_t          *buf,\n                                           const ares_dns_rr_t *rr,\n                                           ares_llist_t       **namelist)\n{\n  const unsigned char *data     = NULL;\n  size_t               data_len = 0;\n  ares_status_t        status;\n\n  (void)namelist;\n\n  /* CRITICAL */\n  status = ares_dns_write_rr_u8(buf, rr, ARES_RR_CAA_CRITICAL);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Tag */\n  status = ares_dns_write_rr_str(buf, rr, ARES_RR_CAA_TAG);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Value - binary! (remaining buffer */\n  data = ares_dns_rr_get_bin(rr, ARES_RR_CAA_VALUE, &data_len);\n  if (data == NULL || data_len == 0) {\n    return ARES_EFORMERR;\n  }\n\n  return ares_buf_append(buf, data, data_len);\n}",
+      "fn_code_pos": [
+        [
+          854,
+          0
+        ],
+        [
+          883,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_caa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr_raw_rr(ares_buf_t          *buf,\n                                              const ares_dns_rr_t *rr,\n                                              ares_llist_t       **namelist)\n{\n  size_t               len = ares_buf_len(buf);\n  ares_status_t        status;\n  const unsigned char *data     = NULL;\n  size_t               data_len = 0;\n\n  (void)namelist;\n\n  /* Coverity reports on this even though its not possible when taken\n   * into context */\n  if (len == 0) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* We need to go back and overwrite the type that was emitted by the parent\n   * function */\n  status = ares_buf_set_length(buf, len - 2 /* RDLENGTH */\n                                      - 4   /* TTL */\n                                      - 2   /* CLASS */\n                                      - 2 /* TYPE */);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_write_rr_be16(buf, rr, ARES_RR_RAW_RR_TYPE);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Now go back to real end */\n  status = ares_buf_set_length(buf, len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Output raw data */\n  data = ares_dns_rr_get_bin(rr, ARES_RR_RAW_RR_DATA, &data_len);\n  if (data == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (data_len == 0) {\n    return ARES_SUCCESS;\n  }\n\n  return ares_buf_append(buf, data, data_len);\n}",
+      "fn_code_pos": [
+        [
+          885,
+          0
+        ],
+        [
+          934,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr_raw_rr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "namelist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_write_rr(const ares_dns_record_t *dnsrec,\n                                       ares_llist_t           **namelist,\n                                       ares_dns_section_t       section,\n                                       ares_buf_t              *buf)\n{\n  size_t i;\n\n  for (i = 0; i < ares_dns_record_rr_cnt(dnsrec, section); i++) {\n    const ares_dns_rr_t *rr;\n    ares_dns_rec_type_t  type;\n    ares_bool_t          allow_compress;\n    ares_llist_t       **namelistptr = NULL;\n    size_t               pos_len;\n    ares_status_t        status;\n    size_t               rdlength;\n    size_t               end_length;\n    unsigned int         ttl;\n\n    rr = ares_dns_record_rr_get_const(dnsrec, section, i);\n    if (rr == NULL) {\n      return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    type           = ares_dns_rr_get_type(rr);\n    allow_compress = ares_dns_rec_allow_name_comp(type);\n    if (allow_compress) {\n      namelistptr = namelist;\n    }\n\n    /* Name */\n    status =\n      ares_dns_name_write(buf, namelist, ARES_TRUE, ares_dns_rr_get_name(rr));\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Type */\n    status = ares_buf_append_be16(buf, (unsigned short)type);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Class */\n    status =\n      ares_buf_append_be16(buf, (unsigned short)ares_dns_rr_get_class(rr));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* TTL */\n    ttl = ares_dns_rr_get_ttl(rr);\n    if (rr->parent->ttl_decrement > ttl) {\n      ttl = 0;\n    } else {\n      ttl -= rr->parent->ttl_decrement;\n    }\n    status = ares_buf_append_be32(buf, ttl);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Length */\n    pos_len = ares_buf_len(buf); /* Save to write real length later */\n    status  = ares_buf_append_be16(buf, 0);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    /* Data */\n    switch (type) {\n      case ARES_REC_TYPE_A:\n        status = ares_dns_write_rr_a(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_NS:\n        status = ares_dns_write_rr_ns(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_CNAME:\n        status = ares_dns_write_rr_cname(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_SOA:\n        status = ares_dns_write_rr_soa(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_PTR:\n        status = ares_dns_write_rr_ptr(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_HINFO:\n        status = ares_dns_write_rr_hinfo(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_MX:\n        status = ares_dns_write_rr_mx(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_TXT:\n        status = ares_dns_write_rr_txt(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_SIG:\n        status = ares_dns_write_rr_sig(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_AAAA:\n        status = ares_dns_write_rr_aaaa(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_SRV:\n        status = ares_dns_write_rr_srv(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_NAPTR:\n        status = ares_dns_write_rr_naptr(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_ANY:\n        status = ARES_EFORMERR;\n        break;\n      case ARES_REC_TYPE_OPT:\n        status = ares_dns_write_rr_opt(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_TLSA:\n        status = ares_dns_write_rr_tlsa(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_SVCB:\n        status = ares_dns_write_rr_svcb(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_HTTPS:\n        status = ares_dns_write_rr_https(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_URI:\n        status = ares_dns_write_rr_uri(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_CAA:\n        status = ares_dns_write_rr_caa(buf, rr, namelistptr);\n        break;\n      case ARES_REC_TYPE_RAW_RR:\n        status = ares_dns_write_rr_raw_rr(buf, rr, namelistptr);\n        break;\n    }\n\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Back off write pointer, write real length, then go back to proper\n     * position */\n    end_length = ares_buf_len(buf);\n    rdlength   = end_length - pos_len - 2;\n\n    status = ares_buf_set_length(buf, pos_len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    status = ares_buf_append_be16(buf, (unsigned short)(rdlength & 0xFFFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_set_length(buf, end_length);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          936,
+          0
+        ],
+        [
+          1094,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_rr",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "namelist": "ares_llist_t",
+          "section": "ares_dns_section_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_write_buf(const ares_dns_record_t *dnsrec,\n                                 ares_buf_t              *buf)\n{\n  ares_llist_t *namelist = NULL;\n  size_t        orig_len;\n  ares_status_t status;\n\n  if (dnsrec == NULL || buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  orig_len = ares_buf_len(buf);\n\n  status = ares_dns_write_header(dnsrec, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_write_questions(dnsrec, &namelist, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_write_rr(dnsrec, &namelist, ARES_SECTION_ANSWER, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_write_rr(dnsrec, &namelist, ARES_SECTION_AUTHORITY, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_write_rr(dnsrec, &namelist, ARES_SECTION_ADDITIONAL, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_llist_destroy(namelist);\n  if (status != ARES_SUCCESS) {\n    ares_buf_set_length(buf, orig_len);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1096,
+          0
+        ],
+        [
+          1141,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_buf",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_write_buf_tcp(const ares_dns_record_t *dnsrec,\n                                     ares_buf_t              *buf)\n{\n  ares_status_t status;\n  size_t        orig_len;\n  size_t        msg_len;\n  size_t        len;\n\n  if (dnsrec == NULL || buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  orig_len = ares_buf_len(buf);\n\n  /* Write placeholder for length */\n  status = ares_buf_append_be16(buf, 0);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* Write message */\n  status = ares_dns_write_buf(dnsrec, buf);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  len     = ares_buf_len(buf);\n  msg_len = len - orig_len - 2;\n  if (msg_len > 65535) {\n    status = ARES_EBADQUERY;\n    goto done;\n  }\n\n  /* Now we need to overwrite the length, so we jump back to the original\n   * message length, overwrite the section and jump back */\n  ares_buf_set_length(buf, orig_len);\n  status = ares_buf_append_be16(buf, (unsigned short)(msg_len & 0xFFFF));\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n  ares_buf_set_length(buf, len);\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_buf_set_length(buf, orig_len);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1143,
+          0
+        ],
+        [
+          1190,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write_buf_tcp",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_write(const ares_dns_record_t *dnsrec,\n                             unsigned char **buf, size_t *buf_len)\n{\n  ares_buf_t   *b = NULL;\n  ares_status_t status;\n\n  if (buf == NULL || buf_len == NULL || dnsrec == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *buf     = NULL;\n  *buf_len = 0;\n\n  b = ares_buf_create();\n  if (b == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_dns_write_buf(dnsrec, b);\n\n  if (status != ARES_SUCCESS) {\n    ares_buf_destroy(b);\n    return status;\n  }\n\n  *buf = ares_buf_finish_bin(b, buf_len);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1192,
+          0
+        ],
+        [
+          1219,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_write",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "buf": "unsigned char",
+          "buf_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_dns_record_ttl_decrement(ares_dns_record_t *dnsrec,\n                                   unsigned int       ttl_decrement)\n{\n  if (dnsrec == NULL) {\n    return;\n  }\n  dnsrec->ttl_decrement = ttl_decrement;\n}",
+      "fn_code_pos": [
+        [
+          1221,
+          0
+        ],
+        [
+          1228,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_record_ttl_decrement",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "ttl_decrement": "unsigned int"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        323,
+        8
+      ],
+      [
+        323,
+        22
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        521,
+        8
+      ],
+      [
+        521,
+        28
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

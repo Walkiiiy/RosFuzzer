@@ -1,0 +1,133 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_strsplit_free(char **elms, size_t num_elm)\n{\n  ares_free_array(elms, num_elm, ares_free);\n}",
+      "fn_code_pos": [
+        [
+          27,
+          0
+        ],
+        [
+          30,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strsplit_free",
+        "parameters": {
+          "elms": "char",
+          "num_elm": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "char **ares_strsplit_duplicate(char **elms, size_t num_elm)\n{\n  size_t i;\n  char **out;\n\n  if (elms == NULL || num_elm == 0) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  out = ares_malloc_zero(sizeof(*elms) * num_elm);\n  if (out == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; i < num_elm; i++) {\n    out[i] = ares_strdup(elms[i]);\n    if (out[i] == NULL) {\n      ares_strsplit_free(out, num_elm); /* LCOV_EXCL_LINE: OutOfMemory */\n      return NULL;                      /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          32,
+          0
+        ],
+        [
+          55,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "char **ares_strsplit(const char *in, const char *delms, size_t *num_elm)\n{\n  ares_status_t status;\n  ares_buf_t   *buf = NULL;\n  char        **out = NULL;\n\n  if (in == NULL || delms == NULL || num_elm == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *num_elm = 0;\n\n  buf = ares_buf_create_const((const unsigned char *)in, ares_strlen(in));\n  if (buf == NULL) {\n    return NULL;\n  }\n\n  status = ares_buf_split_str(\n    buf, (const unsigned char *)delms, ares_strlen(delms),\n    ARES_BUF_SPLIT_NO_DUPLICATES | ARES_BUF_SPLIT_CASE_INSENSITIVE, 0, &out,\n    num_elm);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_buf_destroy(buf);\n  if (status != ARES_SUCCESS) {\n    out = NULL;\n  }\n\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          57,
+          0
+        ],
+        [
+          89,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "char"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_strsplit_duplicate(char **elms, size_t num_elm)",
+      "fn_dec_pos": [
+        [
+          32,
+          7
+        ],
+        [
+          32,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strsplit_duplicate",
+        "parameters": {
+          "elms": "char",
+          "num_elm": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_strsplit(const char *in, const char *delms, size_t *num_elm)",
+      "fn_dec_pos": [
+        [
+          57,
+          7
+        ],
+        [
+          57,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strsplit",
+        "parameters": {
+          "in": "char",
+          "delms": "char",
+          "num_elm": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

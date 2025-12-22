@@ -1,0 +1,781 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_array_t *ares_array_create(size_t                  member_size,\n                                ares_array_destructor_t destruct)\n{\n  ares_array_t *arr;\n\n  if (member_size == 0) {\n    return NULL;\n  }\n\n  arr = ares_malloc_zero(sizeof(*arr));\n  if (arr == NULL) {\n    return NULL;\n  }\n\n  arr->member_size = member_size;\n  arr->destruct    = destruct;\n  return arr;\n}",
+      "fn_code_pos": [
+        [
+          39,
+          0
+        ],
+        [
+          56,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_create",
+        "parameters": {
+          "member_size": "size_t",
+          "destruct": "ares_array_destructor_t"
+        },
+        "return_type": "ares_array_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_array_len(const ares_array_t *arr)\n{\n  if (arr == NULL) {\n    return 0;\n  }\n  return arr->cnt;\n}",
+      "fn_code_pos": [
+        [
+          58,
+          0
+        ],
+        [
+          64,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_len",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_array_at(ares_array_t *arr, size_t idx)\n{\n  if (arr == NULL || idx >= arr->cnt) {\n    return NULL;\n  }\n  return (unsigned char *)arr->arr + ((idx + arr->offset) * arr->member_size);\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          72,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "const void *ares_array_at_const(const ares_array_t *arr, size_t idx)\n{\n  if (arr == NULL || idx >= arr->cnt) {\n    return NULL;\n  }\n  return (unsigned char *)arr->arr + ((idx + arr->offset) * arr->member_size);\n}",
+      "fn_code_pos": [
+        [
+          74,
+          0
+        ],
+        [
+          80,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at_const",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_sort(ares_array_t *arr, ares_array_cmp_t cmp)\n{\n  if (arr == NULL || cmp == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* Nothing to sort */\n  if (arr->cnt < 2) {\n    return ARES_SUCCESS;\n  }\n\n  qsort((unsigned char *)arr->arr + (arr->offset * arr->member_size), arr->cnt,\n        arr->member_size, cmp);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          82,
+          0
+        ],
+        [
+          96,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_sort",
+        "parameters": {
+          "arr": "ares_array_t",
+          "cmp": "ares_array_cmp_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_array_destroy(ares_array_t *arr)\n{\n  size_t i;\n\n  if (arr == NULL) {\n    return;\n  }\n\n  if (arr->destruct != NULL) {\n    for (i = 0; i < arr->cnt; i++) {\n      arr->destruct(ares_array_at(arr, i));\n    }\n  }\n\n  ares_free(arr->arr);\n  ares_free(arr);\n}",
+      "fn_code_pos": [
+        [
+          98,
+          0
+        ],
+        [
+          114,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_destroy",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_array_move(ares_array_t *arr, size_t dest_idx,\n                                     size_t src_idx)\n{\n  void       *dest_ptr;\n  const void *src_ptr;\n  size_t      nmembers;\n\n  if (arr == NULL || dest_idx >= arr->alloc_cnt || src_idx >= arr->alloc_cnt) {\n    return ARES_EFORMERR;\n  }\n\n  /* Nothing to do */\n  if (dest_idx == src_idx) {\n    return ARES_SUCCESS;\n  }\n\n  dest_ptr = (unsigned char *)arr->arr + (dest_idx * arr->member_size);\n  src_ptr  = (unsigned char *)arr->arr + (src_idx * arr->member_size);\n\n  /* Check to make sure shifting to the right won't overflow our allocation\n   * boundary */\n  if (dest_idx > src_idx && arr->cnt + (dest_idx - src_idx) > arr->alloc_cnt) {\n    return ARES_EFORMERR;\n  }\n\n  nmembers = arr->cnt - (src_idx - arr->offset);\n  memmove(dest_ptr, src_ptr, nmembers * arr->member_size);\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          118,
+          0
+        ],
+        [
+          147,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_move",
+        "parameters": {
+          "arr": "ares_array_t",
+          "dest_idx": "size_t",
+          "src_idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_array_finish(ares_array_t *arr, size_t *num_members)\n{\n  void *ptr;\n\n  if (arr == NULL || num_members == NULL) {\n    return NULL;\n  }\n\n  /* Make sure we move data to beginning of allocation */\n  if (arr->offset != 0) {\n    if (ares_array_move(arr, 0, arr->offset) != ARES_SUCCESS) {\n      return NULL;\n    }\n    arr->offset = 0;\n  }\n\n  ptr          = arr->arr;\n  *num_members = arr->cnt;\n  ares_free(arr);\n  return ptr;\n}",
+      "fn_code_pos": [
+        [
+          149,
+          0
+        ],
+        [
+          169,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_finish",
+        "parameters": {
+          "arr": "ares_array_t",
+          "num_members": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_set_size(ares_array_t *arr, size_t size)\n{\n  void *temp;\n\n  if (arr == NULL || size == 0 || size < arr->cnt) {\n    return ARES_EFORMERR;\n  }\n\n  /* Always operate on powers of 2 */\n  size = ares_round_up_pow2(size);\n\n  if (size < ARES__ARRAY_MIN) {\n    size = ARES__ARRAY_MIN;\n  }\n\n  /* If our allocation size is already large enough, skip */\n  if (size <= arr->alloc_cnt) {\n    return ARES_SUCCESS;\n  }\n\n  temp = ares_realloc_zero(arr->arr, arr->alloc_cnt * arr->member_size,\n                           size * arr->member_size);\n  if (temp == NULL) {\n    return ARES_ENOMEM;\n  }\n  arr->alloc_cnt = size;\n  arr->arr       = temp;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          171,
+          0
+        ],
+        [
+          199,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_set_size",
+        "parameters": {
+          "arr": "ares_array_t",
+          "size": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_at(void **elem_ptr, ares_array_t *arr,\n                                   size_t idx)\n{\n  void         *ptr;\n  ares_status_t status;\n\n  if (arr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  /* Not >= since we are allowed to append to the end */\n  if (idx > arr->cnt) {\n    return ARES_EFORMERR;\n  }\n\n  /* Allocate more if needed */\n  status = ares_array_set_size(arr, arr->cnt + 1);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Shift if we have memory but not enough room at the end */\n  if (arr->cnt + 1 + arr->offset > arr->alloc_cnt) {\n    status = ares_array_move(arr, 0, arr->offset);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n    arr->offset = 0;\n  }\n\n  /* If we're inserting anywhere other than the end, we need to move some\n   * elements out of the way */\n  if (idx != arr->cnt) {\n    status = ares_array_move(arr, idx + arr->offset + 1, idx + arr->offset);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  /* Ok, we're guaranteed to have a gap where we need it, lets zero it out,\n   * and return it */\n  ptr = (unsigned char *)arr->arr + ((idx + arr->offset) * arr->member_size);\n  memset(ptr, 0, arr->member_size);\n  arr->cnt++;\n\n  if (elem_ptr) {\n    *elem_ptr = ptr;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          201,
+          0
+        ],
+        [
+          251,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insert_at",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_last(void **elem_ptr, ares_array_t *arr)\n{\n  return ares_array_insert_at(elem_ptr, arr, ares_array_len(arr));\n}",
+      "fn_code_pos": [
+        [
+          253,
+          0
+        ],
+        [
+          256,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insert_last",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_first(void **elem_ptr, ares_array_t *arr)\n{\n  return ares_array_insert_at(elem_ptr, arr, 0);\n}",
+      "fn_code_pos": [
+        [
+          258,
+          0
+        ],
+        [
+          261,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insert_first",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_at(ares_array_t *arr, size_t idx,\n                                       const void *data_ptr)\n{\n  ares_status_t status;\n  void         *ptr = NULL;\n\n  status = ares_array_insert_at(&ptr, arr, idx);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n  memcpy(ptr, data_ptr, arr->member_size);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          263,
+          0
+        ],
+        [
+          275,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insertdata_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t",
+          "data_ptr": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_last(ares_array_t *arr,\n                                         const void   *data_ptr)\n{\n  ares_status_t status;\n  void         *ptr = NULL;\n\n  status = ares_array_insert_last(&ptr, arr);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n  memcpy(ptr, data_ptr, arr->member_size);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          277,
+          0
+        ],
+        [
+          289,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insertdata_last",
+        "parameters": {
+          "arr": "ares_array_t",
+          "data_ptr": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_first(ares_array_t *arr,\n                                          const void   *data_ptr)\n{\n  ares_status_t status;\n  void         *ptr = NULL;\n\n  status = ares_array_insert_last(&ptr, arr);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n  memcpy(ptr, data_ptr, arr->member_size);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          291,
+          0
+        ],
+        [
+          303,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_insertdata_first",
+        "parameters": {
+          "arr": "ares_array_t",
+          "data_ptr": "void"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_array_first(ares_array_t *arr)\n{\n  return ares_array_at(arr, 0);\n}",
+      "fn_code_pos": [
+        [
+          305,
+          0
+        ],
+        [
+          308,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_array_last(ares_array_t *arr)\n{\n  size_t cnt = ares_array_len(arr);\n  if (cnt == 0) {\n    return NULL;\n  }\n  return ares_array_at(arr, cnt - 1);\n}",
+      "fn_code_pos": [
+        [
+          310,
+          0
+        ],
+        [
+          317,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "const void *ares_array_first_const(const ares_array_t *arr)\n{\n  return ares_array_at_const(arr, 0);\n}",
+      "fn_code_pos": [
+        [
+          319,
+          0
+        ],
+        [
+          322,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "const void *ares_array_last_const(const ares_array_t *arr)\n{\n  size_t cnt = ares_array_len(arr);\n  if (cnt == 0) {\n    return NULL;\n  }\n  return ares_array_at_const(arr, cnt - 1);\n}",
+      "fn_code_pos": [
+        [
+          324,
+          0
+        ],
+        [
+          331,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_claim_at(void *dest, size_t dest_size,\n                                  ares_array_t *arr, size_t idx)\n{\n  ares_status_t status;\n\n  if (arr == NULL || idx >= arr->cnt) {\n    return ARES_EFORMERR;\n  }\n\n  if (dest != NULL && dest_size < arr->member_size) {\n    return ARES_EFORMERR;\n  }\n\n  if (dest) {\n    memcpy(dest, ares_array_at(arr, idx), arr->member_size);\n  }\n\n  if (idx == 0) {\n    /* Optimization, if first element, just increment offset, makes removing a\n     * lot from the start quick */\n    arr->offset++;\n  } else if (idx != arr->cnt - 1) {\n    /* Must shift entire array if removing an element from the middle. Does\n     * nothing if removing last element other than decrement count. */\n    status = ares_array_move(arr, idx + arr->offset, idx + arr->offset + 1);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  arr->cnt--;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          333,
+          0
+        ],
+        [
+          365,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_claim_at",
+        "parameters": {
+          "dest": "void",
+          "dest_size": "size_t",
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_at(ares_array_t *arr, size_t idx)\n{\n  void *ptr = ares_array_at(arr, idx);\n  if (arr == NULL || ptr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (arr->destruct != NULL) {\n    arr->destruct(ptr);\n  }\n\n  return ares_array_claim_at(NULL, 0, arr, idx);\n}",
+      "fn_code_pos": [
+        [
+          367,
+          0
+        ],
+        [
+          379,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_remove_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_first(ares_array_t *arr)\n{\n  return ares_array_remove_at(arr, 0);\n}",
+      "fn_code_pos": [
+        [
+          381,
+          0
+        ],
+        [
+          384,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_remove_first",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_last(ares_array_t *arr)\n{\n  size_t cnt = ares_array_len(arr);\n  if (cnt == 0) {\n    return ARES_EFORMERR;\n  }\n  return ares_array_remove_at(arr, cnt - 1);\n}",
+      "fn_code_pos": [
+        [
+          386,
+          0
+        ],
+        [
+          393,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_remove_last",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_array_create(size_t                  member_size,\n                                ares_array_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          39,
+          14
+        ],
+        [
+          40,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_create",
+        "parameters": {
+          "member_size": "size_t",
+          "destruct": "ares_array_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_at(ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          66,
+          6
+        ],
+        [
+          66,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_at_const(const ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          74,
+          12
+        ],
+        [
+          74,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at_const",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_finish(ares_array_t *arr, size_t *num_members)",
+      "fn_dec_pos": [
+        [
+          149,
+          6
+        ],
+        [
+          149,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_finish",
+        "parameters": {
+          "arr": "ares_array_t",
+          "num_members": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_first(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          305,
+          6
+        ],
+        [
+          305,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_last(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          310,
+          6
+        ],
+        [
+          310,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_first_const(const ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          319,
+          12
+        ],
+        [
+          319,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_last_const(const ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          324,
+          12
+        ],
+        [
+          324,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_array {\n  ares_array_destructor_t destruct;\n  void                   *arr;\n  size_t                  member_size;\n  size_t                  cnt;\n  size_t                  offset;\n  size_t                  alloc_cnt;\n}",
+      {
+        "destruct": "ares_array_destructor_t",
+        "*arr": "void",
+        "member_size": "size_t",
+        "cnt": "size_t",
+        "offset": "size_t",
+        "alloc_cnt": "size_t"
+      },
+      "ares_array",
+      [
+        30,
+        0
+      ],
+      [
+        37,
+        1
+      ]
+    ],
+    [
+      "struct ares_array {\n  ares_array_destructor_t destruct;\n  void                   *arr;\n  size_t                  member_size;\n  size_t                  cnt;\n  size_t                  offset;\n  size_t                  alloc_cnt;\n}",
+      {
+        "destruct": "ares_array_destructor_t",
+        "*arr": "void",
+        "member_size": "size_t",
+        "cnt": "size_t",
+        "offset": "size_t",
+        "alloc_cnt": "size_t"
+      },
+      "ares_array",
+      [
+        30,
+        0
+      ],
+      [
+        37,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_array.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

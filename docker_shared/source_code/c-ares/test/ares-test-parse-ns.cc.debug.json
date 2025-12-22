@@ -1,0 +1,188 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseNsReplyOK) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_NS))\n    .add_answer(new DNSNsRR(\"example.com\", 100, \"ns.example.com\"));\n  std::vector<byte> data = pkt.data();\n\n  struct hostent *host = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  ASSERT_NE(nullptr, host);\n  std::stringstream ss;\n  ss << HostEnt(host);\n  EXPECT_EQ(\"{'example.com' aliases=[ns.example.com] addrs=[]}\", ss.str());\n  ares_free_hostent(host);\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          48,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseNsReplyMultiple) {\n  DNSPacket pkt;\n  pkt.set_qid(10501).set_response().set_rd().set_ra()\n    .add_question(new DNSQuestion(\"google.com\", T_NS))\n    .add_answer(new DNSNsRR(\"google.com\", 59, \"ns1.google.com\"))\n    .add_answer(new DNSNsRR(\"google.com\", 59, \"ns2.google.com\"))\n    .add_answer(new DNSNsRR(\"google.com\", 59, \"ns3.google.com\"))\n    .add_answer(new DNSNsRR(\"google.com\", 59, \"ns4.google.com\"))\n    .add_additional(new DNSARR(\"ns4.google.com\", 247, {216,239,38,10}))\n    .add_additional(new DNSARR(\"ns2.google.com\", 247, {216,239,34,10}))\n    .add_additional(new DNSARR(\"ns1.google.com\", 247, {216,239,32,10}))\n    .add_additional(new DNSARR(\"ns3.google.com\", 247, {216,239,36,10}));\n  std::vector<byte> data = pkt.data();\n\n  struct hostent *host = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  ASSERT_NE(nullptr, host);\n  std::stringstream ss;\n  ss << HostEnt(host);\n  EXPECT_EQ(\"{'google.com' aliases=[ns1.google.com, ns2.google.com, ns3.google.com, ns4.google.com] addrs=[]}\", ss.str());\n  ares_free_hostent(host);\n}",
+      "fn_code_pos": [
+        [
+          50,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseNsReplyErrors) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_NS))\n    .add_answer(new DNSNsRR(\"example.com\", 100, \"ns.example.com\"));\n  std::vector<byte> data;\n  struct hostent *host = nullptr;\n\n  // No question.\n  pkt.questions_.clear();\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  pkt.add_question(new DNSQuestion(\"example.com\", T_NS));\n\n#ifdef DISABLED\n  // Question != answer\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"Axample.com\", T_NS));\n  data = pkt.data();\n  EXPECT_EQ(ARES_ENODATA, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"example.com\", T_NS));\n#endif\n\n  // Two questions.\n  pkt.add_question(new DNSQuestion(\"example.com\", T_NS));\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"example.com\", T_NS));\n\n  // Wrong sort of answer.\n  pkt.answers_.clear();\n  pkt.add_answer(new DNSMxRR(\"example.com\", 100, 100, \"mx1.example.com\"));\n  data = pkt.data();\n  EXPECT_EQ(ARES_ENODATA, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  pkt.answers_.clear();\n  pkt.add_answer(new DNSNsRR(\"example.com\", 100, \"ns.example.com\"));\n\n  // No answer.\n  pkt.answers_.clear();\n  data = pkt.data();\n  EXPECT_EQ(ARES_ENODATA, ares_parse_ns_reply(data.data(), (int)data.size(), &host));\n  pkt.add_answer(new DNSNsRR(\"example.com\", 100, \"ns.example.com\"));\n\n  // Truncated packets.\n  data = pkt.data();\n  for (size_t len = 1; len < data.size(); len++) {\n    EXPECT_EQ(ARES_EBADRESP, ares_parse_ns_reply(data.data(), (int)len, &host));\n  }\n\n  // Negative Length\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_ns_reply(data.data(), -1, &host));\n}",
+      "fn_code_pos": [
+        [
+          73,
+          0
+        ],
+        [
+          126,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseNsReplyAllocFail) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_NS))\n    .add_answer(new DNSCnameRR(\"example.com\", 300, \"c.example.com\"))\n    .add_answer(new DNSNsRR(\"c.example.com\", 100, \"ns.example.com\"));\n  std::vector<byte> data = pkt.data();\n  struct hostent *host = nullptr;\n\n  for (int ii = 1; ii <= 8; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    EXPECT_EQ(ARES_ENOMEM, ares_parse_ns_reply(data.data(), (int)data.size(), &host)) << ii;\n  }\n}",
+      "fn_code_pos": [
+        [
+          128,
+          0
+        ],
+        [
+          142,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        41,
+        2
+      ],
+      [
+        41,
+        16
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        64,
+        2
+      ],
+      [
+        64,
+        16
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        79,
+        2
+      ],
+      [
+        79,
+        16
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        135,
+        2
+      ],
+      [
+        135,
+        16
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"dns-proto.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <sstream>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include <vector>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

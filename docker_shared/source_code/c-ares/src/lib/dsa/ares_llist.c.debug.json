@@ -1,0 +1,1072 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_llist_t *ares_llist_create(ares_llist_destructor_t destruct)\n{\n  ares_llist_t *list = ares_malloc_zero(sizeof(*list));\n\n  if (list == NULL) {\n    return NULL;\n  }\n\n  list->destruct = destruct;\n\n  return list;\n}",
+      "fn_code_pos": [
+        [
+          42,
+          0
+        ],
+        [
+          53,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_create",
+        "parameters": {
+          "destruct": "ares_llist_destructor_t"
+        },
+        "return_type": "ares_llist_t"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_replace_destructor(ares_llist_t           *list,\n                                   ares_llist_destructor_t destruct)\n{\n  if (list == NULL) {\n    return;\n  }\n\n  list->destruct = destruct;\n}",
+      "fn_code_pos": [
+        [
+          55,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_replace_destructor",
+        "parameters": {
+          "list": "ares_llist_t",
+          "destruct": "ares_llist_destructor_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_llist_attach_at(ares_llist_t            *list,\n                                 ares_llist_insert_type_t type,\n                                 ares_llist_node_t *at, ares_llist_node_t *node)\n{\n  if (list == NULL || node == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  node->parent = list;\n\n  if (type == ARES__LLIST_INSERT_BEFORE && (at == list->head || at == NULL)) {\n    type = ARES__LLIST_INSERT_HEAD;\n  }\n\n  switch (type) {\n    case ARES__LLIST_INSERT_HEAD:\n      node->next = list->head;\n      node->prev = NULL;\n      if (list->head) {\n        list->head->prev = node;\n      }\n      list->head = node;\n      break;\n    case ARES__LLIST_INSERT_TAIL:\n      node->next = NULL;\n      node->prev = list->tail;\n      if (list->tail) {\n        list->tail->next = node;\n      }\n      list->tail = node;\n      break;\n    case ARES__LLIST_INSERT_BEFORE:\n      node->next = at;\n      node->prev = at->prev;\n      at->prev   = node;\n      break;\n  }\n  if (list->tail == NULL) {\n    list->tail = node;\n  }\n  if (list->head == NULL) {\n    list->head = node;\n  }\n\n  list->cnt++;\n}",
+      "fn_code_pos": [
+        [
+          71,
+          0
+        ],
+        [
+          116,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_attach_at",
+        "parameters": {
+          "list": "ares_llist_t",
+          "type": "ares_llist_insert_type_t",
+          "at": "ares_llist_node_t",
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_llist_node_t *ares_llist_insert_at(ares_llist_t            *list,\n                                               ares_llist_insert_type_t type,\n                                               ares_llist_node_t *at, void *val)\n{\n  ares_llist_node_t *node = NULL;\n\n  if (list == NULL || val == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  node = ares_malloc_zero(sizeof(*node));\n\n  if (node == NULL) {\n    return NULL;\n  }\n\n  node->data = val;\n  ares_llist_attach_at(list, type, at, node);\n\n  return node;\n}",
+      "fn_code_pos": [
+        [
+          118,
+          0
+        ],
+        [
+          138,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_at",
+        "parameters": {
+          "list": "ares_llist_t",
+          "type": "ares_llist_insert_type_t",
+          "at": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_insert_first(ares_llist_t *list, void *val)\n{\n  return ares_llist_insert_at(list, ARES__LLIST_INSERT_HEAD, NULL, val);\n}",
+      "fn_code_pos": [
+        [
+          140,
+          0
+        ],
+        [
+          143,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_first",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_insert_last(ares_llist_t *list, void *val)\n{\n  return ares_llist_insert_at(list, ARES__LLIST_INSERT_TAIL, NULL, val);\n}",
+      "fn_code_pos": [
+        [
+          145,
+          0
+        ],
+        [
+          148,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_last",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_insert_before(ares_llist_node_t *node, void *val)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n\n  return ares_llist_insert_at(node->parent, ARES__LLIST_INSERT_BEFORE, node,\n                              val);\n}",
+      "fn_code_pos": [
+        [
+          150,
+          0
+        ],
+        [
+          158,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_before",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_insert_after(ares_llist_node_t *node, void *val)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n\n  if (node->next == NULL) {\n    return ares_llist_insert_last(node->parent, val);\n  }\n\n  return ares_llist_insert_at(node->parent, ARES__LLIST_INSERT_BEFORE,\n                              node->next, val);\n}",
+      "fn_code_pos": [
+        [
+          160,
+          0
+        ],
+        [
+          172,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_after",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_node_first(ares_llist_t *list)\n{\n  if (list == NULL) {\n    return NULL;\n  }\n  return list->head;\n}",
+      "fn_code_pos": [
+        [
+          174,
+          0
+        ],
+        [
+          180,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_first",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_node_idx(ares_llist_t *list, size_t idx)\n{\n  ares_llist_node_t *node;\n  size_t             cnt;\n\n  if (list == NULL) {\n    return NULL;\n  }\n  if (idx >= list->cnt) {\n    return NULL;\n  }\n\n  node = list->head;\n  for (cnt = 0; node != NULL && cnt < idx; cnt++) {\n    node = node->next;\n  }\n\n  return node;\n}",
+      "fn_code_pos": [
+        [
+          182,
+          0
+        ],
+        [
+          200,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_idx",
+        "parameters": {
+          "list": "ares_llist_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_node_last(ares_llist_t *list)\n{\n  if (list == NULL) {\n    return NULL;\n  }\n  return list->tail;\n}",
+      "fn_code_pos": [
+        [
+          202,
+          0
+        ],
+        [
+          208,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_last",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_node_next(ares_llist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->next;\n}",
+      "fn_code_pos": [
+        [
+          210,
+          0
+        ],
+        [
+          216,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_next",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_t *ares_llist_node_prev(ares_llist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->prev;\n}",
+      "fn_code_pos": [
+        [
+          218,
+          0
+        ],
+        [
+          224,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_prev",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_llist_node_val(ares_llist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n\n  return node->data;\n}",
+      "fn_code_pos": [
+        [
+          226,
+          0
+        ],
+        [
+          233,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_val",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "size_t ares_llist_len(const ares_llist_t *list)\n{\n  if (list == NULL) {\n    return 0;\n  }\n  return list->cnt;\n}",
+      "fn_code_pos": [
+        [
+          235,
+          0
+        ],
+        [
+          241,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_len",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_llist_t *ares_llist_node_parent(ares_llist_node_t *node)\n{\n  if (node == NULL) {\n    return NULL;\n  }\n  return node->parent;\n}",
+      "fn_code_pos": [
+        [
+          243,
+          0
+        ],
+        [
+          249,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_parent",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "ares_llist_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_llist_first_val(ares_llist_t *list)\n{\n  return ares_llist_node_val(ares_llist_node_first(list));\n}",
+      "fn_code_pos": [
+        [
+          251,
+          0
+        ],
+        [
+          254,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_first_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_llist_last_val(ares_llist_t *list)\n{\n  return ares_llist_node_val(ares_llist_node_last(list));\n}",
+      "fn_code_pos": [
+        [
+          256,
+          0
+        ],
+        [
+          259,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_last_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_llist_node_detach(ares_llist_node_t *node)\n{\n  ares_llist_t *list;\n\n  if (node == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  list = node->parent;\n\n  if (node->prev) {\n    node->prev->next = node->next;\n  }\n\n  if (node->next) {\n    node->next->prev = node->prev;\n  }\n\n  if (node == list->head) {\n    list->head = node->next;\n  }\n\n  if (node == list->tail) {\n    list->tail = node->prev;\n  }\n\n  node->parent = NULL;\n  list->cnt--;\n}",
+      "fn_code_pos": [
+        [
+          261,
+          0
+        ],
+        [
+          289,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_detach",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_llist_node_claim(ares_llist_node_t *node)\n{\n  void *val;\n\n  if (node == NULL) {\n    return NULL;\n  }\n\n  val = node->data;\n  ares_llist_node_detach(node);\n  ares_free(node);\n\n  return val;\n}",
+      "fn_code_pos": [
+        [
+          291,
+          0
+        ],
+        [
+          304,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_claim",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_node_destroy(ares_llist_node_t *node)\n{\n  ares_llist_destructor_t destruct;\n  void                   *val;\n\n  if (node == NULL) {\n    return;\n  }\n\n  destruct = node->parent->destruct;\n\n  val = ares_llist_node_claim(node);\n  if (val != NULL && destruct != NULL) {\n    destruct(val);\n  }\n}",
+      "fn_code_pos": [
+        [
+          306,
+          0
+        ],
+        [
+          321,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_destroy",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_node_replace(ares_llist_node_t *node, void *val)\n{\n  ares_llist_destructor_t destruct;\n\n  if (node == NULL) {\n    return;\n  }\n\n  destruct = node->parent->destruct;\n  if (destruct != NULL) {\n    destruct(node->data);\n  }\n\n  node->data = val;\n}",
+      "fn_code_pos": [
+        [
+          323,
+          0
+        ],
+        [
+          337,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_replace",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_clear(ares_llist_t *list)\n{\n  ares_llist_node_t *node;\n\n  if (list == NULL) {\n    return;\n  }\n\n  while ((node = ares_llist_node_first(list)) != NULL) {\n    ares_llist_node_destroy(node);\n  }\n}",
+      "fn_code_pos": [
+        [
+          339,
+          0
+        ],
+        [
+          350,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_clear",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_destroy(ares_llist_t *list)\n{\n  if (list == NULL) {\n    return;\n  }\n  ares_llist_clear(list);\n  ares_free(list);\n}",
+      "fn_code_pos": [
+        [
+          352,
+          0
+        ],
+        [
+          359,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_destroy",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_node_mvparent_last(ares_llist_node_t *node,\n                                   ares_llist_t      *new_parent)\n{\n  if (node == NULL || new_parent == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_llist_node_detach(node);\n  ares_llist_attach_at(new_parent, ARES__LLIST_INSERT_TAIL, NULL, node);\n}",
+      "fn_code_pos": [
+        [
+          361,
+          0
+        ],
+        [
+          370,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_mvparent_last",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "new_parent": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_llist_node_mvparent_first(ares_llist_node_t *node,\n                                    ares_llist_t      *new_parent)\n{\n  if (node == NULL || new_parent == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_llist_node_detach(node);\n  ares_llist_attach_at(new_parent, ARES__LLIST_INSERT_HEAD, NULL, node);\n}",
+      "fn_code_pos": [
+        [
+          372,
+          0
+        ],
+        [
+          381,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_mvparent_first",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "new_parent": "ares_llist_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_llist_create(ares_llist_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          42,
+          14
+        ],
+        [
+          42,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_create",
+        "parameters": {
+          "destruct": "ares_llist_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_at(ares_llist_t            *list,\n                                               ares_llist_insert_type_t type,\n                                               ares_llist_node_t *at, void *val)",
+      "fn_dec_pos": [
+        [
+          118,
+          26
+        ],
+        [
+          120,
+          80
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_at",
+        "parameters": {
+          "list": "ares_llist_t",
+          "type": "ares_llist_insert_type_t",
+          "at": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_first(ares_llist_t *list, void *val)",
+      "fn_dec_pos": [
+        [
+          140,
+          19
+        ],
+        [
+          140,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_first",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_last(ares_llist_t *list, void *val)",
+      "fn_dec_pos": [
+        [
+          145,
+          19
+        ],
+        [
+          145,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_last",
+        "parameters": {
+          "list": "ares_llist_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_before(ares_llist_node_t *node, void *val)",
+      "fn_dec_pos": [
+        [
+          150,
+          19
+        ],
+        [
+          150,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_before",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_insert_after(ares_llist_node_t *node, void *val)",
+      "fn_dec_pos": [
+        [
+          160,
+          19
+        ],
+        [
+          160,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_insert_after",
+        "parameters": {
+          "node": "ares_llist_node_t",
+          "val": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_first(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          174,
+          19
+        ],
+        [
+          174,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_first",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_idx(ares_llist_t *list, size_t idx)",
+      "fn_dec_pos": [
+        [
+          182,
+          19
+        ],
+        [
+          182,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_idx",
+        "parameters": {
+          "list": "ares_llist_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_last(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          202,
+          19
+        ],
+        [
+          202,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_last",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_next(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          210,
+          19
+        ],
+        [
+          210,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_next",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_prev(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          218,
+          19
+        ],
+        [
+          218,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_prev",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_val(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          226,
+          6
+        ],
+        [
+          226,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_val",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_parent(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          243,
+          14
+        ],
+        [
+          243,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_parent",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_first_val(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          251,
+          6
+        ],
+        [
+          251,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_first_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_last_val(ares_llist_t *list)",
+      "fn_dec_pos": [
+        [
+          256,
+          6
+        ],
+        [
+          256,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_last_val",
+        "parameters": {
+          "list": "ares_llist_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_llist_node_claim(ares_llist_node_t *node)",
+      "fn_dec_pos": [
+        [
+          291,
+          6
+        ],
+        [
+          291,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_llist_node_claim",
+        "parameters": {
+          "node": "ares_llist_node_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_llist {\n  ares_llist_node_t      *head;\n  ares_llist_node_t      *tail;\n  ares_llist_destructor_t destruct;\n  size_t                  cnt;\n}",
+      {
+        "*head": "ares_llist_node_t",
+        "*tail": "ares_llist_node_t",
+        "destruct": "ares_llist_destructor_t",
+        "cnt": "size_t"
+      },
+      "ares_llist",
+      [
+        28,
+        0
+      ],
+      [
+        33,
+        1
+      ]
+    ],
+    [
+      "struct ares_llist_node {\n  void              *data;\n  ares_llist_node_t *prev;\n  ares_llist_node_t *next;\n  ares_llist_t      *parent;\n}",
+      {
+        "*data": "void",
+        "*prev": "ares_llist_node_t",
+        "*next": "ares_llist_node_t",
+        "*parent": "ares_llist_t"
+      },
+      "ares_llist_node",
+      [
+        35,
+        0
+      ],
+      [
+        40,
+        1
+      ]
+    ],
+    [
+      "struct ares_llist {\n  ares_llist_node_t      *head;\n  ares_llist_node_t      *tail;\n  ares_llist_destructor_t destruct;\n  size_t                  cnt;\n}",
+      {
+        "*head": "ares_llist_node_t",
+        "*tail": "ares_llist_node_t",
+        "destruct": "ares_llist_destructor_t",
+        "cnt": "size_t"
+      },
+      "ares_llist",
+      [
+        28,
+        0
+      ],
+      [
+        33,
+        1
+      ]
+    ],
+    [
+      "struct ares_llist_node {\n  void              *data;\n  ares_llist_node_t *prev;\n  ares_llist_node_t *next;\n  ares_llist_t      *parent;\n}",
+      {
+        "*data": "void",
+        "*prev": "ares_llist_node_t",
+        "*next": "ares_llist_node_t",
+        "*parent": "ares_llist_t"
+      },
+      "ares_llist_node",
+      [
+        35,
+        0
+      ],
+      [
+        40,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_llist.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES__LLIST_INSERT_HEAD,\n  ARES__LLIST_INSERT_TAIL,\n  ARES__LLIST_INSERT_BEFORE\n} ares_llist_insert_type_t;",
+      {
+        "ARES__LLIST_INSERT_HEAD": "",
+        "ARES__LLIST_INSERT_TAIL": "",
+        "ARES__LLIST_INSERT_BEFORE": ""
+      },
+      "ares_llist_insert_type_t",
+      [
+        65,
+        0
+      ],
+      [
+        69,
+        27
+      ]
+    ]
+  ]
+}

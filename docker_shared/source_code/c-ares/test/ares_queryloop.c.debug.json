@@ -1,0 +1,329 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ai_callback(void *arg, int status, int timeouts,\n                        struct ares_addrinfo *result)\n{\n  struct ares_addrinfo_node *node = NULL;\n  (void)timeouts;\n\n\n  if (status != ARES_SUCCESS) {\n    fprintf(stderr, \"%s: %s\\n\", (char *)arg, ares_strerror(status));\n    return;\n  }\n\n  for (node = result->nodes; node != NULL; node = node->ai_next) {\n    char        addr_buf[64] = \"\";\n    const void *ptr          = NULL;\n    if (node->ai_family == AF_INET) {\n      const struct sockaddr_in *in_addr =\n        (const struct sockaddr_in *)((void *)node->ai_addr);\n      ptr = &in_addr->sin_addr;\n    } else if (node->ai_family == AF_INET6) {\n      const struct sockaddr_in6 *in_addr =\n        (const struct sockaddr_in6 *)((void *)node->ai_addr);\n      ptr = &in_addr->sin6_addr;\n    } else {\n      continue;\n    }\n    ares_inet_ntop(node->ai_family, ptr, addr_buf, sizeof(addr_buf));\n    printf(\"%-32s\\t%s\\n\", result->name, addr_buf);\n  }\n\n  ares_freeaddrinfo(result);\n}",
+      "fn_code_pos": [
+        [
+          46,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ai_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "result": "struct ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static BOOL WINAPI ctrlc_handler(_In_ DWORD dwCtrlType)\n{\n  switch (dwCtrlType) {\n    case CTRL_C_EVENT:\n      is_running = ARES_FALSE;\n      return TRUE;\n    default:\n      break;\n  }\n  return FALSE;\n}",
+      "fn_code_pos": [
+        [
+          83,
+          0
+        ],
+        [
+          93,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ctrlc_handler",
+        "parameters": {
+          "DWORD": "_In_"
+        },
+        "return_type": "BOOL"
+      }
+    },
+    {
+      "fn_code": "static void ctrlc_handler(int sig)\n{\n  switch (sig) {\n    case SIGINT:\n      is_running = ARES_FALSE;\n      break;\n    default:\n      break;\n  }\n}",
+      "fn_code_pos": [
+        [
+          95,
+          0
+        ],
+        [
+          104,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ctrlc_handler",
+        "parameters": {
+          "sig": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int main(int argc, char *argv[])\n{\n  struct ares_options options;\n  int                 optmask = 0;\n  ares_channel_t     *channel;\n  size_t              count;\n  ares_status_t       status;\n\n#ifdef _WIN32\n  WORD    wVersionRequested = MAKEWORD(2, 2);\n  WSADATA wsaData;\n  WSAStartup(wVersionRequested, &wsaData);\n#endif\n\n  if (argc != 2) {\n    printf(\"Usage: %s domain\\n\", argv[0]);\n    return 1;\n  }\n\n  status = (ares_status_t)ares_library_init(ARES_LIB_INIT_ALL);\n  if (status != ARES_SUCCESS) {\n    fprintf(stderr, \"ares_library_init: %s\\n\", ares_strerror((int)status));\n    return 1;\n  }\n\n  memset(&options, 0, sizeof(options));\n  optmask                |= ARES_OPT_EVENT_THREAD;\n  options.evsys           = ARES_EVSYS_DEFAULT;\n  optmask                |= ARES_OPT_QUERY_CACHE;\n  options.qcache_max_ttl  = 0;\n\n  status = (ares_status_t)ares_init_options(&channel, &options, optmask);\n  if (status != ARES_SUCCESS) {\n    fprintf(stderr, \"ares_init: %s\\n\", ares_strerror((int)status));\n    return 1;\n  }\n\n#ifdef _WIN32\n  SetConsoleCtrlHandler(ctrlc_handler, TRUE);\n#else\n  signal(SIGINT, ctrlc_handler);\n#endif\n\n  printf(\"Querying for %s every 1s, press CTRL-C to quit...\\n\", argv[1]);\n\n  for (count = 1; is_running == ARES_TRUE; count++) {\n    struct ares_addrinfo_hints hints;\n    char                      *servers = ares_get_servers_csv(channel);\n\n    memset(&hints, 0, sizeof(hints));\n    hints.ai_family = AF_UNSPEC;\n    printf(\"Attempt %u using server list: %s ...\\n\", (unsigned int)count,\n           servers);\n    ares_free_string(servers);\n\n    ares_getaddrinfo(channel, argv[1], NULL, &hints, ai_callback, argv[1]);\n#ifdef _WIN32\n    Sleep(1000);\n#else\n    sleep(1);\n#endif\n  }\n\n  printf(\"CTRL-C captured, cleaning up...\\n\");\n  ares_destroy(channel);\n  ares_library_cleanup();\n\n#ifdef _WIN32\n  WSACleanup();\n#endif\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          107,
+          0
+        ],
+        [
+          178,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "main",
+        "parameters": {
+          "argc": "int",
+          "argv": "char"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        47,
+        24
+      ],
+      [
+        47,
+        44
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        49,
+        2
+      ],
+      [
+        49,
+        27
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        62,
+        12
+      ],
+      [
+        62,
+        30
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        63,
+        15
+      ],
+      [
+        63,
+        33
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        66,
+        12
+      ],
+      [
+        66,
+        31
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        67,
+        15
+      ],
+      [
+        67,
+        34
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        109,
+        2
+      ],
+      [
+        109,
+        21
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        153,
+        4
+      ],
+      [
+        153,
+        30
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include <stdio.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include <string.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <winsock2.h>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#  include <windows.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <unistd.h>\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#  include <signal.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        40,
+        0
+      ],
+      [
+        41,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

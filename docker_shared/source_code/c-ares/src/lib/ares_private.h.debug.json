@@ -1,0 +1,2969 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "_w32_GetHostsFile(void)",
+      "fn_dec_pos": [
+        [
+          90,
+          21
+        ],
+        [
+          90,
+          44
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "_w32_GetHostsFile",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_is_onion_domain(const char *name)",
+      "fn_dec_pos": [
+        [
+          304,
+          14
+        ],
+        [
+          304,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_onion_domain",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_send_query(ares_server_t *requested_server /* Optional */,\n                              ares_query_t *query, const ares_timeval_t *now)",
+      "fn_dec_pos": [
+        [
+          307,
+          14
+        ],
+        [
+          308,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_send_query",
+        "parameters": {
+          "requested_server": "ares_server_t",
+          "query": "ares_query_t",
+          "now": "ares_timeval_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_requeue_query(ares_query_t *query, const ares_timeval_t *now,\n                                 ares_status_t            status,\n                                 ares_bool_t              inc_try_count,\n                                 ares_dns_record_t       *dnsrec,\n                                 ares_array_t           **requeue)",
+      "fn_dec_pos": [
+        [
+          309,
+          14
+        ],
+        [
+          313,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_requeue_query",
+        "parameters": {
+          "query": "ares_query_t",
+          "now": "ares_timeval_t",
+          "status": "ares_status_t",
+          "inc_try_count": "ares_bool_t",
+          "dnsrec": "ares_dns_record_t",
+          "requeue": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_name_label_cnt(const char *name)",
+      "fn_dec_pos": [
+        [
+          316,
+          14
+        ],
+        [
+          316,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_name_label_cnt",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_search_name_list(const ares_channel_t *channel,\n                                    const char *name, char ***names,\n                                    size_t *names_len)",
+      "fn_dec_pos": [
+        [
+          329,
+          14
+        ],
+        [
+          331,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_search_name_list",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "names": "char",
+          "names_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dnsrec_convert_arg(ares_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          335,
+          14
+        ],
+        [
+          335,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dnsrec_convert_arg",
+        "parameters": {
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_dnsrec_convert_cb(void *arg, ares_status_t status, size_t timeouts,\n                            const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          341,
+          5
+        ],
+        [
+          342,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dnsrec_convert_cb",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_free_query(ares_query_t *query)",
+      "fn_dec_pos": [
+        [
+          344,
+          5
+        ],
+        [
+          344,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_query",
+        "parameters": {
+          "query": "ares_query_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_generate_new_id(ares_rand_state *state)",
+      "fn_dec_pos": [
+        [
+          346,
+          15
+        ],
+        [
+          346,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_generate_new_id",
+        "parameters": {
+          "state": "ares_rand_state"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_expand_name_validated(const unsigned char *encoded,\n                                          const unsigned char *abuf, size_t alen,\n                                          char **s, size_t *enclen,\n                                          ares_bool_t is_hostname)",
+      "fn_dec_pos": [
+        [
+          347,
+          15
+        ],
+        [
+          350,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_name_validated",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "size_t",
+          "s": "char",
+          "enclen": "size_t",
+          "is_hostname": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_expand_string_ex(const unsigned char *encoded,\n                                     const unsigned char *abuf, size_t alen,\n                                     unsigned char **s, size_t *enclen)",
+      "fn_dec_pos": [
+        [
+          351,
+          15
+        ],
+        [
+          353,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_string_ex",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "size_t",
+          "s": "unsigned char",
+          "enclen": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_servers_state(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          354,
+          15
+        ],
+        [
+          354,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_servers_state",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_by_options(ares_channel_t            *channel,\n                                    const struct ares_options *options,\n                                    int                        optmask)",
+      "fn_dec_pos": [
+        [
+          355,
+          15
+        ],
+        [
+          357,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_by_options",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "options": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_by_sysconfig(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          358,
+          15
+        ],
+        [
+          358,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_by_sysconfig",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_set_socket_functions_def(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          359,
+          15
+        ],
+        [
+          359,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_set_socket_functions_def",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_sysconfig_set_options(ares_sysconfig_t *sysconfig,\n                                         const char       *str)",
+      "fn_dec_pos": [
+        [
+          375,
+          14
+        ],
+        [
+          376,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sysconfig_set_options",
+        "parameters": {
+          "sysconfig": "ares_sysconfig_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_by_environment(ares_sysconfig_t *sysconfig)",
+      "fn_dec_pos": [
+        [
+          378,
+          14
+        ],
+        [
+          378,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_by_environment",
+        "parameters": {
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "(*ares_sysconfig_line_cb_t)(const ares_channel_t *channel,\n                                                  ares_sysconfig_t     *sysconfig,\n                                                  ares_buf_t           *line)",
+      "fn_dec_pos": [
+        [
+          381,
+          22
+        ],
+        [
+          383,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t",
+          "line": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_sysconfig_parse_resolv_line(const ares_channel_t *channel,\n                                               ares_sysconfig_t     *sysconfig,\n                                               ares_buf_t           *line)",
+      "fn_dec_pos": [
+        [
+          385,
+          14
+        ],
+        [
+          387,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sysconfig_parse_resolv_line",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t",
+          "line": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_sysconfig_process_buf(const ares_channel_t    *channel,\n                                         ares_sysconfig_t        *sysconfig,\n                                         ares_buf_t              *buf,\n                                         ares_sysconfig_line_cb_t cb)",
+      "fn_dec_pos": [
+        [
+          389,
+          14
+        ],
+        [
+          392,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sysconfig_process_buf",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t",
+          "buf": "ares_buf_t",
+          "cb": "ares_sysconfig_line_cb_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_sysconfig_files(const ares_channel_t *channel,\n                                        ares_sysconfig_t     *sysconfig,\n                                        ares_bool_t process_resolvconf)",
+      "fn_dec_pos": [
+        [
+          394,
+          14
+        ],
+        [
+          396,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_files",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t",
+          "process_resolvconf": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_sysconfig_macos(const ares_channel_t *channel,\n                                        ares_sysconfig_t     *sysconfig)",
+      "fn_dec_pos": [
+        [
+          398,
+          14
+        ],
+        [
+          399,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_macos",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_init_sysconfig_windows(const ares_channel_t *channel,\n                                          ares_sysconfig_t     *sysconfig)",
+      "fn_dec_pos": [
+        [
+          402,
+          14
+        ],
+        [
+          403,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_sysconfig_windows",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sysconfig": "ares_sysconfig_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_parse_sortlist(struct apattern **sortlist, size_t *nsort,\n                                  const char *str)",
+      "fn_dec_pos": [
+        [
+          406,
+          14
+        ],
+        [
+          407,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_sortlist",
+        "parameters": {
+          "sortlist": "struct apattern",
+          "nsort": "size_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_lookup_hostaliases(const ares_channel_t *channel,\n                                      const char *name, char **alias)",
+      "fn_dec_pos": [
+        [
+          412,
+          14
+        ],
+        [
+          413,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_lookup_hostaliases",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "alias": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_cat_domain(const char *name, const char *domain, char **s)",
+      "fn_dec_pos": [
+        [
+          415,
+          14
+        ],
+        [
+          415,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cat_domain",
+        "parameters": {
+          "name": "char",
+          "domain": "char",
+          "s": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_sortaddrinfo(ares_channel_t            *channel,\n                                struct ares_addrinfo_node *ai_node)",
+      "fn_dec_pos": [
+        [
+          416,
+          14
+        ],
+        [
+          417,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sortaddrinfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "ai_node": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_freeaddrinfo_nodes(struct ares_addrinfo_node *ai_node)",
+      "fn_dec_pos": [
+        [
+          419,
+          14
+        ],
+        [
+          419,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo_nodes",
+        "parameters": {
+          "ai_node": "struct ares_addrinfo_node"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_is_localhost(const char *name)",
+      "fn_dec_pos": [
+        [
+          420,
+          14
+        ],
+        [
+          420,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_localhost",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_append_addrinfo_node(struct ares_addrinfo_node **ai_node)",
+      "fn_dec_pos": [
+        [
+          423,
+          2
+        ],
+        [
+          423,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_append_addrinfo_node",
+        "parameters": {
+          "ai_node": "struct ares_addrinfo_node"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_addrinfo_cat_nodes(struct ares_addrinfo_node **head,\n                             struct ares_addrinfo_node  *tail)",
+      "fn_dec_pos": [
+        [
+          424,
+          5
+        ],
+        [
+          425,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo_cat_nodes",
+        "parameters": {
+          "head": "struct ares_addrinfo_node",
+          "tail": "struct ares_addrinfo_node"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_freeaddrinfo_cnames(struct ares_addrinfo_cname *ai_cname)",
+      "fn_dec_pos": [
+        [
+          427,
+          5
+        ],
+        [
+          427,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_freeaddrinfo_cnames",
+        "parameters": {
+          "ai_cname": "struct ares_addrinfo_cname"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_append_addrinfo_cname(struct ares_addrinfo_cname **ai_cname)",
+      "fn_dec_pos": [
+        [
+          430,
+          2
+        ],
+        [
+          430,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_append_addrinfo_cname",
+        "parameters": {
+          "ai_cname": "struct ares_addrinfo_cname"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_append_ai_node(int aftype, unsigned short port,\n                                  unsigned int ttl, const void *adata,\n                                  struct ares_addrinfo_node **nodes)",
+      "fn_dec_pos": [
+        [
+          432,
+          14
+        ],
+        [
+          434,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_append_ai_node",
+        "parameters": {
+          "aftype": "int",
+          "port": "unsigned short",
+          "ttl": "unsigned int",
+          "adata": "void",
+          "nodes": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_addrinfo_cat_cnames(struct ares_addrinfo_cname **head,\n                                       struct ares_addrinfo_cname  *tail)",
+      "fn_dec_pos": [
+        [
+          436,
+          14
+        ],
+        [
+          437,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo_cat_cnames",
+        "parameters": {
+          "head": "struct ares_addrinfo_cname",
+          "tail": "struct ares_addrinfo_cname"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_parse_into_addrinfo(const ares_dns_record_t *dnsrec,\n                                       ares_bool_t    cname_only_is_enodata,\n                                       unsigned short port,\n                                       struct ares_addrinfo *ai)",
+      "fn_dec_pos": [
+        [
+          439,
+          14
+        ],
+        [
+          442,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_into_addrinfo",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "cname_only_is_enodata": "ares_bool_t",
+          "port": "unsigned short",
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_parse_ptr_reply_dnsrec(const ares_dns_record_t *dnsrec,\n                                          const void *addr, int addrlen,\n                                          int family, struct hostent **host)",
+      "fn_dec_pos": [
+        [
+          443,
+          14
+        ],
+        [
+          445,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_ptr_reply_dnsrec",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "addr": "void",
+          "addrlen": "int",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_addrinfo2hostent(const struct ares_addrinfo *ai, int family,\n                                    struct hostent **host)",
+      "fn_dec_pos": [
+        [
+          448,
+          14
+        ],
+        [
+          449,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo2hostent",
+        "parameters": {
+          "ai": "struct ares_addrinfo",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_addrinfo2addrttl(const struct ares_addrinfo *ai, int family,\n                                    size_t                req_naddrttls,\n                                    struct ares_addrttl  *addrttls,\n                                    struct ares_addr6ttl *addr6ttls,\n                                    size_t               *naddrttls)",
+      "fn_dec_pos": [
+        [
+          451,
+          14
+        ],
+        [
+          455,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo2addrttl",
+        "parameters": {
+          "ai": "struct ares_addrinfo",
+          "family": "int",
+          "req_naddrttls": "size_t",
+          "addrttls": "struct ares_addrttl",
+          "addr6ttls": "struct ares_addr6ttl",
+          "naddrttls": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_addrinfo_localhost(const char *name, unsigned short port,\n                                      const struct ares_addrinfo_hints *hints,\n                                      struct ares_addrinfo             *ai)",
+      "fn_dec_pos": [
+        [
+          456,
+          14
+        ],
+        [
+          458,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addrinfo_localhost",
+        "parameters": {
+          "name": "char",
+          "port": "unsigned short",
+          "hints": "struct ares_addrinfo_hints",
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_servers_update(ares_channel_t *channel,\n                                  ares_llist_t   *server_list,\n                                  ares_bool_t     user_specified)",
+      "fn_dec_pos": [
+        [
+          460,
+          14
+        ],
+        [
+          462,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_servers_update",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "server_list": "ares_llist_t",
+          "user_specified": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_sconfig_append(const ares_channel_t *channel, ares_llist_t **sconfig,\n                      const struct ares_addr *addr, unsigned short udp_port,\n                      unsigned short tcp_port, const char *ll_iface)",
+      "fn_dec_pos": [
+        [
+          464,
+          2
+        ],
+        [
+          466,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_append",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sconfig": "ares_llist_t",
+          "addr": "struct ares_addr",
+          "udp_port": "unsigned short",
+          "tcp_port": "unsigned short",
+          "ll_iface": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_sconfig_append_fromstr(const ares_channel_t *channel,\n                                          ares_llist_t        **sconfig,\n                                          const char           *str,\n                                          ares_bool_t           ignore_invalid)",
+      "fn_dec_pos": [
+        [
+          467,
+          14
+        ],
+        [
+          470,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sconfig_append_fromstr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sconfig": "ares_llist_t",
+          "str": "char",
+          "ignore_invalid": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_in_addr_to_sconfig_llist(const struct in_addr *servers,\n                                            size_t                nservers,\n                                            ares_llist_t        **llist)",
+      "fn_dec_pos": [
+        [
+          471,
+          14
+        ],
+        [
+          473,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_in_addr_to_sconfig_llist",
+        "parameters": {
+          "servers": "struct in_addr",
+          "nservers": "size_t",
+          "llist": "ares_llist_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_get_server_addr(const ares_server_t *server,\n                                   ares_buf_t          *buf)",
+      "fn_dec_pos": [
+        [
+          474,
+          14
+        ],
+        [
+          475,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_server_addr",
+        "parameters": {
+          "server": "ares_server_t",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_hosts_file_destroy(ares_hosts_file_t *hf)",
+      "fn_dec_pos": [
+        [
+          480,
+          32
+        ],
+        [
+          480,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_destroy",
+        "parameters": {
+          "hf": "ares_hosts_file_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_hosts_search_ipaddr(ares_channel_t *channel,\n                                       ares_bool_t use_env, const char *ipaddr,\n                                       const ares_hosts_entry_t **entry)",
+      "fn_dec_pos": [
+        [
+          481,
+          14
+        ],
+        [
+          483,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_search_ipaddr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t",
+          "ipaddr": "char",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_hosts_search_host(ares_channel_t *channel,\n                                     ares_bool_t use_env, const char *host,\n                                     const ares_hosts_entry_t **entry)",
+      "fn_dec_pos": [
+        [
+          484,
+          14
+        ],
+        [
+          486,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_search_host",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t",
+          "host": "char",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_hosts_entry_to_hostent(const ares_hosts_entry_t *entry,\n                                          int family, struct hostent **hostent)",
+      "fn_dec_pos": [
+        [
+          487,
+          14
+        ],
+        [
+          488,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_to_hostent",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "family": "int",
+          "hostent": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_hosts_entry_to_addrinfo(const ares_hosts_entry_t *entry,\n                                           const char *name, int family,\n                                           unsigned short        port,\n                                           ares_bool_t           want_cnames,\n                                           struct ares_addrinfo *ai)",
+      "fn_dec_pos": [
+        [
+          489,
+          14
+        ],
+        [
+          493,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_to_addrinfo",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "name": "char",
+          "family": "int",
+          "port": "unsigned short",
+          "want_cnames": "ares_bool_t",
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_query_nolock(ares_channel_t *channel, const char *name,\n                                ares_dns_class_t     dnsclass,\n                                ares_dns_rec_type_t  type,\n                                ares_callback_dnsrec callback, void *arg,\n                                unsigned short *qid)",
+      "fn_dec_pos": [
+        [
+          497,
+          14
+        ],
+        [
+          501,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query_nolock",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_send_nolock(ares_channel_t *channel, ares_server_t *server,\n                               ares_send_flags_t        flags,\n                               const ares_dns_record_t *dnsrec,\n                               ares_callback_dnsrec callback, void *arg,\n                               unsigned short *qid)",
+      "fn_dec_pos": [
+        [
+          512,
+          14
+        ],
+        [
+          516,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_send_nolock",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "server": "ares_server_t",
+          "flags": "ares_send_flags_t",
+          "dnsrec": "ares_dns_record_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_gethostbyaddr_nolock(ares_channel_t *channel, const void *addr,\n                               int addrlen, int family,\n                               ares_host_callback callback, void *arg)",
+      "fn_dec_pos": [
+        [
+          520,
+          5
+        ],
+        [
+          522,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyaddr_nolock",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "addr": "void",
+          "addrlen": "int",
+          "family": "int",
+          "callback": "ares_host_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_dns_name_parse(ares_buf_t *buf, char **name,\n                                  ares_bool_t is_hostname)",
+      "fn_dec_pos": [
+        [
+          538,
+          14
+        ],
+        [
+          539,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_name_parse",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "name": "char",
+          "is_hostname": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_dns_name_write(ares_buf_t *buf, ares_llist_t **list,\n                                  ares_bool_t validate_hostname,\n                                  const char *name)",
+      "fn_dec_pos": [
+        [
+          558,
+          14
+        ],
+        [
+          560,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_name_write",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "list": "ares_llist_t",
+          "validate_hostname": "ares_bool_t",
+          "name": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_queue_notify_empty(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          569,
+          14
+        ],
+        [
+          569,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_queue_notify_empty",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_subnet_match(const struct ares_addr *addr,\n                                const struct ares_addr *subnet,\n                                unsigned char           netmask)",
+      "fn_dec_pos": [
+        [
+          575,
+          14
+        ],
+        [
+          577,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_subnet_match",
+        "parameters": {
+          "addr": "struct ares_addr",
+          "subnet": "struct ares_addr",
+          "netmask": "unsigned char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_addr_is_linklocal(const struct ares_addr *addr)",
+      "fn_dec_pos": [
+        [
+          578,
+          14
+        ],
+        [
+          578,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_addr_is_linklocal",
+        "parameters": {
+          "addr": "struct ares_addr"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_qcache_destroy(ares_qcache_t *cache)",
+      "fn_dec_pos": [
+        [
+          580,
+          14
+        ],
+        [
+          580,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_destroy",
+        "parameters": {
+          "cache": "ares_qcache_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_qcache_create(ares_rand_state *rand_state,\n                                 unsigned int     max_ttl,\n                                 ares_qcache_t  **cache_out)",
+      "fn_dec_pos": [
+        [
+          581,
+          14
+        ],
+        [
+          583,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_create",
+        "parameters": {
+          "rand_state": "ares_rand_state",
+          "max_ttl": "unsigned int",
+          "cache_out": "ares_qcache_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_qcache_flush(ares_qcache_t *cache)",
+      "fn_dec_pos": [
+        [
+          584,
+          14
+        ],
+        [
+          584,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_flush",
+        "parameters": {
+          "cache": "ares_qcache_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_qcache_insert(ares_channel_t          *channel,\n                                 const ares_timeval_t    *now,\n                                 const ares_query_t      *query,\n                                 const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          585,
+          14
+        ],
+        [
+          588,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_insert",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "now": "ares_timeval_t",
+          "query": "ares_query_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_qcache_fetch(ares_channel_t           *channel,\n                                const ares_timeval_t     *now,\n                                const ares_dns_record_t  *dnsrec,\n                                const ares_dns_record_t **dnsrec_resp)",
+      "fn_dec_pos": [
+        [
+          589,
+          14
+        ],
+        [
+          592,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_qcache_fetch",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "now": "ares_timeval_t",
+          "dnsrec": "ares_dns_record_t",
+          "dnsrec_resp": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_metrics_record(const ares_query_t *query, ares_server_t *server,\n                           ares_status_t status, const ares_dns_record_t *dnsrec)",
+      "fn_dec_pos": [
+        [
+          594,
+          7
+        ],
+        [
+          595,
+          81
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_metrics_record",
+        "parameters": {
+          "query": "ares_query_t",
+          "server": "ares_server_t",
+          "status": "ares_status_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_metrics_server_timeout(const ares_server_t  *server,\n                                   const ares_timeval_t *now)",
+      "fn_dec_pos": [
+        [
+          596,
+          7
+        ],
+        [
+          597,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_metrics_server_timeout",
+        "parameters": {
+          "server": "ares_server_t",
+          "now": "ares_timeval_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_cookie_apply(ares_dns_record_t *dnsrec, ares_conn_t *conn,\n                                const ares_timeval_t *now)",
+      "fn_dec_pos": [
+        [
+          599,
+          14
+        ],
+        [
+          600,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cookie_apply",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t",
+          "conn": "ares_conn_t",
+          "now": "ares_timeval_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_cookie_validate(ares_query_t            *query,\n                                   const ares_dns_record_t *dnsresp,\n                                   ares_conn_t             *conn,\n                                   const ares_timeval_t    *now,\n                                   ares_array_t           **requeue)",
+      "fn_dec_pos": [
+        [
+          601,
+          14
+        ],
+        [
+          605,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_cookie_validate",
+        "parameters": {
+          "query": "ares_query_t",
+          "dnsresp": "ares_dns_record_t",
+          "conn": "ares_conn_t",
+          "now": "ares_timeval_t",
+          "requeue": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_channel_threading_init(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          607,
+          14
+        ],
+        [
+          607,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_threading_init",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_channel_threading_destroy(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          608,
+          14
+        ],
+        [
+          608,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_threading_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_channel_lock(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          609,
+          14
+        ],
+        [
+          609,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_lock",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_channel_unlock(const ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          610,
+          14
+        ],
+        [
+          610,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_channel_unlock",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_event_thread_destroy(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          615,
+          14
+        ],
+        [
+          615,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_destroy",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_event_thread_init(ares_channel_t *channel)",
+      "fn_dec_pos": [
+        [
+          616,
+          14
+        ],
+        [
+          616,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_thread_init",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_query {\n  /* Query ID from qbuf, for faster lookup, and current timeout */\n  unsigned short       qid; /* host byte order */\n  ares_timeval_t       ts;  /*!< Timestamp query was sent */\n  ares_timeval_t       timeout;\n  ares_channel_t      *channel;\n\n  /*\n   * Node object for each list entry the query belongs to in order to\n   * make removal operations O(1).\n   */\n  ares_slist_node_t   *node_queries_by_timeout;\n  ares_llist_node_t   *node_queries_to_conn;\n  ares_llist_node_t   *node_all_queries;\n\n  /* connection handle query is associated with */\n  ares_conn_t         *conn;\n\n  /* Query */\n  ares_dns_record_t   *query;\n\n  ares_callback_dnsrec callback;\n  void                *arg;\n\n  /* Query status */\n  size_t        try_count; /* Number of times we tried this query already. */\n  size_t        cookie_try_count; /* Attempt count for cookie resends */\n  ares_bool_t   using_tcp;\n  ares_status_t error_status;\n  size_t        timeouts;   /* number of timeouts we saw for this request */\n  ares_bool_t   no_retries; /* do not perform any additional retries, this is\n                             * set when a query is to be canceled */\n}",
+      {
+        "qid": "unsigned short",
+        "ts": "ares_timeval_t",
+        "timeout": "ares_timeval_t",
+        "*channel": "ares_channel_t",
+        "*node_queries_by_timeout": "ares_slist_node_t",
+        "*node_queries_to_conn": "ares_llist_node_t",
+        "*node_all_queries": "ares_llist_node_t",
+        "*conn": "ares_conn_t",
+        "*query": "ares_dns_record_t",
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void",
+        "try_count": "size_t",
+        "cookie_try_count": "size_t",
+        "using_tcp": "ares_bool_t",
+        "error_status": "ares_status_t",
+        "timeouts": "size_t",
+        "no_retries": "ares_bool_t"
+      },
+      "ares_query",
+      [
+        137,
+        0
+      ],
+      [
+        169,
+        1
+      ]
+    ],
+    [
+      "struct apattern {\n  struct ares_addr addr;\n  unsigned char    mask;\n}",
+      {
+        "addr": "struct ares_addr",
+        "mask": "unsigned char"
+      },
+      "apattern",
+      [
+        171,
+        0
+      ],
+      [
+        174,
+        1
+      ]
+    ],
+    [
+      "struct ares_channeldata {\n  /* Configuration data */\n  unsigned int         flags;\n  size_t               timeout; /* in milliseconds */\n  size_t               tries;\n  size_t               ndots;\n  size_t               maxtimeout;                 /* in milliseconds */\n  ares_bool_t          rotate;\n  unsigned short       udp_port;                   /* stored in network order */\n  unsigned short       tcp_port;                   /* stored in network order */\n  int                  socket_send_buffer_size;    /* setsockopt takes int */\n  int                  socket_receive_buffer_size; /* setsockopt takes int */\n  char               **domains;\n  size_t               ndomains;\n  struct apattern     *sortlist;\n  size_t               nsort;\n  char                *lookups;\n  size_t               ednspsz;\n  unsigned int         qcache_max_ttl;\n  ares_evsys_t         evsys;\n  unsigned int         optmask;\n\n  /* For binding to local devices and/or IP addresses.  Leave\n   * them null/zero for no binding.\n   */\n  char                 local_dev_name[32];\n  unsigned int         local_ip4;\n  unsigned char        local_ip6[16];\n\n  /* Thread safety lock */\n  ares_thread_mutex_t *lock;\n\n  /* Conditional to wake waiters when queue is empty */\n  ares_thread_cond_t  *cond_empty;\n\n  /* Server addresses and communications state. Sorted by least consecutive\n   * failures, followed by the configuration order if failures are equal. */\n  ares_slist_t        *servers;\n\n  /* random state to use when generating new ids and generating retry penalties\n   */\n  ares_rand_state     *rand_state;\n\n  /* All active queries in a single list */\n  ares_llist_t        *all_queries;\n  /* Queries bucketed by qid, for quickly dispatching DNS responses: */\n  ares_htable_szvp_t  *queries_by_qid;\n\n  /* Queries bucketed by timeout, for quickly handling timeouts: */\n  ares_slist_t        *queries_by_timeout;\n\n  /* Map linked list node member for connection to file descriptor.  We use\n   * the node instead of the connection object itself so we can quickly look\n   * up a connection and remove it if necessary (as otherwise we'd have to\n   * scan all connections) */\n  ares_htable_asvp_t  *connnode_by_socket;\n\n  ares_sock_state_cb   sock_state_cb;\n  void                *sock_state_cb_data;\n\n  ares_sock_create_callback           sock_create_cb;\n  void                               *sock_create_cb_data;\n\n  ares_sock_config_callback           sock_config_cb;\n  void                               *sock_config_cb_data;\n\n  struct ares_socket_functions_ex     sock_funcs;\n  void                               *sock_func_cb_data;\n  const struct ares_socket_functions *legacy_sock_funcs;\n  void                               *legacy_sock_funcs_cb_data;\n\n  ares_pending_write_cb               notify_pending_write_cb;\n  void                               *notify_pending_write_cb_data;\n  ares_bool_t                         notify_pending_write;\n\n  ares_query_enqueue_cb               query_enqueue_cb;\n  void                               *query_enqueue_cb_data;\n\n  /* Path for resolv.conf file, configurable via ares_options */\n  char                               *resolvconf_path;\n\n  /* Path for hosts file, configurable via ares_options */\n  char                               *hosts_path;\n\n  /* Maximum UDP queries per connection allowed */\n  size_t                              udp_max_queries;\n\n  /* Cache of local hosts file */\n  ares_hosts_file_t                  *hf;\n\n  /* Query Cache */\n  ares_qcache_t                      *qcache;\n\n  /* Fields controlling server failover behavior.\n   * The retry chance is the probability (1/N) by which we will retry a failed\n   * server instead of the best server when selecting a server to send queries\n   * to.\n   * The retry delay is the minimum time in milliseconds to wait between doing\n   * such retries (applied per-server).\n   */\n  unsigned short                      server_retry_chance;\n  size_t                              server_retry_delay;\n\n  /* Callback triggered when a server has a successful or failed response */\n  ares_server_state_callback          server_state_cb;\n  void                               *server_state_cb_data;\n\n  /* TRUE if a reinit is pending.  Reinit spawns a thread to read the system\n   * configuration and then apply the configuration since configuration\n   * reading may block.  The thread handle is provided for waiting on thread\n   * exit. */\n  ares_bool_t                         reinit_pending;\n  ares_thread_t                      *reinit_thread;\n\n  /* Whether the system is up or not.  This is mainly to prevent deadlocks\n   * and access violations during the cleanup process.  Some things like\n   * system config changes might get triggered and we need a flag to make\n   * sure we don't take action. */\n  ares_bool_t                         sys_up;\n}",
+      {
+        "flags": "unsigned int",
+        "timeout": "size_t",
+        "tries": "size_t",
+        "ndots": "size_t",
+        "maxtimeout": "size_t",
+        "rotate": "ares_bool_t",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "socket_send_buffer_size": "int",
+        "socket_receive_buffer_size": "int",
+        "**domains": "char",
+        "ndomains": "size_t",
+        "*sortlist": "struct apattern",
+        "nsort": "size_t",
+        "*lookups": "char",
+        "ednspsz": "size_t",
+        "qcache_max_ttl": "unsigned int",
+        "evsys": "ares_evsys_t",
+        "optmask": "unsigned int",
+        "local_dev_name[32]": "char",
+        "local_ip4": "unsigned int",
+        "local_ip6[16]": "unsigned char",
+        "*lock": "ares_thread_mutex_t",
+        "*cond_empty": "ares_thread_cond_t",
+        "*servers": "ares_slist_t",
+        "*rand_state": "ares_rand_state",
+        "*all_queries": "ares_llist_t",
+        "*queries_by_qid": "ares_htable_szvp_t",
+        "*queries_by_timeout": "ares_slist_t",
+        "*connnode_by_socket": "ares_htable_asvp_t",
+        "sock_state_cb": "ares_sock_state_cb",
+        "*sock_state_cb_data": "void",
+        "sock_create_cb": "ares_sock_create_callback",
+        "*sock_create_cb_data": "void",
+        "sock_config_cb": "ares_sock_config_callback",
+        "*sock_config_cb_data": "void",
+        "sock_funcs": "struct ares_socket_functions_ex",
+        "*sock_func_cb_data": "void",
+        "struct ares_socket_functions": "const",
+        "*legacy_sock_funcs_cb_data": "void",
+        "notify_pending_write_cb": "ares_pending_write_cb",
+        "*notify_pending_write_cb_data": "void",
+        "notify_pending_write": "ares_bool_t",
+        "query_enqueue_cb": "ares_query_enqueue_cb",
+        "*query_enqueue_cb_data": "void",
+        "*resolvconf_path": "char",
+        "*hosts_path": "char",
+        "udp_max_queries": "size_t",
+        "*hf": "ares_hosts_file_t",
+        "*qcache": "ares_qcache_t",
+        "server_retry_chance": "unsigned short",
+        "server_retry_delay": "size_t",
+        "server_state_cb": "ares_server_state_callback",
+        "*server_state_cb_data": "void",
+        "reinit_pending": "ares_bool_t",
+        "*reinit_thread": "ares_thread_t",
+        "sys_up": "ares_bool_t"
+      },
+      "ares_channeldata",
+      [
+        182,
+        0
+      ],
+      [
+        301,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_llist_t    *sconfig;\n  struct apattern *sortlist;\n  size_t           nsortlist;\n  char           **domains;\n  size_t           ndomains;\n  char            *lookups;\n  size_t           ndots;\n  size_t           tries;\n  ares_bool_t      rotate;\n  size_t           timeout_ms;\n  ares_bool_t      usevc;\n} ares_sysconfig_t;",
+      {
+        "*sconfig": "ares_llist_t",
+        "*sortlist": "struct apattern",
+        "nsortlist": "size_t",
+        "**domains": "char",
+        "ndomains": "size_t",
+        "*lookups": "char",
+        "ndots": "size_t",
+        "tries": "size_t",
+        "rotate": "ares_bool_t",
+        "timeout_ms": "size_t",
+        "usevc": "ares_bool_t"
+      },
+      "ares_sysconfig_t",
+      [
+        361,
+        0
+      ],
+      [
+        373,
+        19
+      ]
+    ],
+    [
+      "struct ares_query",
+      {},
+      "",
+      [
+        133,
+        0
+      ],
+      [
+        133,
+        17
+      ]
+    ],
+    [
+      "typedef struct ares_query ares_query_t;",
+      {},
+      "ares_query_t",
+      [
+        134,
+        0
+      ],
+      [
+        134,
+        39
+      ]
+    ],
+    [
+      "struct ares_query {\n  /* Query ID from qbuf, for faster lookup, and current timeout */\n  unsigned short       qid; /* host byte order */\n  ares_timeval_t       ts;  /*!< Timestamp query was sent */\n  ares_timeval_t       timeout;\n  ares_channel_t      *channel;\n\n  /*\n   * Node object for each list entry the query belongs to in order to\n   * make removal operations O(1).\n   */\n  ares_slist_node_t   *node_queries_by_timeout;\n  ares_llist_node_t   *node_queries_to_conn;\n  ares_llist_node_t   *node_all_queries;\n\n  /* connection handle query is associated with */\n  ares_conn_t         *conn;\n\n  /* Query */\n  ares_dns_record_t   *query;\n\n  ares_callback_dnsrec callback;\n  void                *arg;\n\n  /* Query status */\n  size_t        try_count; /* Number of times we tried this query already. */\n  size_t        cookie_try_count; /* Attempt count for cookie resends */\n  ares_bool_t   using_tcp;\n  ares_status_t error_status;\n  size_t        timeouts;   /* number of timeouts we saw for this request */\n  ares_bool_t   no_retries; /* do not perform any additional retries, this is\n                             * set when a query is to be canceled */\n}",
+      {
+        "qid": "unsigned short",
+        "ts": "ares_timeval_t",
+        "timeout": "ares_timeval_t",
+        "*channel": "ares_channel_t",
+        "*node_queries_by_timeout": "ares_slist_node_t",
+        "*node_queries_to_conn": "ares_llist_node_t",
+        "*node_all_queries": "ares_llist_node_t",
+        "*conn": "ares_conn_t",
+        "*query": "ares_dns_record_t",
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void",
+        "try_count": "size_t",
+        "cookie_try_count": "size_t",
+        "using_tcp": "ares_bool_t",
+        "error_status": "ares_status_t",
+        "timeouts": "size_t",
+        "no_retries": "ares_bool_t"
+      },
+      "ares_query",
+      [
+        137,
+        0
+      ],
+      [
+        169,
+        1
+      ]
+    ],
+    [
+      "struct apattern {\n  struct ares_addr addr;\n  unsigned char    mask;\n}",
+      {
+        "addr": "struct ares_addr",
+        "mask": "unsigned char"
+      },
+      "apattern",
+      [
+        171,
+        0
+      ],
+      [
+        174,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        172,
+        2
+      ],
+      [
+        172,
+        18
+      ]
+    ],
+    [
+      "struct ares_qcache",
+      {},
+      "",
+      [
+        176,
+        0
+      ],
+      [
+        176,
+        18
+      ]
+    ],
+    [
+      "typedef struct ares_qcache ares_qcache_t;",
+      {},
+      "ares_qcache_t",
+      [
+        177,
+        0
+      ],
+      [
+        177,
+        41
+      ]
+    ],
+    [
+      "struct ares_hosts_file",
+      {},
+      "",
+      [
+        179,
+        0
+      ],
+      [
+        179,
+        22
+      ]
+    ],
+    [
+      "typedef struct ares_hosts_file ares_hosts_file_t;",
+      {},
+      "ares_hosts_file_t",
+      [
+        180,
+        0
+      ],
+      [
+        180,
+        49
+      ]
+    ],
+    [
+      "struct ares_channeldata {\n  /* Configuration data */\n  unsigned int         flags;\n  size_t               timeout; /* in milliseconds */\n  size_t               tries;\n  size_t               ndots;\n  size_t               maxtimeout;                 /* in milliseconds */\n  ares_bool_t          rotate;\n  unsigned short       udp_port;                   /* stored in network order */\n  unsigned short       tcp_port;                   /* stored in network order */\n  int                  socket_send_buffer_size;    /* setsockopt takes int */\n  int                  socket_receive_buffer_size; /* setsockopt takes int */\n  char               **domains;\n  size_t               ndomains;\n  struct apattern     *sortlist;\n  size_t               nsort;\n  char                *lookups;\n  size_t               ednspsz;\n  unsigned int         qcache_max_ttl;\n  ares_evsys_t         evsys;\n  unsigned int         optmask;\n\n  /* For binding to local devices and/or IP addresses.  Leave\n   * them null/zero for no binding.\n   */\n  char                 local_dev_name[32];\n  unsigned int         local_ip4;\n  unsigned char        local_ip6[16];\n\n  /* Thread safety lock */\n  ares_thread_mutex_t *lock;\n\n  /* Conditional to wake waiters when queue is empty */\n  ares_thread_cond_t  *cond_empty;\n\n  /* Server addresses and communications state. Sorted by least consecutive\n   * failures, followed by the configuration order if failures are equal. */\n  ares_slist_t        *servers;\n\n  /* random state to use when generating new ids and generating retry penalties\n   */\n  ares_rand_state     *rand_state;\n\n  /* All active queries in a single list */\n  ares_llist_t        *all_queries;\n  /* Queries bucketed by qid, for quickly dispatching DNS responses: */\n  ares_htable_szvp_t  *queries_by_qid;\n\n  /* Queries bucketed by timeout, for quickly handling timeouts: */\n  ares_slist_t        *queries_by_timeout;\n\n  /* Map linked list node member for connection to file descriptor.  We use\n   * the node instead of the connection object itself so we can quickly look\n   * up a connection and remove it if necessary (as otherwise we'd have to\n   * scan all connections) */\n  ares_htable_asvp_t  *connnode_by_socket;\n\n  ares_sock_state_cb   sock_state_cb;\n  void                *sock_state_cb_data;\n\n  ares_sock_create_callback           sock_create_cb;\n  void                               *sock_create_cb_data;\n\n  ares_sock_config_callback           sock_config_cb;\n  void                               *sock_config_cb_data;\n\n  struct ares_socket_functions_ex     sock_funcs;\n  void                               *sock_func_cb_data;\n  const struct ares_socket_functions *legacy_sock_funcs;\n  void                               *legacy_sock_funcs_cb_data;\n\n  ares_pending_write_cb               notify_pending_write_cb;\n  void                               *notify_pending_write_cb_data;\n  ares_bool_t                         notify_pending_write;\n\n  ares_query_enqueue_cb               query_enqueue_cb;\n  void                               *query_enqueue_cb_data;\n\n  /* Path for resolv.conf file, configurable via ares_options */\n  char                               *resolvconf_path;\n\n  /* Path for hosts file, configurable via ares_options */\n  char                               *hosts_path;\n\n  /* Maximum UDP queries per connection allowed */\n  size_t                              udp_max_queries;\n\n  /* Cache of local hosts file */\n  ares_hosts_file_t                  *hf;\n\n  /* Query Cache */\n  ares_qcache_t                      *qcache;\n\n  /* Fields controlling server failover behavior.\n   * The retry chance is the probability (1/N) by which we will retry a failed\n   * server instead of the best server when selecting a server to send queries\n   * to.\n   * The retry delay is the minimum time in milliseconds to wait between doing\n   * such retries (applied per-server).\n   */\n  unsigned short                      server_retry_chance;\n  size_t                              server_retry_delay;\n\n  /* Callback triggered when a server has a successful or failed response */\n  ares_server_state_callback          server_state_cb;\n  void                               *server_state_cb_data;\n\n  /* TRUE if a reinit is pending.  Reinit spawns a thread to read the system\n   * configuration and then apply the configuration since configuration\n   * reading may block.  The thread handle is provided for waiting on thread\n   * exit. */\n  ares_bool_t                         reinit_pending;\n  ares_thread_t                      *reinit_thread;\n\n  /* Whether the system is up or not.  This is mainly to prevent deadlocks\n   * and access violations during the cleanup process.  Some things like\n   * system config changes might get triggered and we need a flag to make\n   * sure we don't take action. */\n  ares_bool_t                         sys_up;\n}",
+      {
+        "flags": "unsigned int",
+        "timeout": "size_t",
+        "tries": "size_t",
+        "ndots": "size_t",
+        "maxtimeout": "size_t",
+        "rotate": "ares_bool_t",
+        "udp_port": "unsigned short",
+        "tcp_port": "unsigned short",
+        "socket_send_buffer_size": "int",
+        "socket_receive_buffer_size": "int",
+        "**domains": "char",
+        "ndomains": "size_t",
+        "*sortlist": "struct apattern",
+        "nsort": "size_t",
+        "*lookups": "char",
+        "ednspsz": "size_t",
+        "qcache_max_ttl": "unsigned int",
+        "evsys": "ares_evsys_t",
+        "optmask": "unsigned int",
+        "local_dev_name[32]": "char",
+        "local_ip4": "unsigned int",
+        "local_ip6[16]": "unsigned char",
+        "*lock": "ares_thread_mutex_t",
+        "*cond_empty": "ares_thread_cond_t",
+        "*servers": "ares_slist_t",
+        "*rand_state": "ares_rand_state",
+        "*all_queries": "ares_llist_t",
+        "*queries_by_qid": "ares_htable_szvp_t",
+        "*queries_by_timeout": "ares_slist_t",
+        "*connnode_by_socket": "ares_htable_asvp_t",
+        "sock_state_cb": "ares_sock_state_cb",
+        "*sock_state_cb_data": "void",
+        "sock_create_cb": "ares_sock_create_callback",
+        "*sock_create_cb_data": "void",
+        "sock_config_cb": "ares_sock_config_callback",
+        "*sock_config_cb_data": "void",
+        "sock_funcs": "struct ares_socket_functions_ex",
+        "*sock_func_cb_data": "void",
+        "struct ares_socket_functions": "const",
+        "*legacy_sock_funcs_cb_data": "void",
+        "notify_pending_write_cb": "ares_pending_write_cb",
+        "*notify_pending_write_cb_data": "void",
+        "notify_pending_write": "ares_bool_t",
+        "query_enqueue_cb": "ares_query_enqueue_cb",
+        "*query_enqueue_cb_data": "void",
+        "*resolvconf_path": "char",
+        "*hosts_path": "char",
+        "udp_max_queries": "size_t",
+        "*hf": "ares_hosts_file_t",
+        "*qcache": "ares_qcache_t",
+        "server_retry_chance": "unsigned short",
+        "server_retry_delay": "size_t",
+        "server_state_cb": "ares_server_state_callback",
+        "*server_state_cb_data": "void",
+        "reinit_pending": "ares_bool_t",
+        "*reinit_thread": "ares_thread_t",
+        "sys_up": "ares_bool_t"
+      },
+      "ares_channeldata",
+      [
+        182,
+        0
+      ],
+      [
+        301,
+        1
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        196,
+        2
+      ],
+      [
+        196,
+        17
+      ]
+    ],
+    [
+      "struct ares_socket_functions_ex",
+      {},
+      "",
+      [
+        248,
+        2
+      ],
+      [
+        248,
+        33
+      ]
+    ],
+    [
+      "struct ares_socket_functions",
+      {},
+      "",
+      [
+        250,
+        8
+      ],
+      [
+        250,
+        36
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        356,
+        42
+      ],
+      [
+        356,
+        61
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_llist_t    *sconfig;\n  struct apattern *sortlist;\n  size_t           nsortlist;\n  char           **domains;\n  size_t           ndomains;\n  char            *lookups;\n  size_t           ndots;\n  size_t           tries;\n  ares_bool_t      rotate;\n  size_t           timeout_ms;\n  ares_bool_t      usevc;\n} ares_sysconfig_t;",
+      {
+        "*sconfig": "ares_llist_t",
+        "*sortlist": "struct apattern",
+        "nsortlist": "size_t",
+        "**domains": "char",
+        "ndomains": "size_t",
+        "*lookups": "char",
+        "ndots": "size_t",
+        "tries": "size_t",
+        "rotate": "ares_bool_t",
+        "timeout_ms": "size_t",
+        "usevc": "ares_bool_t"
+      },
+      "ares_sysconfig_t",
+      [
+        361,
+        0
+      ],
+      [
+        373,
+        19
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        363,
+        2
+      ],
+      [
+        363,
+        17
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        406,
+        34
+      ],
+      [
+        406,
+        49
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        417,
+        32
+      ],
+      [
+        417,
+        57
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        419,
+        38
+      ],
+      [
+        419,
+        63
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        422,
+        0
+      ],
+      [
+        422,
+        25
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        423,
+        28
+      ],
+      [
+        423,
+        53
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        424,
+        29
+      ],
+      [
+        424,
+        54
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        425,
+        29
+      ],
+      [
+        425,
+        54
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        427,
+        30
+      ],
+      [
+        427,
+        56
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        429,
+        0
+      ],
+      [
+        429,
+        26
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        430,
+        29
+      ],
+      [
+        430,
+        55
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        434,
+        34
+      ],
+      [
+        434,
+        59
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        436,
+        39
+      ],
+      [
+        436,
+        65
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        437,
+        39
+      ],
+      [
+        437,
+        65
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        442,
+        39
+      ],
+      [
+        442,
+        59
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        445,
+        54
+      ],
+      [
+        445,
+        68
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        448,
+        42
+      ],
+      [
+        448,
+        62
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        449,
+        36
+      ],
+      [
+        449,
+        50
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        451,
+        42
+      ],
+      [
+        451,
+        62
+      ]
+    ],
+    [
+      "struct ares_addrttl",
+      {},
+      "",
+      [
+        453,
+        36
+      ],
+      [
+        453,
+        55
+      ]
+    ],
+    [
+      "struct ares_addr6ttl",
+      {},
+      "",
+      [
+        454,
+        36
+      ],
+      [
+        454,
+        56
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        457,
+        44
+      ],
+      [
+        457,
+        70
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        458,
+        38
+      ],
+      [
+        458,
+        58
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        465,
+        28
+      ],
+      [
+        465,
+        44
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        471,
+        50
+      ],
+      [
+        471,
+        64
+      ]
+    ],
+    [
+      "struct ares_hosts_entry",
+      {},
+      "",
+      [
+        477,
+        0
+      ],
+      [
+        477,
+        23
+      ]
+    ],
+    [
+      "typedef struct ares_hosts_entry ares_hosts_entry_t;",
+      {},
+      "ares_hosts_entry_t",
+      [
+        478,
+        0
+      ],
+      [
+        478,
+        51
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        488,
+        54
+      ],
+      [
+        488,
+        68
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        493,
+        43
+      ],
+      [
+        493,
+        63
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        575,
+        38
+      ],
+      [
+        575,
+        54
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        576,
+        38
+      ],
+      [
+        576,
+        54
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        578,
+        43
+      ],
+      [
+        578,
+        59
+      ]
+    ],
+    [
+      "struct ares_event_thread",
+      {},
+      "",
+      [
+        612,
+        0
+      ],
+      [
+        612,
+        24
+      ]
+    ],
+    [
+      "typedef struct ares_event_thread ares_event_thread_t;",
+      {},
+      "ares_event_thread_t",
+      [
+        613,
+        0
+      ],
+      [
+        613,
+        53
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_setup.h\"\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_mem.h\"\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_ipv6.h\"\n",
+      [
+        43,
+        0
+      ],
+      [
+        44,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_math.h\"\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_time.h\"\n",
+      [
+        45,
+        0
+      ],
+      [
+        46,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_rand.h\"\n",
+      [
+        46,
+        0
+      ],
+      [
+        47,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_array.h\"\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_llist.h\"\n",
+      [
+        48,
+        0
+      ],
+      [
+        49,
+        0
+      ]
+    ],
+    [
+      "#include \"dsa/ares_slist.h\"\n",
+      [
+        49,
+        0
+      ],
+      [
+        50,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_strvp.h\"\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_szvp.h\"\n",
+      [
+        51,
+        0
+      ],
+      [
+        52,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_asvp.h\"\n",
+      [
+        52,
+        0
+      ],
+      [
+        53,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_dict.h\"\n",
+      [
+        53,
+        0
+      ],
+      [
+        54,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_vpvp.h\"\n",
+      [
+        54,
+        0
+      ],
+      [
+        55,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_vpstr.h\"\n",
+      [
+        55,
+        0
+      ],
+      [
+        56,
+        0
+      ]
+    ],
+    [
+      "#include \"record/ares_dns_multistring.h\"\n",
+      [
+        56,
+        0
+      ],
+      [
+        57,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_buf.h\"\n",
+      [
+        57,
+        0
+      ],
+      [
+        58,
+        0
+      ]
+    ],
+    [
+      "#include \"record/ares_dns_private.h\"\n",
+      [
+        58,
+        0
+      ],
+      [
+        59,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_iface_ips.h\"\n",
+      [
+        59,
+        0
+      ],
+      [
+        60,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_threads.h\"\n",
+      [
+        60,
+        0
+      ],
+      [
+        61,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_socket.h\"\n",
+      [
+        61,
+        0
+      ],
+      [
+        62,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_conn.h\"\n",
+      [
+        62,
+        0
+      ],
+      [
+        63,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_str.h\"\n",
+      [
+        63,
+        0
+      ],
+      [
+        64,
+        0
+      ]
+    ],
+    [
+      "#include \"str/ares_strsplit.h\"\n",
+      [
+        64,
+        0
+      ],
+      [
+        65,
+        0
+      ]
+    ],
+    [
+      "#include \"util/ares_uri.h\"\n",
+      [
+        65,
+        0
+      ],
+      [
+        66,
+        0
+      ]
+    ],
+    [
+      "#  include \"ares_getenv.h\"\n",
+      [
+        68,
+        0
+      ],
+      [
+        69,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_SEND_FLAG_NOCACHE = 1 << 0, /*!< Do not query the cache */\n  ARES_SEND_FLAG_NORETRY = 1 << 1  /*!< Do not retry this query on error */\n} ares_send_flags_t;",
+      {
+        "ARES_SEND_FLAG_NOCACHE": "",
+        "ARES_SEND_FLAG_NORETRY": ""
+      },
+      "ares_send_flags_t",
+      [
+        504,
+        0
+      ],
+      [
+        507,
+        20
+      ]
+    ]
+  ]
+}

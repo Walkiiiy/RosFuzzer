@@ -1,0 +1,887 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "const void *ares_dns_pton(const char *ipaddr, struct ares_addr *addr,\n                          size_t *out_len)\n{\n  const void *ptr     = NULL;\n  size_t      ptr_len = 0;\n\n  if (ipaddr == NULL || addr == NULL || out_len == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *out_len = 0;\n\n  if (addr->family == AF_INET &&\n      ares_inet_pton(AF_INET, ipaddr, &addr->addr.addr4) > 0) {\n    ptr     = &addr->addr.addr4;\n    ptr_len = sizeof(addr->addr.addr4);\n  } else if (addr->family == AF_INET6 &&\n             ares_inet_pton(AF_INET6, ipaddr, &addr->addr.addr6) > 0) {\n    ptr     = &addr->addr.addr6;\n    ptr_len = sizeof(addr->addr.addr6);\n  } else if (addr->family == AF_UNSPEC) {\n    if (ares_inet_pton(AF_INET, ipaddr, &addr->addr.addr4) > 0) {\n      addr->family = AF_INET;\n      ptr          = &addr->addr.addr4;\n      ptr_len      = sizeof(addr->addr.addr4);\n    } else if (ares_inet_pton(AF_INET6, ipaddr, &addr->addr.addr6) > 0) {\n      addr->family = AF_INET6;\n      ptr          = &addr->addr.addr6;\n      ptr_len      = sizeof(addr->addr.addr6);\n    }\n  }\n\n  *out_len = ptr_len;\n  return ptr;\n}",
+      "fn_code_pos": [
+        [
+          102,
+          0
+        ],
+        [
+          136,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_pton",
+        "parameters": {
+          "ipaddr": "char",
+          "addr": "struct ares_addr",
+          "out_len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_normalize_ipaddr(const char *ipaddr, char *out,\n                                         size_t out_len)\n{\n  struct ares_addr data;\n  const void      *addr;\n  size_t           addr_len = 0;\n\n  memset(&data, 0, sizeof(data));\n  data.family = AF_UNSPEC;\n\n  addr = ares_dns_pton(ipaddr, &data, &addr_len);\n  if (addr == NULL) {\n    return ARES_FALSE;\n  }\n\n  if (!ares_inet_ntop(data.family, addr, out, (ares_socklen_t)out_len)) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          138,
+          0
+        ],
+        [
+          158,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_normalize_ipaddr",
+        "parameters": {
+          "ipaddr": "char",
+          "out": "char",
+          "out_len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_hosts_entry_destroy(ares_hosts_entry_t *entry)\n{\n  if (entry == NULL) {\n    return;\n  }\n\n  /* Honor reference counting */\n  if (entry->refcnt != 0) {\n    entry->refcnt--;\n  }\n\n  if (entry->refcnt > 0) {\n    return;\n  }\n\n  ares_llist_destroy(entry->hosts);\n  ares_llist_destroy(entry->ips);\n  ares_free(entry);\n}",
+      "fn_code_pos": [
+        [
+          160,
+          0
+        ],
+        [
+          178,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_destroy",
+        "parameters": {
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_hosts_entry_destroy_cb(void *entry)\n{\n  ares_hosts_entry_destroy(entry);\n}",
+      "fn_code_pos": [
+        [
+          180,
+          0
+        ],
+        [
+          183,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_destroy_cb",
+        "parameters": {
+          "entry": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_hosts_file_destroy(ares_hosts_file_t *hf)\n{\n  if (hf == NULL) {\n    return;\n  }\n\n  ares_free(hf->filename);\n  ares_htable_strvp_destroy(hf->hosthash);\n  ares_htable_strvp_destroy(hf->iphash);\n  ares_free(hf);\n}",
+      "fn_code_pos": [
+        [
+          185,
+          0
+        ],
+        [
+          195,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_destroy",
+        "parameters": {
+          "hf": "ares_hosts_file_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_hosts_file_t *ares_hosts_file_create(const char *filename)\n{\n  ares_hosts_file_t *hf = ares_malloc_zero(sizeof(*hf));\n  if (hf == NULL) {\n    goto fail;\n  }\n\n  hf->ts = time(NULL);\n\n  hf->filename = ares_strdup(filename);\n  if (hf->filename == NULL) {\n    goto fail;\n  }\n\n  hf->iphash = ares_htable_strvp_create(ares_hosts_entry_destroy_cb);\n  if (hf->iphash == NULL) {\n    goto fail;\n  }\n\n  hf->hosthash = ares_htable_strvp_create(NULL);\n  if (hf->hosthash == NULL) {\n    goto fail;\n  }\n\n  return hf;\n\nfail:\n  ares_hosts_file_destroy(hf);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          197,
+          0
+        ],
+        [
+          226,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_create",
+        "parameters": {
+          "filename": "char"
+        },
+        "return_type": "ares_hosts_file_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_hosts_file_merge_entry(\n  const ares_hosts_file_t *hf, ares_hosts_entry_t *existing,\n  ares_hosts_entry_t *entry, ares_hosts_file_match_t matchtype)\n{\n  ares_llist_node_t *node;\n\n  /* If we matched on IP address, we know there can only be 1, so there's no\n   * reason to do anything */\n  if (matchtype != ARES_MATCH_IPADDR) {\n    while ((node = ares_llist_node_first(entry->ips)) != NULL) {\n      const char *ipaddr = ares_llist_node_val(node);\n\n      if (ares_htable_strvp_get_direct(hf->iphash, ipaddr) != NULL) {\n        ares_llist_node_destroy(node);\n        continue;\n      }\n\n      ares_llist_node_mvparent_last(node, existing->ips);\n    }\n  }\n\n\n  while ((node = ares_llist_node_first(entry->hosts)) != NULL) {\n    const char *hostname = ares_llist_node_val(node);\n\n    if (ares_htable_strvp_get_direct(hf->hosthash, hostname) != NULL) {\n      ares_llist_node_destroy(node);\n      continue;\n    }\n\n    ares_llist_node_mvparent_last(node, existing->hosts);\n  }\n\n  ares_hosts_entry_destroy(entry);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          234,
+          0
+        ],
+        [
+          269,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_merge_entry",
+        "parameters": {
+          "hf": "ares_hosts_file_t",
+          "existing": "ares_hosts_entry_t",
+          "entry": "ares_hosts_entry_t",
+          "matchtype": "ares_hosts_file_match_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_hosts_file_match_t\n  ares_hosts_file_match(const ares_hosts_file_t *hf, ares_hosts_entry_t *entry,\n                        ares_hosts_entry_t **match)\n{\n  ares_llist_node_t *node;\n  *match = NULL;\n\n  for (node = ares_llist_node_first(entry->ips); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const char *ipaddr = ares_llist_node_val(node);\n    *match             = ares_htable_strvp_get_direct(hf->iphash, ipaddr);\n    if (*match != NULL) {\n      return ARES_MATCH_IPADDR;\n    }\n  }\n\n  for (node = ares_llist_node_first(entry->hosts); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const char *host = ares_llist_node_val(node);\n    *match           = ares_htable_strvp_get_direct(hf->hosthash, host);\n    if (*match != NULL) {\n      return ARES_MATCH_HOST;\n    }\n  }\n\n  return ARES_MATCH_NONE;\n}",
+      "fn_code_pos": [
+        [
+          271,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_match",
+        "parameters": {
+          "hf": "ares_hosts_file_t",
+          "entry": "ares_hosts_entry_t",
+          "match": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_hosts_file_match_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_hosts_file_add(ares_hosts_file_t  *hosts,\n                                         ares_hosts_entry_t *entry)\n{\n  ares_hosts_entry_t     *match  = NULL;\n  ares_status_t           status = ARES_SUCCESS;\n  ares_llist_node_t      *node;\n  ares_hosts_file_match_t matchtype;\n  size_t                  num_hostnames;\n\n  /* Record the number of hostnames in this entry file.  If we merge into an\n   * existing record, these will be *appended* to the entry, so we'll count\n   * backwards when adding to the hosts hashtable */\n  num_hostnames = ares_llist_len(entry->hosts);\n\n  matchtype = ares_hosts_file_match(hosts, entry, &match);\n\n  if (matchtype != ARES_MATCH_NONE) {\n    status = ares_hosts_file_merge_entry(hosts, match, entry, matchtype);\n    if (status != ARES_SUCCESS) {\n      ares_hosts_entry_destroy(entry); /* LCOV_EXCL_LINE: DefensiveCoding */\n      return status;                   /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n    /* entry was invalidated above by merging */\n    entry = match;\n  }\n\n  if (matchtype != ARES_MATCH_IPADDR) {\n    const char *ipaddr = ares_llist_last_val(entry->ips);\n\n    if (!ares_htable_strvp_get(hosts->iphash, ipaddr, NULL)) {\n      if (!ares_htable_strvp_insert(hosts->iphash, ipaddr, entry)) {\n        ares_hosts_entry_destroy(entry);\n        return ARES_ENOMEM;\n      }\n      entry->refcnt++;\n    }\n  }\n\n  /* Go backwards, on a merge, hostnames are appended.  Breakout once we've\n   * consumed all the hosts that we appended */\n  for (node = ares_llist_node_last(entry->hosts); node != NULL;\n       node = ares_llist_node_prev(node)) {\n    const char *val = ares_llist_node_val(node);\n\n    if (num_hostnames == 0) {\n      break;\n    }\n\n    num_hostnames--;\n\n    /* first hostname match wins.  If we detect a duplicate hostname for another\n     * ip it will automatically be added to the same entry */\n    if (ares_htable_strvp_get(hosts->hosthash, val, NULL)) {\n      continue;\n    }\n\n    if (!ares_htable_strvp_insert(hosts->hosthash, val, entry)) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          300,
+          0
+        ],
+        [
+          362,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_add",
+        "parameters": {
+          "hosts": "ares_hosts_file_t",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_hosts_entry_isdup(ares_hosts_entry_t *entry,\n                                          const char         *host)\n{\n  ares_llist_node_t *node;\n\n  for (node = ares_llist_node_first(entry->ips); node != NULL;\n       node = ares_llist_node_next(node)) {\n    const char *myhost = ares_llist_node_val(node);\n    if (ares_strcaseeq(myhost, host)) {\n      return ARES_TRUE;\n    }\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          364,
+          0
+        ],
+        [
+          378,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_isdup",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "host": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_parse_hosts_hostnames(ares_buf_t         *buf,\n                                                ares_hosts_entry_t *entry)\n{\n  entry->hosts = ares_llist_create(ares_free);\n  if (entry->hosts == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  /* Parse hostnames and aliases */\n  while (ares_buf_len(buf)) {\n    char          hostname[256];\n    char         *temp;\n    ares_status_t status;\n    unsigned char comment = '#';\n\n    ares_buf_consume_whitespace(buf, ARES_FALSE);\n\n    if (ares_buf_len(buf) == 0) {\n      break;\n    }\n\n    /* See if it is a comment, if so stop processing */\n    if (ares_buf_begins_with(buf, &comment, 1)) {\n      break;\n    }\n\n    ares_buf_tag(buf);\n\n    /* Must be at end of line */\n    if (ares_buf_consume_nonwhitespace(buf) == 0) {\n      break;\n    }\n\n    status = ares_buf_tag_fetch_string(buf, hostname, sizeof(hostname));\n    if (status != ARES_SUCCESS) {\n      /* Bad entry, just ignore as long as its not the first.  If its the first,\n       * it must be valid */\n      if (ares_llist_len(entry->hosts) == 0) {\n        return ARES_EBADSTR;\n      }\n\n      continue;\n    }\n\n    /* Validate it is a valid hostname characterset */\n    if (!ares_is_hostname(hostname)) {\n      continue;\n    }\n\n    /* Don't add a duplicate to the same entry */\n    if (ares_hosts_entry_isdup(entry, hostname)) {\n      continue;\n    }\n\n    /* Add to list */\n    temp = ares_strdup(hostname);\n    if (temp == NULL) {\n      return ARES_ENOMEM;\n    }\n\n    if (ares_llist_insert_last(entry->hosts, temp) == NULL) {\n      ares_free(temp);\n      return ARES_ENOMEM;\n    }\n  }\n\n  /* Must have at least 1 entry */\n  if (ares_llist_len(entry->hosts) == 0) {\n    return ARES_EBADSTR;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          380,
+          0
+        ],
+        [
+          452,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_hosts_hostnames",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_parse_hosts_ipaddr(ares_buf_t          *buf,\n                                             ares_hosts_entry_t **entry_out)\n{\n  char                addr[INET6_ADDRSTRLEN];\n  char               *temp;\n  ares_hosts_entry_t *entry = NULL;\n  ares_status_t       status;\n\n  *entry_out = NULL;\n\n  ares_buf_tag(buf);\n  ares_buf_consume_nonwhitespace(buf);\n  status = ares_buf_tag_fetch_string(buf, addr, sizeof(addr));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Validate and normalize the ip address format */\n  if (!ares_normalize_ipaddr(addr, addr, sizeof(addr))) {\n    return ARES_EBADSTR;\n  }\n\n  entry = ares_malloc_zero(sizeof(*entry));\n  if (entry == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  entry->ips = ares_llist_create(ares_free);\n  if (entry->ips == NULL) {\n    ares_hosts_entry_destroy(entry);\n    return ARES_ENOMEM;\n  }\n\n  temp = ares_strdup(addr);\n  if (temp == NULL) {\n    ares_hosts_entry_destroy(entry);\n    return ARES_ENOMEM;\n  }\n\n  if (ares_llist_insert_first(entry->ips, temp) == NULL) {\n    ares_free(temp);\n    ares_hosts_entry_destroy(entry);\n    return ARES_ENOMEM;\n  }\n\n  *entry_out = entry;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          454,
+          0
+        ],
+        [
+          502,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_hosts_ipaddr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "entry_out": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_parse_hosts(const char         *filename,\n                                      ares_hosts_file_t **out)\n{\n  ares_buf_t         *buf    = NULL;\n  ares_status_t       status = ARES_EBADRESP;\n  ares_hosts_file_t  *hf     = NULL;\n  ares_hosts_entry_t *entry  = NULL;\n\n  *out = NULL;\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  status = ares_buf_load_file(filename, buf);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  hf = ares_hosts_file_create(filename);\n  if (hf == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  while (ares_buf_len(buf)) {\n    unsigned char comment = '#';\n\n    /* -- Start of new line here -- */\n\n    /* Consume any leading whitespace */\n    ares_buf_consume_whitespace(buf, ARES_FALSE);\n\n    if (ares_buf_len(buf) == 0) {\n      break;\n    }\n\n    /* See if it is a comment, if so, consume remaining line */\n    if (ares_buf_begins_with(buf, &comment, 1)) {\n      ares_buf_consume_line(buf, ARES_TRUE);\n      continue;\n    }\n\n    /* Pull off ip address */\n    status = ares_parse_hosts_ipaddr(buf, &entry);\n    if (status == ARES_ENOMEM) {\n      goto done;\n    }\n    if (status != ARES_SUCCESS) {\n      /* Bad line, consume and go onto next */\n      ares_buf_consume_line(buf, ARES_TRUE);\n      continue;\n    }\n\n    /* Parse of the hostnames */\n    status = ares_parse_hosts_hostnames(buf, entry);\n    if (status == ARES_ENOMEM) {\n      goto done;\n    } else if (status != ARES_SUCCESS) {\n      /* Bad line, consume and go onto next */\n      ares_hosts_entry_destroy(entry);\n      entry = NULL;\n      ares_buf_consume_line(buf, ARES_TRUE);\n      continue;\n    }\n\n    /* Append the successful entry to the hosts file */\n    status = ares_hosts_file_add(hf, entry);\n    entry  = NULL; /* is always invalidated by this function, even on error */\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    /* Go to next line */\n    ares_buf_consume_line(buf, ARES_TRUE);\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  ares_hosts_entry_destroy(entry);\n  ares_buf_destroy(buf);\n  if (status != ARES_SUCCESS) {\n    ares_hosts_file_destroy(hf);\n  } else {\n    *out = hf;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          504,
+          0
+        ],
+        [
+          594,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_parse_hosts",
+        "parameters": {
+          "filename": "char",
+          "out": "ares_hosts_file_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_hosts_expired(const char              *filename,\n                                      const ares_hosts_file_t *hf)\n{\n  time_t mod_ts = 0;\n\n#ifdef HAVE_STAT\n  struct stat st;\n  if (stat(filename, &st) == 0) {\n    mod_ts = st.st_mtime;\n  }\n#elif defined(_WIN32)\n  struct _stat st;\n  if (_stat(filename, &st) == 0) {\n    mod_ts = st.st_mtime;\n  }\n#else\n  (void)filename;\n#endif\n\n  if (hf == NULL) {\n    return ARES_TRUE;\n  }\n\n  /* Expire every 60s if we can't get a time */\n  if (mod_ts == 0) {\n    mod_ts =\n      time(NULL) - 60; /* LCOV_EXCL_LINE: only on systems without stat() */\n  }\n\n  /* If filenames are different, its expired */\n  if (!ares_strcaseeq(hf->filename, filename)) {\n    return ARES_TRUE;\n  }\n\n  if (hf->ts <= mod_ts) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          596,
+          0
+        ],
+        [
+          635,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_expired",
+        "parameters": {
+          "filename": "char",
+          "hf": "ares_hosts_file_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_hosts_path(const ares_channel_t *channel,\n                                     ares_bool_t use_env, char **path)\n{\n  char *path_hosts = NULL;\n\n  *path = NULL;\n\n  if (channel->hosts_path) {\n    path_hosts = ares_strdup(channel->hosts_path);\n    if (!path_hosts) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  if (use_env) {\n    if (path_hosts) {\n      ares_free(path_hosts);\n    }\n\n    path_hosts = ares_strdup(getenv(\"CARES_HOSTS\"));\n    if (!path_hosts) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  if (!path_hosts) {\n#if defined(USE_WINSOCK)\n    char  PATH_HOSTS[MAX_PATH] = \"\";\n    char  tmp[MAX_PATH];\n    HKEY  hkeyHosts;\n    DWORD dwLength = sizeof(tmp);\n    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, WIN_NS_NT_KEY, 0, KEY_READ,\n                      &hkeyHosts) != ERROR_SUCCESS) {\n      return ARES_ENOTFOUND;\n    }\n    RegQueryValueExA(hkeyHosts, DATABASEPATH, NULL, NULL, (LPBYTE)tmp,\n                     &dwLength);\n    ExpandEnvironmentStringsA(tmp, PATH_HOSTS, MAX_PATH);\n    RegCloseKey(hkeyHosts);\n    strcat(PATH_HOSTS, WIN_PATH_HOSTS);\n#elif defined(WATT32)\n    const char *PATH_HOSTS = _w32_GetHostsFile();\n\n    if (!PATH_HOSTS) {\n      return ARES_ENOTFOUND;\n    }\n#endif\n    path_hosts = ares_strdup(PATH_HOSTS);\n    if (!path_hosts) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  *path = path_hosts;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          637,
+          0
+        ],
+        [
+          692,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_path",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t",
+          "path": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_hosts_update(ares_channel_t *channel,\n                                       ares_bool_t     use_env)\n{\n  ares_status_t status;\n  char         *filename = NULL;\n\n  status = ares_hosts_path(channel, use_env, &filename);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (!ares_hosts_expired(filename, channel->hf)) {\n    ares_free(filename);\n    return ARES_SUCCESS;\n  }\n\n  ares_hosts_file_destroy(channel->hf);\n  channel->hf = NULL;\n\n  status = ares_parse_hosts(filename, &channel->hf);\n  ares_free(filename);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          694,
+          0
+        ],
+        [
+          716,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_update",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_hosts_search_ipaddr(ares_channel_t *channel,\n                                       ares_bool_t use_env, const char *ipaddr,\n                                       const ares_hosts_entry_t **entry)\n{\n  ares_status_t status;\n  char          addr[INET6_ADDRSTRLEN];\n\n  *entry = NULL;\n\n  status = ares_hosts_update(channel, use_env);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (channel->hf == NULL) {\n    return ARES_ENOTFOUND; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (!ares_normalize_ipaddr(ipaddr, addr, sizeof(addr))) {\n    return ARES_EBADNAME;\n  }\n\n  *entry = ares_htable_strvp_get_direct(channel->hf->iphash, addr);\n  if (*entry == NULL) {\n    return ARES_ENOTFOUND;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          718,
+          0
+        ],
+        [
+          746,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_search_ipaddr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t",
+          "ipaddr": "char",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_hosts_search_host(ares_channel_t *channel,\n                                     ares_bool_t use_env, const char *host,\n                                     const ares_hosts_entry_t **entry)\n{\n  ares_status_t status;\n\n  *entry = NULL;\n\n  status = ares_hosts_update(channel, use_env);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (channel->hf == NULL) {\n    return ARES_ENOTFOUND; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *entry = ares_htable_strvp_get_direct(channel->hf->hosthash, host);\n  if (*entry == NULL) {\n    return ARES_ENOTFOUND;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          748,
+          0
+        ],
+        [
+          771,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_search_host",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "use_env": "ares_bool_t",
+          "host": "char",
+          "entry": "ares_hosts_entry_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_hosts_ai_append_cnames(const ares_hosts_entry_t    *entry,\n                              struct ares_addrinfo_cname **cnames_out)\n{\n  struct ares_addrinfo_cname *cname  = NULL;\n  struct ares_addrinfo_cname *cnames = NULL;\n  const char                 *primaryhost;\n  ares_llist_node_t          *node;\n  ares_status_t               status;\n  size_t                      cnt = 0;\n\n  node        = ares_llist_node_first(entry->hosts);\n  primaryhost = ares_llist_node_val(node);\n  /* Skip to next node to start with aliases */\n  node = ares_llist_node_next(node);\n\n  while (node != NULL) {\n    const char *host = ares_llist_node_val(node);\n\n    /* Cap at 100 entries. , some people use\n     * https://github.com/StevenBlack/hosts and we don't need 200k+ aliases */\n    cnt++;\n    if (cnt > 100) {\n      break; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    cname = ares_append_addrinfo_cname(&cnames);\n    if (cname == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    cname->alias = ares_strdup(host);\n    if (cname->alias == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    cname->name = ares_strdup(primaryhost);\n    if (cname->name == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    node = ares_llist_node_next(node);\n  }\n\n  /* No entries, add only primary */\n  if (cnames == NULL) {\n    cname = ares_append_addrinfo_cname(&cnames);\n    if (cname == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    cname->name = ares_strdup(primaryhost);\n    if (cname->name == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n  status = ARES_SUCCESS;\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_freeaddrinfo_cnames(cnames); /* LCOV_EXCL_LINE: DefensiveCoding */\n    return status;                    /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *cnames_out = cnames;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          773,
+          0
+        ],
+        [
+          844,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_ai_append_cnames",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "cnames_out": "struct ares_addrinfo_cname"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_hosts_entry_to_addrinfo(const ares_hosts_entry_t *entry,\n                                           const char *name, int family,\n                                           unsigned short        port,\n                                           ares_bool_t           want_cnames,\n                                           struct ares_addrinfo *ai)\n{\n  ares_status_t               status  = ARES_ENOTFOUND;\n  struct ares_addrinfo_cname *cnames  = NULL;\n  struct ares_addrinfo_node  *ainodes = NULL;\n  ares_llist_node_t          *node;\n\n  switch (family) {\n    case AF_INET:\n    case AF_INET6:\n    case AF_UNSPEC:\n      break;\n    default:                  /* LCOV_EXCL_LINE: DefensiveCoding */\n      return ARES_EBADFAMILY; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (name != NULL) {\n    ares_free(ai->name);\n    ai->name = ares_strdup(name);\n    if (ai->name == NULL) {\n      status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  for (node = ares_llist_node_first(entry->ips); node != NULL;\n       node = ares_llist_node_next(node)) {\n    struct ares_addr addr;\n    const void      *ptr     = NULL;\n    size_t           ptr_len = 0;\n    const char      *ipaddr  = ares_llist_node_val(node);\n\n    memset(&addr, 0, sizeof(addr));\n    addr.family = family;\n    ptr         = ares_dns_pton(ipaddr, &addr, &ptr_len);\n\n    if (ptr == NULL) {\n      continue;\n    }\n\n    status = ares_append_ai_node(addr.family, port, 0, ptr, &ainodes);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n  }\n\n  /* Might be ARES_ENOTFOUND here if no ips matched requested address family */\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  if (want_cnames) {\n    status = ares_hosts_ai_append_cnames(entry, &cnames);\n    if (status != ARES_SUCCESS) {\n      goto done; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n  }\n\n  status = ARES_SUCCESS;\n\ndone:\n  if (status != ARES_SUCCESS) {\n    /* LCOV_EXCL_START: defensive coding */\n    ares_freeaddrinfo_cnames(cnames);\n    ares_freeaddrinfo_nodes(ainodes);\n    ares_free(ai->name);\n    ai->name = NULL;\n    return status;\n    /* LCOV_EXCL_STOP */\n  }\n  ares_addrinfo_cat_cnames(&ai->cnames, cnames);\n  ares_addrinfo_cat_nodes(&ai->nodes, ainodes);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          846,
+          0
+        ],
+        [
+          924,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_to_addrinfo",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "name": "char",
+          "family": "int",
+          "port": "unsigned short",
+          "want_cnames": "ares_bool_t",
+          "ai": "struct ares_addrinfo"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_hosts_entry_to_hostent(const ares_hosts_entry_t *entry,\n                                          int family, struct hostent **hostent)\n{\n  ares_status_t         status;\n  struct ares_addrinfo *ai = ares_malloc_zero(sizeof(*ai));\n\n  *hostent = NULL;\n\n  if (ai == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_hosts_entry_to_addrinfo(entry, NULL, family, 0, ARES_TRUE, ai);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_addrinfo2hostent(ai, family, hostent);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_freeaddrinfo(ai);\n  if (status != ARES_SUCCESS) {\n    ares_free_hostent(*hostent);\n    *hostent = NULL;\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          926,
+          0
+        ],
+        [
+          956,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_entry_to_hostent",
+        "parameters": {
+          "entry": "ares_hosts_entry_t",
+          "family": "int",
+          "hostent": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_dns_pton(const char *ipaddr, struct ares_addr *addr,\n                          size_t *out_len)",
+      "fn_dec_pos": [
+        [
+          102,
+          12
+        ],
+        [
+          103,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_pton",
+        "parameters": {
+          "ipaddr": "char",
+          "addr": "struct ares_addr",
+          "out_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_hosts_file_create(const char *filename)",
+      "fn_dec_pos": [
+        [
+          197,
+          26
+        ],
+        [
+          197,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hosts_file_create",
+        "parameters": {
+          "filename": "char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_hosts_file {\n  time_t               ts;\n  /*! cache the filename so we know if the filename changes it automatically\n   *  invalidates the cache */\n  char                *filename;\n  /*! iphash is the owner of the 'entry' object as there is only ever a single\n   *  match to the object. */\n  ares_htable_strvp_t *iphash;\n  /*! hosthash does not own the entry so won't free on destruction */\n  ares_htable_strvp_t *hosthash;\n}",
+      {
+        "ts": "time_t",
+        "*filename": "char",
+        "*iphash": "ares_htable_strvp_t",
+        "*hosthash": "ares_htable_strvp_t"
+      },
+      "ares_hosts_file",
+      [
+        83,
+        0
+      ],
+      [
+        93,
+        1
+      ]
+    ],
+    [
+      "struct ares_hosts_entry {\n  size_t        refcnt; /*! If the entry is stored multiple times in the\n                         *  ip address hash, we have to reference count it */\n  ares_llist_t *ips;\n  ares_llist_t *hosts;\n}",
+      {
+        "refcnt": "size_t",
+        "*ips": "ares_llist_t",
+        "*hosts": "ares_llist_t"
+      },
+      "ares_hosts_entry",
+      [
+        95,
+        0
+      ],
+      [
+        100,
+        1
+      ]
+    ],
+    [
+      "struct ares_hosts_file {\n  time_t               ts;\n  /*! cache the filename so we know if the filename changes it automatically\n   *  invalidates the cache */\n  char                *filename;\n  /*! iphash is the owner of the 'entry' object as there is only ever a single\n   *  match to the object. */\n  ares_htable_strvp_t *iphash;\n  /*! hosthash does not own the entry so won't free on destruction */\n  ares_htable_strvp_t *hosthash;\n}",
+      {
+        "ts": "time_t",
+        "*filename": "char",
+        "*iphash": "ares_htable_strvp_t",
+        "*hosthash": "ares_htable_strvp_t"
+      },
+      "ares_hosts_file",
+      [
+        83,
+        0
+      ],
+      [
+        93,
+        1
+      ]
+    ],
+    [
+      "struct ares_hosts_entry {\n  size_t        refcnt; /*! If the entry is stored multiple times in the\n                         *  ip address hash, we have to reference count it */\n  ares_llist_t *ips;\n  ares_llist_t *hosts;\n}",
+      {
+        "refcnt": "size_t",
+        "*ips": "ares_llist_t",
+        "*hosts": "ares_llist_t"
+      },
+      "ares_hosts_entry",
+      [
+        95,
+        0
+      ],
+      [
+        100,
+        1
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        102,
+        46
+      ],
+      [
+        102,
+        62
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        141,
+        2
+      ],
+      [
+        141,
+        18
+      ]
+    ],
+    [
+      "struct stat",
+      {},
+      "",
+      [
+        602,
+        2
+      ],
+      [
+        602,
+        13
+      ]
+    ],
+    [
+      "struct _stat",
+      {},
+      "",
+      [
+        607,
+        2
+      ],
+      [
+        607,
+        14
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        775,
+        30
+      ],
+      [
+        775,
+        56
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        777,
+        2
+      ],
+      [
+        777,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        778,
+        2
+      ],
+      [
+        778,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        850,
+        43
+      ],
+      [
+        850,
+        63
+      ]
+    ],
+    [
+      "struct ares_addrinfo_cname",
+      {},
+      "",
+      [
+        853,
+        2
+      ],
+      [
+        853,
+        28
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        854,
+        2
+      ],
+      [
+        854,
+        27
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        877,
+        4
+      ],
+      [
+        877,
+        20
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        927,
+        54
+      ],
+      [
+        927,
+        68
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        930,
+        2
+      ],
+      [
+        930,
+        22
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/stat.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#include <time.h>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  ARES_MATCH_NONE   = 0,\n  ARES_MATCH_IPADDR = 1,\n  ARES_MATCH_HOST   = 2\n} ares_hosts_file_match_t;",
+      {
+        "ARES_MATCH_NONE": "",
+        "ARES_MATCH_IPADDR": "",
+        "ARES_MATCH_HOST": ""
+      },
+      "ares_hosts_file_match_t",
+      [
+        228,
+        0
+      ],
+      [
+        232,
+        26
+      ]
+    ]
+  ]
+}

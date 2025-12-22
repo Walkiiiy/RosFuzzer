@@ -1,0 +1,2551 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "DNSQuestion(const std::string &name, int rrtype, int qclass)\n    : name_(name), rrtype_(rrtype), qclass_(qclass)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          74,
+          2
+        ],
+        [
+          77,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSQuestion",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "qclass": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSQuestion(const std::string &name, int rrtype)\n    : name_(name), rrtype_(rrtype), qclass_(C_IN)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          79,
+          2
+        ],
+        [
+          82,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSQuestion",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "virtual ~DNSQuestion()\n  {\n  }",
+      "fn_code_pos": [
+        [
+          84,
+          2
+        ],
+        [
+          86,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const\n  {\n    return data(nullptr, dnsrec);\n  }",
+      "fn_code_pos": [
+        [
+          91,
+          2
+        ],
+        [
+          94,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "virtual std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }",
+      "fn_code_pos": [
+        [
+          96,
+          2
+        ],
+        [
+          99,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSRR(const std::string &name, int rrtype, int qclass, int ttl)\n    : DNSQuestion(name, rrtype, qclass), ttl_(ttl)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          107,
+          2
+        ],
+        [
+          110,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSRR",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "qclass": "int",
+          "ttl": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSRR(const std::string &name, int rrtype, int ttl)\n    : DNSQuestion(name, rrtype), ttl_(ttl)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          112,
+          2
+        ],
+        [
+          115,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSRR",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "ttl": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "virtual ~DNSRR()\n  {\n  }",
+      "fn_code_pos": [
+        [
+          117,
+          2
+        ],
+        [
+          119,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSAddressRR(const std::string &name, int rrtype, int ttl, const byte *addr,\n               int addrlen)\n    : DNSRR(name, rrtype, ttl), addr_(addr, addr + addrlen)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          126,
+          2
+        ],
+        [
+          130,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSAddressRR",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "ttl": "int",
+          "addr": "byte",
+          "addrlen": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSAddressRR(const std::string &name, int rrtype, int ttl,\n               const std::vector<byte> &addr)\n    : DNSRR(name, rrtype, ttl), addr_(addr)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          132,
+          2
+        ],
+        [
+          136,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSAddressRR",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "ttl": "int",
+          "addr": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSARR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_A, ttl, addr, addrlen)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          143,
+          2
+        ],
+        [
+          146,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSARR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "addr": "byte",
+          "addrlen": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSARR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_A, ttl, addr)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          148,
+          2
+        ],
+        [
+          151,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSARR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "addr": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSAaaaRR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_AAAA, ttl, addr, addrlen)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          155,
+          2
+        ],
+        [
+          158,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSAaaaRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "addr": "byte",
+          "addrlen": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSAaaaRR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_AAAA, ttl, addr)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          160,
+          2
+        ],
+        [
+          163,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSAaaaRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "addr": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSSingleNameRR(const std::string &name, int rrtype, int ttl,\n                  const std::string &other)\n    : DNSRR(name, rrtype, ttl), other_(other)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          167,
+          2
+        ],
+        [
+          171,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSingleNameRR",
+        "parameters": {
+          "name": "std::string",
+          "rrtype": "int",
+          "ttl": "int",
+          "other": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSCnameRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_CNAME, ttl, other)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          178,
+          2
+        ],
+        [
+          181,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSCnameRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "other": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSNsRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_NS, ttl, other)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          185,
+          2
+        ],
+        [
+          188,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSNsRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "other": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSPtrRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_PTR, ttl, other)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          192,
+          2
+        ],
+        [
+          195,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSPtrRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "other": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSTxtRR(const std::string &name, int ttl,\n           const std::vector<std::string> &txt)\n    : DNSRR(name, T_TXT, ttl), txt_(txt)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          199,
+          2
+        ],
+        [
+          203,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSTxtRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "txt": "std::vector<std::string>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSMxRR(const std::string &name, int ttl, int pref, const std::string &other)\n    : DNSRR(name, T_MX, ttl), pref_(pref), other_(other)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          210,
+          2
+        ],
+        [
+          213,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSMxRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "pref": "int",
+          "other": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSSrvRR(const std::string &name, int ttl, int prio, int weight, int port,\n           const std::string &target)\n    : DNSRR(name, T_SRV, ttl), prio_(prio), weight_(weight), port_(port),\n      target_(target)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          221,
+          2
+        ],
+        [
+          226,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSrvRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "prio": "int",
+          "weight": "int",
+          "port": "int",
+          "target": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSUriRR(const std::string &name, int ttl, int prio, int weight,\n           const std::string &target)\n    : DNSRR(name, T_URI, ttl), prio_(prio), weight_(weight), target_(target)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          236,
+          2
+        ],
+        [
+          240,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSUriRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "prio": "int",
+          "weight": "int",
+          "target": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSSoaRR(const std::string &name, int ttl, const std::string &nsname,\n           const std::string &rname, int serial, int refresh, int retry,\n           int expire, int minimum)\n    : DNSRR(name, T_SOA, ttl), nsname_(nsname), rname_(rname), serial_(serial),\n      refresh_(refresh), retry_(retry), expire_(expire), minimum_(minimum)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          249,
+          2
+        ],
+        [
+          255,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSSoaRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "nsname": "std::string",
+          "rname": "std::string",
+          "serial": "int",
+          "refresh": "int",
+          "retry": "int",
+          "expire": "int",
+          "minimum": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSNaptrRR(const std::string &name, int ttl, int order, int pref,\n             const std::string &flags, const std::string &service,\n             const std::string &regexp, const std::string &replacement)\n    : DNSRR(name, T_NAPTR, ttl), order_(order), pref_(pref), flags_(flags),\n      service_(service), regexp_(regexp), replacement_(replacement)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          268,
+          2
+        ],
+        [
+          274,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSNaptrRR",
+        "parameters": {
+          "name": "std::string",
+          "ttl": "int",
+          "order": "int",
+          "pref": "int",
+          "flags": "std::string",
+          "service": "std::string",
+          "regexp": "std::string",
+          "replacement": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSOptRR(unsigned char extrcode, unsigned char version, unsigned short flags,\n           int udpsize, std::vector<byte> client_cookie,\n           std::vector<byte> server_cookie, bool expect_server_cookie)\n    : DNSRR(\"\", T_OPT, static_cast<int>(udpsize),\n            ((int)extrcode) << 24 | ((int)version) << 16 |\n              ((int)flags) /* ttl */)\n  {\n    client_cookie_        = client_cookie;\n    server_cookie_        = server_cookie;\n    expect_server_cookie_ = expect_server_cookie;\n  }",
+      "fn_code_pos": [
+        [
+          291,
+          2
+        ],
+        [
+          301,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSOptRR",
+        "parameters": {
+          "extrcode": "unsigned char",
+          "version": "unsigned char",
+          "flags": "unsigned short",
+          "udpsize": "int",
+          "client_cookie": "std::vector<byte>",
+          "server_cookie": "std::vector<byte>",
+          "expect_server_cookie": "bool"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSPacket()\n    : qid_(0), response_(false), opcode_(O_QUERY), aa_(false), tc_(false),\n      rd_(false), ra_(false), z_(false), ad_(false), cd_(false), rcode_(NOERROR)\n  {\n  }",
+      "fn_code_pos": [
+        [
+          311,
+          2
+        ],
+        [
+          315,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "DNSPacket",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "DNSPacket &add_question(DNSQuestion *q)\n  {\n    questions_.push_back(std::unique_ptr<DNSQuestion>(q));\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          318,
+          2
+        ],
+        [
+          322,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &add_answer(DNSRR *q)\n  {\n    answers_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          324,
+          2
+        ],
+        [
+          328,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &add_auth(DNSRR *q)\n  {\n    auths_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          330,
+          2
+        ],
+        [
+          334,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &add_additional(DNSRR *q)\n  {\n    adds_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          336,
+          2
+        ],
+        [
+          340,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_qid(int qid)\n  {\n    qid_ = qid;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          343,
+          2
+        ],
+        [
+          347,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_response(bool v = true)\n  {\n    response_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          349,
+          2
+        ],
+        [
+          353,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_aa(bool v = true)\n  {\n    aa_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          355,
+          2
+        ],
+        [
+          359,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_tc(bool v = true)\n  {\n    tc_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          361,
+          2
+        ],
+        [
+          365,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_rd(bool v = true)\n  {\n    rd_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          367,
+          2
+        ],
+        [
+          371,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_ra(bool v = true)\n  {\n    ra_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          373,
+          2
+        ],
+        [
+          377,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_z(bool v = true)\n  {\n    z_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          379,
+          2
+        ],
+        [
+          383,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_ad(bool v = true)\n  {\n    ad_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          385,
+          2
+        ],
+        [
+          389,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_cd(bool v = true)\n  {\n    cd_ = v;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          391,
+          2
+        ],
+        [
+          395,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "DNSPacket &set_rcode(int rcode)\n  {\n    rcode_ = rcode;\n    return *this;\n  }",
+      "fn_code_pos": [
+        [
+          397,
+          2
+        ],
+        [
+          401,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "DNSPacket"
+      }
+    },
+    {
+      "fn_code": "std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }",
+      "fn_code_pos": [
+        [
+          407,
+          2
+        ],
+        [
+          410,
+          3
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "arestest_strtolower(char *dest, const char *src,\n                                    size_t dest_size)",
+      "fn_dec_pos": [
+        [
+          38,
+          16
+        ],
+        [
+          39,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "arestest_strtolower",
+        "parameters": {
+          "dest": "char",
+          "src": "char",
+          "dest_size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "HexDump(std::vector<byte> data)",
+      "fn_dec_pos": [
+        [
+          45,
+          22
+        ],
+        [
+          45,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "HexDump(const byte *data, int len)",
+      "fn_dec_pos": [
+        [
+          46,
+          22
+        ],
+        [
+          46,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "HexDump(const char *data, int len)",
+      "fn_dec_pos": [
+        [
+          47,
+          22
+        ],
+        [
+          47,
+          56
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "HexDump",
+        "parameters": {
+          "data": "char",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "StatusToString(int status)",
+      "fn_dec_pos": [
+        [
+          49,
+          22
+        ],
+        [
+          49,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "StatusToString",
+        "parameters": {
+          "status": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "RcodeToString(int rcode)",
+      "fn_dec_pos": [
+        [
+          50,
+          22
+        ],
+        [
+          50,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RcodeToString",
+        "parameters": {
+          "rcode": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "RRTypeToString(int rrtype)",
+      "fn_dec_pos": [
+        [
+          51,
+          22
+        ],
+        [
+          51,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RRTypeToString",
+        "parameters": {
+          "rrtype": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ClassToString(int qclass)",
+      "fn_dec_pos": [
+        [
+          52,
+          22
+        ],
+        [
+          52,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ClassToString",
+        "parameters": {
+          "qclass": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "AddressToString(const void *addr, int len)",
+      "fn_dec_pos": [
+        [
+          53,
+          22
+        ],
+        [
+          53,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "AddressToString",
+        "parameters": {
+          "addr": "void",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "fetch_rr_opt(const ares_dns_record_t *rec)",
+      "fn_dec_pos": [
+        [
+          55,
+          22
+        ],
+        [
+          55,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "fetch_rr_opt",
+        "parameters": {
+          "rec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "PacketToString(const std::vector<byte> &packet)",
+      "fn_dec_pos": [
+        [
+          61,
+          22
+        ],
+        [
+          61,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PacketToString",
+        "parameters": {
+          "packet": "std::vector<byte>"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "QuestionToString(const std::vector<byte> &packet, const byte **data,\n                             int *len)",
+      "fn_dec_pos": [
+        [
+          62,
+          12
+        ],
+        [
+          63,
+          38
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "QuestionToString",
+        "parameters": {
+          "packet": "std::vector<byte>",
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "RRToString(const std::vector<byte> &packet, const byte **data,\n                       int *len)",
+      "fn_dec_pos": [
+        [
+          64,
+          12
+        ],
+        [
+          65,
+          32
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "RRToString",
+        "parameters": {
+          "packet": "std::vector<byte>",
+          "data": "byte",
+          "len": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "PushInt32(std::vector<byte> *data, int value)",
+      "fn_dec_pos": [
+        [
+          69,
+          12
+        ],
+        [
+          69,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PushInt32",
+        "parameters": {
+          "data": "std::vector<byte>",
+          "value": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "PushInt16(std::vector<byte> *data, int value)",
+      "fn_dec_pos": [
+        [
+          70,
+          12
+        ],
+        [
+          70,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "PushInt16",
+        "parameters": {
+          "data": "std::vector<byte>",
+          "value": "int"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "EncodeString(const std::string &name)",
+      "fn_dec_pos": [
+        [
+          71,
+          18
+        ],
+        [
+          71,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "EncodeString",
+        "parameters": {
+          "name": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const char              *request_name,\n                                 const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          88,
+          28
+        ],
+        [
+          89,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "request_name": "char",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          121,
+          28
+        ],
+        [
+          121,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          138,
+          28
+        ],
+        [
+          138,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          173,
+          28
+        ],
+        [
+          173,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          205,
+          28
+        ],
+        [
+          205,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          215,
+          28
+        ],
+        [
+          215,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          228,
+          28
+        ],
+        [
+          228,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          242,
+          28
+        ],
+        [
+          242,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          257,
+          28
+        ],
+        [
+          257,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          276,
+          28
+        ],
+        [
+          276,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          303,
+          28
+        ],
+        [
+          303,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "add_question(DNSQuestion *q)",
+      "fn_dec_pos": [
+        [
+          318,
+          13
+        ],
+        [
+          318,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "add_question",
+        "parameters": {
+          "q": "DNSQuestion"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "add_answer(DNSRR *q)",
+      "fn_dec_pos": [
+        [
+          324,
+          13
+        ],
+        [
+          324,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "add_answer",
+        "parameters": {
+          "q": "DNSRR"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "add_auth(DNSRR *q)",
+      "fn_dec_pos": [
+        [
+          330,
+          13
+        ],
+        [
+          330,
+          31
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "add_auth",
+        "parameters": {
+          "q": "DNSRR"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "add_additional(DNSRR *q)",
+      "fn_dec_pos": [
+        [
+          336,
+          13
+        ],
+        [
+          336,
+          37
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "add_additional",
+        "parameters": {
+          "q": "DNSRR"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_qid(int qid)",
+      "fn_dec_pos": [
+        [
+          343,
+          13
+        ],
+        [
+          343,
+          29
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_qid",
+        "parameters": {
+          "qid": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_response(bool v = true)",
+      "fn_dec_pos": [
+        [
+          349,
+          13
+        ],
+        [
+          349,
+          40
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_response",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_aa(bool v = true)",
+      "fn_dec_pos": [
+        [
+          355,
+          13
+        ],
+        [
+          355,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_aa",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_tc(bool v = true)",
+      "fn_dec_pos": [
+        [
+          361,
+          13
+        ],
+        [
+          361,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_tc",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_rd(bool v = true)",
+      "fn_dec_pos": [
+        [
+          367,
+          13
+        ],
+        [
+          367,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_rd",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_ra(bool v = true)",
+      "fn_dec_pos": [
+        [
+          373,
+          13
+        ],
+        [
+          373,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_ra",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_z(bool v = true)",
+      "fn_dec_pos": [
+        [
+          379,
+          13
+        ],
+        [
+          379,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_z",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_ad(bool v = true)",
+      "fn_dec_pos": [
+        [
+          385,
+          13
+        ],
+        [
+          385,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_ad",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_cd(bool v = true)",
+      "fn_dec_pos": [
+        [
+          391,
+          13
+        ],
+        [
+          391,
+          34
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_cd",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "set_rcode(int rcode)",
+      "fn_dec_pos": [
+        [
+          397,
+          13
+        ],
+        [
+          397,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "set_rcode",
+        "parameters": {
+          "rcode": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "data(const char              *request_name,\n                         const ares_dns_record_t *dnsrec) const",
+      "fn_dec_pos": [
+        [
+          404,
+          20
+        ],
+        [
+          405,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "data",
+        "parameters": {
+          "request_name": "char",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct DNSQuestion {\n  DNSQuestion(const std::string &name, int rrtype, int qclass)\n    : name_(name), rrtype_(rrtype), qclass_(qclass)\n  {\n  }\n\n  DNSQuestion(const std::string &name, int rrtype)\n    : name_(name), rrtype_(rrtype), qclass_(C_IN)\n  {\n  }\n\n  virtual ~DNSQuestion()\n  {\n  }\n\n  virtual std::vector<byte> data(const char              *request_name,\n                                 const ares_dns_record_t *dnsrec) const;\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const\n  {\n    return data(nullptr, dnsrec);\n  }\n\n  virtual std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }\n\n  std::string name_;\n  int         rrtype_;\n  int         qclass_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "name_": "std::string",
+        "rrtype_": "int",
+        "qclass_": "int"
+      },
+      "DNSQuestion",
+      [
+        73,
+        0
+      ],
+      [
+        104,
+        1
+      ]
+    ],
+    [
+      "struct DNSRR : public DNSQuestion {\n  DNSRR(const std::string &name, int rrtype, int qclass, int ttl)\n    : DNSQuestion(name, rrtype, qclass), ttl_(ttl)\n  {\n  }\n\n  DNSRR(const std::string &name, int rrtype, int ttl)\n    : DNSQuestion(name, rrtype), ttl_(ttl)\n  {\n  }\n\n  virtual ~DNSRR()\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const = 0;\n  int                       ttl_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "ttl_": "int"
+      },
+      "",
+      [
+        106,
+        0
+      ],
+      [
+        123,
+        1
+      ]
+    ],
+    [
+      "struct DNSAddressRR : public DNSRR {\n  DNSAddressRR(const std::string &name, int rrtype, int ttl, const byte *addr,\n               int addrlen)\n    : DNSRR(name, rrtype, ttl), addr_(addr, addr + addrlen)\n  {\n  }\n\n  DNSAddressRR(const std::string &name, int rrtype, int ttl,\n               const std::vector<byte> &addr)\n    : DNSRR(name, rrtype, ttl), addr_(addr)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<byte>         addr_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "addr_": "std::vector<byte>"
+      },
+      "",
+      [
+        125,
+        0
+      ],
+      [
+        140,
+        1
+      ]
+    ],
+    [
+      "struct DNSARR : public DNSAddressRR {\n  DNSARR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_A, ttl, addr, addrlen)\n  {\n  }\n\n  DNSARR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_A, ttl, addr)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        142,
+        0
+      ],
+      [
+        152,
+        1
+      ]
+    ],
+    [
+      "struct DNSAaaaRR : public DNSAddressRR {\n  DNSAaaaRR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_AAAA, ttl, addr, addrlen)\n  {\n  }\n\n  DNSAaaaRR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_AAAA, ttl, addr)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        154,
+        0
+      ],
+      [
+        164,
+        1
+      ]
+    ],
+    [
+      "struct DNSSingleNameRR : public DNSRR {\n  DNSSingleNameRR(const std::string &name, int rrtype, int ttl,\n                  const std::string &other)\n    : DNSRR(name, rrtype, ttl), other_(other)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::string               other_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "other_": "std::string"
+      },
+      "",
+      [
+        166,
+        0
+      ],
+      [
+        175,
+        1
+      ]
+    ],
+    [
+      "struct DNSCnameRR : public DNSSingleNameRR {\n  DNSCnameRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_CNAME, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        177,
+        0
+      ],
+      [
+        182,
+        1
+      ]
+    ],
+    [
+      "struct DNSNsRR : public DNSSingleNameRR {\n  DNSNsRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_NS, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        184,
+        0
+      ],
+      [
+        189,
+        1
+      ]
+    ],
+    [
+      "struct DNSPtrRR : public DNSSingleNameRR {\n  DNSPtrRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_PTR, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        191,
+        0
+      ],
+      [
+        196,
+        1
+      ]
+    ],
+    [
+      "struct DNSTxtRR : public DNSRR {\n  DNSTxtRR(const std::string &name, int ttl,\n           const std::vector<std::string> &txt)\n    : DNSRR(name, T_TXT, ttl), txt_(txt)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<std::string>  txt_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "txt_": "std::vector<std::string>"
+      },
+      "",
+      [
+        198,
+        0
+      ],
+      [
+        207,
+        1
+      ]
+    ],
+    [
+      "struct DNSMxRR : public DNSRR {\n  DNSMxRR(const std::string &name, int ttl, int pref, const std::string &other)\n    : DNSRR(name, T_MX, ttl), pref_(pref), other_(other)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       pref_;\n  std::string               other_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "pref_": "int",
+        "other_": "std::string"
+      },
+      "",
+      [
+        209,
+        0
+      ],
+      [
+        218,
+        1
+      ]
+    ],
+    [
+      "struct DNSSrvRR : public DNSRR {\n  DNSSrvRR(const std::string &name, int ttl, int prio, int weight, int port,\n           const std::string &target)\n    : DNSRR(name, T_SRV, ttl), prio_(prio), weight_(weight), port_(port),\n      target_(target)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       prio_;\n  int                       weight_;\n  int                       port_;\n  std::string               target_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "prio_": "int",
+        "weight_": "int",
+        "port_": "int",
+        "target_": "std::string"
+      },
+      "",
+      [
+        220,
+        0
+      ],
+      [
+        233,
+        1
+      ]
+    ],
+    [
+      "struct DNSUriRR : public DNSRR {\n  DNSUriRR(const std::string &name, int ttl, int prio, int weight,\n           const std::string &target)\n    : DNSRR(name, T_URI, ttl), prio_(prio), weight_(weight), target_(target)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       prio_;\n  int                       weight_;\n  std::string               target_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "prio_": "int",
+        "weight_": "int",
+        "target_": "std::string"
+      },
+      "",
+      [
+        235,
+        0
+      ],
+      [
+        246,
+        1
+      ]
+    ],
+    [
+      "struct DNSSoaRR : public DNSRR {\n  DNSSoaRR(const std::string &name, int ttl, const std::string &nsname,\n           const std::string &rname, int serial, int refresh, int retry,\n           int expire, int minimum)\n    : DNSRR(name, T_SOA, ttl), nsname_(nsname), rname_(rname), serial_(serial),\n      refresh_(refresh), retry_(retry), expire_(expire), minimum_(minimum)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::string               nsname_;\n  std::string               rname_;\n  int                       serial_;\n  int                       refresh_;\n  int                       retry_;\n  int                       expire_;\n  int                       minimum_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "nsname_": "std::string",
+        "rname_": "std::string",
+        "serial_": "int",
+        "refresh_": "int",
+        "retry_": "int",
+        "expire_": "int",
+        "minimum_": "int"
+      },
+      "",
+      [
+        248,
+        0
+      ],
+      [
+        265,
+        1
+      ]
+    ],
+    [
+      "struct DNSNaptrRR : public DNSRR {\n  DNSNaptrRR(const std::string &name, int ttl, int order, int pref,\n             const std::string &flags, const std::string &service,\n             const std::string &regexp, const std::string &replacement)\n    : DNSRR(name, T_NAPTR, ttl), order_(order), pref_(pref), flags_(flags),\n      service_(service), regexp_(regexp), replacement_(replacement)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       order_;\n  int                       pref_;\n  std::string               flags_;\n  std::string               service_;\n  std::string               regexp_;\n  std::string               replacement_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "order_": "int",
+        "pref_": "int",
+        "flags_": "std::string",
+        "service_": "std::string",
+        "regexp_": "std::string",
+        "replacement_": "std::string"
+      },
+      "",
+      [
+        267,
+        0
+      ],
+      [
+        283,
+        1
+      ]
+    ],
+    [
+      "struct DNSOption {\n  int               code_;\n  std::vector<byte> data_;\n}",
+      {
+        "code_": "int",
+        "data_": "std::vector<byte>"
+      },
+      "DNSOption",
+      [
+        285,
+        0
+      ],
+      [
+        288,
+        1
+      ]
+    ],
+    [
+      "struct DNSOptRR : public DNSRR {\n  DNSOptRR(unsigned char extrcode, unsigned char version, unsigned short flags,\n           int udpsize, std::vector<byte> client_cookie,\n           std::vector<byte> server_cookie, bool expect_server_cookie)\n    : DNSRR(\"\", T_OPT, static_cast<int>(udpsize),\n            ((int)extrcode) << 24 | ((int)version) << 16 |\n              ((int)flags) /* ttl */)\n  {\n    client_cookie_        = client_cookie;\n    server_cookie_        = server_cookie;\n    expect_server_cookie_ = expect_server_cookie;\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<DNSOption>    opts_;\n  std::vector<byte>         client_cookie_;\n  std::vector<byte>         server_cookie_;\n  bool                      expect_server_cookie_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "opts_": "std::vector<DNSOption>",
+        "client_cookie_": "std::vector<byte>",
+        "server_cookie_": "std::vector<byte>",
+        "expect_server_cookie_": "bool"
+      },
+      "",
+      [
+        290,
+        0
+      ],
+      [
+        308,
+        1
+      ]
+    ],
+    [
+      "struct DNSPacket {\n  DNSPacket()\n    : qid_(0), response_(false), opcode_(O_QUERY), aa_(false), tc_(false),\n      rd_(false), ra_(false), z_(false), ad_(false), cd_(false), rcode_(NOERROR)\n  {\n  }\n\n  // Convenience functions that take ownership of given pointers.\n  DNSPacket &add_question(DNSQuestion *q)\n  {\n    questions_.push_back(std::unique_ptr<DNSQuestion>(q));\n    return *this;\n  }\n\n  DNSPacket &add_answer(DNSRR *q)\n  {\n    answers_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  DNSPacket &add_auth(DNSRR *q)\n  {\n    auths_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  DNSPacket &add_additional(DNSRR *q)\n  {\n    adds_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  // Chainable setters.\n  DNSPacket &set_qid(int qid)\n  {\n    qid_ = qid;\n    return *this;\n  }\n\n  DNSPacket &set_response(bool v = true)\n  {\n    response_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_aa(bool v = true)\n  {\n    aa_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_tc(bool v = true)\n  {\n    tc_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_rd(bool v = true)\n  {\n    rd_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_ra(bool v = true)\n  {\n    ra_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_z(bool v = true)\n  {\n    z_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_ad(bool v = true)\n  {\n    ad_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_cd(bool v = true)\n  {\n    cd_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_rcode(int rcode)\n  {\n    rcode_ = rcode;\n    return *this;\n  }\n\n  // Return the encoded packet.\n  std::vector<byte> data(const char              *request_name,\n                         const ares_dns_record_t *dnsrec) const;\n\n  std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }\n\n  int                                       qid_;\n  bool                                      response_;\n  int                                       opcode_;\n  bool                                      aa_;\n  bool                                      tc_;\n  bool                                      rd_;\n  bool                                      ra_;\n  bool                                      z_;\n  bool                                      ad_;\n  bool                                      cd_;\n  int                                       rcode_;\n  std::vector<std::unique_ptr<DNSQuestion>> questions_;\n  std::vector<std::unique_ptr<DNSRR>>       answers_;\n  std::vector<std::unique_ptr<DNSRR>>       auths_;\n  std::vector<std::unique_ptr<DNSRR>>       adds_;\n}",
+      {
+        "data(const char              *request_name,\n                         const ares_dns_record_t *dnsrec) const": "std::vector<byte>",
+        "qid_": "int",
+        "response_": "bool",
+        "opcode_": "int",
+        "aa_": "bool",
+        "tc_": "bool",
+        "rd_": "bool",
+        "ra_": "bool",
+        "z_": "bool",
+        "ad_": "bool",
+        "cd_": "bool",
+        "rcode_": "int",
+        "questions_": "std::vector<std::unique_ptr<DNSQuestion>>",
+        "answers_": "std::vector<std::unique_ptr<DNSRR>>",
+        "auths_": "std::vector<std::unique_ptr<DNSRR>>",
+        "adds_": "std::vector<std::unique_ptr<DNSRR>>"
+      },
+      "DNSPacket",
+      [
+        310,
+        0
+      ],
+      [
+        427,
+        1
+      ]
+    ],
+    [
+      "struct DNSQuestion {\n  DNSQuestion(const std::string &name, int rrtype, int qclass)\n    : name_(name), rrtype_(rrtype), qclass_(qclass)\n  {\n  }\n\n  DNSQuestion(const std::string &name, int rrtype)\n    : name_(name), rrtype_(rrtype), qclass_(C_IN)\n  {\n  }\n\n  virtual ~DNSQuestion()\n  {\n  }\n\n  virtual std::vector<byte> data(const char              *request_name,\n                                 const ares_dns_record_t *dnsrec) const;\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const\n  {\n    return data(nullptr, dnsrec);\n  }\n\n  virtual std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }\n\n  std::string name_;\n  int         rrtype_;\n  int         qclass_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "name_": "std::string",
+        "rrtype_": "int",
+        "qclass_": "int"
+      },
+      "DNSQuestion",
+      [
+        73,
+        0
+      ],
+      [
+        104,
+        1
+      ]
+    ],
+    [
+      "struct DNSRR : public DNSQuestion {\n  DNSRR(const std::string &name, int rrtype, int qclass, int ttl)\n    : DNSQuestion(name, rrtype, qclass), ttl_(ttl)\n  {\n  }\n\n  DNSRR(const std::string &name, int rrtype, int ttl)\n    : DNSQuestion(name, rrtype), ttl_(ttl)\n  {\n  }\n\n  virtual ~DNSRR()\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const = 0;\n  int                       ttl_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "ttl_": "int"
+      },
+      "",
+      [
+        106,
+        0
+      ],
+      [
+        123,
+        1
+      ]
+    ],
+    [
+      "struct DNSAddressRR : public DNSRR {\n  DNSAddressRR(const std::string &name, int rrtype, int ttl, const byte *addr,\n               int addrlen)\n    : DNSRR(name, rrtype, ttl), addr_(addr, addr + addrlen)\n  {\n  }\n\n  DNSAddressRR(const std::string &name, int rrtype, int ttl,\n               const std::vector<byte> &addr)\n    : DNSRR(name, rrtype, ttl), addr_(addr)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<byte>         addr_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "addr_": "std::vector<byte>"
+      },
+      "",
+      [
+        125,
+        0
+      ],
+      [
+        140,
+        1
+      ]
+    ],
+    [
+      "struct DNSARR : public DNSAddressRR {\n  DNSARR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_A, ttl, addr, addrlen)\n  {\n  }\n\n  DNSARR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_A, ttl, addr)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        142,
+        0
+      ],
+      [
+        152,
+        1
+      ]
+    ],
+    [
+      "struct DNSAaaaRR : public DNSAddressRR {\n  DNSAaaaRR(const std::string &name, int ttl, const byte *addr, int addrlen)\n    : DNSAddressRR(name, T_AAAA, ttl, addr, addrlen)\n  {\n  }\n\n  DNSAaaaRR(const std::string &name, int ttl, const std::vector<byte> &addr)\n    : DNSAddressRR(name, T_AAAA, ttl, addr)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        154,
+        0
+      ],
+      [
+        164,
+        1
+      ]
+    ],
+    [
+      "struct DNSSingleNameRR : public DNSRR {\n  DNSSingleNameRR(const std::string &name, int rrtype, int ttl,\n                  const std::string &other)\n    : DNSRR(name, rrtype, ttl), other_(other)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::string               other_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "other_": "std::string"
+      },
+      "",
+      [
+        166,
+        0
+      ],
+      [
+        175,
+        1
+      ]
+    ],
+    [
+      "struct DNSCnameRR : public DNSSingleNameRR {\n  DNSCnameRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_CNAME, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        177,
+        0
+      ],
+      [
+        182,
+        1
+      ]
+    ],
+    [
+      "struct DNSNsRR : public DNSSingleNameRR {\n  DNSNsRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_NS, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        184,
+        0
+      ],
+      [
+        189,
+        1
+      ]
+    ],
+    [
+      "struct DNSPtrRR : public DNSSingleNameRR {\n  DNSPtrRR(const std::string &name, int ttl, const std::string &other)\n    : DNSSingleNameRR(name, T_PTR, ttl, other)\n  {\n  }\n}",
+      {},
+      "",
+      [
+        191,
+        0
+      ],
+      [
+        196,
+        1
+      ]
+    ],
+    [
+      "struct DNSTxtRR : public DNSRR {\n  DNSTxtRR(const std::string &name, int ttl,\n           const std::vector<std::string> &txt)\n    : DNSRR(name, T_TXT, ttl), txt_(txt)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<std::string>  txt_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "txt_": "std::vector<std::string>"
+      },
+      "",
+      [
+        198,
+        0
+      ],
+      [
+        207,
+        1
+      ]
+    ],
+    [
+      "struct DNSMxRR : public DNSRR {\n  DNSMxRR(const std::string &name, int ttl, int pref, const std::string &other)\n    : DNSRR(name, T_MX, ttl), pref_(pref), other_(other)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       pref_;\n  std::string               other_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "pref_": "int",
+        "other_": "std::string"
+      },
+      "",
+      [
+        209,
+        0
+      ],
+      [
+        218,
+        1
+      ]
+    ],
+    [
+      "struct DNSSrvRR : public DNSRR {\n  DNSSrvRR(const std::string &name, int ttl, int prio, int weight, int port,\n           const std::string &target)\n    : DNSRR(name, T_SRV, ttl), prio_(prio), weight_(weight), port_(port),\n      target_(target)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       prio_;\n  int                       weight_;\n  int                       port_;\n  std::string               target_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "prio_": "int",
+        "weight_": "int",
+        "port_": "int",
+        "target_": "std::string"
+      },
+      "",
+      [
+        220,
+        0
+      ],
+      [
+        233,
+        1
+      ]
+    ],
+    [
+      "struct DNSUriRR : public DNSRR {\n  DNSUriRR(const std::string &name, int ttl, int prio, int weight,\n           const std::string &target)\n    : DNSRR(name, T_URI, ttl), prio_(prio), weight_(weight), target_(target)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       prio_;\n  int                       weight_;\n  std::string               target_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "prio_": "int",
+        "weight_": "int",
+        "target_": "std::string"
+      },
+      "",
+      [
+        235,
+        0
+      ],
+      [
+        246,
+        1
+      ]
+    ],
+    [
+      "struct DNSSoaRR : public DNSRR {\n  DNSSoaRR(const std::string &name, int ttl, const std::string &nsname,\n           const std::string &rname, int serial, int refresh, int retry,\n           int expire, int minimum)\n    : DNSRR(name, T_SOA, ttl), nsname_(nsname), rname_(rname), serial_(serial),\n      refresh_(refresh), retry_(retry), expire_(expire), minimum_(minimum)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::string               nsname_;\n  std::string               rname_;\n  int                       serial_;\n  int                       refresh_;\n  int                       retry_;\n  int                       expire_;\n  int                       minimum_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "nsname_": "std::string",
+        "rname_": "std::string",
+        "serial_": "int",
+        "refresh_": "int",
+        "retry_": "int",
+        "expire_": "int",
+        "minimum_": "int"
+      },
+      "",
+      [
+        248,
+        0
+      ],
+      [
+        265,
+        1
+      ]
+    ],
+    [
+      "struct DNSNaptrRR : public DNSRR {\n  DNSNaptrRR(const std::string &name, int ttl, int order, int pref,\n             const std::string &flags, const std::string &service,\n             const std::string &regexp, const std::string &replacement)\n    : DNSRR(name, T_NAPTR, ttl), order_(order), pref_(pref), flags_(flags),\n      service_(service), regexp_(regexp), replacement_(replacement)\n  {\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  int                       order_;\n  int                       pref_;\n  std::string               flags_;\n  std::string               service_;\n  std::string               regexp_;\n  std::string               replacement_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "order_": "int",
+        "pref_": "int",
+        "flags_": "std::string",
+        "service_": "std::string",
+        "regexp_": "std::string",
+        "replacement_": "std::string"
+      },
+      "",
+      [
+        267,
+        0
+      ],
+      [
+        283,
+        1
+      ]
+    ],
+    [
+      "struct DNSOption {\n  int               code_;\n  std::vector<byte> data_;\n}",
+      {
+        "code_": "int",
+        "data_": "std::vector<byte>"
+      },
+      "DNSOption",
+      [
+        285,
+        0
+      ],
+      [
+        288,
+        1
+      ]
+    ],
+    [
+      "struct DNSOptRR : public DNSRR {\n  DNSOptRR(unsigned char extrcode, unsigned char version, unsigned short flags,\n           int udpsize, std::vector<byte> client_cookie,\n           std::vector<byte> server_cookie, bool expect_server_cookie)\n    : DNSRR(\"\", T_OPT, static_cast<int>(udpsize),\n            ((int)extrcode) << 24 | ((int)version) << 16 |\n              ((int)flags) /* ttl */)\n  {\n    client_cookie_        = client_cookie;\n    server_cookie_        = server_cookie;\n    expect_server_cookie_ = expect_server_cookie;\n  }\n\n  virtual std::vector<byte> data(const ares_dns_record_t *dnsrec) const;\n  std::vector<DNSOption>    opts_;\n  std::vector<byte>         client_cookie_;\n  std::vector<byte>         server_cookie_;\n  bool                      expect_server_cookie_;\n}",
+      {
+        "std::vector<byte>": "virtual",
+        "opts_": "std::vector<DNSOption>",
+        "client_cookie_": "std::vector<byte>",
+        "server_cookie_": "std::vector<byte>",
+        "expect_server_cookie_": "bool"
+      },
+      "",
+      [
+        290,
+        0
+      ],
+      [
+        308,
+        1
+      ]
+    ],
+    [
+      "struct DNSPacket {\n  DNSPacket()\n    : qid_(0), response_(false), opcode_(O_QUERY), aa_(false), tc_(false),\n      rd_(false), ra_(false), z_(false), ad_(false), cd_(false), rcode_(NOERROR)\n  {\n  }\n\n  // Convenience functions that take ownership of given pointers.\n  DNSPacket &add_question(DNSQuestion *q)\n  {\n    questions_.push_back(std::unique_ptr<DNSQuestion>(q));\n    return *this;\n  }\n\n  DNSPacket &add_answer(DNSRR *q)\n  {\n    answers_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  DNSPacket &add_auth(DNSRR *q)\n  {\n    auths_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  DNSPacket &add_additional(DNSRR *q)\n  {\n    adds_.push_back(std::unique_ptr<DNSRR>(q));\n    return *this;\n  }\n\n  // Chainable setters.\n  DNSPacket &set_qid(int qid)\n  {\n    qid_ = qid;\n    return *this;\n  }\n\n  DNSPacket &set_response(bool v = true)\n  {\n    response_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_aa(bool v = true)\n  {\n    aa_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_tc(bool v = true)\n  {\n    tc_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_rd(bool v = true)\n  {\n    rd_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_ra(bool v = true)\n  {\n    ra_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_z(bool v = true)\n  {\n    z_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_ad(bool v = true)\n  {\n    ad_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_cd(bool v = true)\n  {\n    cd_ = v;\n    return *this;\n  }\n\n  DNSPacket &set_rcode(int rcode)\n  {\n    rcode_ = rcode;\n    return *this;\n  }\n\n  // Return the encoded packet.\n  std::vector<byte> data(const char              *request_name,\n                         const ares_dns_record_t *dnsrec) const;\n\n  std::vector<byte> data() const\n  {\n    return data(nullptr, nullptr);\n  }\n\n  int                                       qid_;\n  bool                                      response_;\n  int                                       opcode_;\n  bool                                      aa_;\n  bool                                      tc_;\n  bool                                      rd_;\n  bool                                      ra_;\n  bool                                      z_;\n  bool                                      ad_;\n  bool                                      cd_;\n  int                                       rcode_;\n  std::vector<std::unique_ptr<DNSQuestion>> questions_;\n  std::vector<std::unique_ptr<DNSRR>>       answers_;\n  std::vector<std::unique_ptr<DNSRR>>       auths_;\n  std::vector<std::unique_ptr<DNSRR>>       adds_;\n}",
+      {
+        "data(const char              *request_name,\n                         const ares_dns_record_t *dnsrec) const": "std::vector<byte>",
+        "qid_": "int",
+        "response_": "bool",
+        "opcode_": "int",
+        "aa_": "bool",
+        "tc_": "bool",
+        "rd_": "bool",
+        "ra_": "bool",
+        "z_": "bool",
+        "ad_": "bool",
+        "cd_": "bool",
+        "rcode_": "int",
+        "questions_": "std::vector<std::unique_ptr<DNSQuestion>>",
+        "answers_": "std::vector<std::unique_ptr<DNSRR>>",
+        "auths_": "std::vector<std::unique_ptr<DNSRR>>",
+        "adds_": "std::vector<std::unique_ptr<DNSRR>>"
+      },
+      "DNSPacket",
+      [
+        310,
+        0
+      ],
+      [
+        427,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_setup.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#include <memory>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ],
+    [
+      "#include <string>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#include <vector>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

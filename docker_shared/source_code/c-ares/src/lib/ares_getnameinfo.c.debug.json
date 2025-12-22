@@ -1,0 +1,725 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void  ares_getnameinfo_int(ares_channel_t        *channel,\n                                  const struct sockaddr *sa,\n                                  ares_socklen_t salen, int flags_int,\n                                  ares_nameinfo_callback callback, void *arg)\n{\n  const struct sockaddr_in  *addr  = NULL;\n  const struct sockaddr_in6 *addr6 = NULL;\n  struct nameinfo_query     *niquery;\n  unsigned short             port  = 0;\n  unsigned int               flags = (unsigned int)flags_int;\n\n  /* Validate socket address family and length */\n  if (sa && sa->sa_family == AF_INET &&\n      salen >= (ares_socklen_t)sizeof(struct sockaddr_in)) {\n    addr = CARES_INADDR_CAST(const struct sockaddr_in *, sa);\n    port = addr->sin_port;\n  } else if (sa && sa->sa_family == AF_INET6 &&\n             salen >= (ares_socklen_t)sizeof(struct sockaddr_in6)) {\n    addr6 = CARES_INADDR_CAST(const struct sockaddr_in6 *, sa);\n    port  = addr6->sin6_port;\n  } else {\n    callback(arg, ARES_ENOTIMP, 0, NULL, NULL);\n    return;\n  }\n\n  /* If neither, assume they want a host */\n  if (!(flags & ARES_NI_LOOKUPSERVICE) && !(flags & ARES_NI_LOOKUPHOST)) {\n    flags |= ARES_NI_LOOKUPHOST;\n  }\n\n  /* All they want is a service, no need for DNS */\n  if ((flags & ARES_NI_LOOKUPSERVICE) && !(flags & ARES_NI_LOOKUPHOST)) {\n    char  buf[33];\n    char *service;\n\n    service =\n      lookup_service((unsigned short)(port & 0xffff), flags, buf, sizeof(buf));\n    callback(arg, ARES_SUCCESS, 0, NULL, service);\n    return;\n  }\n\n  /* They want a host lookup */\n  if (flags & ARES_NI_LOOKUPHOST) {\n    /* A numeric host can be handled without DNS */\n    if (flags & ARES_NI_NUMERICHOST) {\n      char  ipbuf[IPBUFSIZ];\n      char  srvbuf[33];\n      char *service = NULL;\n      ipbuf[0]      = 0;\n\n      /* Specifying not to lookup a host, but then saying a host\n       * is required has to be illegal.\n       */\n      if (flags & ARES_NI_NAMEREQD) {\n        callback(arg, ARES_EBADFLAGS, 0, NULL, NULL);\n        return;\n      }\n      if (sa->sa_family == AF_INET6) {\n        ares_inet_ntop(AF_INET6, &addr6->sin6_addr, ipbuf, IPBUFSIZ);\n        /* If the system supports scope IDs, use it */\n#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID\n        append_scopeid(addr6, flags, ipbuf, sizeof(ipbuf));\n#endif\n      } else {\n        ares_inet_ntop(AF_INET, &addr->sin_addr, ipbuf, IPBUFSIZ);\n      }\n      /* They also want a service */\n      if (flags & ARES_NI_LOOKUPSERVICE) {\n        service = lookup_service((unsigned short)(port & 0xffff), flags, srvbuf,\n                                 sizeof(srvbuf));\n      }\n      callback(arg, ARES_SUCCESS, 0, ipbuf, service);\n      return;\n    } else {\n      /* This is where a DNS lookup becomes necessary */\n      niquery = ares_malloc(sizeof(struct nameinfo_query));\n      if (!niquery) {\n        callback(arg, ARES_ENOMEM, 0, NULL, NULL);\n        return;\n      }\n      niquery->callback = callback;\n      niquery->arg      = arg;\n      niquery->flags    = flags;\n      niquery->timeouts = 0;\n      if (sa->sa_family == AF_INET) {\n        niquery->family = AF_INET;\n        memcpy(&niquery->addr.addr4, addr, sizeof(niquery->addr.addr4));\n        ares_gethostbyaddr_nolock(channel, &addr->sin_addr,\n                                  sizeof(struct in_addr), AF_INET,\n                                  nameinfo_callback, niquery);\n      } else {\n        niquery->family = AF_INET6;\n        memcpy(&niquery->addr.addr6, addr6, sizeof(niquery->addr.addr6));\n        ares_gethostbyaddr_nolock(channel, &addr6->sin6_addr,\n                                  sizeof(struct ares_in6_addr), AF_INET6,\n                                  nameinfo_callback, niquery);\n      }\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          86,
+          0
+        ],
+        [
+          185,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getnameinfo_int",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t",
+          "flags_int": "int",
+          "callback": "ares_nameinfo_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_getnameinfo(ares_channel_t *channel, const struct sockaddr *sa,\n                      ares_socklen_t salen, int flags_int,\n                      ares_nameinfo_callback callback, void *arg)\n{\n  if (channel == NULL) {\n    return;\n  }\n\n  ares_channel_lock(channel);\n  ares_getnameinfo_int(channel, sa, salen, flags_int, callback, arg);\n  ares_channel_unlock(channel);\n}",
+      "fn_code_pos": [
+        [
+          187,
+          0
+        ],
+        [
+          198,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getnameinfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "sa": "struct sockaddr",
+          "salen": "ares_socklen_t",
+          "flags_int": "int",
+          "callback": "ares_nameinfo_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void nameinfo_callback(void *arg, int status, int timeouts,\n                              struct hostent *host)\n{\n  struct nameinfo_query *niquery = (struct nameinfo_query *)arg;\n  char                   srvbuf[33];\n  char                  *service = NULL;\n\n  niquery->timeouts += (size_t)timeouts;\n  if (status == ARES_SUCCESS) {\n    /* They want a service too */\n    if (niquery->flags & ARES_NI_LOOKUPSERVICE) {\n      if (niquery->family == AF_INET) {\n        service = lookup_service(niquery->addr.addr4.sin_port, niquery->flags,\n                                 srvbuf, sizeof(srvbuf));\n      } else {\n        service = lookup_service(niquery->addr.addr6.sin6_port, niquery->flags,\n                                 srvbuf, sizeof(srvbuf));\n      }\n    }\n    /* NOFQDN means we have to strip off the domain name portion.  We do\n       this by determining our own domain name, then searching the string\n       for this domain name and removing it.\n     */\n#ifdef HAVE_GETHOSTNAME\n    if (niquery->flags & ARES_NI_NOFQDN) {\n      char        buf[255];\n      const char *domain;\n      gethostname(buf, 255);\n      if ((domain = strchr(buf, '.')) != NULL) {\n        char *end = ares_striendstr(host->h_name, domain);\n        if (end) {\n          *end = 0;\n        }\n      }\n    }\n#endif\n    niquery->callback(niquery->arg, ARES_SUCCESS, (int)niquery->timeouts,\n                      host->h_name, service);\n    ares_free(niquery);\n    return;\n  }\n  /* We couldn't find the host, but it's OK, we can use the IP */\n  else if (status == ARES_ENOTFOUND && !(niquery->flags & ARES_NI_NAMEREQD)) {\n    char ipbuf[IPBUFSIZ];\n    if (niquery->family == AF_INET) {\n      ares_inet_ntop(AF_INET, &niquery->addr.addr4.sin_addr, ipbuf, IPBUFSIZ);\n    } else {\n      ares_inet_ntop(AF_INET6, &niquery->addr.addr6.sin6_addr, ipbuf, IPBUFSIZ);\n#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID\n      append_scopeid(&niquery->addr.addr6, niquery->flags, ipbuf,\n                     sizeof(ipbuf));\n#endif\n    }\n    /* They want a service too */\n    if (niquery->flags & ARES_NI_LOOKUPSERVICE) {\n      if (niquery->family == AF_INET) {\n        service = lookup_service(niquery->addr.addr4.sin_port, niquery->flags,\n                                 srvbuf, sizeof(srvbuf));\n      } else {\n        service = lookup_service(niquery->addr.addr6.sin6_port, niquery->flags,\n                                 srvbuf, sizeof(srvbuf));\n      }\n    }\n    niquery->callback(niquery->arg, ARES_SUCCESS, (int)niquery->timeouts, ipbuf,\n                      service);\n    ares_free(niquery);\n    return;\n  }\n  niquery->callback(niquery->arg, status, (int)niquery->timeouts, NULL, NULL);\n  ares_free(niquery);\n}",
+      "fn_code_pos": [
+        [
+          200,
+          0
+        ],
+        [
+          270,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "nameinfo_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static char *lookup_service(unsigned short port, unsigned int flags, char *buf,\n                            size_t buflen)\n{\n  const char     *proto;\n  struct servent *sep;\n#ifdef HAVE_GETSERVBYPORT_R\n  struct servent se;\n#endif\n  char        tmpbuf[4096];\n  const char *name;\n  size_t      name_len;\n\n  if (port) {\n    if (flags & ARES_NI_NUMERICSERV) {\n      sep = NULL;\n    } else {\n      if (flags & ARES_NI_UDP) {\n        proto = \"udp\";\n      } else if (flags & ARES_NI_SCTP) {\n        proto = \"sctp\";\n      } else if (flags & ARES_NI_DCCP) {\n        proto = \"dccp\";\n      } else {\n        proto = \"tcp\";\n      }\n#ifdef HAVE_GETSERVBYPORT_R\n      memset(&se, 0, sizeof(se));\n      sep = &se;\n      memset(tmpbuf, 0, sizeof(tmpbuf));\n#  if GETSERVBYPORT_R_ARGS == 6\n      if (getservbyport_r(port, proto, &se, (void *)tmpbuf, sizeof(tmpbuf),\n                          &sep) != 0) {\n        sep = NULL; /* LCOV_EXCL_LINE: buffer large so this never fails */\n      }\n#  elif GETSERVBYPORT_R_ARGS == 5\n      sep = getservbyport_r(port, proto, &se, (void *)tmpbuf, sizeof(tmpbuf));\n#  elif GETSERVBYPORT_R_ARGS == 4\n      if (getservbyport_r(port, proto, &se, (void *)tmpbuf) != 0) {\n        sep = NULL;\n      }\n#  else\n      /* Lets just hope the OS uses TLS! */\n      sep = getservbyport(port, proto);\n#  endif\n#else\n      /* Lets just hope the OS uses TLS! */\n#  if (defined(NETWARE) && !defined(__NOVELL_LIBC__))\n      sep = getservbyport(port, (char *)proto);\n#  else\n      sep = getservbyport(port, proto);\n#  endif\n#endif\n    }\n    if (sep && sep->s_name) {\n      /* get service name */\n      name = sep->s_name;\n    } else {\n      /* get port as a string */\n      snprintf(tmpbuf, sizeof(tmpbuf), \"%u\", (unsigned int)ntohs(port));\n      name = tmpbuf;\n    }\n    name_len = ares_strlen(name);\n    if (name_len < buflen) {\n      /* return it if buffer big enough */\n      memcpy(buf, name, name_len + 1);\n    } else {\n      /* avoid reusing previous one */\n      buf[0] = '\\0'; /* LCOV_EXCL_LINE: no real service names are too big */\n    }\n    return buf;\n  }\n  buf[0] = '\\0';\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          272,
+          0
+        ],
+        [
+          345,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "lookup_service",
+        "parameters": {
+          "port": "unsigned short",
+          "flags": "unsigned int",
+          "buf": "char",
+          "buflen": "size_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "static void append_scopeid(const struct sockaddr_in6 *addr6, unsigned int flags,\n                           char *buf, size_t buflen)\n{\n#  ifdef HAVE_IF_INDEXTONAME\n  int is_ll;\n  int is_mcll;\n#  endif\n  char   tmpbuf[IF_NAMESIZE + 2];\n  size_t bufl;\n\n  tmpbuf[0] = '%';\n\n#  ifdef HAVE_IF_INDEXTONAME\n  is_ll   = IN6_IS_ADDR_LINKLOCAL(&addr6->sin6_addr);\n  is_mcll = IN6_IS_ADDR_MC_LINKLOCAL(&addr6->sin6_addr);\n  if ((flags & ARES_NI_NUMERICSCOPE) || (!is_ll && !is_mcll)) {\n    snprintf(&tmpbuf[1], sizeof(tmpbuf) - 1, \"%lu\",\n             (unsigned long)addr6->sin6_scope_id);\n  } else {\n    if (if_indextoname(addr6->sin6_scope_id, &tmpbuf[1]) == NULL) {\n      snprintf(&tmpbuf[1], sizeof(tmpbuf) - 1, \"%lu\",\n               (unsigned long)addr6->sin6_scope_id);\n    }\n  }\n#  else\n  snprintf(&tmpbuf[1], sizeof(tmpbuf) - 1, \"%lu\",\n           (unsigned long)addr6->sin6_scope_id);\n  (void)flags;\n#  endif\n  tmpbuf[IF_NAMESIZE + 1] = '\\0';\n  bufl                    = ares_strlen(buf);\n\n  if (bufl + ares_strlen(tmpbuf) < buflen) {\n    /* only append the scopeid string if it fits in the target buffer */\n    ares_strcpy(&buf[bufl], tmpbuf, buflen - bufl);\n  }\n}",
+      "fn_code_pos": [
+        [
+          348,
+          0
+        ],
+        [
+          384,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "append_scopeid",
+        "parameters": {
+          "addr6": "struct sockaddr_in6",
+          "flags": "unsigned int",
+          "buf": "char",
+          "buflen": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static char *ares_striendstr(const char *s1, const char *s2)\n{\n  const char *c1;\n  const char *c2;\n  const char *c1_begin;\n  int         lo1;\n  int         lo2;\n  size_t      s1_len = ares_strlen(s1);\n  size_t      s2_len = ares_strlen(s2);\n\n  if (s1 == NULL || s2 == NULL) {\n    return NULL;\n  }\n\n  /* If the substr is longer than the full str, it can't match */\n  if (s2_len > s1_len) {\n    return NULL;\n  }\n\n  /* Jump to the end of s1 minus the length of s2 */\n  c1_begin = s1 + s1_len - s2_len;\n  c1       = c1_begin;\n  c2       = s2;\n  while (c2 < s2 + s2_len) {\n    lo1 = ares_tolower((unsigned char)*c1);\n    lo2 = ares_tolower((unsigned char)*c2);\n    if (lo1 != lo2) {\n      return NULL;\n    } else {\n      c1++;\n      c2++;\n    }\n  }\n  /* Cast off const */\n  return (char *)((size_t)c1_begin);\n}",
+      "fn_code_pos": [
+        [
+          388,
+          0
+        ],
+        [
+          423,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_striendstr",
+        "parameters": {
+          "s1": "char",
+          "s2": "char"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_is_onion_domain(const char *name)\n{\n  if (ares_striendstr(name, \".onion\")) {\n    return ARES_TRUE;\n  }\n\n  if (ares_striendstr(name, \".onion.\")) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          425,
+          0
+        ],
+        [
+          436,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_onion_domain",
+        "parameters": {
+          "name": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "nameinfo_callback(void *arg, int status, int timeouts,\n                               struct hostent *host)",
+      "fn_dec_pos": [
+        [
+          76,
+          13
+        ],
+        [
+          77,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "nameinfo_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "lookup_service(unsigned short port, unsigned int flags, char *buf,\n                            size_t buflen)",
+      "fn_dec_pos": [
+        [
+          78,
+          13
+        ],
+        [
+          79,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "lookup_service",
+        "parameters": {
+          "port": "unsigned short",
+          "flags": "unsigned int",
+          "buf": "char",
+          "buflen": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "append_scopeid(const struct sockaddr_in6 *addr6, unsigned int flags,\n                           char *buf, size_t buflen)",
+      "fn_dec_pos": [
+        [
+          81,
+          12
+        ],
+        [
+          82,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "append_scopeid",
+        "parameters": {
+          "addr6": "struct sockaddr_in6",
+          "flags": "unsigned int",
+          "buf": "char",
+          "buflen": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_striendstr(const char *s1, const char *s2)",
+      "fn_dec_pos": [
+        [
+          84,
+          13
+        ],
+        [
+          84,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_striendstr",
+        "parameters": {
+          "s1": "char",
+          "s2": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "lookup_service(unsigned short port, unsigned int flags, char *buf,\n                            size_t buflen)",
+      "fn_dec_pos": [
+        [
+          272,
+          13
+        ],
+        [
+          273,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "lookup_service",
+        "parameters": {
+          "port": "unsigned short",
+          "flags": "unsigned int",
+          "buf": "char",
+          "buflen": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_striendstr(const char *s1, const char *s2)",
+      "fn_dec_pos": [
+        [
+          388,
+          13
+        ],
+        [
+          388,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_striendstr",
+        "parameters": {
+          "s1": "char",
+          "s2": "char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct nameinfo_query {\n  ares_nameinfo_callback callback;\n  void                  *arg;\n\n  union {\n    struct sockaddr_in  addr4;\n    struct sockaddr_in6 addr6;\n  } addr;\n\n  int          family;\n  unsigned int flags;\n  size_t       timeouts;\n}",
+      {
+        "callback": "ares_nameinfo_callback",
+        "*arg": "void",
+        "addr": "union {\n    struct sockaddr_in  addr4;\n    struct sockaddr_in6 addr6;\n  }",
+        "addr4": "struct sockaddr_in",
+        "addr6": "struct sockaddr_in6",
+        "family": "int",
+        "flags": "unsigned int",
+        "timeouts": "size_t"
+      },
+      "nameinfo_query",
+      [
+        55,
+        0
+      ],
+      [
+        67,
+        1
+      ]
+    ],
+    [
+      "struct nameinfo_query {\n  ares_nameinfo_callback callback;\n  void                  *arg;\n\n  union {\n    struct sockaddr_in  addr4;\n    struct sockaddr_in6 addr6;\n  } addr;\n\n  int          family;\n  unsigned int flags;\n  size_t       timeouts;\n}",
+      {
+        "callback": "ares_nameinfo_callback",
+        "*arg": "void",
+        "addr": "union {\n    struct sockaddr_in  addr4;\n    struct sockaddr_in6 addr6;\n  }",
+        "addr4": "struct sockaddr_in",
+        "addr6": "struct sockaddr_in6",
+        "family": "int",
+        "flags": "unsigned int",
+        "timeouts": "size_t"
+      },
+      "nameinfo_query",
+      [
+        55,
+        0
+      ],
+      [
+        67,
+        1
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        60,
+        4
+      ],
+      [
+        60,
+        22
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        61,
+        4
+      ],
+      [
+        61,
+        23
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        77,
+        31
+      ],
+      [
+        77,
+        45
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        81,
+        33
+      ],
+      [
+        81,
+        52
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        87,
+        40
+      ],
+      [
+        87,
+        55
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        91,
+        8
+      ],
+      [
+        91,
+        26
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        92,
+        8
+      ],
+      [
+        92,
+        27
+      ]
+    ],
+    [
+      "struct nameinfo_query",
+      {},
+      "",
+      [
+        93,
+        2
+      ],
+      [
+        93,
+        23
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        99,
+        38
+      ],
+      [
+        99,
+        56
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        103,
+        45
+      ],
+      [
+        103,
+        64
+      ]
+    ],
+    [
+      "struct nameinfo_query",
+      {},
+      "",
+      [
+        161,
+        35
+      ],
+      [
+        161,
+        56
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        174,
+        41
+      ],
+      [
+        174,
+        55
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        180,
+        41
+      ],
+      [
+        180,
+        61
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        187,
+        53
+      ],
+      [
+        187,
+        68
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        201,
+        30
+      ],
+      [
+        201,
+        44
+      ]
+    ],
+    [
+      "struct nameinfo_query",
+      {},
+      "",
+      [
+        203,
+        2
+      ],
+      [
+        203,
+        23
+      ]
+    ],
+    [
+      "struct nameinfo_query",
+      {},
+      "",
+      [
+        203,
+        36
+      ],
+      [
+        203,
+        57
+      ]
+    ],
+    [
+      "struct servent",
+      {},
+      "",
+      [
+        276,
+        2
+      ],
+      [
+        276,
+        16
+      ]
+    ],
+    [
+      "struct servent",
+      {},
+      "",
+      [
+        278,
+        2
+      ],
+      [
+        278,
+        16
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        348,
+        33
+      ],
+      [
+        348,
+        52
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        35,
+        0
+      ],
+      [
+        36,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#  include <net/if.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#  include <iphlpapi.h>\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_ipv6.h\"\n",
+      [
+        53,
+        0
+      ],
+      [
+        54,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

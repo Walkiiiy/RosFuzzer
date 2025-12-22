@@ -1,0 +1,596 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_array_destructor_t)(void *data)",
+      "fn_dec_pos": [
+        [
+          50,
+          13
+        ],
+        [
+          50,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_array_cmp_t)(const void *data1, const void *data2)",
+      "fn_dec_pos": [
+        [
+          58,
+          12
+        ],
+        [
+          58,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "data1": "void",
+          "data2": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_array_create(size_t member_size,\n                                             ares_array_destructor_t destruct)",
+      "fn_dec_pos": [
+        [
+          76,
+          27
+        ],
+        [
+          77,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "member_size": "size_t",
+          "destruct": "ares_array_destructor_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_set_size(ares_array_t *arr, size_t size)",
+      "fn_dec_pos": [
+        [
+          87,
+          13
+        ],
+        [
+          87,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_set_size",
+        "parameters": {
+          "arr": "ares_array_t",
+          "size": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_sort(ares_array_t    *arr,\n                                           ares_array_cmp_t cmp)",
+      "fn_dec_pos": [
+        [
+          96,
+          13
+        ],
+        [
+          97,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_sort",
+        "parameters": {
+          "arr": "ares_array_t",
+          "cmp": "ares_array_cmp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_array_destroy(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          104,
+          27
+        ],
+        [
+          104,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_destroy",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_array_finish(ares_array_t *arr, size_t *num_members)",
+      "fn_dec_pos": [
+        [
+          114,
+          20
+        ],
+        [
+          114,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_finish",
+        "parameters": {
+          "arr": "ares_array_t",
+          "num_members": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_len(const ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          121,
+          20
+        ],
+        [
+          121,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_len",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_at(void        **elem_ptr,\n                                                ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          132,
+          13
+        ],
+        [
+          133,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insert_at",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_last(void        **elem_ptr,\n                                                  ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          141,
+          13
+        ],
+        [
+          142,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insert_last",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insert_first(void        **elem_ptr,\n                                                   ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          150,
+          13
+        ],
+        [
+          151,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insert_first",
+        "parameters": {
+          "elem_ptr": "void",
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_at(ares_array_t *arr,\n                                                    size_t        idx,\n                                                    const void   *data_ptr)",
+      "fn_dec_pos": [
+        [
+          167,
+          13
+        ],
+        [
+          169,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insertdata_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t",
+          "data_ptr": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_last(ares_array_t *arr,\n                                                      const void   *data_ptr)",
+      "fn_dec_pos": [
+        [
+          182,
+          13
+        ],
+        [
+          183,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insertdata_last",
+        "parameters": {
+          "arr": "ares_array_t",
+          "data_ptr": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_insertdata_first(ares_array_t *arr,\n                                                       const void   *data_ptr)",
+      "fn_dec_pos": [
+        [
+          196,
+          13
+        ],
+        [
+          197,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_insertdata_first",
+        "parameters": {
+          "arr": "ares_array_t",
+          "data_ptr": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_array_at(ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          203,
+          27
+        ],
+        [
+          203,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_first(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          208,
+          27
+        ],
+        [
+          208,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_last(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          213,
+          27
+        ],
+        [
+          213,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_at_const(const ares_array_t *arr,\n                                               size_t              idx)",
+      "fn_dec_pos": [
+        [
+          219,
+          27
+        ],
+        [
+          220,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_at_const",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_first_const(const ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          225,
+          27
+        ],
+        [
+          225,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_first_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_array_last_const(const ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          230,
+          27
+        ],
+        [
+          230,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_array_last_const",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_claim_at(void *dest, size_t dest_size,\n                                               ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          246,
+          13
+        ],
+        [
+          247,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_claim_at",
+        "parameters": {
+          "dest": "void",
+          "dest_size": "size_t",
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_at(ares_array_t *arr, size_t idx)",
+      "fn_dec_pos": [
+        [
+          256,
+          13
+        ],
+        [
+          256,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_remove_at",
+        "parameters": {
+          "arr": "ares_array_t",
+          "idx": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_first(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          263,
+          13
+        ],
+        [
+          263,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_remove_first",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_array_remove_last(ares_array_t *arr)",
+      "fn_dec_pos": [
+        [
+          270,
+          13
+        ],
+        [
+          270,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_array_remove_last",
+        "parameters": {
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_array",
+      {},
+      "",
+      [
+        40,
+        0
+      ],
+      [
+        40,
+        17
+      ]
+    ],
+    [
+      "typedef struct ares_array ares_array_t;",
+      {},
+      "ares_array_t",
+      [
+        43,
+        0
+      ],
+      [
+        43,
+        39
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

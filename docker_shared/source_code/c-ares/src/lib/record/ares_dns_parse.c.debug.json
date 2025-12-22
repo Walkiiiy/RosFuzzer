@@ -1,0 +1,856 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static size_t ares_dns_rr_remaining_len(const ares_buf_t *buf, size_t orig_len,\n                                        size_t rdlength)\n{\n  size_t used_len = orig_len - ares_buf_len(buf);\n  if (used_len >= rdlength) {\n    return 0;\n  }\n  return rdlength - used_len;\n}",
+      "fn_code_pos": [
+        [
+          31,
+          0
+        ],
+        [
+          39,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_rr_remaining_len",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "orig_len": "size_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_and_set_dns_name(ares_buf_t    *buf,\n                                                     ares_bool_t    is_hostname,\n                                                     ares_dns_rr_t *rr,\n                                                     ares_dns_rr_key_t key)\n{\n  ares_status_t status;\n  char         *name = NULL;\n\n  status = ares_dns_name_parse(buf, &name, is_hostname);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_str_own(rr, key, name);\n  if (status != ARES_SUCCESS) {\n    ares_free(name);\n    return status;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_dns_name",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "is_hostname": "ares_bool_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_and_set_dns_str(ares_buf_t       *buf,\n                                                    size_t            max_len,\n                                                    ares_dns_rr_t    *rr,\n                                                    ares_dns_rr_key_t key,\n                                                    ares_bool_t blank_allowed)\n{\n  ares_status_t status;\n  char         *str = NULL;\n\n  status = ares_buf_parse_dns_str(buf, max_len, &str);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (!blank_allowed && ares_strlen(str) == 0) {\n    ares_free(str);\n    return ARES_EBADRESP;\n  }\n\n  status = ares_dns_rr_set_str_own(rr, key, str);\n  if (status != ARES_SUCCESS) {\n    ares_free(str);\n    return status;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          62,
+          0
+        ],
+        [
+          87,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_dns_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "max_len": "size_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "blank_allowed": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_dns_parse_and_set_dns_abin(ares_buf_t *buf, size_t max_len,\n                                  ares_dns_rr_t *rr, ares_dns_rr_key_t key,\n                                  ares_bool_t validate_printable)\n{\n  ares_status_t           status;\n  ares_dns_multistring_t *strs = NULL;\n\n  status =\n    ares_dns_multistring_parse_buf(buf, max_len, &strs, validate_printable);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_abin_own(rr, key, strs);\n  if (status != ARES_SUCCESS) {\n    ares_dns_multistring_destroy(strs);\n    return status;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          89,
+          0
+        ],
+        [
+          109,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_dns_abin",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "max_len": "size_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t",
+          "validate_printable": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_and_set_be32(ares_buf_t       *buf,\n                                                 ares_dns_rr_t    *rr,\n                                                 ares_dns_rr_key_t key)\n{\n  ares_status_t status;\n  unsigned int  u32;\n\n  status = ares_buf_fetch_be32(buf, &u32);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_dns_rr_set_u32(rr, key, u32);\n}",
+      "fn_code_pos": [
+        [
+          111,
+          0
+        ],
+        [
+          124,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_and_set_be16(ares_buf_t       *buf,\n                                                 ares_dns_rr_t    *rr,\n                                                 ares_dns_rr_key_t key)\n{\n  ares_status_t  status;\n  unsigned short u16;\n\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_dns_rr_set_u16(rr, key, u16);\n}",
+      "fn_code_pos": [
+        [
+          126,
+          0
+        ],
+        [
+          139,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_and_set_u8(ares_buf_t       *buf,\n                                               ares_dns_rr_t    *rr,\n                                               ares_dns_rr_key_t key)\n{\n  ares_status_t status;\n  unsigned char u8;\n\n  status = ares_buf_fetch_bytes(buf, &u8, 1);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_dns_rr_set_u8(rr, key, u8);\n}",
+      "fn_code_pos": [
+        [
+          141,
+          0
+        ],
+        [
+          154,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_and_set_u8",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "key": "ares_dns_rr_key_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_a(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                         size_t rdlength)\n{\n  struct in_addr addr;\n  ares_status_t  status;\n\n  (void)rdlength; /* Not needed */\n\n  status = ares_buf_fetch_bytes(buf, (unsigned char *)&addr, sizeof(addr));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_dns_rr_set_addr(rr, ARES_RR_A_ADDR, &addr);\n}",
+      "fn_code_pos": [
+        [
+          156,
+          0
+        ],
+        [
+          170,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_a",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_ns(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                          size_t rdlength)\n{\n  (void)rdlength; /* Not needed */\n\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_NS_NSDNAME);\n}",
+      "fn_code_pos": [
+        [
+          172,
+          0
+        ],
+        [
+          179,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_ns",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_cname(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                             size_t rdlength)\n{\n  (void)rdlength; /* Not needed */\n\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_CNAME_CNAME);\n}",
+      "fn_code_pos": [
+        [
+          181,
+          0
+        ],
+        [
+          188,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_cname",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_soa(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  ares_status_t status;\n\n  (void)rdlength; /* Not needed */\n\n  /* MNAME */\n  status =\n    ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr, ARES_RR_SOA_MNAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* RNAME */\n  status =\n    ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr, ARES_RR_SOA_RNAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* SERIAL */\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SOA_SERIAL);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* REFRESH */\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SOA_REFRESH);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* RETRY */\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SOA_RETRY);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* EXPIRE */\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SOA_EXPIRE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* MINIMUM */\n  return ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SOA_MINIMUM);\n}",
+      "fn_code_pos": [
+        [
+          190,
+          0
+        ],
+        [
+          237,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_soa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_ptr(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  (void)rdlength; /* Not needed */\n\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_PTR_DNAME);\n}",
+      "fn_code_pos": [
+        [
+          239,
+          0
+        ],
+        [
+          246,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_ptr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_hinfo(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                             size_t rdlength)\n{\n  ares_status_t status;\n  size_t        orig_len = ares_buf_len(buf);\n\n  (void)rdlength; /* Not needed */\n\n  /* CPU */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_HINFO_CPU, ARES_TRUE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* OS */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_HINFO_OS, ARES_TRUE);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          248,
+          0
+        ],
+        [
+          270,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_hinfo",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_mx(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                          size_t rdlength)\n{\n  ares_status_t status;\n\n  (void)rdlength; /* Not needed */\n\n  /* PREFERENCE */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_MX_PREFERENCE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* EXCHANGE */\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_MX_EXCHANGE);\n}",
+      "fn_code_pos": [
+        [
+          272,
+          0
+        ],
+        [
+          288,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_mx",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_txt(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  return ares_dns_parse_and_set_dns_abin(buf, rdlength, rr, ARES_RR_TXT_DATA,\n                                         ARES_FALSE);\n}",
+      "fn_code_pos": [
+        [
+          290,
+          0
+        ],
+        [
+          295,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_txt",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_sig(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  ares_status_t  status;\n  size_t         orig_len = ares_buf_len(buf);\n  size_t         len;\n  unsigned char *data;\n\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SIG_TYPE_COVERED);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_SIG_ALGORITHM);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_SIG_LABELS);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SIG_ORIGINAL_TTL);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SIG_EXPIRATION);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_be32(buf, rr, ARES_RR_SIG_INCEPTION);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SIG_KEY_TAG);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                           ARES_RR_SIG_SIGNERS_NAME);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  len = ares_dns_rr_remaining_len(buf, orig_len, rdlength);\n  if (len == 0) {\n    return ARES_EBADRESP;\n  }\n\n  status = ares_buf_fetch_bytes_dup(buf, len, ARES_FALSE, &data);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_bin_own(rr, ARES_RR_SIG_SIGNATURE, data, len);\n  if (status != ARES_SUCCESS) {\n    ares_free(data);\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          297,
+          0
+        ],
+        [
+          363,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_sig",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_aaaa(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                            size_t rdlength)\n{\n  struct ares_in6_addr addr;\n  ares_status_t        status;\n\n  (void)rdlength; /* Not needed */\n\n  status = ares_buf_fetch_bytes(buf, (unsigned char *)&addr, sizeof(addr));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_dns_rr_set_addr6(rr, ARES_RR_AAAA_ADDR, &addr);\n}",
+      "fn_code_pos": [
+        [
+          365,
+          0
+        ],
+        [
+          379,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_aaaa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_srv(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  ares_status_t status;\n\n  (void)rdlength; /* Not needed */\n\n  /* PRIORITY */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SRV_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* WEIGHT */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SRV_WEIGHT);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* PORT */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SRV_PORT);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* TARGET */\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_SRV_TARGET);\n}",
+      "fn_code_pos": [
+        [
+          381,
+          0
+        ],
+        [
+          409,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_srv",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_naptr(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                             size_t rdlength)\n{\n  ares_status_t status;\n  size_t        orig_len = ares_buf_len(buf);\n\n  /* ORDER */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_NAPTR_ORDER);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* PREFERENCE */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_NAPTR_PREFERENCE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* FLAGS */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_NAPTR_FLAGS, ARES_TRUE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* SERVICES */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_NAPTR_SERVICES, ARES_TRUE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* REGEXP */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_NAPTR_REGEXP, ARES_TRUE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* REPLACEMENT */\n  return ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr,\n                                         ARES_RR_NAPTR_REPLACEMENT);\n}",
+      "fn_code_pos": [
+        [
+          411,
+          0
+        ],
+        [
+          456,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_naptr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_opt(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t         rdlength,\n                                           unsigned short raw_class,\n                                           unsigned int   raw_ttl)\n{\n  ares_status_t  status;\n  size_t         orig_len = ares_buf_len(buf);\n  unsigned short rcode_high;\n\n  status = ares_dns_rr_set_u16(rr, ARES_RR_OPT_UDP_SIZE, raw_class);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* First 8 bits of TTL are an extended RCODE, and they go in the higher order\n   * after the original 4-bit rcode */\n  rcode_high             = (unsigned short)((raw_ttl >> 20) & 0x0FF0);\n  rr->parent->raw_rcode |= rcode_high;\n\n  status = ares_dns_rr_set_u8(rr, ARES_RR_OPT_VERSION,\n                              (unsigned char)(raw_ttl >> 16) & 0xFF);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_u16(rr, ARES_RR_OPT_FLAGS,\n                               (unsigned short)(raw_ttl & 0xFFFF));\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Parse options */\n  while (ares_dns_rr_remaining_len(buf, orig_len, rdlength)) {\n    unsigned short opt = 0;\n    unsigned short len = 0;\n    unsigned char *val = NULL;\n\n    /* Fetch be16 option */\n    status = ares_buf_fetch_be16(buf, &opt);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Fetch be16 length */\n    status = ares_buf_fetch_be16(buf, &len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    if (len) {\n      status = ares_buf_fetch_bytes_dup(buf, len, ARES_TRUE, &val);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n\n    status = ares_dns_rr_set_opt_own(rr, ARES_RR_OPT_OPTIONS, opt, val, len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          458,
+          0
+        ],
+        [
+          521,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_opt",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t",
+          "raw_class": "unsigned short",
+          "raw_ttl": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_tlsa(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                            size_t rdlength)\n{\n  ares_status_t  status;\n  size_t         orig_len = ares_buf_len(buf);\n  size_t         len;\n  unsigned char *data;\n\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_TLSA_CERT_USAGE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_TLSA_SELECTOR);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_TLSA_MATCH);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  len = ares_dns_rr_remaining_len(buf, orig_len, rdlength);\n  if (len == 0) {\n    return ARES_EBADRESP;\n  }\n\n  status = ares_buf_fetch_bytes_dup(buf, len, ARES_FALSE, &data);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_bin_own(rr, ARES_RR_TLSA_DATA, data, len);\n  if (status != ARES_SUCCESS) {\n    ares_free(data);\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          523,
+          0
+        ],
+        [
+          563,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_tlsa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_svcb(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                            size_t rdlength)\n{\n  ares_status_t status;\n  size_t        orig_len = ares_buf_len(buf);\n\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_SVCB_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status =\n    ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr, ARES_RR_SVCB_TARGET);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Parse params */\n  while (ares_dns_rr_remaining_len(buf, orig_len, rdlength)) {\n    unsigned short opt = 0;\n    unsigned short len = 0;\n    unsigned char *val = NULL;\n\n    /* Fetch be16 option */\n    status = ares_buf_fetch_be16(buf, &opt);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Fetch be16 length */\n    status = ares_buf_fetch_be16(buf, &len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    if (len) {\n      status = ares_buf_fetch_bytes_dup(buf, len, ARES_TRUE, &val);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n\n    status = ares_dns_rr_set_opt_own(rr, ARES_RR_SVCB_PARAMS, opt, val, len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          565,
+          0
+        ],
+        [
+          614,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_svcb",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_https(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                             size_t rdlength)\n{\n  ares_status_t status;\n  size_t        orig_len = ares_buf_len(buf);\n\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_HTTPS_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status =\n    ares_dns_parse_and_set_dns_name(buf, ARES_FALSE, rr, ARES_RR_HTTPS_TARGET);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Parse params */\n  while (ares_dns_rr_remaining_len(buf, orig_len, rdlength)) {\n    unsigned short opt = 0;\n    unsigned short len = 0;\n    unsigned char *val = NULL;\n\n    /* Fetch be16 option */\n    status = ares_buf_fetch_be16(buf, &opt);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    /* Fetch be16 length */\n    status = ares_buf_fetch_be16(buf, &len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n\n    if (len) {\n      status = ares_buf_fetch_bytes_dup(buf, len, ARES_TRUE, &val);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n\n    status = ares_dns_rr_set_opt_own(rr, ARES_RR_HTTPS_PARAMS, opt, val, len);\n    if (status != ARES_SUCCESS) {\n      return status;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          616,
+          0
+        ],
+        [
+          665,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_https",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_uri(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  char         *name = NULL;\n  ares_status_t status;\n  size_t        orig_len = ares_buf_len(buf);\n  size_t        remaining_len;\n\n  /* PRIORITY */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_URI_PRIORITY);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* WEIGHT */\n  status = ares_dns_parse_and_set_be16(buf, rr, ARES_RR_URI_WEIGHT);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* TARGET -- not in string format, rest of buffer, required to be\n   * non-zero length */\n  remaining_len = ares_dns_rr_remaining_len(buf, orig_len, rdlength);\n  if (remaining_len == 0) {\n    status = ARES_EBADRESP;\n    return status;\n  }\n\n  /* NOTE: Not in DNS string format */\n  status = ares_buf_fetch_str_dup(buf, remaining_len, &name);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  if (!ares_str_isprint(name, remaining_len)) {\n    ares_free(name);\n    return ARES_EBADRESP;\n  }\n\n  status = ares_dns_rr_set_str_own(rr, ARES_RR_URI_TARGET, name);\n  if (status != ARES_SUCCESS) {\n    ares_free(name);\n    return status;\n  }\n  name = NULL;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          667,
+          0
+        ],
+        [
+          714,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_uri",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_caa(ares_buf_t *buf, ares_dns_rr_t *rr,\n                                           size_t rdlength)\n{\n  unsigned char *data     = NULL;\n  size_t         data_len = 0;\n  ares_status_t  status;\n  size_t         orig_len = ares_buf_len(buf);\n\n  /* CRITICAL */\n  status = ares_dns_parse_and_set_u8(buf, rr, ARES_RR_CAA_CRITICAL);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Tag */\n  status = ares_dns_parse_and_set_dns_str(\n    buf, ares_dns_rr_remaining_len(buf, orig_len, rdlength), rr,\n    ARES_RR_CAA_TAG, ARES_FALSE);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Value - binary! (remaining buffer */\n  data_len = ares_dns_rr_remaining_len(buf, orig_len, rdlength);\n  if (data_len == 0) {\n    status = ARES_EBADRESP;\n    return status;\n  }\n  status = ares_buf_fetch_bytes_dup(buf, data_len, ARES_TRUE, &data);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  status = ares_dns_rr_set_bin_own(rr, ARES_RR_CAA_VALUE, data, data_len);\n  if (status != ARES_SUCCESS) {\n    ares_free(data);\n    return status;\n  }\n  data = NULL;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          716,
+          0
+        ],
+        [
+          757,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_caa",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr_raw_rr(ares_buf_t    *buf,\n                                              ares_dns_rr_t *rr,\n                                              size_t         rdlength,\n                                              unsigned short raw_type)\n{\n  ares_status_t  status;\n  unsigned char *bytes = NULL;\n\n  if (rdlength == 0) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_fetch_bytes_dup(buf, rdlength, ARES_FALSE, &bytes);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* Can't fail */\n  status = ares_dns_rr_set_u16(rr, ARES_RR_RAW_RR_TYPE, raw_type);\n  if (status != ARES_SUCCESS) {\n    ares_free(bytes);\n    return status;\n  }\n\n  status = ares_dns_rr_set_bin_own(rr, ARES_RR_RAW_RR_DATA, bytes, rdlength);\n  if (status != ARES_SUCCESS) {\n    ares_free(bytes);\n    return status;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          759,
+          0
+        ],
+        [
+          790,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_raw_rr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rr": "ares_dns_rr_t",
+          "rdlength": "size_t",
+          "raw_type": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_header(ares_buf_t *buf, unsigned int flags,\n                                           ares_dns_record_t **dnsrec,\n                                           unsigned short     *qdcount,\n                                           unsigned short     *ancount,\n                                           unsigned short     *nscount,\n                                           unsigned short     *arcount)\n{\n  ares_status_t     status = ARES_EBADRESP;\n  unsigned short    u16;\n  unsigned short    id;\n  unsigned short    dns_flags = 0;\n  ares_dns_opcode_t opcode;\n  unsigned short    rcode;\n\n  (void)flags; /* currently unused */\n\n  if (buf == NULL || dnsrec == NULL || qdcount == NULL || ancount == NULL ||\n      nscount == NULL || arcount == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *dnsrec = NULL;\n\n  /*\n   *  RFC 1035 4.1.1. Header section format.\n   *  and Updated by RFC 2065 to add AD and CD bits.\n   *                                  1  1  1  1  1  1\n   *    0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |                      ID                       |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |QR|   Opcode  |AA|TC|RD|RA| Z|AD|CD|   RCODE   |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |                    QDCOUNT                    |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |                    ANCOUNT                    |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |                    NSCOUNT                    |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   *  |                    ARCOUNT                    |\n   *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   */\n\n  /* ID */\n  status = ares_buf_fetch_be16(buf, &id);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* Flags */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* QR */\n  if (u16 & 0x8000) {\n    dns_flags |= ARES_FLAG_QR;\n  }\n\n  /* OPCODE */\n  opcode = (u16 >> 11) & 0xf;\n\n  /* AA */\n  if (u16 & 0x400) {\n    dns_flags |= ARES_FLAG_AA;\n  }\n\n  /* TC */\n  if (u16 & 0x200) {\n    dns_flags |= ARES_FLAG_TC;\n  }\n\n  /* RD */\n  if (u16 & 0x100) {\n    dns_flags |= ARES_FLAG_RD;\n  }\n\n  /* RA */\n  if (u16 & 0x80) {\n    dns_flags |= ARES_FLAG_RA;\n  }\n\n  /* Z -- unused */\n\n  /* AD */\n  if (u16 & 0x20) {\n    dns_flags |= ARES_FLAG_AD;\n  }\n\n  /* CD */\n  if (u16 & 0x10) {\n    dns_flags |= ARES_FLAG_CD;\n  }\n\n  /* RCODE */\n  rcode = u16 & 0xf;\n\n  /* QDCOUNT */\n  status = ares_buf_fetch_be16(buf, qdcount);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* ANCOUNT */\n  status = ares_buf_fetch_be16(buf, ancount);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* NSCOUNT */\n  status = ares_buf_fetch_be16(buf, nscount);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* ARCOUNT */\n  status = ares_buf_fetch_be16(buf, arcount);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  status = ares_dns_record_create(dnsrec, id, dns_flags, opcode,\n                                  ARES_RCODE_NOERROR /* Temporary */);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  (*dnsrec)->raw_rcode = rcode;\n\n  if (*ancount > 0) {\n    status =\n      ares_dns_record_rr_prealloc(*dnsrec, ARES_SECTION_ANSWER, *ancount);\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  if (*nscount > 0) {\n    status =\n      ares_dns_record_rr_prealloc(*dnsrec, ARES_SECTION_AUTHORITY, *nscount);\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  if (*arcount > 0) {\n    status =\n      ares_dns_record_rr_prealloc(*dnsrec, ARES_SECTION_ADDITIONAL, *arcount);\n    if (status != ARES_SUCCESS) {\n      goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ARES_SUCCESS;\n\nfail:\n  ares_dns_record_destroy(*dnsrec);\n  *dnsrec  = NULL;\n  *qdcount = 0;\n  *ancount = 0;\n  *nscount = 0;\n  *arcount = 0;\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          792,
+          0
+        ],
+        [
+          957,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_header",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "flags": "unsigned int",
+          "dnsrec": "ares_dns_record_t",
+          "qdcount": "unsigned short",
+          "ancount": "unsigned short",
+          "nscount": "unsigned short",
+          "arcount": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_dns_parse_rr_data(ares_buf_t *buf, size_t rdlength, ares_dns_rr_t *rr,\n                         ares_dns_rec_type_t type, unsigned short raw_type,\n                         unsigned short raw_class, unsigned int raw_ttl)\n{\n  switch (type) {\n    case ARES_REC_TYPE_A:\n      return ares_dns_parse_rr_a(buf, rr, rdlength);\n    case ARES_REC_TYPE_NS:\n      return ares_dns_parse_rr_ns(buf, rr, rdlength);\n    case ARES_REC_TYPE_CNAME:\n      return ares_dns_parse_rr_cname(buf, rr, rdlength);\n    case ARES_REC_TYPE_SOA:\n      return ares_dns_parse_rr_soa(buf, rr, rdlength);\n    case ARES_REC_TYPE_PTR:\n      return ares_dns_parse_rr_ptr(buf, rr, rdlength);\n    case ARES_REC_TYPE_HINFO:\n      return ares_dns_parse_rr_hinfo(buf, rr, rdlength);\n    case ARES_REC_TYPE_MX:\n      return ares_dns_parse_rr_mx(buf, rr, rdlength);\n    case ARES_REC_TYPE_TXT:\n      return ares_dns_parse_rr_txt(buf, rr, rdlength);\n    case ARES_REC_TYPE_SIG:\n      return ares_dns_parse_rr_sig(buf, rr, rdlength);\n    case ARES_REC_TYPE_AAAA:\n      return ares_dns_parse_rr_aaaa(buf, rr, rdlength);\n    case ARES_REC_TYPE_SRV:\n      return ares_dns_parse_rr_srv(buf, rr, rdlength);\n    case ARES_REC_TYPE_NAPTR:\n      return ares_dns_parse_rr_naptr(buf, rr, rdlength);\n    case ARES_REC_TYPE_ANY:\n      return ARES_EBADRESP;\n    case ARES_REC_TYPE_OPT:\n      return ares_dns_parse_rr_opt(buf, rr, rdlength, raw_class, raw_ttl);\n    case ARES_REC_TYPE_TLSA:\n      return ares_dns_parse_rr_tlsa(buf, rr, rdlength);\n    case ARES_REC_TYPE_SVCB:\n      return ares_dns_parse_rr_svcb(buf, rr, rdlength);\n    case ARES_REC_TYPE_HTTPS:\n      return ares_dns_parse_rr_https(buf, rr, rdlength);\n    case ARES_REC_TYPE_URI:\n      return ares_dns_parse_rr_uri(buf, rr, rdlength);\n    case ARES_REC_TYPE_CAA:\n      return ares_dns_parse_rr_caa(buf, rr, rdlength);\n    case ARES_REC_TYPE_RAW_RR:\n      return ares_dns_parse_rr_raw_rr(buf, rr, rdlength, raw_type);\n  }\n  return ARES_EFORMERR;\n}",
+      "fn_code_pos": [
+        [
+          959,
+          0
+        ],
+        [
+          1007,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr_data",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "rdlength": "size_t",
+          "rr": "ares_dns_rr_t",
+          "type": "ares_dns_rec_type_t",
+          "raw_type": "unsigned short",
+          "raw_class": "unsigned short",
+          "raw_ttl": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_qd(ares_buf_t        *buf,\n                                       ares_dns_record_t *dnsrec)\n{\n  char               *name = NULL;\n  unsigned short      u16;\n  ares_status_t       status;\n  ares_dns_rec_type_t type;\n  ares_dns_class_t    qclass;\n  /* The question section is used to carry the \"question\" in most queries,\n   * i.e., the parameters that define what is being asked.  The section\n   * contains QDCOUNT (usually 1) entries, each of the following format:\n   *                                 1  1  1  1  1  1\n   *   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                                               |\n   * /                     QNAME                     /\n   * /                                               /\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                     QTYPE                     |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                     QCLASS                    |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   */\n\n  /* Name */\n  status = ares_dns_name_parse(buf, &name, ARES_FALSE);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Type */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  type = u16;\n\n  /* Class */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  qclass = u16;\n\n  /* Add question */\n  status = ares_dns_record_query_add(dnsrec, name, type, qclass);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_free(name);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1009,
+          0
+        ],
+        [
+          1062,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_qd",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_rr(ares_buf_t *buf, unsigned int flags,\n                                       ares_dns_section_t sect,\n                                       ares_dns_record_t *dnsrec)\n{\n  char               *name = NULL;\n  unsigned short      u16;\n  unsigned short      raw_type;\n  ares_status_t       status;\n  ares_dns_rec_type_t type;\n  ares_dns_class_t    qclass;\n  unsigned int        ttl;\n  size_t              rdlength;\n  ares_dns_rr_t      *rr            = NULL;\n  size_t              remaining_len = 0;\n  size_t              processed_len = 0;\n  ares_bool_t         namecomp;\n\n  /* All RRs have the same top level format shown below:\n   *                                 1  1  1  1  1  1\n   *   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                                               |\n   * /                                               /\n   * /                      NAME                     /\n   * |                                               |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                      TYPE                     |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                     CLASS                     |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                      TTL                      |\n   * |                                               |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   * |                   RDLENGTH                    |\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|\n   * /                     RDATA                     /\n   * /                                               /\n   * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+\n   */\n\n  /* Name */\n  status = ares_dns_name_parse(buf, &name, ARES_FALSE);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Type */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  type     = u16;\n  raw_type = u16; /* Only used for raw rr data */\n\n  /* Class */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  qclass = u16;\n\n  /* TTL */\n  status = ares_buf_fetch_be32(buf, &ttl);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Length */\n  status = ares_buf_fetch_be16(buf, &u16);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n  rdlength = u16;\n\n  if (!ares_dns_rec_type_isvalid(type, ARES_FALSE)) {\n    type = ARES_REC_TYPE_RAW_RR;\n  }\n\n  namecomp = ares_dns_rec_allow_name_comp(type);\n  if (sect == ARES_SECTION_ANSWER &&\n      (flags &\n       (namecomp ? ARES_DNS_PARSE_AN_BASE_RAW : ARES_DNS_PARSE_AN_EXT_RAW))) {\n    type = ARES_REC_TYPE_RAW_RR;\n  }\n  if (sect == ARES_SECTION_AUTHORITY &&\n      (flags &\n       (namecomp ? ARES_DNS_PARSE_NS_BASE_RAW : ARES_DNS_PARSE_NS_EXT_RAW))) {\n    type = ARES_REC_TYPE_RAW_RR;\n  }\n  if (sect == ARES_SECTION_ADDITIONAL &&\n      (flags &\n       (namecomp ? ARES_DNS_PARSE_AR_BASE_RAW : ARES_DNS_PARSE_AR_EXT_RAW))) {\n    type = ARES_REC_TYPE_RAW_RR;\n  }\n\n  /* Pull into another buffer for safety */\n  if (rdlength > ares_buf_len(buf)) {\n    status = ARES_EBADRESP;\n    goto done;\n  }\n\n  /* Add the base rr */\n  status =\n    ares_dns_record_rr_add(&rr, dnsrec, sect, name, type,\n                           type == ARES_REC_TYPE_OPT ? ARES_CLASS_IN : qclass,\n                           type == ARES_REC_TYPE_OPT ? 0 : ttl);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Record the current remaining length in the buffer so we can tell how\n   * much was processed */\n  remaining_len = ares_buf_len(buf);\n\n  /* Fill in the data for the rr */\n  status = ares_dns_parse_rr_data(buf, rdlength, rr, type, raw_type,\n                                  (unsigned short)qclass, ttl);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Determine how many bytes were processed */\n  processed_len = remaining_len - ares_buf_len(buf);\n\n  /* If too many bytes were processed, error! */\n  if (processed_len > rdlength) {\n    status = ARES_EBADRESP;\n    goto done;\n  }\n\n  /* If too few bytes were processed, consume the unprocessed data for this\n   * record as the parser may not have wanted/needed to use it */\n  if (processed_len < rdlength) {\n    ares_buf_consume(buf, rdlength - processed_len);\n  }\n\n\ndone:\n  ares_free(name);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1064,
+          0
+        ],
+        [
+          1204,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_rr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "flags": "unsigned int",
+          "sect": "ares_dns_section_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_dns_parse_buf(ares_buf_t *buf, unsigned int flags,\n                                        ares_dns_record_t **dnsrec)\n{\n  ares_status_t  status;\n  unsigned short qdcount;\n  unsigned short ancount;\n  unsigned short nscount;\n  unsigned short arcount;\n  unsigned short i;\n\n  if (buf == NULL || dnsrec == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Maximum DNS packet size is 64k, even over TCP */\n  if (ares_buf_len(buf) > 0xFFFF) {\n    return ARES_EFORMERR;\n  }\n\n  /* All communications inside of the domain protocol are carried in a single\n   * format called a message.  The top level format of message is divided\n   * into 5 sections (some of which are empty in certain cases) shown below:\n   *\n   * +---------------------+\n   * |        Header       |\n   * +---------------------+\n   * |       Question      | the question for the name server\n   * +---------------------+\n   * |        Answer       | RRs answering the question\n   * +---------------------+\n   * |      Authority      | RRs pointing toward an authority\n   * +---------------------+\n   * |      Additional     | RRs holding additional information\n   * +---------------------+\n   */\n\n  /* Parse header */\n  status = ares_dns_parse_header(buf, flags, dnsrec, &qdcount, &ancount,\n                                 &nscount, &arcount);\n  if (status != ARES_SUCCESS) {\n    goto fail;\n  }\n\n  /* Must have questions */\n  if (qdcount == 0) {\n    status = ARES_EBADRESP;\n    goto fail;\n  }\n\n  /* XXX: this should be controlled by a flag in case we want to allow\n   *      multiple questions.  I think mDNS allows this */\n  if (qdcount > 1) {\n    status = ARES_EBADRESP;\n    goto fail;\n  }\n\n  /* Parse questions */\n  for (i = 0; i < qdcount; i++) {\n    status = ares_dns_parse_qd(buf, *dnsrec);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  /* Parse Answers */\n  for (i = 0; i < ancount; i++) {\n    status = ares_dns_parse_rr(buf, flags, ARES_SECTION_ANSWER, *dnsrec);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  /* Parse Authority */\n  for (i = 0; i < nscount; i++) {\n    status = ares_dns_parse_rr(buf, flags, ARES_SECTION_AUTHORITY, *dnsrec);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  /* Parse Additional */\n  for (i = 0; i < arcount; i++) {\n    status = ares_dns_parse_rr(buf, flags, ARES_SECTION_ADDITIONAL, *dnsrec);\n    if (status != ARES_SUCCESS) {\n      goto fail;\n    }\n  }\n\n  /* Finalize rcode now that if we have OPT it is processed */\n  if (!ares_dns_rcode_isvalid((*dnsrec)->raw_rcode)) {\n    (*dnsrec)->rcode = ARES_RCODE_SERVFAIL;\n  } else {\n    (*dnsrec)->rcode = (ares_dns_rcode_t)(*dnsrec)->raw_rcode;\n  }\n\n  return ARES_SUCCESS;\n\nfail:\n  ares_dns_record_destroy(*dnsrec);\n  *dnsrec = NULL;\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1206,
+          0
+        ],
+        [
+          1307,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "flags": "unsigned int",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_dns_parse(const unsigned char *buf, size_t buf_len,\n                             unsigned int flags, ares_dns_record_t **dnsrec)\n{\n  ares_buf_t   *parser = NULL;\n  ares_status_t status;\n\n  if (buf == NULL || buf_len == 0 || dnsrec == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  parser = ares_buf_create_const(buf, buf_len);\n  if (parser == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_dns_parse_buf(parser, flags, dnsrec);\n  ares_buf_destroy(parser);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1309,
+          0
+        ],
+        [
+          1328,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_dns_parse",
+        "parameters": {
+          "buf": "unsigned char",
+          "buf_len": "size_t",
+          "flags": "unsigned int",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        159,
+        2
+      ],
+      [
+        159,
+        16
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        368,
+        2
+      ],
+      [
+        368,
+        22
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

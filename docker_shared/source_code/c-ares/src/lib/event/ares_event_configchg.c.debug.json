@@ -1,0 +1,945 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  (void)configchg;\n  (void)e;\n  /* No ability */\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          30,
+          0
+        ],
+        [
+          37,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  /* No-op */\n  (void)configchg;\n}",
+      "fn_code_pos": [
+        [
+          39,
+          0
+        ],
+        [
+          43,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  if (configchg == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Tell event system to stop monitoring for changes.  This will cause the\n   * cleanup to be called */\n  ares_event_update(NULL, configchg->e, ARES_EVENT_FLAG_NONE, NULL,\n                    configchg->inotify_fd, NULL, NULL, NULL);\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          64,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_configchg_free(void *data)\n{\n  ares_event_configchg_t *configchg = data;\n  if (configchg == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (configchg->inotify_fd >= 0) {\n    close(configchg->inotify_fd);\n    configchg->inotify_fd = -1;\n  }\n\n  ares_free(configchg);\n}",
+      "fn_code_pos": [
+        [
+          66,
+          0
+        ],
+        [
+          79,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_free",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_configchg_cb(ares_event_thread_t *e, ares_socket_t fd,\n                                    void *data, ares_event_flags_t flags)\n{\n  const ares_event_configchg_t *configchg = data;\n\n  /* Some systems cannot read integer variables if they are not\n   * properly aligned. On other systems, incorrect alignment may\n   * decrease performance. Hence, the buffer used for reading from\n   * the inotify file descriptor should have the same alignment as\n   * struct inotify_event. */\n  unsigned char                 buf[4096]\n    __attribute__((aligned(__alignof__(struct inotify_event))));\n  const struct inotify_event *event;\n  ssize_t                     len;\n  ares_bool_t                 triggered = ARES_FALSE;\n\n  (void)fd;\n  (void)flags;\n\n  while (1) {\n    const unsigned char *ptr;\n\n    len = read(configchg->inotify_fd, buf, sizeof(buf));\n    if (len <= 0) {\n      break;\n    }\n\n    /* Loop over all events in the buffer. Says kernel will check the buffer\n     * size provided, so I assume it won't ever return partial events. */\n    for (ptr  = buf; ptr < buf + len;\n         ptr += sizeof(struct inotify_event) + event->len) {\n      event = (const struct inotify_event *)((const void *)ptr);\n\n      if (event->len == 0 || ares_strlen(event->name) == 0) {\n        continue;\n      }\n\n      if (ares_strcaseeq(event->name, \"resolv.conf\") ||\n          ares_strcaseeq(event->name, \"nsswitch.conf\")) {\n        triggered = ARES_TRUE;\n      }\n    }\n  }\n\n  /* Only process after all events are read.  No need to process more often as\n   * we don't want to reload the config back to back */\n  if (triggered) {\n    ares_reinit(e->channel);\n  }\n}",
+      "fn_code_pos": [
+        [
+          81,
+          0
+        ],
+        [
+          130,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_cb",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  ares_status_t           status = ARES_SUCCESS;\n  ares_event_configchg_t *c;\n\n  (void)e;\n\n  /* Not used by this implementation */\n  *configchg = NULL;\n\n  c = ares_malloc_zero(sizeof(*c));\n  if (c == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  c->e          = e;\n  c->inotify_fd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);\n  if (c->inotify_fd == -1) {\n    status = ARES_ESERVFAIL; /* LCOV_EXCL_LINE: UntestablePath */\n    goto done;               /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  /* We need to monitor /etc/resolv.conf, /etc/nsswitch.conf */\n  if (inotify_add_watch(c->inotify_fd, \"/etc\",\n                        IN_CREATE | IN_MODIFY | IN_MOVED_TO | IN_ONLYDIR) ==\n      -1) {\n    status = ARES_ESERVFAIL; /* LCOV_EXCL_LINE: UntestablePath */\n    goto done;               /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  status =\n    ares_event_update(NULL, e, ARES_EVENT_FLAG_READ, ares_event_configchg_cb,\n                      c->inotify_fd, c, ares_event_configchg_free, NULL);\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_event_configchg_free(c);\n  } else {\n    *configchg = c;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          132,
+          0
+        ],
+        [
+          174,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  if (configchg == NULL) {\n    return;\n  }\n\n#  ifdef HAVE_NOTIFYIPINTERFACECHANGE\n  if (configchg->ifchg_hnd != NULL) {\n    CancelMibChangeNotify2(configchg->ifchg_hnd);\n    configchg->ifchg_hnd = NULL;\n  }\n#  endif\n\n#  ifdef HAVE_REGISTERWAITFORSINGLEOBJECT\n  if (configchg->regip4_wait != NULL) {\n    UnregisterWait(configchg->regip4_wait);\n    configchg->regip4_wait = NULL;\n  }\n\n  if (configchg->regip6_wait != NULL) {\n    UnregisterWait(configchg->regip6_wait);\n    configchg->regip6_wait = NULL;\n  }\n\n  if (configchg->regip4 != NULL) {\n    RegCloseKey(configchg->regip4);\n    configchg->regip4 = NULL;\n  }\n\n  if (configchg->regip6 != NULL) {\n    RegCloseKey(configchg->regip6);\n    configchg->regip6 = NULL;\n  }\n\n  if (configchg->regip4_event != NULL) {\n    CloseHandle(configchg->regip4_event);\n    configchg->regip4_event = NULL;\n  }\n\n  if (configchg->regip6_event != NULL) {\n    CloseHandle(configchg->regip6_event);\n    configchg->regip6_event = NULL;\n  }\n#  endif\n\n  ares_free(configchg);\n}",
+      "fn_code_pos": [
+        [
+          194,
+          0
+        ],
+        [
+          240,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void NETIOAPI_API_\n  ares_event_configchg_ip_cb(PVOID CallerContext, PMIB_IPINTERFACE_ROW Row,\n                             MIB_NOTIFICATION_TYPE NotificationType)\n{\n  ares_event_configchg_t *configchg = CallerContext;\n  (void)Row;\n  (void)NotificationType;\n  ares_reinit(configchg->e->channel);\n}",
+      "fn_code_pos": [
+        [
+          244,
+          0
+        ],
+        [
+          252,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "NETIOAPI_API_\n  ares_event_configchg_ip_cb",
+        "parameters": {
+          "CallerContext": "PVOID",
+          "Row": "PMIB_IPINTERFACE_ROW",
+          "NotificationType": "MIB_NOTIFICATION_TYPE"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t\n  ares_event_configchg_regnotify(ares_event_configchg_t *configchg)\n{\n#  if defined(HAVE_REGISTERWAITFORSINGLEOBJECT) && defined(HAVE_REGNOTIFYCHANGEKEYVALUE)\n#    if defined(__WATCOMC__) && !defined(REG_NOTIFY_THREAD_AGNOSTIC)\n#      define REG_NOTIFY_THREAD_AGNOSTIC 0x10000000L\n#    endif\n  DWORD flags = REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET |\n                REG_NOTIFY_THREAD_AGNOSTIC;\n\n  if (RegNotifyChangeKeyValue(configchg->regip4, TRUE, flags,\n                              configchg->regip4_event, TRUE) != ERROR_SUCCESS) {\n    return ARES_FALSE;\n  }\n\n  if (RegNotifyChangeKeyValue(configchg->regip6, TRUE, flags,\n                              configchg->regip6_event, TRUE) != ERROR_SUCCESS) {\n    return ARES_FALSE;\n  }\n#  else\n  (void)configchg;\n#  endif\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          255,
+          0
+        ],
+        [
+          278,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_regnotify",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static VOID CALLBACK ares_event_configchg_reg_cb(PVOID   lpParameter,\n                                                 BOOLEAN TimerOrWaitFired)\n{\n  ares_event_configchg_t *configchg = lpParameter;\n  (void)TimerOrWaitFired;\n\n  ares_reinit(configchg->e->channel);\n\n  /* Re-arm, as its single-shot.  However, we don't know which one needs to\n   * be re-armed, so we just do both */\n  ares_event_configchg_regnotify(configchg);\n}",
+      "fn_code_pos": [
+        [
+          280,
+          0
+        ],
+        [
+          291,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_reg_cb",
+        "parameters": {
+          "lpParameter": "PVOID",
+          "TimerOrWaitFired": "BOOLEAN"
+        },
+        "return_type": "VOID"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  ares_status_t           status = ARES_SUCCESS;\n  ares_event_configchg_t *c      = NULL;\n\n  c = ares_malloc_zero(sizeof(**configchg));\n  if (c == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  c->e = e;\n\n#  ifdef HAVE_NOTIFYIPINTERFACECHANGE\n  /* NOTE: If a user goes into the control panel and changes the network\n   *       adapter DNS addresses manually, this will NOT trigger a notification.\n   *       We've also tried listening on NotifyUnicastIpAddressChange(), but\n   *       that didn't get triggered either.\n   */\n  if (NotifyIpInterfaceChange(AF_UNSPEC, ares_event_configchg_ip_cb, c, FALSE,\n                              &c->ifchg_hnd) != NO_ERROR) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n#  endif\n\n#  ifdef HAVE_REGISTERWAITFORSINGLEOBJECT\n  /* Monitor HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters\\Interfaces\n   * and HKLM\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\n   * for changes via RegNotifyChangeKeyValue() */\n  if (RegOpenKeyExW(\n        HKEY_LOCAL_MACHINE,\n        L\"SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip\\\\Parameters\\\\Interfaces\",\n        0, KEY_NOTIFY, &c->regip4) != ERROR_SUCCESS) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  if (RegOpenKeyExW(\n        HKEY_LOCAL_MACHINE,\n        L\"SYSTEM\\\\CurrentControlSet\\\\Services\\\\Tcpip6\\\\Parameters\\\\Interfaces\",\n        0, KEY_NOTIFY, &c->regip6) != ERROR_SUCCESS) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  c->regip4_event = CreateEvent(NULL, TRUE, FALSE, NULL);\n  if (c->regip4_event == NULL) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  c->regip6_event = CreateEvent(NULL, TRUE, FALSE, NULL);\n  if (c->regip6_event == NULL) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  if (!RegisterWaitForSingleObject(&c->regip4_wait, c->regip4_event,\n                                   ares_event_configchg_reg_cb, c, INFINITE,\n                                   WT_EXECUTEDEFAULT)) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  if (!RegisterWaitForSingleObject(&c->regip6_wait, c->regip6_event,\n                                   ares_event_configchg_reg_cb, c, INFINITE,\n                                   WT_EXECUTEDEFAULT)) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n#  endif\n\n  if (!ares_event_configchg_regnotify(c)) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_event_configchg_destroy(c);\n  } else {\n    *configchg = c;\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          293,
+          0
+        ],
+        [
+          379,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  (void)configchg;\n\n  /* Cleanup happens automatically */\n}",
+      "fn_code_pos": [
+        [
+          395,
+          0
+        ],
+        [
+          400,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_configchg_free(void *data)\n{\n  ares_event_configchg_t *configchg = data;\n  if (configchg == NULL) {\n    return;\n  }\n\n  if (configchg->fd >= 0) {\n    notify_cancel(configchg->token);\n    /* automatically closes fd */\n    configchg->fd = -1;\n  }\n\n  ares_free(configchg);\n}",
+      "fn_code_pos": [
+        [
+          402,
+          0
+        ],
+        [
+          416,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_free",
+        "parameters": {
+          "data": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_event_configchg_cb(ares_event_thread_t *e, ares_socket_t fd,\n                                    void *data, ares_event_flags_t flags)\n{\n  ares_event_configchg_t *configchg = data;\n  ares_bool_t             triggered = ARES_FALSE;\n\n  (void)fd;\n  (void)flags;\n\n  while (1) {\n    int     t = 0;\n    ssize_t len;\n\n    len = read(configchg->fd, &t, sizeof(t));\n\n    if (len < (ssize_t)sizeof(t)) {\n      break;\n    }\n\n    /* Token is read in network byte order (yeah, docs don't mention this) */\n    t = (int)ntohl(t);\n\n    if (t != configchg->token) {\n      continue;\n    }\n\n    triggered = ARES_TRUE;\n  }\n\n  /* Only process after all events are read.  No need to process more often as\n   * we don't want to reload the config back to back */\n  if (triggered) {\n    ares_reinit(e->channel);\n  }\n}",
+      "fn_code_pos": [
+        [
+          418,
+          0
+        ],
+        [
+          452,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_cb",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  ares_status_t status                               = ARES_SUCCESS;\n  void         *handle                               = NULL;\n  const char *(*pdns_configuration_notify_key)(void) = NULL;\n  const char *notify_key                             = NULL;\n  int         flags;\n  size_t      i;\n  const char *searchlibs[] = {\n    \"/usr/lib/libSystem.dylib\",\n    \"/System/Library/Frameworks/SystemConfiguration.framework/\"\n    \"SystemConfiguration\",\n    NULL\n  };\n\n  *configchg = ares_malloc_zero(sizeof(**configchg));\n  if (*configchg == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  /* Load symbol as it isn't normally public */\n  for (i = 0; searchlibs[i] != NULL; i++) {\n    handle = dlopen(searchlibs[i], RTLD_LAZY);\n    if (handle == NULL) {\n      /* Fail, loop! */\n      continue;\n    }\n\n    pdns_configuration_notify_key =\n      (const char *(*)(void))dlsym(handle, \"dns_configuration_notify_key\");\n    if (pdns_configuration_notify_key != NULL) {\n      break;\n    }\n\n    /* Fail, loop! */\n    dlclose(handle);\n    handle = NULL;\n  }\n\n  if (pdns_configuration_notify_key == NULL) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  notify_key = pdns_configuration_notify_key();\n  if (notify_key == NULL) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  if (notify_register_file_descriptor(notify_key, &(*configchg)->fd, 0,\n                                      &(*configchg)->token) !=\n      NOTIFY_STATUS_OK) {\n    status = ARES_ESERVFAIL;\n    goto done;\n  }\n\n  /* Set file descriptor to non-blocking */\n  flags = fcntl((*configchg)->fd, F_GETFL, 0);\n  fcntl((*configchg)->fd, F_SETFL, flags | O_NONBLOCK);\n\n  /* Register file descriptor with event subsystem */\n  status = ares_event_update(NULL, e, ARES_EVENT_FLAG_READ,\n                             ares_event_configchg_cb, (*configchg)->fd,\n                             *configchg, ares_event_configchg_free, NULL);\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_event_configchg_free(*configchg);\n    *configchg = NULL;\n  }\n\n  if (handle) {\n    dlclose(handle);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          454,
+          0
+        ],
+        [
+          532,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t config_change_check(ares_htable_strvp_t *filestat,\n                                         const char          *resolvconf_path)\n{\n  size_t      i;\n  const char *configfiles[16];\n  ares_bool_t changed = ARES_FALSE;\n  size_t      cnt = 0;\n\n  memset(configfiles, 0, sizeof(configfiles));\n\n  configfiles[cnt++] = resolvconf_path;\n  configfiles[cnt++] = \"/etc/nsswitch.conf\";\n#ifdef _AIX\n  configfiles[cnt++] = \"/etc/netsvc.conf\";\n#endif\n#ifdef __osf /* Tru64 */\n  configfiles[cnt++] = \"/etc/svc.conf\";\n#endif\n#ifdef __QNX__\n  configfiles[cnt++] = \"/etc/net.cfg\";\n#endif\n  configfiles[cnt++] = NULL;\n\n  for (i = 0; configfiles[i] != NULL; i++) {\n    fileinfo_t *fi = ares_htable_strvp_get_direct(filestat, configfiles[i]);\n    struct stat st;\n\n    if (stat(configfiles[i], &st) == 0) {\n      if (fi == NULL) {\n        fi = ares_malloc_zero(sizeof(*fi));\n        if (fi == NULL) {\n          return ARES_ENOMEM;\n        }\n        if (!ares_htable_strvp_insert(filestat, configfiles[i], fi)) {\n          ares_free(fi);\n          return ARES_ENOMEM;\n        }\n      }\n      if (fi->size != (size_t)st.st_size || fi->mtime != (time_t)st.st_mtime) {\n        changed = ARES_TRUE;\n      }\n      fi->size  = (size_t)st.st_size;\n      fi->mtime = (time_t)st.st_mtime;\n    } else if (fi != NULL) {\n      /* File no longer exists, remove */\n      ares_htable_strvp_remove(filestat, configfiles[i]);\n      changed = ARES_TRUE;\n    }\n  }\n\n  if (changed) {\n    return ARES_SUCCESS;\n  }\n  return ARES_ENOTFOUND;\n}",
+      "fn_code_pos": [
+        [
+          557,
+          0
+        ],
+        [
+          611,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "config_change_check",
+        "parameters": {
+          "filestat": "ares_htable_strvp_t",
+          "resolvconf_path": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void *ares_event_configchg_thread(void *arg)\n{\n  ares_event_configchg_t *c = arg;\n\n  ares_thread_mutex_lock(c->lock);\n  while (c->isup) {\n    ares_status_t status;\n\n    if (ares_thread_cond_timedwait(c->wake, c->lock, 30000) != ARES_ETIMEOUT) {\n      continue;\n    }\n\n    /* make sure status didn't change even though we got a timeout */\n    if (!c->isup) {\n      break;\n    }\n\n    status = config_change_check(c->filestat, c->resolvconf_path);\n    if (status == ARES_SUCCESS) {\n      ares_reinit(c->e->channel);\n    }\n  }\n\n  ares_thread_mutex_unlock(c->lock);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          613,
+          0
+        ],
+        [
+          638,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_thread",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  ares_status_t           status = ARES_SUCCESS;\n  ares_event_configchg_t *c      = NULL;\n\n  *configchg = NULL;\n\n  c = ares_malloc_zero(sizeof(*c));\n  if (c == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  c->e = e;\n\n  c->filestat = ares_htable_strvp_create(ares_free);\n  if (c->filestat == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  c->wake = ares_thread_cond_create();\n  if (c->wake == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  c->lock = ares_thread_mutex_create();\n  if (c->lock == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  c->resolvconf_path = c->e->channel->resolvconf_path;\n  if (c->resolvconf_path == NULL) {\n    c->resolvconf_path = PATH_RESOLV_CONF;\n  }\n\n  status = config_change_check(c->filestat, c->resolvconf_path);\n  if (status == ARES_ENOMEM) {\n    goto done;\n  }\n\n  c->isup = ARES_TRUE;\n  status  = ares_thread_create(&c->thread, ares_event_configchg_thread, c);\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_event_configchg_destroy(c);\n  } else {\n    *configchg = c;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          640,
+          0
+        ],
+        [
+          694,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  if (configchg == NULL) {\n    return;\n  }\n\n  if (configchg->lock) {\n    ares_thread_mutex_lock(configchg->lock);\n  }\n\n  configchg->isup = ARES_FALSE;\n  if (configchg->wake) {\n    ares_thread_cond_signal(configchg->wake);\n  }\n\n  if (configchg->lock) {\n    ares_thread_mutex_unlock(configchg->lock);\n  }\n\n  if (configchg->thread) {\n    void *rv = NULL;\n    ares_thread_join(configchg->thread, &rv);\n  }\n\n  ares_thread_mutex_destroy(configchg->lock);\n  ares_thread_cond_destroy(configchg->wake);\n  ares_htable_strvp_destroy(configchg->filestat);\n  ares_free(configchg);\n}",
+      "fn_code_pos": [
+        [
+          696,
+          0
+        ],
+        [
+          724,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_event_configchg_init(ares_event_configchg_t **configchg,\n                                        ares_event_thread_t     *e)\n{\n  (void)configchg;\n  (void)e;\n  /* No ability */\n  return ARES_ENOTIMP;\n}",
+      "fn_code_pos": [
+        [
+          728,
+          0
+        ],
+        [
+          735,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_init",
+        "parameters": {
+          "configchg": "ares_event_configchg_t",
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_event_configchg_destroy(ares_event_configchg_t *configchg)\n{\n  /* No-op */\n  (void)configchg;\n}",
+      "fn_code_pos": [
+        [
+          737,
+          0
+        ],
+        [
+          741,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_destroy",
+        "parameters": {
+          "configchg": "ares_event_configchg_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*pdns_configuration_notify_key)(void)",
+      "fn_dec_pos": [
+        [
+          459,
+          14
+        ],
+        [
+          459,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_event_configchg_thread(void *arg)",
+      "fn_dec_pos": [
+        [
+          613,
+          13
+        ],
+        [
+          613,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_event_configchg_thread",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_event_configchg {\n  int                  inotify_fd;\n  ares_event_thread_t *e;\n}",
+      {
+        "inotify_fd": "int",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        49,
+        0
+      ],
+      [
+        52,
+        1
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  HANDLE               ifchg_hnd;\n  HKEY                 regip4;\n  HANDLE               regip4_event;\n  HANDLE               regip4_wait;\n  HKEY                 regip6;\n  HANDLE               regip6_event;\n  HANDLE               regip6_wait;\n  ares_event_thread_t *e;\n}",
+      {
+        "ifchg_hnd": "HANDLE",
+        "regip4": "HKEY",
+        "regip4_event": "HANDLE",
+        "regip4_wait": "HANDLE",
+        "regip6": "HKEY",
+        "regip6_event": "HANDLE",
+        "regip6_wait": "HANDLE",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        183,
+        0
+      ],
+      [
+        192,
+        1
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  int fd;\n  int token;\n}",
+      {
+        "fd": "int",
+        "token": "int"
+      },
+      "ares_event_configchg",
+      [
+        390,
+        0
+      ],
+      [
+        393,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  size_t size;\n  time_t mtime;\n} fileinfo_t;",
+      {
+        "size": "size_t",
+        "mtime": "time_t"
+      },
+      "fileinfo_t",
+      [
+        542,
+        0
+      ],
+      [
+        545,
+        13
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  ares_bool_t          isup;\n  ares_thread_t       *thread;\n  ares_htable_strvp_t *filestat;\n  ares_thread_mutex_t *lock;\n  ares_thread_cond_t  *wake;\n  const char          *resolvconf_path;\n  ares_event_thread_t *e;\n}",
+      {
+        "isup": "ares_bool_t",
+        "*thread": "ares_thread_t",
+        "*filestat": "ares_htable_strvp_t",
+        "*lock": "ares_thread_mutex_t",
+        "*wake": "ares_thread_cond_t",
+        "char": "const",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        547,
+        0
+      ],
+      [
+        555,
+        1
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  int                  inotify_fd;\n  ares_event_thread_t *e;\n}",
+      {
+        "inotify_fd": "int",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        49,
+        0
+      ],
+      [
+        52,
+        1
+      ]
+    ],
+    [
+      "struct inotify_event",
+      {},
+      "",
+      [
+        92,
+        39
+      ],
+      [
+        92,
+        59
+      ]
+    ],
+    [
+      "struct inotify_event",
+      {},
+      "",
+      [
+        93,
+        8
+      ],
+      [
+        93,
+        28
+      ]
+    ],
+    [
+      "struct inotify_event",
+      {},
+      "",
+      [
+        111,
+        23
+      ],
+      [
+        111,
+        43
+      ]
+    ],
+    [
+      "struct inotify_event",
+      {},
+      "",
+      [
+        112,
+        21
+      ],
+      [
+        112,
+        41
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  HANDLE               ifchg_hnd;\n  HKEY                 regip4;\n  HANDLE               regip4_event;\n  HANDLE               regip4_wait;\n  HKEY                 regip6;\n  HANDLE               regip6_event;\n  HANDLE               regip6_wait;\n  ares_event_thread_t *e;\n}",
+      {
+        "ifchg_hnd": "HANDLE",
+        "regip4": "HKEY",
+        "regip4_event": "HANDLE",
+        "regip4_wait": "HANDLE",
+        "regip6": "HKEY",
+        "regip6_event": "HANDLE",
+        "regip6_wait": "HANDLE",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        183,
+        0
+      ],
+      [
+        192,
+        1
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  int fd;\n  int token;\n}",
+      {
+        "fd": "int",
+        "token": "int"
+      },
+      "ares_event_configchg",
+      [
+        390,
+        0
+      ],
+      [
+        393,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  size_t size;\n  time_t mtime;\n} fileinfo_t;",
+      {
+        "size": "size_t",
+        "mtime": "time_t"
+      },
+      "fileinfo_t",
+      [
+        542,
+        0
+      ],
+      [
+        545,
+        13
+      ]
+    ],
+    [
+      "struct ares_event_configchg {\n  ares_bool_t          isup;\n  ares_thread_t       *thread;\n  ares_htable_strvp_t *filestat;\n  ares_thread_mutex_t *lock;\n  ares_thread_cond_t  *wake;\n  const char          *resolvconf_path;\n  ares_event_thread_t *e;\n}",
+      {
+        "isup": "ares_bool_t",
+        "*thread": "ares_thread_t",
+        "*filestat": "ares_htable_strvp_t",
+        "*lock": "ares_thread_mutex_t",
+        "*wake": "ares_thread_cond_t",
+        "char": "const",
+        "*e": "ares_event_thread_t"
+      },
+      "ares_event_configchg",
+      [
+        547,
+        0
+      ],
+      [
+        555,
+        1
+      ]
+    ],
+    [
+      "struct stat",
+      {},
+      "",
+      [
+        582,
+        4
+      ],
+      [
+        582,
+        15
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/inotify.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#  include <winsock2.h>\n",
+      [
+        178,
+        0
+      ],
+      [
+        179,
+        0
+      ]
+    ],
+    [
+      "#  include <iphlpapi.h>\n",
+      [
+        179,
+        0
+      ],
+      [
+        180,
+        0
+      ]
+    ],
+    [
+      "#  include <stdio.h>\n",
+      [
+        180,
+        0
+      ],
+      [
+        181,
+        0
+      ]
+    ],
+    [
+      "#  include <windows.h>\n",
+      [
+        181,
+        0
+      ],
+      [
+        182,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/types.h>\n",
+      [
+        383,
+        0
+      ],
+      [
+        384,
+        0
+      ]
+    ],
+    [
+      "#  include <unistd.h>\n",
+      [
+        384,
+        0
+      ],
+      [
+        385,
+        0
+      ]
+    ],
+    [
+      "#  include <stdbool.h>\n",
+      [
+        385,
+        0
+      ],
+      [
+        386,
+        0
+      ]
+    ],
+    [
+      "#  include <notify.h>\n",
+      [
+        386,
+        0
+      ],
+      [
+        387,
+        0
+      ]
+    ],
+    [
+      "#  include <dlfcn.h>\n",
+      [
+        387,
+        0
+      ],
+      [
+        388,
+        0
+      ]
+    ],
+    [
+      "#  include <fcntl.h>\n",
+      [
+        388,
+        0
+      ],
+      [
+        389,
+        0
+      ]
+    ],
+    [
+      "#    include <sys/types.h>\n",
+      [
+        536,
+        0
+      ],
+      [
+        537,
+        0
+      ]
+    ],
+    [
+      "#    include <sys/stat.h>\n",
+      [
+        539,
+        0
+      ],
+      [
+        540,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

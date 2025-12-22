@@ -1,0 +1,123 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_requeue_queries(ares_conn_t  *conn,\n                                 ares_status_t requeue_status)\n{\n  ares_query_t  *query;\n  ares_timeval_t now;\n\n  ares_tvnow(&now);\n\n  while ((query = ares_llist_first_val(conn->queries_to_conn)) != NULL) {\n    ares_requeue_query(query, &now, requeue_status, ARES_TRUE, NULL, NULL);\n  }\n}",
+      "fn_code_pos": [
+        [
+          30,
+          0
+        ],
+        [
+          41,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_requeue_queries",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "requeue_status": "ares_status_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_close_connection(ares_conn_t *conn, ares_status_t requeue_status)\n{\n  ares_server_t  *server  = conn->server;\n  ares_channel_t *channel = server->channel;\n\n  /* Unlink */\n  ares_llist_node_claim(\n    ares_htable_asvp_get_direct(channel->connnode_by_socket, conn->fd));\n  ares_htable_asvp_remove(channel->connnode_by_socket, conn->fd);\n\n  if (conn->flags & ARES_CONN_FLAG_TCP) {\n    server->tcp_conn = NULL;\n  }\n\n  ares_buf_destroy(conn->in_buf);\n  ares_buf_destroy(conn->out_buf);\n\n  /* Requeue queries to other connections */\n  ares_requeue_queries(conn, requeue_status);\n\n  ares_llist_destroy(conn->queries_to_conn);\n\n  ares_conn_sock_state_cb_update(conn, ARES_CONN_STATE_NONE);\n\n  ares_socket_close(channel, conn->fd);\n\n  ares_free(conn);\n}",
+      "fn_code_pos": [
+        [
+          43,
+          0
+        ],
+        [
+          70,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_close_connection",
+        "parameters": {
+          "conn": "ares_conn_t",
+          "requeue_status": "ares_status_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_close_sockets(ares_server_t *server)\n{\n  ares_llist_node_t *node;\n\n  while ((node = ares_llist_node_first(server->connections)) != NULL) {\n    ares_conn_t *conn = ares_llist_node_val(node);\n    ares_close_connection(conn, ARES_SUCCESS);\n  }\n}",
+      "fn_code_pos": [
+        [
+          72,
+          0
+        ],
+        [
+          80,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_close_sockets",
+        "parameters": {
+          "server": "ares_server_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_check_cleanup_conns(const ares_channel_t *channel)\n{\n  ares_slist_node_t *snode;\n\n  if (channel == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Iterate across each server */\n  for (snode = ares_slist_node_first(channel->servers); snode != NULL;\n       snode = ares_slist_node_next(snode)) {\n    ares_server_t     *server = ares_slist_node_val(snode);\n    ares_llist_node_t *cnode;\n\n    /* Iterate across each connection */\n    cnode = ares_llist_node_first(server->connections);\n    while (cnode != NULL) {\n      ares_llist_node_t *next       = ares_llist_node_next(cnode);\n      ares_conn_t       *conn       = ares_llist_node_val(cnode);\n      ares_bool_t        do_cleanup = ARES_FALSE;\n      cnode                         = next;\n\n      /* Has connections, not eligible */\n      if (ares_llist_len(conn->queries_to_conn)) {\n        continue;\n      }\n\n      /* If we are configured not to stay open, close it out */\n      if (!(channel->flags & ARES_FLAG_STAYOPEN)) {\n        do_cleanup = ARES_TRUE;\n      }\n\n      /* If the associated server has failures, close it out. Resetting the\n       * connection (and specifically the source port number) can help resolve\n       * situations where packets are being dropped.\n       */\n      if (conn->server->consec_failures > 0) {\n        do_cleanup = ARES_TRUE;\n      }\n\n      /* If the udp connection hit its max queries, always close it */\n      if (!(conn->flags & ARES_CONN_FLAG_TCP) && channel->udp_max_queries > 0 &&\n          conn->total_queries >= channel->udp_max_queries) {\n        do_cleanup = ARES_TRUE;\n      }\n\n      if (!do_cleanup) {\n        continue;\n      }\n\n      /* Clean it up */\n      ares_close_connection(conn, ARES_SUCCESS);\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          82,
+          0
+        ],
+        [
+          136,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_check_cleanup_conns",
+        "parameters": {
+          "channel": "ares_channel_t"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

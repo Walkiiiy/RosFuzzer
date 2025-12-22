@@ -1,0 +1,262 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_pipeevent_destroy(ares_pipeevent_t *p)\n{\n  if (p->filedes[0] != -1) {\n    close(p->filedes[0]);\n  }\n  if (p->filedes[1] != -1) {\n    close(p->filedes[1]);\n  }\n\n  ares_free(p);\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          51,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_destroy",
+        "parameters": {
+          "p": "ares_pipeevent_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_pipeevent_destroy_cb(void *arg)\n{\n  ares_pipeevent_destroy(arg);\n}",
+      "fn_code_pos": [
+        [
+          53,
+          0
+        ],
+        [
+          56,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_destroy_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_pipeevent_t *ares_pipeevent_init(void)\n{\n  ares_pipeevent_t *p = ares_malloc_zero(sizeof(*p));\n  if (p == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  p->filedes[0] = -1;\n  p->filedes[1] = -1;\n\n#  ifdef HAVE_PIPE2\n  if (pipe2(p->filedes, O_NONBLOCK | O_CLOEXEC) != 0) {\n    ares_pipeevent_destroy(p); /* LCOV_EXCL_LINE: UntestablePath */\n    return NULL;               /* LCOV_EXCL_LINE: UntestablePath */\n  }\n#  else\n  if (pipe(p->filedes) != 0) {\n    ares_pipeevent_destroy(p);\n    return NULL;\n  }\n\n#    ifdef O_NONBLOCK\n  {\n    int val;\n    val = fcntl(p->filedes[0], F_GETFL, 0);\n    if (val >= 0) {\n      val |= O_NONBLOCK;\n    }\n    fcntl(p->filedes[0], F_SETFL, val);\n\n    val = fcntl(p->filedes[1], F_GETFL, 0);\n    if (val >= 0) {\n      val |= O_NONBLOCK;\n    }\n    fcntl(p->filedes[1], F_SETFL, val);\n  }\n#    endif\n\n#    ifdef FD_CLOEXEC\n  fcntl(p->filedes[0], F_SETFD, FD_CLOEXEC);\n  fcntl(p->filedes[1], F_SETFD, FD_CLOEXEC);\n#    endif\n#  endif\n\n#  ifdef F_SETNOSIGPIPE\n  fcntl(p->filedes[0], F_SETNOSIGPIPE, 1);\n  fcntl(p->filedes[1], F_SETNOSIGPIPE, 1);\n#  endif\n\n  return p;\n}",
+      "fn_code_pos": [
+        [
+          58,
+          0
+        ],
+        [
+          108,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_init",
+        "parameters": {},
+        "return_type": "ares_pipeevent_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_pipeevent_signal(const ares_event_t *e)\n{\n  const ares_pipeevent_t *p;\n\n  if (e == NULL || e->data == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  p = e->data;\n  (void)write(p->filedes[1], \"1\", 1);\n}",
+      "fn_code_pos": [
+        [
+          110,
+          0
+        ],
+        [
+          120,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_signal",
+        "parameters": {
+          "e": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_pipeevent_cb(ares_event_thread_t *e, ares_socket_t fd,\n                              void *data, ares_event_flags_t flags)\n{\n  unsigned char           buf[32];\n  const ares_pipeevent_t *p = NULL;\n\n  (void)e;\n  (void)fd;\n  (void)flags;\n\n  if (data == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  p = data;\n\n  while (read(p->filedes[0], buf, sizeof(buf)) == sizeof(buf)) {\n    /* Do nothing */\n  }\n}",
+      "fn_code_pos": [
+        [
+          122,
+          0
+        ],
+        [
+          141,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_cb",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_event_t *ares_pipeevent_create(ares_event_thread_t *e)\n{\n  ares_event_t     *event = NULL;\n  ares_pipeevent_t *p     = NULL;\n  ares_status_t     status;\n\n  p = ares_pipeevent_init();\n  if (p == NULL) {\n    return NULL;\n  }\n\n  status = ares_event_update(&event, e, ARES_EVENT_FLAG_READ, ares_pipeevent_cb,\n                             p->filedes[0], p, ares_pipeevent_destroy_cb,\n                             ares_pipeevent_signal);\n  if (status != ARES_SUCCESS) {\n    ares_pipeevent_destroy(p); /* LCOV_EXCL_LINE: DefensiveCoding */\n    return NULL;               /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  return event;\n}",
+      "fn_code_pos": [
+        [
+          143,
+          0
+        ],
+        [
+          163,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_create",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_event_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_pipeevent_init(void)",
+      "fn_dec_pos": [
+        [
+          58,
+          25
+        ],
+        [
+          58,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_init",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_pipeevent_create(ares_event_thread_t *e)",
+      "fn_dec_pos": [
+        [
+          143,
+          14
+        ],
+        [
+          143,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pipeevent_create",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  int filedes[2];\n} ares_pipeevent_t;",
+      {
+        "filedes[2]": "int"
+      },
+      "ares_pipeevent_t",
+      [
+        37,
+        0
+      ],
+      [
+        39,
+        19
+      ]
+    ],
+    [
+      "typedef struct {\n  int filedes[2];\n} ares_pipeevent_t;",
+      {
+        "filedes[2]": "int"
+      },
+      "ares_pipeevent_t",
+      [
+        37,
+        0
+      ],
+      [
+        39,
+        19
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#    include <unistd.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#    include <fcntl.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

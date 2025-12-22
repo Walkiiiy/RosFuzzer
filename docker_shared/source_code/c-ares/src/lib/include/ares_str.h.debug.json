@@ -1,0 +1,605 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_strdup(const char *s1)",
+      "fn_dec_pos": [
+        [
+          29,
+          20
+        ],
+        [
+          29,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strdup",
+        "parameters": {
+          "s1": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_strnlen(const char *str, size_t maxlen)",
+      "fn_dec_pos": [
+        [
+          43,
+          20
+        ],
+        [
+          43,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strnlen",
+        "parameters": {
+          "str": "char",
+          "maxlen": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strlen(const char *str)",
+      "fn_dec_pos": [
+        [
+          45,
+          20
+        ],
+        [
+          45,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strlen",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strcpy(char *dest, const char *src, size_t dest_size)",
+      "fn_dec_pos": [
+        [
+          57,
+          20
+        ],
+        [
+          57,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcpy",
+        "parameters": {
+          "dest": "char",
+          "src": "char",
+          "dest_size": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_str_isnum(const char *str)",
+      "fn_dec_pos": [
+        [
+          59,
+          13
+        ],
+        [
+          59,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_str_isnum",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_str_isalnum(const char *str)",
+      "fn_dec_pos": [
+        [
+          60,
+          13
+        ],
+        [
+          60,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_str_isalnum",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_str_ltrim(char *str)",
+      "fn_dec_pos": [
+        [
+          62,
+          28
+        ],
+        [
+          62,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_ltrim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_str_rtrim(char *str)",
+      "fn_dec_pos": [
+        [
+          63,
+          28
+        ],
+        [
+          63,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_rtrim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_str_trim(char *str)",
+      "fn_dec_pos": [
+        [
+          64,
+          28
+        ],
+        [
+          64,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_trim",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_str_lower(char *str)",
+      "fn_dec_pos": [
+        [
+          65,
+          28
+        ],
+        [
+          65,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_str_lower",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_tolower(unsigned char c)",
+      "fn_dec_pos": [
+        [
+          67,
+          28
+        ],
+        [
+          67,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_tolower",
+        "parameters": {
+          "c": "unsigned char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_memmem(const unsigned char *big,\n                                        size_t               big_len,\n                                        const unsigned char *little,\n                                        size_t               little_len)",
+      "fn_dec_pos": [
+        [
+          68,
+          28
+        ],
+        [
+          71,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_memmem",
+        "parameters": {
+          "big": "unsigned char",
+          "big_len": "size_t",
+          "little": "unsigned char",
+          "little_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_memeq(const unsigned char *ptr,\n                                       const unsigned char *val, size_t len)",
+      "fn_dec_pos": [
+        [
+          72,
+          13
+        ],
+        [
+          73,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_memeq",
+        "parameters": {
+          "ptr": "unsigned char",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_memeq_ci(const unsigned char *ptr,\n                                          const unsigned char *val, size_t len)",
+      "fn_dec_pos": [
+        [
+          74,
+          13
+        ],
+        [
+          75,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_memeq_ci",
+        "parameters": {
+          "ptr": "unsigned char",
+          "val": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_is_hostname(const char *str)",
+      "fn_dec_pos": [
+        [
+          76,
+          13
+        ],
+        [
+          76,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_is_hostname",
+        "parameters": {
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t    ares_str_isprint(const char *str, size_t len)",
+      "fn_dec_pos": [
+        [
+          89,
+          13
+        ],
+        [
+          89,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t    ares_str_isprint",
+        "parameters": {
+          "str": "char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strcmp(const char *a, const char *b)",
+      "fn_dec_pos": [
+        [
+          145,
+          17
+        ],
+        [
+          145,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcmp",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strncmp(const char *a, const char *b, size_t n)",
+      "fn_dec_pos": [
+        [
+          158,
+          17
+        ],
+        [
+          158,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strncmp",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strcasecmp(const char *a, const char *b)",
+      "fn_dec_pos": [
+        [
+          171,
+          17
+        ],
+        [
+          171,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strcasecmp",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_strncasecmp(const char *a, const char *b, size_t n)",
+      "fn_dec_pos": [
+        [
+          185,
+          17
+        ],
+        [
+          185,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_strncasecmp",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_streq(const char *a, const char *b)",
+      "fn_dec_pos": [
+        [
+          195,
+          13
+        ],
+        [
+          195,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_streq",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_streq_max(const char *a, const char *b, size_t n)",
+      "fn_dec_pos": [
+        [
+          206,
+          13
+        ],
+        [
+          206,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_streq_max",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_strcaseeq(const char *a, const char *b)",
+      "fn_dec_pos": [
+        [
+          216,
+          13
+        ],
+        [
+          216,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_strcaseeq",
+        "parameters": {
+          "a": "char",
+          "b": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_strcaseeq_max(const char *a, const char *b,\n                                            size_t n)",
+      "fn_dec_pos": [
+        [
+          228,
+          13
+        ],
+        [
+          229,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_strcaseeq_max",
+        "parameters": {
+          "a": "char",
+          "b": "char",
+          "n": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_free_array(void *arr, size_t nmembers,\n                                         void (*freefunc)(void *))",
+      "fn_dec_pos": [
+        [
+          240,
+          25
+        ],
+        [
+          241,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_array",
+        "parameters": {
+          "arr": "void",
+          "nmembers": "size_t",
+          "freefunc": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "(*freefunc)(void *)",
+      "fn_dec_pos": [
+        [
+          241,
+          46
+        ],
+        [
+          241,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "void"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

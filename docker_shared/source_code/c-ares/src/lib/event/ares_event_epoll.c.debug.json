@@ -1,0 +1,272 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_evsys_epoll_destroy(ares_event_thread_t *e)\n{\n  ares_evsys_epoll_t *ep = NULL;\n\n  if (e == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ep = e->ev_sys_data;\n  if (ep == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (ep->epoll_fd != -1) {\n    close(ep->epoll_fd);\n  }\n\n  ares_free(ep);\n  e->ev_sys_data = NULL;\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_destroy",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_epoll_init(ares_event_thread_t *e)\n{\n  ares_evsys_epoll_t *ep = NULL;\n\n  ep = ares_malloc_zero(sizeof(*ep));\n  if (ep == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  e->ev_sys_data = ep;\n\n  ep->epoll_fd = epoll_create1(EPOLL_CLOEXEC);\n  if (ep->epoll_fd == -1) {\n    ares_evsys_epoll_destroy(e); /* LCOV_EXCL_LINE: UntestablePath */\n    return ARES_FALSE;           /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  e->ev_signal = ares_pipeevent_create(e);\n  if (e->ev_signal == NULL) {\n    ares_evsys_epoll_destroy(e); /* LCOV_EXCL_LINE: UntestablePath */\n    return ARES_FALSE;           /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          62,
+          0
+        ],
+        [
+          86,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_init",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_epoll_event_add(ares_event_t *event)\n{\n  const ares_event_thread_t *e  = event->e;\n  const ares_evsys_epoll_t  *ep = e->ev_sys_data;\n  struct epoll_event         epev;\n\n  memset(&epev, 0, sizeof(epev));\n  epev.data.fd = event->fd;\n  epev.events  = EPOLLRDHUP | EPOLLERR | EPOLLHUP;\n  if (event->flags & ARES_EVENT_FLAG_READ) {\n    epev.events |= EPOLLIN;\n  }\n  if (event->flags & ARES_EVENT_FLAG_WRITE) {\n    epev.events |= EPOLLOUT;\n  }\n  if (epoll_ctl(ep->epoll_fd, EPOLL_CTL_ADD, event->fd, &epev) != 0) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          88,
+          0
+        ],
+        [
+          107,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_event_add",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_epoll_event_del(ares_event_t *event)\n{\n  const ares_event_thread_t *e  = event->e;\n  const ares_evsys_epoll_t  *ep = e->ev_sys_data;\n  struct epoll_event         epev;\n\n  memset(&epev, 0, sizeof(epev));\n  epev.data.fd = event->fd;\n  epoll_ctl(ep->epoll_fd, EPOLL_CTL_DEL, event->fd, &epev);\n}",
+      "fn_code_pos": [
+        [
+          109,
+          0
+        ],
+        [
+          118,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_event_del",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_epoll_event_mod(ares_event_t      *event,\n                                       ares_event_flags_t new_flags)\n{\n  const ares_event_thread_t *e  = event->e;\n  const ares_evsys_epoll_t  *ep = e->ev_sys_data;\n  struct epoll_event         epev;\n\n  memset(&epev, 0, sizeof(epev));\n  epev.data.fd = event->fd;\n  epev.events  = EPOLLRDHUP | EPOLLERR | EPOLLHUP;\n  if (new_flags & ARES_EVENT_FLAG_READ) {\n    epev.events |= EPOLLIN;\n  }\n  if (new_flags & ARES_EVENT_FLAG_WRITE) {\n    epev.events |= EPOLLOUT;\n  }\n  epoll_ctl(ep->epoll_fd, EPOLL_CTL_MOD, event->fd, &epev);\n}",
+      "fn_code_pos": [
+        [
+          120,
+          0
+        ],
+        [
+          137,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_event_mod",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_evsys_epoll_wait(ares_event_thread_t *e,\n                                    unsigned long        timeout_ms)\n{\n  struct epoll_event        events[8];\n  size_t                    nevents = sizeof(events) / sizeof(*events);\n  const ares_evsys_epoll_t *ep      = e->ev_sys_data;\n  int                       rv;\n  size_t                    i;\n  size_t                    cnt = 0;\n\n  memset(events, 0, sizeof(events));\n\n  rv = epoll_wait(ep->epoll_fd, events, (int)nevents,\n                  (timeout_ms == 0) ? -1 : (int)timeout_ms);\n  if (rv < 0) {\n    return 0; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n\n  nevents = (size_t)rv;\n\n  for (i = 0; i < nevents; i++) {\n    ares_event_t      *ev;\n    ares_event_flags_t flags = 0;\n\n    ev = ares_htable_asvp_get_direct(e->ev_sock_handles,\n                                     (ares_socket_t)events[i].data.fd);\n    if (ev == NULL || ev->cb == NULL) {\n      continue; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    cnt++;\n\n    if (events[i].events & (EPOLLIN | EPOLLRDHUP | EPOLLHUP | EPOLLERR)) {\n      flags |= ARES_EVENT_FLAG_READ;\n    }\n    if (events[i].events & EPOLLOUT) {\n      flags |= ARES_EVENT_FLAG_WRITE;\n    }\n\n    ev->cb(e, ev->fd, ev->data, flags);\n  }\n\n  return cnt;\n}",
+      "fn_code_pos": [
+        [
+          139,
+          0
+        ],
+        [
+          182,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_epoll_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  int epoll_fd;\n} ares_evsys_epoll_t;",
+      {
+        "epoll_fd": "int"
+      },
+      "ares_evsys_epoll_t",
+      [
+        37,
+        0
+      ],
+      [
+        39,
+        21
+      ]
+    ],
+    [
+      "typedef struct {\n  int epoll_fd;\n} ares_evsys_epoll_t;",
+      {
+        "epoll_fd": "int"
+      },
+      "ares_evsys_epoll_t",
+      [
+        37,
+        0
+      ],
+      [
+        39,
+        21
+      ]
+    ],
+    [
+      "struct epoll_event",
+      {},
+      "",
+      [
+        92,
+        2
+      ],
+      [
+        92,
+        20
+      ]
+    ],
+    [
+      "struct epoll_event",
+      {},
+      "",
+      [
+        113,
+        2
+      ],
+      [
+        113,
+        20
+      ]
+    ],
+    [
+      "struct epoll_event",
+      {},
+      "",
+      [
+        125,
+        2
+      ],
+      [
+        125,
+        20
+      ]
+    ],
+    [
+      "struct epoll_event",
+      {},
+      "",
+      [
+        142,
+        2
+      ],
+      [
+        142,
+        20
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/epoll.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#  include <fcntl.h>\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

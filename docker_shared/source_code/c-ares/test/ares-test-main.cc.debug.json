@@ -1,0 +1,122 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void thread_set_realtime(pthread_t pthread)\n{\n  mach_timebase_info_data_t            timebase_info;\n  const uint64_t                       NANOS_PER_MSEC = 1000000ULL;\n  double                               clock2abs;\n  int                                  rv;\n  thread_time_constraint_policy_data_t policy;\n\n  mach_timebase_info(&timebase_info);\n  clock2abs = ((double)timebase_info.denom / (double)timebase_info.numer)\n              * NANOS_PER_MSEC;\n\n  policy.period      = 0;\n  policy.computation = (uint32_t)(5 * clock2abs); // 5 ms of work\n  policy.constraint  = (uint32_t)(10 * clock2abs);\n  policy.preemptible = FALSE;\n\n  rv = thread_policy_set(pthread_mach_thread_np(pthread),\n                         THREAD_TIME_CONSTRAINT_POLICY,\n                         (thread_policy_t)&policy,\n                         THREAD_TIME_CONSTRAINT_POLICY_COUNT);\n  if (rv != KERN_SUCCESS) {\n    mach_error(\"thread_policy_set:\", rv);\n    exit(1);\n  }\n}",
+      "fn_code_pos": [
+        [
+          35,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "thread_set_realtime",
+        "parameters": {
+          "pthread": "pthread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int main(int argc, char* argv[]) {\n  std::vector<char*> gtest_argv = {argv[0]};\n  for (int ii = 1; ii < argc; ii++) {\n    if (strcmp(argv[ii], \"-v\") == 0) {\n      ares::test::verbose = true;\n    } else if ((strcmp(argv[ii], \"-p\") == 0) && (ii + 1 < argc)) {\n      ii++;\n      ares::test::mock_port = (unsigned short)atoi(argv[ii]);\n    } else if (strcmp(argv[ii], \"-4\") == 0) {\n      ares::test::families = ares::test::ipv4_family;\n      ares::test::families_modes = ares::test::ipv4_family_both_modes;\n      ares::test::evsys_families = ares::test::all_evsys_ipv4_family;\n      ares::test::evsys_families_modes = ares::test::all_evsys_ipv4_family_both_modes;\n    } else if (strcmp(argv[ii], \"-6\") == 0) {\n      ares::test::families = ares::test::ipv6_family;\n      ares::test::families_modes = ares::test::ipv6_family_both_modes;\n      ares::test::evsys_families = ares::test::all_evsys_ipv6_family;\n      ares::test::evsys_families_modes = ares::test::all_evsys_ipv6_family_both_modes;\n    } else {\n      gtest_argv.push_back(argv[ii]);\n    }\n  }\n  int gtest_argc = (int)gtest_argv.size();\n  gtest_argv.push_back(nullptr);\n  ::testing::InitGoogleTest(&gtest_argc, gtest_argv.data());\n\n#ifdef WIN32\n  WORD wVersionRequested = MAKEWORD(2, 2);\n  WSADATA wsaData;\n  WSAStartup(wVersionRequested, &wsaData);\n#else\n  signal(SIGPIPE, SIG_IGN);\n#endif\n\n#ifdef __APPLE__\n  /* We need to increase the priority in order for some timing-sensitive tests\n   * to succeed reliably.  On CI systems, the host can be overloaded and things\n   * like sleep timers can wait many multiples of the time specified otherwise.\n   * This is sort of a necessary hack for test reliability. Not something that\n   * would generally be used */\n  thread_set_realtime(pthread_self());\n#endif\n\n  int rc = RUN_ALL_TESTS();\n\n#ifdef WIN32\n  WSACleanup();\n#endif\n\n  return rc;\n}",
+      "fn_code_pos": [
+        [
+          63,
+          0
+        ],
+        [
+          113,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "main",
+        "parameters": {
+          "argc": "int",
+          "argv": "char"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <signal.h>\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <mach/mach.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#  include <mach/mach_time.h>\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#  include <pthread.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

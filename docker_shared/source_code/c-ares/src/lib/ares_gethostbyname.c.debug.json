@@ -1,0 +1,961 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_gethostbyname_callback(void *arg, int status, int timeouts,\n                                        struct ares_addrinfo *result)\n{\n  struct hostent    *hostent  = NULL;\n  struct host_query *ghbn_arg = arg;\n\n  if (status == ARES_SUCCESS) {\n    status = (int)ares_addrinfo2hostent(result, AF_UNSPEC, &hostent);\n  }\n\n  /* addrinfo2hostent will only return ENODATA if there are no addresses _and_\n   * no cname/aliases.  However, gethostbyname will return ENODATA even if there\n   * is cname/alias data */\n  if (status == ARES_SUCCESS && hostent &&\n      (!hostent->h_addr_list || !hostent->h_addr_list[0])) {\n    status = ARES_ENODATA;\n  }\n\n  if (status == ARES_SUCCESS && ghbn_arg->channel->nsort && hostent) {\n    if (hostent->h_addrtype == AF_INET6) {\n      sort6_addresses(hostent, ghbn_arg->channel->sortlist,\n                      ghbn_arg->channel->nsort);\n    }\n    if (hostent->h_addrtype == AF_INET) {\n      sort_addresses(hostent, ghbn_arg->channel->sortlist,\n                     ghbn_arg->channel->nsort);\n    }\n  }\n\n  ghbn_arg->callback(ghbn_arg->arg, status, timeouts, hostent);\n\n  ares_freeaddrinfo(result);\n  ares_free(ghbn_arg);\n  ares_free_hostent(hostent);\n}",
+      "fn_code_pos": [
+        [
+          62,
+          0
+        ],
+        [
+          96,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname_callback",
+        "parameters": {
+          "arg": "void",
+          "status": "int",
+          "timeouts": "int",
+          "result": "struct ares_addrinfo"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_gethostbyname(ares_channel_t *channel, const char *name, int family,\n                        ares_host_callback callback, void *arg)\n{\n  struct ares_addrinfo_hints hints;\n  struct host_query         *ghbn_arg;\n\n  if (!callback) {\n    return;\n  }\n\n  memset(&hints, 0, sizeof(hints));\n  hints.ai_flags  = ARES_AI_CANONNAME;\n  hints.ai_family = family;\n\n  ghbn_arg = ares_malloc(sizeof(*ghbn_arg));\n  if (!ghbn_arg) {\n    callback(arg, ARES_ENOMEM, 0, NULL);\n    return;\n  }\n\n  ghbn_arg->callback = callback;\n  ghbn_arg->arg      = arg;\n  ghbn_arg->channel  = channel;\n\n  /* NOTE: ares_getaddrinfo() locks the channel, we don't use the channel\n   *       outside so no need to lock */\n  ares_getaddrinfo(channel, name, NULL, &hints, ares_gethostbyname_callback,\n                   ghbn_arg);\n}",
+      "fn_code_pos": [
+        [
+          98,
+          0
+        ],
+        [
+          126,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "family": "int",
+          "callback": "ares_host_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void sort_addresses(const struct hostent  *host,\n                           const struct apattern *sortlist, size_t nsort)\n{\n  struct in_addr a1;\n  struct in_addr a2;\n  int            i1;\n  int            i2;\n  size_t         ind1;\n  size_t         ind2;\n\n  /* This is a simple insertion sort, not optimized at all.  i1 walks\n   * through the address list, with the loop invariant that everything\n   * to the left of i1 is sorted.  In the loop body, the value at i1 is moved\n   * back through the list (via i2) until it is in sorted order.\n   *\n   * The IPs are sorted in ascending order of corresponding sortlist\n   * indices, with those that don't match the subnets in the sortlist\n   * coming last.  There is no particular order amongst IPs that tie\n   * in this sorting scheme.\n   */\n  for (i1 = 0; host->h_addr_list[i1]; i1++) {\n    memcpy(&a1, host->h_addr_list[i1], sizeof(struct in_addr));\n    ind1 = get_address_index(&a1, sortlist, nsort);\n    for (i2 = i1 - 1; i2 >= 0; i2--) {\n      memcpy(&a2, host->h_addr_list[i2], sizeof(struct in_addr));\n      ind2 = get_address_index(&a2, sortlist, nsort);\n      if (ind2 <= ind1) {\n        break;\n      }\n      memcpy(host->h_addr_list[i2 + 1], &a2, sizeof(struct in_addr));\n    }\n    memcpy(host->h_addr_list[i2 + 1], &a1, sizeof(struct in_addr));\n  }\n}",
+      "fn_code_pos": [
+        [
+          128,
+          0
+        ],
+        [
+          161,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "sort_addresses",
+        "parameters": {
+          "host": "struct hostent",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t get_address_index(const struct in_addr  *addr,\n                                const struct apattern *sortlist, size_t nsort)\n{\n  size_t           i;\n  struct ares_addr aaddr;\n\n  memset(&aaddr, 0, sizeof(aaddr));\n  aaddr.family = AF_INET;\n  memcpy(&aaddr.addr.addr4, addr, 4);\n\n  for (i = 0; i < nsort; i++) {\n    if (sortlist[i].addr.family != AF_INET) {\n      continue;\n    }\n\n    if (ares_subnet_match(&aaddr, &sortlist[i].addr, sortlist[i].mask)) {\n      break;\n    }\n  }\n\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          187,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get_address_index",
+        "parameters": {
+          "addr": "struct in_addr",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static void sort6_addresses(const struct hostent  *host,\n                            const struct apattern *sortlist, size_t nsort)\n{\n  struct ares_in6_addr a1;\n  struct ares_in6_addr a2;\n  int                  i1;\n  int                  i2;\n  size_t               ind1;\n  size_t               ind2;\n\n  /* This is a simple insertion sort, not optimized at all.  i1 walks\n   * through the address list, with the loop invariant that everything\n   * to the left of i1 is sorted.  In the loop body, the value at i1 is moved\n   * back through the list (via i2) until it is in sorted order.\n   *\n   * The IPv6s are sorted in ascending order of corresponding sortlist\n   * indices, with those that don't match the subnets in the sortlist\n   * coming last.  There is no particular order amongst IPs that tie\n   * in this sorting scheme.\n   */\n  for (i1 = 0; host->h_addr_list[i1]; i1++) {\n    memcpy(&a1, host->h_addr_list[i1], sizeof(struct ares_in6_addr));\n    ind1 = get6_address_index(&a1, sortlist, nsort);\n    for (i2 = i1 - 1; i2 >= 0; i2--) {\n      memcpy(&a2, host->h_addr_list[i2], sizeof(struct ares_in6_addr));\n      ind2 = get6_address_index(&a2, sortlist, nsort);\n      if (ind2 <= ind1) {\n        break;\n      }\n      memcpy(host->h_addr_list[i2 + 1], &a2, sizeof(struct ares_in6_addr));\n    }\n    memcpy(host->h_addr_list[i2 + 1], &a1, sizeof(struct ares_in6_addr));\n  }\n}",
+      "fn_code_pos": [
+        [
+          189,
+          0
+        ],
+        [
+          222,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "sort6_addresses",
+        "parameters": {
+          "host": "struct hostent",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t get6_address_index(const struct ares_in6_addr *addr,\n                                 const struct apattern *sortlist, size_t nsort)\n{\n  size_t           i;\n  struct ares_addr aaddr;\n\n  memset(&aaddr, 0, sizeof(aaddr));\n  aaddr.family = AF_INET6;\n  memcpy(&aaddr.addr.addr6, addr, 16);\n\n  for (i = 0; i < nsort; i++) {\n    if (sortlist[i].addr.family != AF_INET6) {\n      continue;\n    }\n\n    if (ares_subnet_match(&aaddr, &sortlist[i].addr, sortlist[i].mask)) {\n      break;\n    }\n  }\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          227,
+          0
+        ],
+        [
+          247,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get6_address_index",
+        "parameters": {
+          "addr": "struct ares_in6_addr",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_hostent_localhost(const char *name, int family,\n                                            struct hostent **host_out)\n{\n  ares_status_t              status;\n  struct ares_addrinfo      *ai = NULL;\n  struct ares_addrinfo_hints hints;\n\n  memset(&hints, 0, sizeof(hints));\n  hints.ai_family = family;\n\n  ai = ares_malloc_zero(sizeof(*ai));\n  if (ai == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_addrinfo_localhost(name, 0, &hints, ai);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_addrinfo2hostent(ai, family, host_out);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\ndone:\n  ares_freeaddrinfo(ai);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          249,
+          0
+        ],
+        [
+          278,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_hostent_localhost",
+        "parameters": {
+          "name": "char",
+          "family": "int",
+          "host_out": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_gethostbyname_file_int(ares_channel_t *channel,\n                                                 const char *name, int family,\n                                                 struct hostent **host)\n{\n  const ares_hosts_entry_t *entry;\n  ares_status_t             status;\n\n  /* We only take the channel to ensure that ares_init() been called. */\n  if (channel == NULL || name == NULL || host == NULL) {\n    /* Anything will do, really.  This seems fine, and is consistent with\n       other error cases. */\n    if (host != NULL) {\n      *host = NULL;\n    }\n    return ARES_ENOTFOUND;\n  }\n\n  *host  = NULL;\n\n  /* Per RFC 7686, reject queries for \".onion\" domain names with NXDOMAIN. */\n  if (ares_is_onion_domain(name)) {\n    return ARES_ENOTFOUND;\n  }\n\n  status = ares_hosts_search_host(channel, ARES_FALSE, name, &entry);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_hosts_entry_to_hostent(entry, family, host);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\ndone:\n  /* RFC6761 section 6.3 #3 states that \"Name resolution APIs and libraries\n   * SHOULD recognize localhost names as special and SHOULD always return the\n   * IP loopback address for address queries\".\n   * We will also ignore ALL errors when trying to resolve localhost, such\n   * as permissions errors reading /etc/hosts or a malformed /etc/hosts.\n   *\n   * Also, just because the query itself returned success from /etc/hosts\n   * lookup doesn't mean it returned everything it needed to for all requested\n   * address families. As long as we're not on a critical out of memory\n   * condition pass it through to fill in any other address classes. */\n  if (status != ARES_ENOMEM && ares_is_localhost(name)) {\n    return ares_hostent_localhost(name, family, host);\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          282,
+          0
+        ],
+        [
+          332,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname_file_int",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "int ares_gethostbyname_file(ares_channel_t *channel, const char *name,\n                            int family, struct hostent **host)\n{\n  ares_status_t status;\n  if (channel == NULL) {\n    return ARES_ENOTFOUND;\n  }\n\n  ares_channel_lock(channel);\n  status = ares_gethostbyname_file_int(channel, name, family, host);\n  ares_channel_unlock(channel);\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          334,
+          0
+        ],
+        [
+          346,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_gethostbyname_file",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "family": "int",
+          "host": "struct hostent"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "sort_addresses(const struct hostent  *host,\n                             const struct apattern *sortlist, size_t nsort)",
+      "fn_dec_pos": [
+        [
+          47,
+          14
+        ],
+        [
+          48,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "sort_addresses",
+        "parameters": {
+          "host": "struct hostent",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "sort6_addresses(const struct hostent  *host,\n                              const struct apattern *sortlist, size_t nsort)",
+      "fn_dec_pos": [
+        [
+          49,
+          14
+        ],
+        [
+          50,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "sort6_addresses",
+        "parameters": {
+          "host": "struct hostent",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "get_address_index(const struct in_addr  *addr,\n                                const struct apattern *sortlist, size_t nsort)",
+      "fn_dec_pos": [
+        [
+          51,
+          14
+        ],
+        [
+          52,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get_address_index",
+        "parameters": {
+          "addr": "struct in_addr",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "get6_address_index(const struct ares_in6_addr *addr,\n                                 const struct apattern *sortlist, size_t nsort)",
+      "fn_dec_pos": [
+        [
+          53,
+          14
+        ],
+        [
+          54,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get6_address_index",
+        "parameters": {
+          "addr": "struct ares_in6_addr",
+          "sortlist": "struct apattern",
+          "nsort": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct host_query {\n  ares_host_callback callback;\n  void              *arg;\n  ares_channel_t    *channel;\n}",
+      {
+        "callback": "ares_host_callback",
+        "*arg": "void",
+        "*channel": "ares_channel_t"
+      },
+      "host_query",
+      [
+        56,
+        0
+      ],
+      [
+        60,
+        1
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        47,
+        35
+      ],
+      [
+        47,
+        49
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        48,
+        35
+      ],
+      [
+        48,
+        50
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        49,
+        36
+      ],
+      [
+        49,
+        50
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        50,
+        36
+      ],
+      [
+        50,
+        51
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        51,
+        38
+      ],
+      [
+        51,
+        52
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        52,
+        38
+      ],
+      [
+        52,
+        53
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        53,
+        39
+      ],
+      [
+        53,
+        59
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        54,
+        39
+      ],
+      [
+        54,
+        54
+      ]
+    ],
+    [
+      "struct host_query {\n  ares_host_callback callback;\n  void              *arg;\n  ares_channel_t    *channel;\n}",
+      {
+        "callback": "ares_host_callback",
+        "*arg": "void",
+        "*channel": "ares_channel_t"
+      },
+      "host_query",
+      [
+        56,
+        0
+      ],
+      [
+        60,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        63,
+        40
+      ],
+      [
+        63,
+        60
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        65,
+        2
+      ],
+      [
+        65,
+        16
+      ]
+    ],
+    [
+      "struct host_query",
+      {},
+      "",
+      [
+        66,
+        2
+      ],
+      [
+        66,
+        19
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        101,
+        2
+      ],
+      [
+        101,
+        28
+      ]
+    ],
+    [
+      "struct host_query",
+      {},
+      "",
+      [
+        102,
+        2
+      ],
+      [
+        102,
+        19
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        128,
+        33
+      ],
+      [
+        128,
+        47
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        129,
+        33
+      ],
+      [
+        129,
+        48
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        131,
+        2
+      ],
+      [
+        131,
+        16
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        132,
+        2
+      ],
+      [
+        132,
+        16
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        149,
+        46
+      ],
+      [
+        149,
+        60
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        152,
+        48
+      ],
+      [
+        152,
+        62
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        157,
+        52
+      ],
+      [
+        157,
+        66
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        159,
+        50
+      ],
+      [
+        159,
+        64
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        166,
+        38
+      ],
+      [
+        166,
+        52
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        167,
+        38
+      ],
+      [
+        167,
+        53
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        170,
+        2
+      ],
+      [
+        170,
+        18
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        189,
+        34
+      ],
+      [
+        189,
+        48
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        190,
+        34
+      ],
+      [
+        190,
+        49
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        192,
+        2
+      ],
+      [
+        192,
+        22
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        193,
+        2
+      ],
+      [
+        193,
+        22
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        210,
+        46
+      ],
+      [
+        210,
+        66
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        213,
+        48
+      ],
+      [
+        213,
+        68
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        218,
+        52
+      ],
+      [
+        218,
+        72
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        220,
+        50
+      ],
+      [
+        220,
+        70
+      ]
+    ],
+    [
+      "struct ares_in6_addr",
+      {},
+      "",
+      [
+        227,
+        39
+      ],
+      [
+        227,
+        59
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        228,
+        39
+      ],
+      [
+        228,
+        54
+      ]
+    ],
+    [
+      "struct ares_addr",
+      {},
+      "",
+      [
+        231,
+        2
+      ],
+      [
+        231,
+        18
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        250,
+        44
+      ],
+      [
+        250,
+        58
+      ]
+    ],
+    [
+      "struct ares_addrinfo",
+      {},
+      "",
+      [
+        253,
+        2
+      ],
+      [
+        253,
+        22
+      ]
+    ],
+    [
+      "struct ares_addrinfo_hints",
+      {},
+      "",
+      [
+        254,
+        2
+      ],
+      [
+        254,
+        28
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        284,
+        49
+      ],
+      [
+        284,
+        63
+      ]
+    ],
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        335,
+        40
+      ],
+      [
+        335,
+        54
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    [
+      "#  include <strings.h>\n",
+      [
+        42,
+        0
+      ],
+      [
+        43,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_inet_net_pton.h\"\n",
+      [
+        45,
+        0
+      ],
+      [
+        46,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

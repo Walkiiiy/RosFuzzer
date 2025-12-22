@@ -1,0 +1,1709 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_buf_t *ares_buf_create(void)\n{\n  ares_buf_t *buf = ares_malloc_zero(sizeof(*buf));\n  if (buf == NULL) {\n    return NULL;\n  }\n\n  buf->tag_offset = SIZE_MAX;\n  return buf;\n}",
+      "fn_code_pos": [
+        [
+          45,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create",
+        "parameters": {},
+        "return_type": "ares_buf_t"
+      }
+    },
+    {
+      "fn_code": "ares_buf_t *ares_buf_create_const(const unsigned char *data, size_t data_len)\n{\n  ares_buf_t *buf;\n\n  if (data == NULL || data_len == 0) {\n    return NULL;\n  }\n\n  buf = ares_buf_create();\n  if (buf == NULL) {\n    return NULL;\n  }\n\n  buf->data     = data;\n  buf->data_len = data_len;\n\n  return buf;\n}",
+      "fn_code_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          73,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create_const",
+        "parameters": {
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": "ares_buf_t"
+      }
+    },
+    {
+      "fn_code": "void ares_buf_destroy(ares_buf_t *buf)\n{\n  if (buf == NULL) {\n    return;\n  }\n  ares_free(buf->alloc_buf);\n  ares_free(buf);\n}",
+      "fn_code_pos": [
+        [
+          75,
+          0
+        ],
+        [
+          82,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_destroy",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_buf_is_const(const ares_buf_t *buf)\n{\n  if (buf == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (buf->data != NULL && buf->alloc_buf == NULL) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          84,
+          0
+        ],
+        [
+          95,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_is_const",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void ares_buf_reclaim(ares_buf_t *buf)\n{\n  size_t prefix_size;\n  size_t data_size;\n\n  if (buf == NULL) {\n    return;\n  }\n\n  if (ares_buf_is_const(buf)) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Silence coverity.  All lengths are zero so would bail out later but\n   * coverity doesn't know this */\n  if (buf->alloc_buf == NULL) {\n    return;\n  }\n\n  if (buf->tag_offset != SIZE_MAX && buf->tag_offset < buf->offset) {\n    prefix_size = buf->tag_offset;\n  } else {\n    prefix_size = buf->offset;\n  }\n\n  if (prefix_size == 0) {\n    return;\n  }\n\n  data_size = buf->data_len - prefix_size;\n\n  memmove(buf->alloc_buf, buf->alloc_buf + prefix_size, data_size);\n  buf->data      = buf->alloc_buf;\n  buf->data_len  = data_size;\n  buf->offset   -= prefix_size;\n  if (buf->tag_offset != SIZE_MAX) {\n    buf->tag_offset -= prefix_size;\n  }\n}",
+      "fn_code_pos": [
+        [
+          97,
+          0
+        ],
+        [
+          135,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_reclaim",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_buf_ensure_space(ares_buf_t *buf, size_t needed_size)\n{\n  size_t         remaining_size;\n  size_t         alloc_size;\n  unsigned char *ptr;\n\n  if (buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (ares_buf_is_const(buf)) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* When calling ares_buf_finish_str() we end up adding a null terminator,\n   * so we want to ensure the size is always sufficient for this as we don't\n   * want an ARES_ENOMEM at that point */\n  needed_size++;\n\n  /* No need to do an expensive move operation, we have enough to just append */\n  remaining_size = buf->alloc_buf_len - buf->data_len;\n  if (remaining_size >= needed_size) {\n    return ARES_SUCCESS;\n  }\n\n  /* See if just moving consumed data frees up enough space */\n  ares_buf_reclaim(buf);\n\n  remaining_size = buf->alloc_buf_len - buf->data_len;\n  if (remaining_size >= needed_size) {\n    return ARES_SUCCESS;\n  }\n\n  alloc_size = buf->alloc_buf_len;\n\n  /* Not yet started */\n  if (alloc_size == 0) {\n    alloc_size = 16; /* Always shifts 1, so ends up being 32 minimum */\n  }\n\n  /* Increase allocation by powers of 2 */\n  do {\n    alloc_size     <<= 1;\n    remaining_size   = alloc_size - buf->data_len;\n  } while (remaining_size < needed_size);\n\n  ptr = ares_realloc(buf->alloc_buf, alloc_size);\n  if (ptr == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  buf->alloc_buf     = ptr;\n  buf->alloc_buf_len = alloc_size;\n  buf->data          = ptr;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          137,
+          0
+        ],
+        [
+          193,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_ensure_space",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "needed_size": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_set_length(ares_buf_t *buf, size_t len)\n{\n  if (buf == NULL || ares_buf_is_const(buf)) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (len >= buf->alloc_buf_len - buf->offset) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  buf->data_len = len + buf->offset;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          195,
+          0
+        ],
+        [
+          207,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_set_length",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append(ares_buf_t *buf, const unsigned char *data,\n                              size_t data_len)\n{\n  ares_status_t status;\n\n  if (data == NULL && data_len != 0) {\n    return ARES_EFORMERR;\n  }\n\n  if (data_len == 0) {\n    return ARES_SUCCESS;\n  }\n\n  status = ares_buf_ensure_space(buf, data_len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  memcpy(buf->alloc_buf + buf->data_len, data, data_len);\n  buf->data_len += data_len;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          209,
+          0
+        ],
+        [
+          230,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_byte(ares_buf_t *buf, unsigned char b)\n{\n  return ares_buf_append(buf, &b, 1);\n}",
+      "fn_code_pos": [
+        [
+          232,
+          0
+        ],
+        [
+          235,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_byte",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "b": "unsigned char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_be16(ares_buf_t *buf, unsigned short u16)\n{\n  ares_status_t status;\n\n  status = ares_buf_append_byte(buf, (unsigned char)((u16 >> 8) & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_byte(buf, (unsigned char)(u16 & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          237,
+          0
+        ],
+        [
+          252,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u16": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_be32(ares_buf_t *buf, unsigned int u32)\n{\n  ares_status_t status;\n\n  status = ares_buf_append_byte(buf, ((unsigned char)(u32 >> 24) & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_byte(buf, ((unsigned char)(u32 >> 16) & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_byte(buf, ((unsigned char)(u32 >> 8) & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_buf_append_byte(buf, ((unsigned char)u32 & 0xff));\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          254,
+          0
+        ],
+        [
+          279,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u32": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "unsigned char *ares_buf_append_start(ares_buf_t *buf, size_t *len)\n{\n  ares_status_t status;\n\n  if (len == NULL || *len == 0) {\n    return NULL;\n  }\n\n  status = ares_buf_ensure_space(buf, *len);\n  if (status != ARES_SUCCESS) {\n    return NULL;\n  }\n\n  /* -1 for possible null terminator for ares_buf_finish_str() */\n  *len = buf->alloc_buf_len - buf->data_len - 1;\n  return buf->alloc_buf + buf->data_len;\n}",
+      "fn_code_pos": [
+        [
+          281,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_start",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "void ares_buf_append_finish(ares_buf_t *buf, size_t len)\n{\n  if (buf == NULL) {\n    return;\n  }\n\n  buf->data_len += len;\n}",
+      "fn_code_pos": [
+        [
+          299,
+          0
+        ],
+        [
+          306,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_finish",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "unsigned char *ares_buf_finish_bin(ares_buf_t *buf, size_t *len)\n{\n  unsigned char *ptr = NULL;\n  if (buf == NULL || len == NULL || ares_buf_is_const(buf)) {\n    return NULL;\n  }\n\n  ares_buf_reclaim(buf);\n\n  /* We don't want to return NULL except on failure, may be zero-length */\n  if (buf->alloc_buf == NULL && ares_buf_ensure_space(buf, 1) != ARES_SUCCESS) {\n    return NULL; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  ptr  = buf->alloc_buf;\n  *len = buf->data_len;\n  ares_free(buf);\n  return ptr;\n}",
+      "fn_code_pos": [
+        [
+          308,
+          0
+        ],
+        [
+          325,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_bin",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "char *ares_buf_finish_str(ares_buf_t *buf, size_t *len)\n{\n  char  *ptr;\n  size_t mylen;\n\n  ptr = (char *)ares_buf_finish_bin(buf, &mylen);\n  if (ptr == NULL) {\n    return NULL;\n  }\n\n  if (len != NULL) {\n    *len = mylen;\n  }\n\n  /* NOTE: ensured via ares_buf_ensure_space() that there is always at least\n   *       1 extra byte available for this specific use-case */\n  ptr[mylen] = 0;\n\n  return ptr;\n}",
+      "fn_code_pos": [
+        [
+          327,
+          0
+        ],
+        [
+          346,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "void ares_buf_tag(ares_buf_t *buf)\n{\n  if (buf == NULL) {\n    return;\n  }\n\n  buf->tag_offset = buf->offset;\n}",
+      "fn_code_pos": [
+        [
+          348,
+          0
+        ],
+        [
+          355,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_rollback(ares_buf_t *buf)\n{\n  if (buf == NULL || buf->tag_offset == SIZE_MAX) {\n    return ARES_EFORMERR;\n  }\n\n  buf->offset     = buf->tag_offset;\n  buf->tag_offset = SIZE_MAX;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          357,
+          0
+        ],
+        [
+          366,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_rollback",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_clear(ares_buf_t *buf)\n{\n  if (buf == NULL || buf->tag_offset == SIZE_MAX) {\n    return ARES_EFORMERR;\n  }\n\n  buf->tag_offset = SIZE_MAX;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          368,
+          0
+        ],
+        [
+          376,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_clear",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "const unsigned char *ares_buf_tag_fetch(const ares_buf_t *buf, size_t *len)\n{\n  if (buf == NULL || buf->tag_offset == SIZE_MAX || len == NULL) {\n    return NULL;\n  }\n\n  *len = buf->offset - buf->tag_offset;\n  return buf->data + buf->tag_offset;\n}",
+      "fn_code_pos": [
+        [
+          378,
+          0
+        ],
+        [
+          386,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_tag_length(const ares_buf_t *buf)\n{\n  if (buf == NULL || buf->tag_offset == SIZE_MAX) {\n    return 0;\n  }\n  return buf->offset - buf->tag_offset;\n}",
+      "fn_code_pos": [
+        [
+          388,
+          0
+        ],
+        [
+          394,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_length",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_bytes(const ares_buf_t *buf,\n                                       unsigned char *bytes, size_t *len)\n{\n  size_t               ptr_len = 0;\n  const unsigned char *ptr     = ares_buf_tag_fetch(buf, &ptr_len);\n\n  if (ptr == NULL || bytes == NULL || len == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (*len < ptr_len) {\n    return ARES_EFORMERR;\n  }\n\n  *len = ptr_len;\n\n  if (ptr_len > 0) {\n    memcpy(bytes, ptr, ptr_len);\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          396,
+          0
+        ],
+        [
+          416,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch_bytes",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "bytes": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_constbuf(const ares_buf_t *buf,\n                                          ares_buf_t      **newbuf)\n{\n  size_t               ptr_len = 0;\n  const unsigned char *ptr     = ares_buf_tag_fetch(buf, &ptr_len);\n\n  if (ptr == NULL || newbuf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *newbuf = ares_buf_create_const(ptr, ptr_len);\n  if (*newbuf == NULL) {\n    return ARES_ENOMEM;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          418,
+          0
+        ],
+        [
+          433,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch_constbuf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "newbuf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_string(const ares_buf_t *buf, char *str,\n                                        size_t len)\n{\n  size_t        out_len;\n  ares_status_t status;\n  size_t        i;\n\n  if (str == NULL || len == 0) {\n    return ARES_EFORMERR;\n  }\n\n  /* Space for NULL terminator */\n  out_len = len - 1;\n\n  status = ares_buf_tag_fetch_bytes(buf, (unsigned char *)str, &out_len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  /* NULL terminate */\n  str[out_len] = 0;\n\n  /* Validate string is printable */\n  for (i = 0; i < out_len; i++) {\n    if (!ares_isprint(str[i])) {\n      return ARES_EBADSTR;\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          435,
+          0
+        ],
+        [
+          465,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch_string",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_strdup(const ares_buf_t *buf, char **str)\n{\n  size_t               ptr_len = 0;\n  const unsigned char *ptr     = ares_buf_tag_fetch(buf, &ptr_len);\n\n  if (ptr == NULL || str == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (!ares_str_isprint((const char *)ptr, ptr_len)) {\n    return ARES_EBADSTR;\n  }\n\n  *str = ares_malloc(ptr_len + 1);\n  if (*str == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  if (ptr_len > 0) {\n    memcpy(*str, ptr, ptr_len);\n  }\n  (*str)[ptr_len] = 0;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          467,
+          0
+        ],
+        [
+          490,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch_strdup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static const unsigned char *ares_buf_fetch(const ares_buf_t *buf, size_t *len)\n{\n  if (len != NULL) {\n    *len = 0;\n  }\n\n  if (buf == NULL || len == NULL || buf->data == NULL) {\n    return NULL;\n  }\n\n  *len = buf->data_len - buf->offset;\n  if (*len == 0) {\n    return NULL;\n  }\n\n  return buf->data + buf->offset;\n}",
+      "fn_code_pos": [
+        [
+          492,
+          0
+        ],
+        [
+          508,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_consume(ares_buf_t *buf, size_t len)\n{\n  size_t remaining_len = ares_buf_len(buf);\n\n  if (remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  buf->offset += len;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          510,
+          0
+        ],
+        [
+          520,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_be16(ares_buf_t *buf, unsigned short *u16)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n  unsigned int         u32;\n\n  if (buf == NULL || u16 == NULL || remaining_len < sizeof(*u16)) {\n    return ARES_EBADRESP;\n  }\n\n  /* Do math in an unsigned int in order to prevent warnings due to automatic\n   * conversion by the compiler from short to int during shifts */\n  u32  = ((unsigned int)(ptr[0]) << 8 | (unsigned int)ptr[1]);\n  *u16 = (unsigned short)(u32 & 0xFFFF);\n\n  return ares_buf_consume(buf, sizeof(*u16));\n}",
+      "fn_code_pos": [
+        [
+          522,
+          0
+        ],
+        [
+          538,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u16": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_be32(ares_buf_t *buf, unsigned int *u32)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n\n  if (buf == NULL || u32 == NULL || remaining_len < sizeof(*u32)) {\n    return ARES_EBADRESP;\n  }\n\n  *u32 = ((unsigned int)(ptr[0]) << 24 | (unsigned int)(ptr[1]) << 16 |\n          (unsigned int)(ptr[2]) << 8 | (unsigned int)(ptr[3]));\n\n  return ares_buf_consume(buf, sizeof(*u32));\n}",
+      "fn_code_pos": [
+        [
+          540,
+          0
+        ],
+        [
+          553,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u32": "unsigned int"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes(ares_buf_t *buf, unsigned char *bytes,\n                                   size_t len)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n\n  if (buf == NULL || bytes == NULL || len == 0 || remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  memcpy(bytes, ptr, len);\n  return ares_buf_consume(buf, len);\n}",
+      "fn_code_pos": [
+        [
+          555,
+          0
+        ],
+        [
+          567,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_bytes",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "bytes": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes_dup(ares_buf_t *buf, size_t len,\n                                       ares_bool_t     null_term,\n                                       unsigned char **bytes)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n\n  if (buf == NULL || bytes == NULL || len == 0 || remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  *bytes = ares_malloc(null_term ? len + 1 : len);\n  if (*bytes == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  memcpy(*bytes, ptr, len);\n  if (null_term) {\n    (*bytes)[len] = 0;\n  }\n  return ares_buf_consume(buf, len);\n}",
+      "fn_code_pos": [
+        [
+          569,
+          0
+        ],
+        [
+          590,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_bytes_dup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t",
+          "null_term": "ares_bool_t",
+          "bytes": "unsigned char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_str_dup(ares_buf_t *buf, size_t len, char **str)\n{\n  size_t               remaining_len;\n  size_t               i;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n\n  if (buf == NULL || str == NULL || len == 0 || remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  /* Validate string is printable */\n  for (i = 0; i < len; i++) {\n    if (!ares_isprint(ptr[i])) {\n      return ARES_EBADSTR;\n    }\n  }\n\n  *str = ares_malloc(len + 1);\n  if (*str == NULL) {\n    return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  memcpy(*str, ptr, len);\n  (*str)[len] = 0;\n\n  return ares_buf_consume(buf, len);\n}",
+      "fn_code_pos": [
+        [
+          592,
+          0
+        ],
+        [
+          618,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_str_dup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes_into_buf(ares_buf_t *buf, ares_buf_t *dest,\n                                            size_t len)\n{\n  size_t               remaining_len;\n  const unsigned char *ptr = ares_buf_fetch(buf, &remaining_len);\n  ares_status_t        status;\n\n  if (buf == NULL || dest == NULL || len == 0 || remaining_len < len) {\n    return ARES_EBADRESP;\n  }\n\n  status = ares_buf_append(dest, ptr, len);\n  if (status != ARES_SUCCESS) {\n    return status;\n  }\n\n  return ares_buf_consume(buf, len);\n}",
+      "fn_code_pos": [
+        [
+          620,
+          0
+        ],
+        [
+          637,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch_bytes_into_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "dest": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_is_whitespace(unsigned char c,\n                                      ares_bool_t   include_linefeed)\n{\n  switch (c) {\n    case '\\r':\n    case '\\t':\n    case ' ':\n    case '\\v':\n    case '\\f':\n      return ARES_TRUE;\n    case '\\n':\n      return include_linefeed;\n    default:\n      break;\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          639,
+          0
+        ],
+        [
+          655,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_whitespace",
+        "parameters": {
+          "c": "unsigned char",
+          "include_linefeed": "ares_bool_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_whitespace(ares_buf_t *buf,\n                                   ares_bool_t include_linefeed)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  size_t               i;\n\n  if (ptr == NULL) {\n    return 0;\n  }\n\n  for (i = 0; i < remaining_len; i++) {\n    if (!ares_is_whitespace(ptr[i], include_linefeed)) {\n      break;\n    }\n  }\n\n  if (i > 0) {\n    ares_buf_consume(buf, i);\n  }\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          657,
+          0
+        ],
+        [
+          678,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_whitespace",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "include_linefeed": "ares_bool_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_nonwhitespace(ares_buf_t *buf)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  size_t               i;\n\n  if (ptr == NULL) {\n    return 0;\n  }\n\n  for (i = 0; i < remaining_len; i++) {\n    if (ares_is_whitespace(ptr[i], ARES_TRUE)) {\n      break;\n    }\n  }\n\n  if (i > 0) {\n    ares_buf_consume(buf, i);\n  }\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          680,
+          0
+        ],
+        [
+          700,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_nonwhitespace",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_line(ares_buf_t *buf, ares_bool_t include_linefeed)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  size_t               i;\n\n  if (ptr == NULL) {\n    return 0;\n  }\n\n  for (i = 0; i < remaining_len; i++) {\n    if (ptr[i] == '\\n') {\n      goto done;\n    }\n  }\n\ndone:\n  if (include_linefeed && i < remaining_len && ptr[i] == '\\n') {\n    i++;\n  }\n\n  if (i > 0) {\n    ares_buf_consume(buf, i);\n  }\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          702,
+          0
+        ],
+        [
+          727,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_line",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "include_linefeed": "ares_bool_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_until_charset(ares_buf_t          *buf,\n                                      const unsigned char *charset, size_t len,\n                                      ares_bool_t require_charset)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  size_t               pos;\n  ares_bool_t          found = ARES_FALSE;\n\n  if (ptr == NULL || charset == NULL || len == 0) {\n    return 0;\n  }\n\n  /* Optimize for single character searches */\n  if (len == 1) {\n    const unsigned char *p = memchr(ptr, charset[0], remaining_len);\n    if (p != NULL) {\n      found = ARES_TRUE;\n      pos   = (size_t)(p - ptr);\n    } else {\n      pos = remaining_len;\n    }\n    goto done;\n  }\n\n  for (pos = 0; pos < remaining_len; pos++) {\n    size_t j;\n    for (j = 0; j < len; j++) {\n      if (ptr[pos] == charset[j]) {\n        found = ARES_TRUE;\n        goto done;\n      }\n    }\n  }\n\ndone:\n  if (require_charset && !found) {\n    return SIZE_MAX;\n  }\n\n  if (pos > 0) {\n    ares_buf_consume(buf, pos);\n  }\n  return pos;\n}",
+      "fn_code_pos": [
+        [
+          729,
+          0
+        ],
+        [
+          773,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_until_charset",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "charset": "unsigned char",
+          "len": "size_t",
+          "require_charset": "ares_bool_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_until_seq(ares_buf_t *buf, const unsigned char *seq,\n                                  size_t len, ares_bool_t require_seq)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  const unsigned char *p;\n  size_t               consume_len = 0;\n\n  if (ptr == NULL || seq == NULL || len == 0) {\n    return 0;\n  }\n\n  p = ares_memmem(ptr, remaining_len, seq, len);\n  if (require_seq && p == NULL) {\n    return SIZE_MAX;\n  }\n\n  if (p != NULL) {\n    consume_len = (size_t)(p - ptr);\n  } else {\n    consume_len = remaining_len;\n  }\n\n  if (consume_len > 0) {\n    ares_buf_consume(buf, consume_len);\n  }\n\n  return consume_len;\n}",
+      "fn_code_pos": [
+        [
+          775,
+          0
+        ],
+        [
+          803,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_until_seq",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "seq": "unsigned char",
+          "len": "size_t",
+          "require_seq": "ares_bool_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_consume_charset(ares_buf_t *buf, const unsigned char *charset,\n                                size_t len)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n  size_t               i;\n\n  if (ptr == NULL || charset == NULL || len == 0) {\n    return 0;\n  }\n\n  for (i = 0; i < remaining_len; i++) {\n    size_t j;\n    for (j = 0; j < len; j++) {\n      if (ptr[i] == charset[j]) {\n        break;\n      }\n    }\n    /* Not found */\n    if (j == len) {\n      break;\n    }\n  }\n\n  if (i > 0) {\n    ares_buf_consume(buf, i);\n  }\n  return i;\n}",
+      "fn_code_pos": [
+        [
+          805,
+          0
+        ],
+        [
+          833,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_charset",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "charset": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_buf_destroy_cb(void *arg)\n{\n  ares_buf_t **buf = arg;\n  ares_buf_destroy(*buf);\n}",
+      "fn_code_pos": [
+        [
+          835,
+          0
+        ],
+        [
+          839,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_destroy_cb",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_buf_split_isduplicate(ares_array_t        *arr,\n                                              const unsigned char *val,\n                                              size_t               len,\n                                              ares_buf_split_t     flags)\n{\n  size_t i;\n  size_t num = ares_array_len(arr);\n\n  for (i = 0; i < num; i++) {\n    ares_buf_t         **bufptr = ares_array_at(arr, i);\n    const ares_buf_t    *buf    = *bufptr;\n    size_t               plen   = 0;\n    const unsigned char *ptr    = ares_buf_peek(buf, &plen);\n\n    /* Can't be duplicate if lengths mismatch */\n    if (plen != len) {\n      continue;\n    }\n\n    if (flags & ARES_BUF_SPLIT_CASE_INSENSITIVE) {\n      if (ares_memeq_ci(ptr, val, len)) {\n        return ARES_TRUE;\n      }\n    } else {\n      if (ares_memeq(ptr, val, len)) {\n        return ARES_TRUE;\n      }\n    }\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          841,
+          0
+        ],
+        [
+          872,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_split_isduplicate",
+        "parameters": {
+          "arr": "ares_array_t",
+          "val": "unsigned char",
+          "len": "size_t",
+          "flags": "ares_buf_split_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split(ares_buf_t *buf, const unsigned char *delims,\n                             size_t delims_len, ares_buf_split_t flags,\n                             size_t max_sections, ares_array_t **arr)\n{\n  ares_status_t status = ARES_SUCCESS;\n  ares_bool_t   first  = ARES_TRUE;\n\n  if (buf == NULL || delims == NULL || delims_len == 0 || arr == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *arr = ares_array_create(sizeof(ares_buf_t *), ares_buf_destroy_cb);\n  if (*arr == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  while (ares_buf_len(buf)) {\n    size_t               len = 0;\n    const unsigned char *ptr;\n\n    if (first) {\n      /* No delimiter yet, just tag the start */\n      ares_buf_tag(buf);\n    } else {\n      if (flags & ARES_BUF_SPLIT_KEEP_DELIMS) {\n        /* tag then eat delimiter so its first byte in buffer */\n        ares_buf_tag(buf);\n        ares_buf_consume(buf, 1);\n      } else {\n        /* throw away delimiter */\n        ares_buf_consume(buf, 1);\n        ares_buf_tag(buf);\n      }\n    }\n\n    if (max_sections && ares_array_len(*arr) >= max_sections - 1) {\n      ares_buf_consume(buf, ares_buf_len(buf));\n    } else {\n      ares_buf_consume_until_charset(buf, delims, delims_len, ARES_FALSE);\n    }\n\n    ptr = ares_buf_tag_fetch(buf, &len);\n\n    /* Shouldn't be possible */\n    if (ptr == NULL) {\n      status = ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n      goto done;\n    }\n\n    if (flags & ARES_BUF_SPLIT_LTRIM) {\n      size_t i;\n      for (i = 0; i < len; i++) {\n        if (!ares_is_whitespace(ptr[i], ARES_TRUE)) {\n          break;\n        }\n      }\n      ptr += i;\n      len -= i;\n    }\n\n    if (flags & ARES_BUF_SPLIT_RTRIM) {\n      while (len > 0 && ares_is_whitespace(ptr[len - 1], ARES_TRUE)) {\n        len--;\n      }\n    }\n\n    if (len != 0 || flags & ARES_BUF_SPLIT_ALLOW_BLANK) {\n      ares_buf_t *data;\n\n      if (!(flags & ARES_BUF_SPLIT_NO_DUPLICATES) ||\n          !ares_buf_split_isduplicate(*arr, ptr, len, flags)) {\n        /* Since we don't allow const buffers of 0 length, and user wants\n         * 0-length buffers, swap what we do here */\n        if (len) {\n          data = ares_buf_create_const(ptr, len);\n        } else {\n          data = ares_buf_create();\n        }\n\n        if (data == NULL) {\n          status = ARES_ENOMEM;\n          goto done;\n        }\n\n        status = ares_array_insertdata_last(*arr, &data);\n        if (status != ARES_SUCCESS) {\n          ares_buf_destroy(data);\n          goto done;\n        }\n      }\n    }\n\n    first = ARES_FALSE;\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_array_destroy(*arr);\n    *arr = NULL;\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          874,
+          0
+        ],
+        [
+          977,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_split",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_free_split_array(void *arg)\n{\n  void **ptr = arg;\n  ares_free(*ptr);\n}",
+      "fn_code_pos": [
+        [
+          979,
+          0
+        ],
+        [
+          983,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free_split_array",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split_str_array(ares_buf_t          *buf,\n                                       const unsigned char *delims,\n                                       size_t               delims_len,\n                                       ares_buf_split_t     flags,\n                                       size_t max_sections, ares_array_t **arr)\n{\n  ares_status_t status;\n  ares_array_t *split = NULL;\n  size_t        i;\n  size_t        len;\n\n  if (arr == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *arr = NULL;\n\n  status = ares_buf_split(buf, delims, delims_len, flags, max_sections, &split);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  *arr = ares_array_create(sizeof(char *), ares_free_split_array);\n  if (*arr == NULL) {\n    status = ARES_ENOMEM;\n    goto done;\n  }\n\n  len = ares_array_len(split);\n  for (i = 0; i < len; i++) {\n    ares_buf_t **bufptr = ares_array_at(split, i);\n    ares_buf_t  *lbuf   = *bufptr;\n    char        *str    = NULL;\n\n    status = ares_buf_fetch_str_dup(lbuf, ares_buf_len(lbuf), &str);\n    if (status != ARES_SUCCESS) {\n      goto done;\n    }\n\n    status = ares_array_insertdata_last(*arr, &str);\n    if (status != ARES_SUCCESS) {\n      ares_free(str);\n      goto done;\n    }\n  }\n\ndone:\n  ares_array_destroy(split);\n  if (status != ARES_SUCCESS) {\n    ares_array_destroy(*arr);\n    *arr = NULL;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          985,
+          0
+        ],
+        [
+          1038,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_split_str_array",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "arr": "ares_array_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split_str(ares_buf_t *buf, const unsigned char *delims,\n                                 size_t delims_len, ares_buf_split_t flags,\n                                 size_t max_sections, char ***strs,\n                                 size_t *nstrs)\n{\n  ares_status_t status;\n  ares_array_t *arr = NULL;\n\n  if (strs == NULL || nstrs == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  *strs  = NULL;\n  *nstrs = 0;\n\n  status = ares_buf_split_str_array(buf, delims, delims_len, flags,\n                                    max_sections, &arr);\n\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  if (status == ARES_SUCCESS) {\n    *strs = ares_array_finish(arr, nstrs);\n  } else {\n    ares_array_destroy(arr);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1040,
+          0
+        ],
+        [
+          1069,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_split_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "strs": "char",
+          "nstrs": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_buf_begins_with(const ares_buf_t    *buf,\n                                 const unsigned char *data, size_t data_len)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n\n  if (ptr == NULL || data == NULL || data_len == 0) {\n    return ARES_FALSE;\n  }\n\n  if (data_len > remaining_len) {\n    return ARES_FALSE;\n  }\n\n  if (memcmp(ptr, data, data_len) != 0) {\n    return ARES_FALSE;\n  }\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          1071,
+          0
+        ],
+        [
+          1090,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_begins_with",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_len(const ares_buf_t *buf)\n{\n  if (buf == NULL) {\n    return 0;\n  }\n\n  return buf->data_len - buf->offset;\n}",
+      "fn_code_pos": [
+        [
+          1092,
+          0
+        ],
+        [
+          1099,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_len",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "const unsigned char *ares_buf_peek(const ares_buf_t *buf, size_t *len)\n{\n  return ares_buf_fetch(buf, len);\n}",
+      "fn_code_pos": [
+        [
+          1101,
+          0
+        ],
+        [
+          1104,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_peek",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_replace(ares_buf_t *buf, const unsigned char *srch,\n                               size_t srch_size, const unsigned char *rplc,\n                               size_t rplc_size)\n{\n  size_t        processed_len = 0;\n  ares_status_t status;\n\n  if (buf->alloc_buf == NULL || srch == NULL || srch_size == 0 ||\n      (rplc == NULL && rplc_size != 0)) {\n    return ARES_EFORMERR;\n  }\n\n  while (1) {\n    unsigned char *ptr           = buf->alloc_buf + buf->offset + processed_len;\n    size_t         remaining_len = buf->data_len - buf->offset - processed_len;\n    size_t         found_offset  = 0;\n    size_t         move_data_len;\n\n    /* Find pattern */\n    ptr = ares_memmem(ptr, remaining_len, srch, srch_size);\n    if (ptr == NULL) {\n      break;\n    }\n\n    /* Store the offset this was found because our actual pointer might be\n     * switched out from under us by the call to ensure_space() if the\n     * replacement pattern is larger than the search pattern */\n    found_offset   = (size_t)(ptr - (size_t)(buf->alloc_buf + buf->offset));\n    if (rplc_size > srch_size) {\n      status = ares_buf_ensure_space(buf, rplc_size - srch_size);\n      if (status != ARES_SUCCESS) {\n        return status;\n      }\n    }\n\n    /* Impossible, but silence clang */\n    if (buf->alloc_buf == NULL) {\n      return ARES_ENOMEM;\n    }\n\n    /* Recalculate actual pointer */\n    ptr = buf->alloc_buf + buf->offset + found_offset;\n\n    /* Move the data */\n    move_data_len = buf->data_len - buf->offset - found_offset - srch_size;\n    memmove(ptr + rplc_size,\n            ptr + srch_size,\n            move_data_len);\n\n    /* Copy in the replacement data */\n    if (rplc != NULL && rplc_size > 0) {\n      memcpy(ptr, rplc, rplc_size);\n    }\n\n    if (rplc_size > srch_size) {\n      buf->data_len += rplc_size - srch_size;\n    } else {\n      buf->data_len -= srch_size - rplc_size;\n    }\n\n    processed_len = found_offset + rplc_size;\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1106,
+          0
+        ],
+        [
+          1170,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_replace",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "srch": "unsigned char",
+          "srch_size": "size_t",
+          "rplc": "unsigned char",
+          "rplc_size": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_peek_byte(const ares_buf_t *buf, unsigned char *b)\n{\n  size_t               remaining_len = 0;\n  const unsigned char *ptr           = ares_buf_fetch(buf, &remaining_len);\n\n  if (buf == NULL || b == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (remaining_len == 0) {\n    return ARES_EBADRESP;\n  }\n  *b = ptr[0];\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1172,
+          0
+        ],
+        [
+          1186,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_peek_byte",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "b": "unsigned char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_buf_get_position(const ares_buf_t *buf)\n{\n  if (buf == NULL) {\n    return 0;\n  }\n  return buf->offset;\n}",
+      "fn_code_pos": [
+        [
+          1188,
+          0
+        ],
+        [
+          1194,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_get_position",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_set_position(ares_buf_t *buf, size_t idx)\n{\n  if (buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (idx > buf->data_len) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  buf->offset = idx;\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1196,
+          0
+        ],
+        [
+          1208,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_set_position",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "idx": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t\n  ares_buf_parse_dns_binstr_int(ares_buf_t *buf, size_t remaining_len,\n                                unsigned char **bin, size_t *bin_len,\n                                ares_bool_t validate_printable)\n{\n  unsigned char len;\n  ares_status_t status = ARES_EBADRESP;\n  ares_buf_t   *binbuf = NULL;\n\n  if (buf == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  if (remaining_len == 0) {\n    return ARES_EBADRESP;\n  }\n\n  binbuf = ares_buf_create();\n  if (binbuf == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_buf_fetch_bytes(buf, &len, 1);\n  if (status != ARES_SUCCESS) {\n    goto done; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  remaining_len--;\n\n  if (len > remaining_len) {\n    status = ARES_EBADRESP;\n    goto done;\n  }\n\n  if (len) {\n    /* When used by the _str() parser, it really needs to be validated to\n     * be a valid printable ascii string.  Do that here */\n    if (validate_printable && ares_buf_len(buf) >= len) {\n      size_t      mylen;\n      const char *data = (const char *)ares_buf_peek(buf, &mylen);\n      if (!ares_str_isprint(data, len)) {\n        status = ARES_EBADSTR;\n        goto done;\n      }\n    }\n\n    if (bin != NULL) {\n      status = ares_buf_fetch_bytes_into_buf(buf, binbuf, len);\n    } else {\n      status = ares_buf_consume(buf, len);\n    }\n  }\n\ndone:\n  if (status != ARES_SUCCESS) {\n    ares_buf_destroy(binbuf);\n  } else {\n    if (bin != NULL) {\n      size_t mylen = 0;\n      /* NOTE: we use ares_buf_finish_str() here as we guarantee NULL\n       *       Termination even though we are technically returning binary data.\n       */\n      *bin     = (unsigned char *)ares_buf_finish_str(binbuf, &mylen);\n      *bin_len = mylen;\n    }\n  }\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1210,
+          0
+        ],
+        [
+          1278,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_parse_dns_binstr_int",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "bin": "unsigned char",
+          "bin_len": "size_t",
+          "validate_printable": "ares_bool_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_parse_dns_binstr(ares_buf_t *buf, size_t remaining_len,\n                                        unsigned char **bin, size_t *bin_len)\n{\n  return ares_buf_parse_dns_binstr_int(buf, remaining_len, bin, bin_len,\n                                       ARES_FALSE);\n}",
+      "fn_code_pos": [
+        [
+          1280,
+          0
+        ],
+        [
+          1285,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_parse_dns_binstr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "bin": "unsigned char",
+          "bin_len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_parse_dns_str(ares_buf_t *buf, size_t remaining_len,\n                                     char **str)\n{\n  size_t len;\n\n  return ares_buf_parse_dns_binstr_int(buf, remaining_len,\n                                       (unsigned char **)str, &len, ARES_TRUE);\n}",
+      "fn_code_pos": [
+        [
+          1287,
+          0
+        ],
+        [
+          1294,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_parse_dns_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_num_dec(ares_buf_t *buf, size_t num, size_t len)\n{\n  size_t i;\n  size_t mod;\n\n  if (len == 0) {\n    len = ares_count_digits(num);\n  }\n\n  mod = ares_pow(10, len);\n\n  for (i = len; i > 0; i--) {\n    size_t        digit = (num % mod);\n    ares_status_t status;\n\n    mod /= 10;\n\n    /* Silence coverity.  Shouldn't be possible since we calculate it above */\n    if (mod == 0) {\n      return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n\n    digit  /= mod;\n    status  = ares_buf_append_byte(buf, '0' + (unsigned char)(digit & 0xFF));\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1296,
+          0
+        ],
+        [
+          1325,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_num_dec",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "num": "size_t",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_num_hex(ares_buf_t *buf, size_t num, size_t len)\n{\n  size_t                     i;\n  static const unsigned char hexbytes[] = \"0123456789ABCDEF\";\n\n  if (len == 0) {\n    len = ares_count_hexdigits(num);\n  }\n\n  for (i = len; i > 0; i--) {\n    ares_status_t status;\n    status = ares_buf_append_byte(buf, hexbytes[(num >> ((i - 1) * 4)) & 0xF]);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1327,
+          0
+        ],
+        [
+          1344,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_num_hex",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "num": "size_t",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_append_str(ares_buf_t *buf, const char *str)\n{\n  return ares_buf_append(buf, (const unsigned char *)str, ares_strlen(str));\n}",
+      "fn_code_pos": [
+        [
+          1346,
+          0
+        ],
+        [
+          1349,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_buf_hexdump_line(ares_buf_t *buf, size_t idx,\n                                           const unsigned char *data,\n                                           size_t               len)\n{\n  size_t        i;\n  ares_status_t status;\n\n  /* Address */\n  status = ares_buf_append_num_hex(buf, idx, 6);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  /* | */\n  status = ares_buf_append_str(buf, \" | \");\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; i < 16; i++) {\n    if (i >= len) {\n      status = ares_buf_append_str(buf, \"  \");\n    } else {\n      status = ares_buf_append_num_hex(buf, data[i], 2);\n    }\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n\n    status = ares_buf_append_byte(buf, ' ');\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  /* | */\n  status = ares_buf_append_str(buf, \" | \");\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; i < 16; i++) {\n    if (i >= len) {\n      break;\n    }\n    status = ares_buf_append_byte(buf, ares_isprint(data[i]) ? data[i] : '.');\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ares_buf_append_byte(buf, '\\n');\n}",
+      "fn_code_pos": [
+        [
+          1351,
+          0
+        ],
+        [
+          1403,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_hexdump_line",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "idx": "size_t",
+          "data": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_hexdump(ares_buf_t *buf, const unsigned char *data,\n                               size_t len)\n{\n  size_t i;\n\n  /* Each line is 16 bytes */\n  for (i = 0; i < len; i += 16) {\n    ares_status_t status;\n    status = ares_buf_hexdump_line(buf, i, data + i, len - i);\n    if (status != ARES_SUCCESS) {\n      return status; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n  }\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          1405,
+          0
+        ],
+        [
+          1420,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_hexdump",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_load_file(const char *filename, ares_buf_t *buf)\n{\n  FILE          *fp        = NULL;\n  unsigned char *ptr       = NULL;\n  size_t         len       = 0;\n  size_t         ptr_len   = 0;\n  long           ftell_len = 0;\n  ares_status_t  status;\n\n  if (filename == NULL || buf == NULL) {\n    return ARES_EFORMERR; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  fp = fopen(filename, \"rb\");\n  if (fp == NULL) {\n    int error = errno;\n    switch (error) {\n      case ENOENT:\n      case ESRCH:\n        status = ARES_ENOTFOUND;\n        goto done;\n      default:\n        DEBUGF(fprintf(stderr, \"fopen() failed with error: %d %s\\n\", error,\n                       strerror(error)));\n        DEBUGF(fprintf(stderr, \"Error opening file: %s\\n\", filename));\n        status = ARES_EFILE;\n        goto done;\n    }\n  }\n\n  if (setvbuf(fp, NULL, _IONBF, 0) != 0) {\n    status = ARES_EFILE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;           /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Get length portably, fstat() is POSIX, not C */\n  if (fseek(fp, 0, SEEK_END) != 0) {\n    status = ARES_EFILE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;           /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ftell_len = ftell(fp);\n  if (ftell_len < 0) {\n    status = ARES_EFILE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;           /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n  len = (size_t)ftell_len;\n\n  if (fseek(fp, 0, SEEK_SET) != 0) {\n    status = ARES_EFILE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;           /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (len == 0) {\n    status = ARES_SUCCESS; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;             /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  /* Read entire data into buffer */\n  ptr_len = len;\n  ptr     = ares_buf_append_start(buf, &ptr_len);\n  if (ptr == NULL) {\n    status = ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    goto done;            /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  ptr_len = fread(ptr, 1, len, fp);\n  if (ptr_len != len) {\n    status = ARES_EFILE; /* LCOV_EXCL_LINE: DefensiveCoding */\n    goto done;           /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_buf_append_finish(buf, len);\n  status = ARES_SUCCESS;\n\ndone:\n  if (fp != NULL) {\n    fclose(fp);\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          1422,
+          0
+        ],
+        [
+          1502,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_load_file",
+        "parameters": {
+          "filename": "char",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_buf_create(void)",
+      "fn_dec_pos": [
+        [
+          45,
+          12
+        ],
+        [
+          45,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_create_const(const unsigned char *data, size_t data_len)",
+      "fn_dec_pos": [
+        [
+          56,
+          12
+        ],
+        [
+          56,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create_const",
+        "parameters": {
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_append_start(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          281,
+          15
+        ],
+        [
+          281,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_start",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_finish_bin(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          308,
+          15
+        ],
+        [
+          308,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_bin",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_finish_str(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          327,
+          6
+        ],
+        [
+          327,
+          55
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_tag_fetch(const ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          378,
+          21
+        ],
+        [
+          378,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_fetch(const ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          492,
+          28
+        ],
+        [
+          492,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_fetch",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_peek(const ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          1101,
+          21
+        ],
+        [
+          1101,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_peek",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_buf {\n  const unsigned char *data;          /*!< pointer to start of data buffer */\n  size_t               data_len;      /*!< total size of data in buffer */\n\n  unsigned char       *alloc_buf;     /*!< Pointer to allocated data buffer,\n                                       *   not used for const buffers */\n  size_t               alloc_buf_len; /*!< Size of allocated data buffer */\n\n  size_t               offset;        /*!< Current working offset in buffer */\n  size_t               tag_offset;    /*!< Tagged offset in buffer. Uses\n                                       *   SIZE_MAX if not set. */\n}",
+      {
+        "unsigned char": "const",
+        "data_len": "size_t",
+        "*alloc_buf": "unsigned char",
+        "alloc_buf_len": "size_t",
+        "offset": "size_t",
+        "tag_offset": "size_t"
+      },
+      "ares_buf",
+      [
+        32,
+        0
+      ],
+      [
+        43,
+        1
+      ]
+    ],
+    [
+      "struct ares_buf {\n  const unsigned char *data;          /*!< pointer to start of data buffer */\n  size_t               data_len;      /*!< total size of data in buffer */\n\n  unsigned char       *alloc_buf;     /*!< Pointer to allocated data buffer,\n                                       *   not used for const buffers */\n  size_t               alloc_buf_len; /*!< Size of allocated data buffer */\n\n  size_t               offset;        /*!< Current working offset in buffer */\n  size_t               tag_offset;    /*!< Tagged offset in buffer. Uses\n                                       *   SIZE_MAX if not set. */\n}",
+      {
+        "unsigned char": "const",
+        "data_len": "size_t",
+        "*alloc_buf": "unsigned char",
+        "alloc_buf_len": "size_t",
+        "offset": "size_t",
+        "tag_offset": "size_t"
+      },
+      "ares_buf",
+      [
+        32,
+        0
+      ],
+      [
+        43,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_buf.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

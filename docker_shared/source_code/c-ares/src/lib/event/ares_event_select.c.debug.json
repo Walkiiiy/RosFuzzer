@@ -1,0 +1,205 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static ares_bool_t ares_evsys_select_init(ares_event_thread_t *e)\n{\n  e->ev_signal = ares_pipeevent_create(e);\n  if (e->ev_signal == NULL) {\n    return ARES_FALSE; /* LCOV_EXCL_LINE: UntestablePath */\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          42,
+          0
+        ],
+        [
+          49,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_init",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_select_destroy(ares_event_thread_t *e)\n{\n  (void)e;\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_destroy",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_select_event_add(ares_event_t *event)\n{\n  (void)event;\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_event_add",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_select_event_del(ares_event_t *event)\n{\n  (void)event;\n}",
+      "fn_code_pos": [
+        [
+          62,
+          0
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_event_del",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_select_event_mod(ares_event_t      *event,\n                                        ares_event_flags_t new_flags)\n{\n  (void)event;\n  (void)new_flags;\n}",
+      "fn_code_pos": [
+        [
+          67,
+          0
+        ],
+        [
+          72,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_event_mod",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_evsys_select_wait(ares_event_thread_t *e,\n                                     unsigned long        timeout_ms)\n{\n  size_t          num_fds = 0;\n  ares_socket_t  *fdlist  = ares_htable_asvp_keys(e->ev_sock_handles, &num_fds);\n  int             rv;\n  size_t          cnt = 0;\n  size_t          i;\n  fd_set          read_fds;\n  fd_set          write_fds;\n  fd_set          except_fds;\n  int             nfds = 0;\n  struct timeval  tv;\n  struct timeval *tout = NULL;\n\n  FD_ZERO(&read_fds);\n  FD_ZERO(&write_fds);\n  FD_ZERO(&except_fds);\n\n  for (i = 0; i < num_fds; i++) {\n    const ares_event_t *ev =\n      ares_htable_asvp_get_direct(e->ev_sock_handles, fdlist[i]);\n    if (ev->flags & ARES_EVENT_FLAG_READ) {\n      FD_SET(ev->fd, &read_fds);\n    }\n    if (ev->flags & ARES_EVENT_FLAG_WRITE) {\n      FD_SET(ev->fd, &write_fds);\n    }\n    FD_SET(ev->fd, &except_fds);\n    if (ev->fd + 1 > nfds) {\n      nfds = ev->fd + 1;\n    }\n  }\n\n  if (timeout_ms) {\n    tv.tv_sec  = (int)(timeout_ms / 1000);\n    tv.tv_usec = (int)((timeout_ms % 1000) * 1000);\n    tout       = &tv;\n  }\n\n  rv = select(nfds, &read_fds, &write_fds, &except_fds, tout);\n  if (rv > 0) {\n    for (i = 0; i < num_fds; i++) {\n      ares_event_t      *ev;\n      ares_event_flags_t flags = 0;\n\n      ev = ares_htable_asvp_get_direct(e->ev_sock_handles, fdlist[i]);\n      if (ev == NULL || ev->cb == NULL) {\n        continue; /* LCOV_EXCL_LINE: DefensiveCoding */\n      }\n\n      if (FD_ISSET(fdlist[i], &read_fds) || FD_ISSET(fdlist[i], &except_fds)) {\n        flags |= ARES_EVENT_FLAG_READ;\n      }\n\n      if (FD_ISSET(fdlist[i], &write_fds)) {\n        flags |= ARES_EVENT_FLAG_WRITE;\n      }\n\n      if (flags == 0) {\n        continue;\n      }\n\n      cnt++;\n\n      ev->cb(e, fdlist[i], ev->data, flags);\n    }\n  }\n\n  ares_free(fdlist);\n\n  return cnt;\n}",
+      "fn_code_pos": [
+        [
+          74,
+          0
+        ],
+        [
+          146,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_select_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        86,
+        2
+      ],
+      [
+        86,
+        16
+      ]
+    ],
+    [
+      "struct timeval",
+      {},
+      "",
+      [
+        87,
+        2
+      ],
+      [
+        87,
+        16
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/select.h>\n",
+      [
+        39,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

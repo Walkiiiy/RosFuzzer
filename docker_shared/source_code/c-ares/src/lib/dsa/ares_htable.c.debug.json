@@ -1,0 +1,485 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static unsigned int ares_htable_generate_seed(ares_htable_t *htable)\n{\n#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION\n  /* Seed needs to be static for fuzzing */\n  return 0;\n#else\n  unsigned int seed = 0;\n  time_t       t    = time(NULL);\n\n  /* Mix stack address, heap address, and time to generate a random seed, it\n   * doesn't have to be super secure, just quick.  Likelihood of a hash\n   * collision attack is very low with a small amount of effort */\n  seed |= (unsigned int)((size_t)htable & 0xFFFFFFFF);\n  seed |= (unsigned int)((size_t)&seed & 0xFFFFFFFF);\n  seed |= (unsigned int)(((ares_uint64_t)t) & 0xFFFFFFFF);\n  return seed;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          51,
+          0
+        ],
+        [
+          68,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_generate_seed",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static void ares_htable_buckets_destroy(ares_llist_t **buckets,\n                                        unsigned int   size,\n                                        ares_bool_t    destroy_vals)\n{\n  unsigned int i;\n\n  if (buckets == NULL) {\n    return;\n  }\n\n  for (i = 0; i < size; i++) {\n    if (buckets[i] == NULL) {\n      continue;\n    }\n\n    if (!destroy_vals) {\n      ares_llist_replace_destructor(buckets[i], NULL);\n    }\n\n    ares_llist_destroy(buckets[i]);\n  }\n\n  ares_free(buckets);\n}",
+      "fn_code_pos": [
+        [
+          70,
+          0
+        ],
+        [
+          93,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_buckets_destroy",
+        "parameters": {
+          "buckets": "ares_llist_t",
+          "size": "unsigned int",
+          "destroy_vals": "ares_bool_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_htable_destroy(ares_htable_t *htable)\n{\n  if (htable == NULL) {\n    return;\n  }\n  ares_htable_buckets_destroy(htable->buckets, htable->size, ARES_TRUE);\n  ares_free(htable);\n}",
+      "fn_code_pos": [
+        [
+          95,
+          0
+        ],
+        [
+          102,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_destroy",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_htable_t *ares_htable_create(ares_htable_hashfunc_t    hash_func,\n                                  ares_htable_bucket_key_t  bucket_key,\n                                  ares_htable_bucket_free_t bucket_free,\n                                  ares_htable_key_eq_t      key_eq)\n{\n  ares_htable_t *htable = NULL;\n\n  if (hash_func == NULL || bucket_key == NULL || bucket_free == NULL ||\n      key_eq == NULL) {\n    goto fail;\n  }\n\n  htable = ares_malloc_zero(sizeof(*htable));\n  if (htable == NULL) {\n    goto fail;\n  }\n\n  htable->hash        = hash_func;\n  htable->bucket_key  = bucket_key;\n  htable->bucket_free = bucket_free;\n  htable->key_eq      = key_eq;\n  htable->seed        = ares_htable_generate_seed(htable);\n  htable->size        = ARES__HTABLE_MIN_BUCKETS;\n  htable->buckets = ares_malloc_zero(sizeof(*htable->buckets) * htable->size);\n\n  if (htable->buckets == NULL) {\n    goto fail;\n  }\n\n  return htable;\n\nfail:\n  ares_htable_destroy(htable);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          104,
+          0
+        ],
+        [
+          138,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_create",
+        "parameters": {
+          "hash_func": "ares_htable_hashfunc_t",
+          "bucket_key": "ares_htable_bucket_key_t",
+          "bucket_free": "ares_htable_bucket_free_t",
+          "key_eq": "ares_htable_key_eq_t"
+        },
+        "return_type": "ares_htable_t"
+      }
+    },
+    {
+      "fn_code": "const void **ares_htable_all_buckets(const ares_htable_t *htable, size_t *num)\n{\n  const void **out = NULL;\n  size_t       cnt = 0;\n  size_t       i;\n\n  if (htable == NULL || num == NULL) {\n    return NULL; /* LCOV_EXCL_LINE */\n  }\n\n  *num = 0;\n\n  out = ares_malloc_zero(sizeof(*out) * htable->num_keys);\n  if (out == NULL) {\n    return NULL; /* LCOV_EXCL_LINE */\n  }\n\n  for (i = 0; i < htable->size; i++) {\n    ares_llist_node_t *node;\n    for (node = ares_llist_node_first(htable->buckets[i]); node != NULL;\n         node = ares_llist_node_next(node)) {\n      out[cnt++] = ares_llist_node_val(node);\n    }\n  }\n\n  *num = cnt;\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          140,
+          0
+        ],
+        [
+          167,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_llist_node_t *ares_htable_find(const ares_htable_t *htable,\n                                           unsigned int idx, const void *key)\n{\n  ares_llist_node_t *node = NULL;\n\n  for (node = ares_llist_node_first(htable->buckets[idx]); node != NULL;\n       node = ares_llist_node_next(node)) {\n    if (htable->key_eq(key, htable->bucket_key(ares_llist_node_val(node)))) {\n      break;\n    }\n  }\n\n  return node;\n}",
+      "fn_code_pos": [
+        [
+          176,
+          0
+        ],
+        [
+          189,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_find",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "idx": "unsigned int",
+          "key": "void"
+        },
+        "return_type": "ares_llist_node_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_htable_expand(ares_htable_t *htable)\n{\n  ares_llist_t **buckets  = NULL;\n  unsigned int   old_size = htable->size;\n  size_t         i;\n  ares_llist_t **prealloc_llist     = NULL;\n  size_t         prealloc_llist_len = 0;\n  ares_bool_t    rv                 = ARES_FALSE;\n\n  /* Not a failure, just won't expand */\n  if (old_size == ARES__HTABLE_MAX_BUCKETS) {\n    return ARES_TRUE; /* LCOV_EXCL_LINE */\n  }\n\n  htable->size <<= 1;\n\n  /* We must pre-allocate all memory we'll need before moving entries to the\n   * new hash array.  Otherwise if there's a memory allocation failure in the\n   * middle, we wouldn't be able to recover. */\n  buckets = ares_malloc_zero(sizeof(*buckets) * htable->size);\n  if (buckets == NULL) {\n    goto done; /* LCOV_EXCL_LINE */\n  }\n\n  /* The maximum number of new llists we'll need is the number of collisions\n   * that were recorded */\n  prealloc_llist_len = htable->num_collisions;\n  if (prealloc_llist_len) {\n    prealloc_llist =\n      ares_malloc_zero(sizeof(*prealloc_llist) * prealloc_llist_len);\n    if (prealloc_llist == NULL) {\n      goto done; /* LCOV_EXCL_LINE */\n    }\n  }\n  for (i = 0; i < prealloc_llist_len; i++) {\n    prealloc_llist[i] = ares_llist_create(htable->bucket_free);\n    if (prealloc_llist[i] == NULL) {\n      goto done;\n    }\n  }\n\n  /* Iterate across all buckets and move the entries to the new buckets */\n  htable->num_collisions = 0;\n  for (i = 0; i < old_size; i++) {\n    ares_llist_node_t *node;\n\n    /* Nothing in this bucket */\n    if (htable->buckets[i] == NULL) {\n      continue;\n    }\n\n    /* Fast path optimization (most likely case), there is likely only a single\n     * entry in both the source and destination, check for this to confirm and\n     * if so, just move the bucket over */\n    if (ares_llist_len(htable->buckets[i]) == 1) {\n      const void *val = ares_llist_first_val(htable->buckets[i]);\n      size_t      idx = HASH_IDX(htable, htable->bucket_key(val));\n\n      if (buckets[idx] == NULL) {\n        /* Swap! */\n        buckets[idx]       = htable->buckets[i];\n        htable->buckets[i] = NULL;\n        continue;\n      }\n    }\n\n    /* Slow path, collisions */\n    while ((node = ares_llist_node_first(htable->buckets[i])) != NULL) {\n      const void *val = ares_llist_node_val(node);\n      size_t      idx = HASH_IDX(htable, htable->bucket_key(val));\n\n      /* Try fast path again as maybe we popped one collision off and the\n       * next we can reuse the llist parent */\n      if (buckets[idx] == NULL && ares_llist_len(htable->buckets[i]) == 1) {\n        /* Swap! */\n        buckets[idx]       = htable->buckets[i];\n        htable->buckets[i] = NULL;\n        break;\n      }\n\n      /* Grab one off our preallocated list */\n      if (buckets[idx] == NULL) {\n        /* Silence static analysis, this isn't possible but it doesn't know */\n        if (prealloc_llist == NULL || prealloc_llist_len == 0) {\n          goto done; /* LCOV_EXCL_LINE */\n        }\n        buckets[idx] = prealloc_llist[prealloc_llist_len - 1];\n        prealloc_llist_len--;\n      } else {\n        /* Collision occurred since the bucket wasn't empty */\n        htable->num_collisions++;\n      }\n\n      ares_llist_node_mvparent_first(node, buckets[idx]);\n    }\n\n    /* Abandoned bucket, destroy */\n    if (htable->buckets[i] != NULL) {\n      ares_llist_destroy(htable->buckets[i]);\n      htable->buckets[i] = NULL;\n    }\n  }\n\n  /* We have guaranteed all the buckets have either been moved or destroyed,\n   * so we just call ares_free() on the array and swap out the pointer */\n  ares_free(htable->buckets);\n  htable->buckets = buckets;\n  buckets         = NULL;\n  rv              = ARES_TRUE;\n\ndone:\n  ares_free(buckets);\n  /* destroy any unused preallocated buckets */\n  ares_htable_buckets_destroy(prealloc_llist, (unsigned int)prealloc_llist_len,\n                              ARES_FALSE);\n\n  /* On failure, we need to restore the htable size */\n  if (rv != ARES_TRUE) {\n    htable->size = old_size; /* LCOV_EXCL_LINE */\n  }\n\n  return rv;\n}",
+      "fn_code_pos": [
+        [
+          191,
+          0
+        ],
+        [
+          313,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_expand",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_insert(ares_htable_t *htable, void *bucket)\n{\n  unsigned int       idx  = 0;\n  ares_llist_node_t *node = NULL;\n  const void        *key  = NULL;\n\n  if (htable == NULL || bucket == NULL) {\n    return ARES_FALSE;\n  }\n\n\n  key = htable->bucket_key(bucket);\n  idx = HASH_IDX(htable, key);\n\n  /* See if we have a matching bucket already, if so, replace it */\n  node = ares_htable_find(htable, idx, key);\n  if (node != NULL) {\n    ares_llist_node_replace(node, bucket);\n    return ARES_TRUE;\n  }\n\n  /* Check to see if we should rehash because likelihood of collisions has\n   * increased beyond our threshold */\n  if (htable->num_keys + 1 >\n      (htable->size * ARES__HTABLE_EXPAND_PERCENT) / 100) {\n    if (!ares_htable_expand(htable)) {\n      return ARES_FALSE; /* LCOV_EXCL_LINE */\n    }\n    /* If we expanded, need to calculate a new index */\n    idx = HASH_IDX(htable, key);\n  }\n\n  /* We lazily allocate the linked list */\n  if (htable->buckets[idx] == NULL) {\n    htable->buckets[idx] = ares_llist_create(htable->bucket_free);\n    if (htable->buckets[idx] == NULL) {\n      return ARES_FALSE;\n    }\n  }\n\n  node = ares_llist_insert_first(htable->buckets[idx], bucket);\n  if (node == NULL) {\n    return ARES_FALSE;\n  }\n\n  /* Track collisions for rehash stability */\n  if (ares_llist_len(htable->buckets[idx]) > 1) {\n    htable->num_collisions++;\n  }\n\n  htable->num_keys++;\n\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          315,
+          0
+        ],
+        [
+          368,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_insert",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "bucket": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_htable_get(const ares_htable_t *htable, const void *key)\n{\n  unsigned int idx;\n\n  if (htable == NULL || key == NULL) {\n    return NULL;\n  }\n\n  idx = HASH_IDX(htable, key);\n\n  return ares_llist_node_val(ares_htable_find(htable, idx, key));\n}",
+      "fn_code_pos": [
+        [
+          370,
+          0
+        ],
+        [
+          381,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_get",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "key": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_remove(ares_htable_t *htable, const void *key)\n{\n  ares_llist_node_t *node;\n  unsigned int       idx;\n\n  if (htable == NULL || key == NULL) {\n    return ARES_FALSE;\n  }\n\n  idx  = HASH_IDX(htable, key);\n  node = ares_htable_find(htable, idx, key);\n  if (node == NULL) {\n    return ARES_FALSE;\n  }\n\n  htable->num_keys--;\n\n  /* Reduce collisions */\n  if (ares_llist_len(ares_llist_node_parent(node)) > 1) {\n    htable->num_collisions--;\n  }\n\n  ares_llist_node_destroy(node);\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          383,
+          0
+        ],
+        [
+          407,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_remove",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "key": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_htable_num_keys(const ares_htable_t *htable)\n{\n  if (htable == NULL) {\n    return 0;\n  }\n  return htable->num_keys;\n}",
+      "fn_code_pos": [
+        [
+          409,
+          0
+        ],
+        [
+          415,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_num_keys",
+        "parameters": {
+          "htable": "ares_htable_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_htable_hash_FNV1a(const unsigned char *key, size_t key_len,\n                                    unsigned int seed)\n{\n  unsigned int hv = seed ^ 2166136261U;\n  size_t       i;\n\n  for (i = 0; i < key_len; i++) {\n    hv ^= (unsigned int)key[i];\n    /* hv *= 16777619 (0x01000193) */\n    hv += (hv << 1) + (hv << 4) + (hv << 7) + (hv << 8) + (hv << 24);\n  }\n\n  return hv;\n}",
+      "fn_code_pos": [
+        [
+          417,
+          0
+        ],
+        [
+          430,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_hash_FNV1a",
+        "parameters": {
+          "key": "unsigned char",
+          "key_len": "size_t",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "unsigned int ares_htable_hash_FNV1a_casecmp(const unsigned char *key,\n                                            size_t key_len, unsigned int seed)\n{\n  unsigned int hv = seed ^ 2166136261U;\n  size_t       i;\n\n  for (i = 0; i < key_len; i++) {\n    hv ^= (unsigned int)ares_tolower(key[i]);\n    /* hv *= 16777619 (0x01000193) */\n    hv += (hv << 1) + (hv << 4) + (hv << 7) + (hv << 8) + (hv << 24);\n  }\n\n  return hv;\n}",
+      "fn_code_pos": [
+        [
+          433,
+          0
+        ],
+        [
+          446,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_hash_FNV1a_casecmp",
+        "parameters": {
+          "key": "unsigned char",
+          "key_len": "size_t",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_htable_create(ares_htable_hashfunc_t    hash_func,\n                                  ares_htable_bucket_key_t  bucket_key,\n                                  ares_htable_bucket_free_t bucket_free,\n                                  ares_htable_key_eq_t      key_eq)",
+      "fn_dec_pos": [
+        [
+          104,
+          15
+        ],
+        [
+          107,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_create",
+        "parameters": {
+          "hash_func": "ares_htable_hashfunc_t",
+          "bucket_key": "ares_htable_bucket_key_t",
+          "bucket_free": "ares_htable_bucket_free_t",
+          "key_eq": "ares_htable_key_eq_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_all_buckets(const ares_htable_t *htable, size_t *num)",
+      "fn_dec_pos": [
+        [
+          140,
+          13
+        ],
+        [
+          140,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_all_buckets",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_find(const ares_htable_t *htable,\n                                           unsigned int idx, const void *key)",
+      "fn_dec_pos": [
+        [
+          176,
+          26
+        ],
+        [
+          177,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_find",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "idx": "unsigned int",
+          "key": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_get(const ares_htable_t *htable, const void *key)",
+      "fn_dec_pos": [
+        [
+          370,
+          6
+        ],
+        [
+          370,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_get",
+        "parameters": {
+          "htable": "ares_htable_t",
+          "key": "void"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable {\n  ares_htable_hashfunc_t    hash;\n  ares_htable_bucket_key_t  bucket_key;\n  ares_htable_bucket_free_t bucket_free;\n  ares_htable_key_eq_t      key_eq;\n  unsigned int              seed;\n  unsigned int              size;\n  size_t                    num_keys;\n  size_t                    num_collisions;\n  /* NOTE: if we converted buckets into ares_slist_t we could guarantee on\n   *       hash collisions we would have O(log n) worst case insert and search\n   *       performance.  (We'd also need to make key_eq into a key_cmp to\n   *       support sort).  That said, risk with a random hash seed is near zero,\n   *       and ares_slist_t is heavier weight, so I think using ares_llist_t\n   *       is an overall win. */\n  ares_llist_t            **buckets;\n}",
+      {
+        "hash": "ares_htable_hashfunc_t",
+        "bucket_key": "ares_htable_bucket_key_t",
+        "bucket_free": "ares_htable_bucket_free_t",
+        "key_eq": "ares_htable_key_eq_t",
+        "seed": "unsigned int",
+        "size": "unsigned int",
+        "num_keys": "size_t",
+        "num_collisions": "size_t",
+        "**buckets": "ares_llist_t"
+      },
+      "ares_htable",
+      [
+        33,
+        0
+      ],
+      [
+        49,
+        1
+      ]
+    ],
+    [
+      "struct ares_htable {\n  ares_htable_hashfunc_t    hash;\n  ares_htable_bucket_key_t  bucket_key;\n  ares_htable_bucket_free_t bucket_free;\n  ares_htable_key_eq_t      key_eq;\n  unsigned int              seed;\n  unsigned int              size;\n  size_t                    num_keys;\n  size_t                    num_collisions;\n  /* NOTE: if we converted buckets into ares_slist_t we could guarantee on\n   *       hash collisions we would have O(log n) worst case insert and search\n   *       performance.  (We'd also need to make key_eq into a key_cmp to\n   *       support sort).  That said, risk with a random hash seed is near zero,\n   *       and ares_slist_t is heavier weight, so I think using ares_llist_t\n   *       is an overall win. */\n  ares_llist_t            **buckets;\n}",
+      {
+        "hash": "ares_htable_hashfunc_t",
+        "bucket_key": "ares_htable_bucket_key_t",
+        "bucket_free": "ares_htable_bucket_free_t",
+        "key_eq": "ares_htable_key_eq_t",
+        "seed": "unsigned int",
+        "size": "unsigned int",
+        "num_keys": "size_t",
+        "num_collisions": "size_t",
+        "**buckets": "ares_llist_t"
+      },
+      "ares_htable",
+      [
+        33,
+        0
+      ],
+      [
+        49,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_llist.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

@@ -1,0 +1,573 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void        *default_malloc(size_t size)\n{\n  if (size == 0) {\n    return NULL;\n  }\n  return malloc(size);\n}",
+      "fn_code_pos": [
+        [
+          46,
+          0
+        ],
+        [
+          52,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_malloc",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void *default_realloc(void *p, size_t size)\n{\n  return realloc(p, size);\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_realloc",
+        "parameters": {
+          "p": "void",
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void default_free(void *p)\n{\n  free(p);\n}",
+      "fn_code_pos": [
+        [
+          59,
+          0
+        ],
+        [
+          62,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_free",
+        "parameters": {
+          "p": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_malloc(size_t size)\n{\n  return __ares_malloc(size);\n}",
+      "fn_code_pos": [
+        [
+          68,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_malloc",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_realloc(void *ptr, size_t size)\n{\n  return __ares_realloc(ptr, size);\n}",
+      "fn_code_pos": [
+        [
+          73,
+          0
+        ],
+        [
+          76,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_realloc",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void ares_free(void *ptr)\n{\n  __ares_free(ptr);\n}",
+      "fn_code_pos": [
+        [
+          78,
+          0
+        ],
+        [
+          81,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_free",
+        "parameters": {
+          "ptr": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_malloc_zero(size_t size)\n{\n  void *ptr = ares_malloc(size);\n  if (ptr != NULL) {\n    memset(ptr, 0, size);\n  }\n\n  return ptr;\n}",
+      "fn_code_pos": [
+        [
+          83,
+          0
+        ],
+        [
+          91,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_malloc_zero",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "void *ares_realloc_zero(void *ptr, size_t orig_size, size_t new_size)\n{\n  void *p = ares_realloc(ptr, new_size);\n  if (p == NULL) {\n    return NULL;\n  }\n\n  if (new_size > orig_size) {\n    memset((unsigned char *)p + orig_size, 0, new_size - orig_size);\n  }\n\n  return p;\n}",
+      "fn_code_pos": [
+        [
+          93,
+          0
+        ],
+        [
+          105,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_realloc_zero",
+        "parameters": {
+          "ptr": "void",
+          "orig_size": "size_t",
+          "new_size": "size_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int ares_library_init(int flags)\n{\n  if (ares_initialized) {\n    ares_initialized++;\n    return ARES_SUCCESS;\n  }\n  ares_initialized++;\n\n  /* NOTE: ARES_LIB_INIT_WIN32 flag no longer used */\n\n  ares_init_flags = flags;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          107,
+          0
+        ],
+        [
+          120,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init",
+        "parameters": {
+          "flags": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_library_init_mem(int flags, void *(*amalloc)(size_t size),\n                          void (*afree)(void *ptr),\n                          void *(*arealloc)(void *ptr, size_t size))\n{\n  if (amalloc) {\n    __ares_malloc = amalloc;\n  }\n  if (arealloc) {\n    __ares_realloc = arealloc;\n  }\n  if (afree) {\n    __ares_free = afree;\n  }\n  return ares_library_init(flags);\n}",
+      "fn_code_pos": [
+        [
+          122,
+          0
+        ],
+        [
+          136,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_mem",
+        "parameters": {
+          "flags": "int",
+          "amalloc": "void",
+          "size": "size_t",
+          "afree": "void",
+          "ptr": "void",
+          "arealloc": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "void ares_library_cleanup(void)\n{\n  if (!ares_initialized) {\n    return;\n  }\n  ares_initialized--;\n  if (ares_initialized) {\n    return;\n  }\n\n  /* NOTE: ARES_LIB_INIT_WIN32 flag no longer used */\n\n#if defined(ANDROID) || defined(__ANDROID__)\n  ares_library_cleanup_android();\n#endif\n\n  ares_init_flags = ARES_LIB_INIT_NONE;\n  __ares_malloc   = default_malloc;\n  __ares_realloc  = default_realloc;\n  __ares_free     = default_free;\n}",
+      "fn_code_pos": [
+        [
+          138,
+          0
+        ],
+        [
+          158,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_cleanup",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int ares_library_initialized(void)\n{\n#ifdef USE_WINSOCK\n  if (!ares_initialized) {\n    return ARES_ENOTINITIALIZED;\n  }\n#endif\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          160,
+          0
+        ],
+        [
+          168,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_initialized",
+        "parameters": {},
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "default_malloc(size_t size)",
+      "fn_dec_pos": [
+        [
+          46,
+          20
+        ],
+        [
+          46,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_malloc",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "default_realloc(void *p, size_t size)",
+      "fn_dec_pos": [
+        [
+          54,
+          13
+        ],
+        [
+          54,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "default_realloc",
+        "parameters": {
+          "p": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*__ares_malloc)(size_t size)",
+      "fn_dec_pos": [
+        [
+          64,
+          13
+        ],
+        [
+          64,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*__ares_realloc)(void *ptr, size_t size)",
+      "fn_dec_pos": [
+        [
+          65,
+          13
+        ],
+        [
+          65,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*__ares_free)(void *ptr)",
+      "fn_dec_pos": [
+        [
+          66,
+          12
+        ],
+        [
+          66,
+          37
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_malloc(size_t size)",
+      "fn_dec_pos": [
+        [
+          68,
+          6
+        ],
+        [
+          68,
+          30
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_malloc",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_realloc(void *ptr, size_t size)",
+      "fn_dec_pos": [
+        [
+          73,
+          6
+        ],
+        [
+          73,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_realloc",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_malloc_zero(size_t size)",
+      "fn_dec_pos": [
+        [
+          83,
+          6
+        ],
+        [
+          83,
+          35
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_malloc_zero",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_realloc_zero(void *ptr, size_t orig_size, size_t new_size)",
+      "fn_dec_pos": [
+        [
+          93,
+          6
+        ],
+        [
+          93,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_realloc_zero",
+        "parameters": {
+          "ptr": "void",
+          "orig_size": "size_t",
+          "new_size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*amalloc)(size_t size)",
+      "fn_dec_pos": [
+        [
+          122,
+          43
+        ],
+        [
+          122,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "(*afree)(void *ptr)",
+      "fn_dec_pos": [
+        [
+          123,
+          31
+        ],
+        [
+          123,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*arealloc)(void *ptr, size_t size)",
+      "fn_dec_pos": [
+        [
+          124,
+          32
+        ],
+        [
+          124,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "ptr": "void",
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include \"ares_android.h\"\n",
+      [
+        32,
+        0
+      ],
+      [
+        33,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

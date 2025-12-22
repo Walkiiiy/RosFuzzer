@@ -1,0 +1,637 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static int get_scope(const struct sockaddr *addr)\n{\n  if (addr->sa_family == AF_INET6) {\n    const struct sockaddr_in6 *addr6 =\n      CARES_INADDR_CAST(const struct sockaddr_in6 *, addr);\n    if (IN6_IS_ADDR_MULTICAST(&addr6->sin6_addr)) {\n      return ARES_IPV6_ADDR_MC_SCOPE(&addr6->sin6_addr);\n    } else if (IN6_IS_ADDR_LOOPBACK(&addr6->sin6_addr) ||\n               IN6_IS_ADDR_LINKLOCAL(&addr6->sin6_addr)) {\n      /*\n       * RFC 4291 section 2.5.3 says loopback is to be treated as having\n       * link-local scope.\n       */\n      return ARES_IPV6_ADDR_SCOPE_LINKLOCAL;\n    } else if (IN6_IS_ADDR_SITELOCAL(&addr6->sin6_addr)) {\n      return ARES_IPV6_ADDR_SCOPE_SITELOCAL;\n    } else {\n      return ARES_IPV6_ADDR_SCOPE_GLOBAL;\n    }\n  } else if (addr->sa_family == AF_INET) {\n    const struct sockaddr_in *addr4 =\n      CARES_INADDR_CAST(const struct sockaddr_in *, addr);\n    unsigned long int na = ntohl(addr4->sin_addr.s_addr);\n    if (ARES_IN_LOOPBACK(na) ||          /* 127.0.0.0/8 */\n        (na & 0xffff0000) == 0xa9fe0000) /* 169.254.0.0/16 */\n    {\n      return ARES_IPV6_ADDR_SCOPE_LINKLOCAL;\n    } else {\n      /*\n       * RFC 6724 section 3.2. Other IPv4 addresses, including private\n       * addresses and shared addresses (100.64.0.0/10), are assigned global\n       * scope.\n       */\n      return ARES_IPV6_ADDR_SCOPE_GLOBAL;\n    }\n  } else {\n    /*\n     * This should never happen.\n     * Return a scope with low priority as a last resort.\n     */\n    return ARES_IPV6_ADDR_SCOPE_NODELOCAL;\n  }\n}",
+      "fn_code_pos": [
+        [
+          87,
+          0
+        ],
+        [
+          129,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get_scope",
+        "parameters": {
+          "addr": "struct sockaddr"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int get_label(const struct sockaddr *addr)\n{\n  if (addr->sa_family == AF_INET) {\n    return 4;\n  } else if (addr->sa_family == AF_INET6) {\n    const struct sockaddr_in6 *addr6 =\n      CARES_INADDR_CAST(const struct sockaddr_in6 *, addr);\n    if (IN6_IS_ADDR_LOOPBACK(&addr6->sin6_addr)) {\n      return 0;\n    } else if (IN6_IS_ADDR_V4MAPPED(&addr6->sin6_addr)) {\n      return 4;\n    } else if (ARES_IN6_IS_ADDR_6TO4(&addr6->sin6_addr)) {\n      return 2;\n    } else if (ARES_IN6_IS_ADDR_TEREDO(&addr6->sin6_addr)) {\n      return 5;\n    } else if (ARES_IN6_IS_ADDR_ULA(&addr6->sin6_addr)) {\n      return 13;\n    } else if (IN6_IS_ADDR_V4COMPAT(&addr6->sin6_addr)) {\n      return 3;\n    } else if (IN6_IS_ADDR_SITELOCAL(&addr6->sin6_addr)) {\n      return 11;\n    } else if (ARES_IN6_IS_ADDR_6BONE(&addr6->sin6_addr)) {\n      return 12;\n    } else {\n      /* All other IPv6 addresses, including global unicast addresses. */\n      return 1;\n    }\n  } else {\n    /*\n     * This should never happen.\n     * Return a semi-random label as a last resort.\n     */\n    return 1;\n  }\n}",
+      "fn_code_pos": [
+        [
+          131,
+          0
+        ],
+        [
+          165,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get_label",
+        "parameters": {
+          "addr": "struct sockaddr"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int get_precedence(const struct sockaddr *addr)\n{\n  if (addr->sa_family == AF_INET) {\n    return 35;\n  } else if (addr->sa_family == AF_INET6) {\n    const struct sockaddr_in6 *addr6 =\n      CARES_INADDR_CAST(const struct sockaddr_in6 *, addr);\n    if (IN6_IS_ADDR_LOOPBACK(&addr6->sin6_addr)) {\n      return 50;\n    } else if (IN6_IS_ADDR_V4MAPPED(&addr6->sin6_addr)) {\n      return 35;\n    } else if (ARES_IN6_IS_ADDR_6TO4(&addr6->sin6_addr)) {\n      return 30;\n    } else if (ARES_IN6_IS_ADDR_TEREDO(&addr6->sin6_addr)) {\n      return 5;\n    } else if (ARES_IN6_IS_ADDR_ULA(&addr6->sin6_addr)) {\n      return 3;\n    } else if (IN6_IS_ADDR_V4COMPAT(&addr6->sin6_addr) ||\n               IN6_IS_ADDR_SITELOCAL(&addr6->sin6_addr) ||\n               ARES_IN6_IS_ADDR_6BONE(&addr6->sin6_addr)) {\n      return 1;\n    } else {\n      /* All other IPv6 addresses, including global unicast addresses. */\n      return 40;\n    }\n  } else {\n    return 1;\n  }\n}",
+      "fn_code_pos": [
+        [
+          171,
+          0
+        ],
+        [
+          199,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "get_precedence",
+        "parameters": {
+          "addr": "struct sockaddr"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static size_t common_prefix_len(const struct in6_addr *a1,\n                                const struct in6_addr *a2)\n{\n  const unsigned char *p1 = (const unsigned char *)a1;\n  const unsigned char *p2 = (const unsigned char *)a2;\n  size_t               i;\n  for (i = 0; i < sizeof(*a1); ++i) {\n    unsigned char x;\n    size_t        j;\n    if (p1[i] == p2[i]) {\n      continue;\n    }\n    x = p1[i] ^ p2[i];\n    for (j = 0; j < CHAR_BIT; ++j) {\n      if (x & (1 << (CHAR_BIT - 1))) {\n        return i * CHAR_BIT + j;\n      }\n      x <<= 1;\n    }\n  }\n  return sizeof(*a1) * CHAR_BIT;\n}",
+      "fn_code_pos": [
+        [
+          204,
+          0
+        ],
+        [
+          225,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "common_prefix_len",
+        "parameters": {
+          "a1": "struct in6_addr",
+          "a2": "struct in6_addr"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "static int rfc6724_compare(const void *ptr1, const void *ptr2)\n{\n  const struct addrinfo_sort_elem *a1 = (const struct addrinfo_sort_elem *)ptr1;\n  const struct addrinfo_sort_elem *a2 = (const struct addrinfo_sort_elem *)ptr2;\n  int                              scope_src1;\n  int                              scope_dst1;\n  int                              scope_match1;\n  int                              scope_src2;\n  int                              scope_dst2;\n  int                              scope_match2;\n  int                              label_src1;\n  int                              label_dst1;\n  int                              label_match1;\n  int                              label_src2;\n  int                              label_dst2;\n  int                              label_match2;\n  int                              precedence1;\n  int                              precedence2;\n  size_t                           prefixlen1;\n  size_t                           prefixlen2;\n\n  /* Rule 1: Avoid unusable destinations. */\n  if (a1->has_src_addr != a2->has_src_addr) {\n    return ((int)a2->has_src_addr) - ((int)a1->has_src_addr);\n  }\n\n  /* Rule 2: Prefer matching scope. */\n  scope_src1 = ARES_IPV6_ADDR_SCOPE_NODELOCAL;\n  if (a1->has_src_addr) {\n    scope_src1 = get_scope(&a1->src_addr.sa);\n  }\n  scope_dst1   = get_scope(a1->ai->ai_addr);\n  scope_match1 = (scope_src1 == scope_dst1);\n\n  scope_src2 = ARES_IPV6_ADDR_SCOPE_NODELOCAL;\n  if (a2->has_src_addr) {\n    scope_src2 = get_scope(&a2->src_addr.sa);\n  }\n  scope_dst2   = get_scope(a2->ai->ai_addr);\n  scope_match2 = (scope_src2 == scope_dst2);\n\n  if (scope_match1 != scope_match2) {\n    return scope_match2 - scope_match1;\n  }\n\n  /* Rule 3: Avoid deprecated addresses.  */\n\n  /* Rule 4: Prefer home addresses.  */\n\n  /* Rule 5: Prefer matching label. */\n  label_src1 = 1;\n  if (a1->has_src_addr) {\n    label_src1 = get_label(&a1->src_addr.sa);\n  }\n  label_dst1   = get_label(a1->ai->ai_addr);\n  label_match1 = (label_src1 == label_dst1);\n\n  label_src2 = 1;\n  if (a2->has_src_addr) {\n    label_src2 = get_label(&a2->src_addr.sa);\n  }\n  label_dst2   = get_label(a2->ai->ai_addr);\n  label_match2 = (label_src2 == label_dst2);\n\n  if (label_match1 != label_match2) {\n    return label_match2 - label_match1;\n  }\n\n  /* Rule 6: Prefer higher precedence. */\n  precedence1 = get_precedence(a1->ai->ai_addr);\n  precedence2 = get_precedence(a2->ai->ai_addr);\n  if (precedence1 != precedence2) {\n    return precedence2 - precedence1;\n  }\n\n  /* Rule 7: Prefer native transport.  */\n\n  /* Rule 8: Prefer smaller scope. */\n  if (scope_dst1 != scope_dst2) {\n    return scope_dst1 - scope_dst2;\n  }\n\n  /* Rule 9: Use longest matching prefix. */\n  if (a1->has_src_addr && a1->ai->ai_addr->sa_family == AF_INET6 &&\n      a2->has_src_addr && a2->ai->ai_addr->sa_family == AF_INET6) {\n    const struct sockaddr_in6 *a1_src = &a1->src_addr.sa6;\n    const struct sockaddr_in6 *a1_dst =\n      CARES_INADDR_CAST(const struct sockaddr_in6 *, a1->ai->ai_addr);\n    const struct sockaddr_in6 *a2_src = &a2->src_addr.sa6;\n    const struct sockaddr_in6 *a2_dst =\n      CARES_INADDR_CAST(const struct sockaddr_in6 *, a2->ai->ai_addr);\n    prefixlen1 = common_prefix_len(&a1_src->sin6_addr, &a1_dst->sin6_addr);\n    prefixlen2 = common_prefix_len(&a2_src->sin6_addr, &a2_dst->sin6_addr);\n    if (prefixlen1 != prefixlen2) {\n      return (int)prefixlen2 - (int)prefixlen1;\n    }\n  }\n\n  /*\n   * Rule 10: Leave the order unchanged.\n   * We need this since qsort() is not necessarily stable.\n   */\n  return ((int)a1->original_order) - ((int)a2->original_order);\n}",
+      "fn_code_pos": [
+        [
+          231,
+          0
+        ],
+        [
+          334,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rfc6724_compare",
+        "parameters": {
+          "ptr1": "void",
+          "ptr2": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static int find_src_addr(ares_channel_t *channel, const struct sockaddr *addr,\n                         struct sockaddr *src_addr)\n{\n  ares_socket_t   sock;\n  ares_socklen_t  len;\n  ares_conn_err_t err;\n\n  switch (addr->sa_family) {\n    case AF_INET:\n      len = sizeof(struct sockaddr_in);\n      break;\n    case AF_INET6:\n      len = sizeof(struct sockaddr_in6);\n      break;\n    default:\n      /* No known usable source address for non-INET families. */\n      return 0;\n  }\n\n  err =\n    ares_socket_open(&sock, channel, addr->sa_family, SOCK_DGRAM, IPPROTO_UDP);\n  if (err == ARES_CONN_ERR_AFNOSUPPORT) {\n    return 0;\n  } else if (err != ARES_CONN_ERR_SUCCESS) {\n    return -1;\n  }\n\n  err = ares_socket_connect(channel, sock, ARES_FALSE, addr, len);\n  if (err != ARES_CONN_ERR_SUCCESS && err != ARES_CONN_ERR_WOULDBLOCK) {\n    ares_socket_close(channel, sock);\n    return 0;\n  }\n\n  if (channel->sock_funcs.agetsockname == NULL ||\n      channel->sock_funcs.agetsockname(sock, src_addr, &len,\n                                       channel->sock_func_cb_data) != 0) {\n    ares_socket_close(channel, sock);\n    return -1;\n  }\n  ares_socket_close(channel, sock);\n  return 1;\n}",
+      "fn_code_pos": [
+        [
+          344,
+          0
+        ],
+        [
+          385,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "find_src_addr",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "addr": "struct sockaddr",
+          "src_addr": "struct sockaddr"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_sortaddrinfo(ares_channel_t            *channel,\n                                struct ares_addrinfo_node *list_sentinel)\n{\n  struct ares_addrinfo_node *cur;\n  size_t                     nelem = 0;\n  size_t                     i;\n  int                        has_src_addr;\n  struct addrinfo_sort_elem *elems;\n\n  cur = list_sentinel->ai_next;\n  while (cur) {\n    ++nelem;\n    cur = cur->ai_next;\n  }\n\n  if (!nelem) {\n    return ARES_ENODATA;\n  }\n\n  elems = (struct addrinfo_sort_elem *)ares_malloc(\n    nelem * sizeof(struct addrinfo_sort_elem));\n  if (!elems) {\n    return ARES_ENOMEM;\n  }\n\n  /*\n   * Convert the linked list to an array that also contains the candidate\n   * source address for each destination address.\n   */\n  for (i = 0, cur = list_sentinel->ai_next; i < nelem;\n       ++i, cur   = cur->ai_next) {\n    assert(cur != NULL);\n    elems[i].ai             = cur;\n    elems[i].original_order = i;\n    has_src_addr = find_src_addr(channel, cur->ai_addr, &elems[i].src_addr.sa);\n    if (has_src_addr == -1) {\n      ares_free(elems);\n      return ARES_ENOTFOUND;\n    }\n    elems[i].has_src_addr = (has_src_addr == 1) ? ARES_TRUE : ARES_FALSE;\n  }\n\n  /* Sort the addresses, and rearrange the linked list so it matches the sorted\n   * order. */\n  qsort((void *)elems, nelem, sizeof(struct addrinfo_sort_elem),\n        rfc6724_compare);\n\n  list_sentinel->ai_next = elems[0].ai;\n  for (i = 0; i < nelem - 1; ++i) {\n    elems[i].ai->ai_next = elems[i + 1].ai;\n  }\n  elems[nelem - 1].ai->ai_next = NULL;\n\n  ares_free(elems);\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          391,
+          0
+        ],
+        [
+          446,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_sortaddrinfo",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "list_sentinel": "struct ares_addrinfo_node"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct addrinfo_sort_elem {\n  struct ares_addrinfo_node *ai;\n  ares_bool_t                has_src_addr;\n  ares_sockaddr              src_addr;\n  size_t                     original_order;\n}",
+      {
+        "*ai": "struct ares_addrinfo_node",
+        "has_src_addr": "ares_bool_t",
+        "src_addr": "ares_sockaddr",
+        "original_order": "size_t"
+      },
+      "addrinfo_sort_elem",
+      [
+        53,
+        0
+      ],
+      [
+        58,
+        1
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem {\n  struct ares_addrinfo_node *ai;\n  ares_bool_t                has_src_addr;\n  ares_sockaddr              src_addr;\n  size_t                     original_order;\n}",
+      {
+        "*ai": "struct ares_addrinfo_node",
+        "has_src_addr": "ares_bool_t",
+        "src_addr": "ares_sockaddr",
+        "original_order": "size_t"
+      },
+      "addrinfo_sort_elem",
+      [
+        53,
+        0
+      ],
+      [
+        58,
+        1
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        54,
+        2
+      ],
+      [
+        54,
+        27
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        87,
+        27
+      ],
+      [
+        87,
+        42
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        90,
+        10
+      ],
+      [
+        90,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        107,
+        10
+      ],
+      [
+        107,
+        28
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        131,
+        27
+      ],
+      [
+        131,
+        42
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        136,
+        10
+      ],
+      [
+        136,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        171,
+        32
+      ],
+      [
+        171,
+        47
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        176,
+        10
+      ],
+      [
+        176,
+        29
+      ]
+    ],
+    [
+      "struct in6_addr",
+      {},
+      "",
+      [
+        204,
+        38
+      ],
+      [
+        204,
+        53
+      ]
+    ],
+    [
+      "struct in6_addr",
+      {},
+      "",
+      [
+        205,
+        38
+      ],
+      [
+        205,
+        53
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        233,
+        8
+      ],
+      [
+        233,
+        33
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        233,
+        47
+      ],
+      [
+        233,
+        72
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        234,
+        8
+      ],
+      [
+        234,
+        33
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        234,
+        47
+      ],
+      [
+        234,
+        72
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        316,
+        10
+      ],
+      [
+        316,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        317,
+        10
+      ],
+      [
+        317,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        319,
+        10
+      ],
+      [
+        319,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        320,
+        10
+      ],
+      [
+        320,
+        29
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        344,
+        56
+      ],
+      [
+        344,
+        71
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        345,
+        25
+      ],
+      [
+        345,
+        40
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        353,
+        19
+      ],
+      [
+        353,
+        37
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        356,
+        19
+      ],
+      [
+        356,
+        38
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        392,
+        32
+      ],
+      [
+        392,
+        57
+      ]
+    ],
+    [
+      "struct ares_addrinfo_node",
+      {},
+      "",
+      [
+        394,
+        2
+      ],
+      [
+        394,
+        27
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        398,
+        2
+      ],
+      [
+        398,
+        27
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        410,
+        11
+      ],
+      [
+        410,
+        36
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        411,
+        19
+      ],
+      [
+        411,
+        44
+      ]
+    ],
+    [
+      "struct addrinfo_sort_elem",
+      {},
+      "",
+      [
+        435,
+        37
+      ],
+      [
+        435,
+        62
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        41,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    [
+      "#  include <netdb.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#  include <strings.h>\n",
+      [
+        47,
+        0
+      ],
+      [
+        48,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        50,
+        0
+      ],
+      [
+        51,
+        0
+      ]
+    ],
+    [
+      "#include <limits.h>\n",
+      [
+        51,
+        0
+      ],
+      [
+        52,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

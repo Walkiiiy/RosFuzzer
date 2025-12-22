@@ -1,0 +1,267 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "int LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)\n{\n  /* Feed the data into each of the ares_parse_*_reply functions. */\n  struct hostent          *host = NULL;\n  struct ares_addrttl      info[5];\n  struct ares_addr6ttl     info6[5];\n  unsigned char            addrv4[4] = { 0x10, 0x20, 0x30, 0x40 };\n  struct ares_srv_reply   *srv       = NULL;\n  struct ares_mx_reply    *mx        = NULL;\n  struct ares_txt_reply   *txt       = NULL;\n  struct ares_soa_reply   *soa       = NULL;\n  struct ares_naptr_reply *naptr     = NULL;\n  struct ares_caa_reply   *caa       = NULL;\n  struct ares_uri_reply   *uri       = NULL;\n  int                      count     = 5;\n  ares_parse_a_reply(data, (int)size, &host, info, &count);\n  if (host) {\n    ares_free_hostent(host);\n  }\n\n  host  = NULL;\n  count = 5;\n  ares_parse_aaaa_reply(data, (int)size, &host, info6, &count);\n  if (host) {\n    ares_free_hostent(host);\n  }\n\n  host = NULL;\n  ares_parse_ptr_reply(data, (int)size, addrv4, sizeof(addrv4), AF_INET, &host);\n  if (host) {\n    ares_free_hostent(host);\n  }\n\n  host = NULL;\n  ares_parse_ns_reply(data, (int)size, &host);\n  if (host) {\n    ares_free_hostent(host);\n  }\n\n  ares_parse_srv_reply(data, (int)size, &srv);\n  if (srv) {\n    ares_free_data(srv);\n  }\n\n  ares_parse_mx_reply(data, (int)size, &mx);\n  if (mx) {\n    ares_free_data(mx);\n  }\n\n  ares_parse_txt_reply(data, (int)size, &txt);\n  if (txt) {\n    ares_free_data(txt);\n  }\n\n  ares_parse_soa_reply(data, (int)size, &soa);\n  if (soa) {\n    ares_free_data(soa);\n  }\n\n  ares_parse_naptr_reply(data, (int)size, &naptr);\n  if (naptr) {\n    ares_free_data(naptr);\n  }\n\n  ares_parse_caa_reply(data, (int)size, &caa);\n  if (caa) {\n    ares_free_data(caa);\n  }\n\n  ares_parse_uri_reply(data, (int)size, &uri);\n  if (uri) {\n    ares_free_data(uri);\n  }\n\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          124,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)\n{\n  ares_dns_record_t *dnsrec    = NULL;\n  char              *printdata = NULL;\n  ares_buf_t        *printmsg  = NULL;\n  size_t             i;\n  unsigned char     *datadup     = NULL;\n  size_t             datadup_len = 0;\n\n  /* There is never a reason to have a size > 65535, it is immediately\n   * rejected by the parser */\n  if (size > 65535) {\n    return -1;\n  }\n\n  if (ares_dns_parse(data, size, 0, &dnsrec) != ARES_SUCCESS) {\n    goto done;\n  }\n\n  /* Lets test the message fetchers */\n  printmsg = ares_buf_create();\n  if (printmsg == NULL) {\n    goto done;\n  }\n\n  ares_buf_append_str(printmsg, \";; ->>HEADER<<- opcode: \");\n  ares_buf_append_str(\n    printmsg, ares_dns_opcode_tostr(ares_dns_record_get_opcode(dnsrec)));\n  ares_buf_append_str(printmsg, \", status: \");\n  ares_buf_append_str(printmsg,\n                      ares_dns_rcode_tostr(ares_dns_record_get_rcode(dnsrec)));\n  ares_buf_append_str(printmsg, \", id: \");\n  ares_buf_append_num_dec(printmsg, (size_t)ares_dns_record_get_id(dnsrec), 0);\n  ares_buf_append_str(printmsg, \"\\n;; flags: \");\n  ares_buf_append_num_hex(printmsg, (size_t)ares_dns_record_get_flags(dnsrec),\n                          0);\n  ares_buf_append_str(printmsg, \"; QUERY: \");\n  ares_buf_append_num_dec(printmsg, ares_dns_record_query_cnt(dnsrec), 0);\n  ares_buf_append_str(printmsg, \", ANSWER: \");\n  ares_buf_append_num_dec(\n    printmsg, ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER), 0);\n  ares_buf_append_str(printmsg, \", AUTHORITY: \");\n  ares_buf_append_num_dec(\n    printmsg, ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_AUTHORITY), 0);\n  ares_buf_append_str(printmsg, \", ADDITIONAL: \");\n  ares_buf_append_num_dec(\n    printmsg, ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ADDITIONAL), 0);\n  ares_buf_append_str(printmsg, \"\\n\\n\");\n  ares_buf_append_str(printmsg, \";; QUESTION SECTION:\\n\");\n  for (i = 0; i < ares_dns_record_query_cnt(dnsrec); i++) {\n    const char         *name;\n    ares_dns_rec_type_t qtype;\n    ares_dns_class_t    qclass;\n\n    if (ares_dns_record_query_get(dnsrec, i, &name, &qtype, &qclass) !=\n        ARES_SUCCESS) {\n      goto done;\n    }\n\n    ares_buf_append_str(printmsg, \";\");\n    ares_buf_append_str(printmsg, name);\n    ares_buf_append_str(printmsg, \".\\t\\t\\t\");\n    ares_buf_append_str(printmsg, ares_dns_class_tostr(qclass));\n    ares_buf_append_str(printmsg, \"\\t\");\n    ares_buf_append_str(printmsg, ares_dns_rec_type_tostr(qtype));\n    ares_buf_append_str(printmsg, \"\\n\");\n  }\n  ares_buf_append_str(printmsg, \"\\n\");\n  for (i = ARES_SECTION_ANSWER; i < ARES_SECTION_ADDITIONAL + 1; i++) {\n    size_t j;\n\n    ares_buf_append_str(printmsg, \";; \");\n    ares_buf_append_str(printmsg,\n                        ares_dns_section_tostr((ares_dns_section_t)i));\n    ares_buf_append_str(printmsg, \" SECTION:\\n\");\n    for (j = 0; j < ares_dns_record_rr_cnt(dnsrec, (ares_dns_section_t)i);\n         j++) {\n      size_t                   keys_cnt = 0;\n      const ares_dns_rr_key_t *keys     = NULL;\n      ares_dns_rr_t           *rr       = NULL;\n      size_t                   k;\n\n      rr = ares_dns_record_rr_get(dnsrec, (ares_dns_section_t)i, j);\n      ares_buf_append_str(printmsg, ares_dns_rr_get_name(rr));\n      ares_buf_append_str(printmsg, \".\\t\\t\\t\");\n      ares_buf_append_str(printmsg,\n                          ares_dns_class_tostr(ares_dns_rr_get_class(rr)));\n      ares_buf_append_str(printmsg, \"\\t\");\n      ares_buf_append_str(printmsg,\n                          ares_dns_rec_type_tostr(ares_dns_rr_get_type(rr)));\n      ares_buf_append_str(printmsg, \"\\t\");\n      ares_buf_append_num_dec(printmsg, ares_dns_rr_get_ttl(rr), 0);\n      ares_buf_append_str(printmsg, \"\\t\");\n\n      keys = ares_dns_rr_get_keys(ares_dns_rr_get_type(rr), &keys_cnt);\n      for (k = 0; k < keys_cnt; k++) {\n        char buf[256] = \"\";\n\n        ares_buf_append_str(printmsg, ares_dns_rr_key_tostr(keys[k]));\n        ares_buf_append_str(printmsg, \"=\");\n        switch (ares_dns_rr_key_datatype(keys[k])) {\n          case ARES_DATATYPE_INADDR:\n            ares_inet_ntop(AF_INET, ares_dns_rr_get_addr(rr, keys[k]), buf,\n                           sizeof(buf));\n            ares_buf_append_str(printmsg, buf);\n            break;\n          case ARES_DATATYPE_INADDR6:\n            ares_inet_ntop(AF_INET6, ares_dns_rr_get_addr6(rr, keys[k]), buf,\n                           sizeof(buf));\n            ares_buf_append_str(printmsg, buf);\n            break;\n          case ARES_DATATYPE_U8:\n            ares_buf_append_num_dec(printmsg, ares_dns_rr_get_u8(rr, keys[k]),\n                                    0);\n            break;\n          case ARES_DATATYPE_U16:\n            ares_buf_append_num_dec(printmsg, ares_dns_rr_get_u16(rr, keys[k]),\n                                    0);\n            break;\n          case ARES_DATATYPE_U32:\n            ares_buf_append_num_dec(printmsg, ares_dns_rr_get_u32(rr, keys[k]),\n                                    0);\n            break;\n          case ARES_DATATYPE_NAME:\n          case ARES_DATATYPE_STR:\n            ares_buf_append_byte(printmsg, '\"');\n            ares_buf_append_str(printmsg, ares_dns_rr_get_str(rr, keys[k]));\n            ares_buf_append_byte(printmsg, '\"');\n            break;\n          case ARES_DATATYPE_BIN:\n            /* TODO */\n            break;\n          case ARES_DATATYPE_BINP:\n            {\n              size_t templen;\n              ares_buf_append_byte(printmsg, '\"');\n              ares_buf_append_str(printmsg, (const char *)ares_dns_rr_get_bin(\n                                              rr, keys[k], &templen));\n              ares_buf_append_byte(printmsg, '\"');\n            }\n            break;\n          case ARES_DATATYPE_ABINP:\n            {\n              size_t a;\n              for (a = 0; a < ares_dns_rr_get_abin_cnt(rr, keys[k]); a++) {\n                size_t templen;\n\n                if (a != 0) {\n                  ares_buf_append_byte(printmsg, ' ');\n                }\n                ares_buf_append_byte(printmsg, '\"');\n                ares_buf_append_str(\n                  printmsg,\n                  (const char *)ares_dns_rr_get_abin(rr, keys[k], a, &templen));\n                ares_buf_append_byte(printmsg, '\"');\n              }\n            }\n            break;\n          case ARES_DATATYPE_OPT:\n            /* TODO */\n            break;\n        }\n        ares_buf_append_str(printmsg, \" \");\n      }\n      ares_buf_append_str(printmsg, \"\\n\");\n    }\n  }\n  ares_buf_append_str(printmsg, \";; SIZE: \");\n  ares_buf_append_num_dec(printmsg, size, 0);\n  ares_buf_append_str(printmsg, \"\\n\\n\");\n\n  printdata = ares_buf_finish_str(printmsg, NULL);\n  printmsg  = NULL;\n\n  /* Write it back out as a dns message to test writer */\n  if (ares_dns_write(dnsrec, &datadup, &datadup_len) != ARES_SUCCESS) {\n    goto done;\n  }\n\ndone:\n  ares_dns_record_destroy(dnsrec);\n  ares_buf_destroy(printmsg);\n  ares_free(printdata);\n  ares_free(datadup);\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          128,
+          0
+        ],
+        [
+          313,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "LLVMFuzzerTestOneInput(const unsigned char *data, unsigned long size)",
+      "fn_dec_pos": [
+        [
+          31,
+          4
+        ],
+        [
+          31,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "LLVMFuzzerTestOneInput",
+        "parameters": {
+          "data": "unsigned char",
+          "size": "unsigned long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        52,
+        2
+      ],
+      [
+        52,
+        16
+      ]
+    ],
+    [
+      "struct ares_addrttl",
+      {},
+      "",
+      [
+        53,
+        2
+      ],
+      [
+        53,
+        21
+      ]
+    ],
+    [
+      "struct ares_addr6ttl",
+      {},
+      "",
+      [
+        54,
+        2
+      ],
+      [
+        54,
+        22
+      ]
+    ],
+    [
+      "struct ares_srv_reply",
+      {},
+      "",
+      [
+        56,
+        2
+      ],
+      [
+        56,
+        23
+      ]
+    ],
+    [
+      "struct ares_mx_reply",
+      {},
+      "",
+      [
+        57,
+        2
+      ],
+      [
+        57,
+        22
+      ]
+    ],
+    [
+      "struct ares_txt_reply",
+      {},
+      "",
+      [
+        58,
+        2
+      ],
+      [
+        58,
+        23
+      ]
+    ],
+    [
+      "struct ares_soa_reply",
+      {},
+      "",
+      [
+        59,
+        2
+      ],
+      [
+        59,
+        23
+      ]
+    ],
+    [
+      "struct ares_naptr_reply",
+      {},
+      "",
+      [
+        60,
+        2
+      ],
+      [
+        60,
+        25
+      ]
+    ],
+    [
+      "struct ares_caa_reply",
+      {},
+      "",
+      [
+        61,
+        2
+      ],
+      [
+        61,
+        23
+      ]
+    ],
+    [
+      "struct ares_uri_reply",
+      {},
+      "",
+      [
+        62,
+        2
+      ],
+      [
+        62,
+        23
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include <stddef.h>\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include <stdio.h>\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#include \"include/ares_buf.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include \"include/ares_mem.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

@@ -446,7 +446,7 @@ def setup_parser() -> argparse.ArgumentParser:
     parser.add_argument('--project_name', type=str, default="c-ares", help='Project Name')
     parser.add_argument('--shared_llm_dir', type=str, default="../docker_shared", help='Shared LLM Directory')
     parser.add_argument('--saved_dir', type=str, default="./external_database/c-ares/codebase", help='Saved Directory')
-    parser.add_argument('--language', type=str, default="c++", help='Language')
+    parser.add_argument('--language', type=str, default="cpp", help='Language')
     parser.add_argument('--build_command', type=str, default="/src/fuzzing_os/build_c_ares.sh", help='Build command')
     parser.add_argument('--project_build_info', type=str, default=None, help='Build information of the project')
     parser.add_argument('--environment_vars', dest='environment_vars', action='append', help="Set environment variable e.g., VAR=value")

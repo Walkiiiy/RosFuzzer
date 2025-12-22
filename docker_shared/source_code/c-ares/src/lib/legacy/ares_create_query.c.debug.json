@@ -1,0 +1,108 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static int ares_create_query_int(const char *name, int dnsclass, int type,\n                                 unsigned short id, int rd,\n                                 unsigned char **bufp, int *buflenp,\n                                 int max_udp_size)\n{\n  ares_status_t      status;\n  ares_dns_record_t *dnsrec = NULL;\n  size_t             len;\n  ares_dns_flags_t   rd_flag = rd ? ARES_FLAG_RD : 0;\n\n  if (name == NULL || bufp == NULL || buflenp == NULL) {\n    status = ARES_EFORMERR;\n    goto done;\n  }\n\n  *bufp    = NULL;\n  *buflenp = 0;\n\n  status = ares_dns_record_create_query(\n    &dnsrec, name, (ares_dns_class_t)dnsclass, (ares_dns_rec_type_t)type, id,\n    rd_flag, (size_t)max_udp_size);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  status = ares_dns_write(dnsrec, bufp, &len);\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  *buflenp = (int)len;\n\ndone:\n  ares_dns_record_destroy(dnsrec);\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          28,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_create_query_int",
+        "parameters": {
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "id": "unsigned short",
+          "rd": "int",
+          "bufp": "unsigned char",
+          "buflenp": "int",
+          "max_udp_size": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_create_query(const char *name, int dnsclass, int type,\n                      unsigned short id, int rd, unsigned char **bufp,\n                      int *buflenp, int max_udp_size)\n{\n  return ares_create_query_int(name, dnsclass, type, id, rd, bufp, buflenp,\n                               max_udp_size);\n}",
+      "fn_code_pos": [
+        [
+          65,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_create_query",
+        "parameters": {
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "id": "unsigned short",
+          "rd": "int",
+          "bufp": "unsigned char",
+          "buflenp": "int",
+          "max_udp_size": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_mkquery(const char *name, int dnsclass, int type, unsigned short id,\n                 int rd, unsigned char **buf, int *buflen)\n{\n  return ares_create_query_int(name, dnsclass, type, id, rd, buf, buflen, 0);\n}",
+      "fn_code_pos": [
+        [
+          73,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_mkquery",
+        "parameters": {
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "id": "unsigned short",
+          "rd": "int",
+          "buf": "unsigned char",
+          "buflen": "int"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

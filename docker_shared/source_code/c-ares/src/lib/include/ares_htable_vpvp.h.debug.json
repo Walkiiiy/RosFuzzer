@@ -1,0 +1,242 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(*ares_htable_vpvp_key_free_t)(void *key)",
+      "fn_dec_pos": [
+        [
+          51,
+          13
+        ],
+        [
+          51,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "key": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "(*ares_htable_vpvp_val_free_t)(void *val)",
+      "fn_dec_pos": [
+        [
+          57,
+          13
+        ],
+        [
+          57,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "val": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_htable_vpvp_destroy(ares_htable_vpvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          63,
+          18
+        ],
+        [
+          63,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_vpvp_destroy",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_vpvp_create(ares_htable_vpvp_key_free_t key_free,\n                          ares_htable_vpvp_val_free_t val_free)",
+      "fn_dec_pos": [
+        [
+          75,
+          2
+        ],
+        [
+          76,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "key_free": "ares_htable_vpvp_key_free_t",
+          "val_free": "ares_htable_vpvp_val_free_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_vpvp_insert(ares_htable_vpvp_t *htable,\n                                                 void *key, void *val)",
+      "fn_dec_pos": [
+        [
+          85,
+          13
+        ],
+        [
+          86,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_vpvp_insert",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t",
+          "key": "void",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_vpvp_get(const ares_htable_vpvp_t *htable,\n                                              const void *key, void **val)",
+      "fn_dec_pos": [
+        [
+          95,
+          13
+        ],
+        [
+          96,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_vpvp_get",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t",
+          "key": "void",
+          "val": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_vpvp_get_direct(const ares_htable_vpvp_t *htable,\n                                               const void               *key)",
+      "fn_dec_pos": [
+        [
+          106,
+          19
+        ],
+        [
+          107,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_vpvp_get_direct",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t",
+          "key": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_vpvp_remove(ares_htable_vpvp_t *htable,\n                                                 const void         *key)",
+      "fn_dec_pos": [
+        [
+          115,
+          13
+        ],
+        [
+          116,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t ares_htable_vpvp_remove",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t",
+          "key": "void"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_htable_vpvp_num_keys(const ares_htable_vpvp_t *htable)",
+      "fn_dec_pos": [
+        [
+          123,
+          20
+        ],
+        [
+          123,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_vpvp_num_keys",
+        "parameters": {
+          "htable": "ares_htable_vpvp_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable_vpvp",
+      {},
+      "",
+      [
+        42,
+        0
+      ],
+      [
+        42,
+        23
+      ]
+    ],
+    [
+      "typedef struct ares_htable_vpvp ares_htable_vpvp_t;",
+      {},
+      "ares_htable_vpvp_t",
+      [
+        45,
+        0
+      ],
+      [
+        45,
+        51
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

@@ -1,0 +1,301 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_destroy_options(struct ares_options *options)\n{\n  int i;\n\n  ares_free(options->servers);\n\n  for (i = 0; options->domains && i < options->ndomains; i++) {\n    ares_free(options->domains[i]);\n  }\n\n  ares_free(options->domains);\n  ares_free(options->sortlist);\n  ares_free(options->lookups);\n  ares_free(options->resolvconf_path);\n  ares_free(options->hosts_path);\n}",
+      "fn_code_pos": [
+        [
+          36,
+          0
+        ],
+        [
+          51,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_destroy_options",
+        "parameters": {
+          "options": "struct ares_options"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static struct in_addr *ares_save_opt_servers(const ares_channel_t *channel,\n                                             int                  *nservers)\n{\n  ares_slist_node_t *snode;\n  struct in_addr    *out =\n    ares_malloc_zero(ares_slist_len(channel->servers) * sizeof(*out));\n\n  *nservers = 0;\n\n  if (out == NULL) {\n    return NULL;\n  }\n\n  for (snode = ares_slist_node_first(channel->servers); snode != NULL;\n       snode = ares_slist_node_next(snode)) {\n    const ares_server_t *server = ares_slist_node_val(snode);\n\n    if (server->addr.family != AF_INET) {\n      continue;\n    }\n\n    memcpy(&out[*nservers], &server->addr.addr.addr4, sizeof(*out));\n    (*nservers)++;\n  }\n\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          53,
+          0
+        ],
+        [
+          79,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_save_opt_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "nservers": "int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "int ares_save_options(const ares_channel_t *channel,\n                      struct ares_options *options, int *optmask)\n{\n  size_t i;\n\n  /* NOTE: We can't zero the whole thing out, this is because the size of the\n   *       struct ares_options changes over time, so if someone compiled\n   *       with an older version, their struct size might be smaller and\n   *       we might overwrite their memory! So using the optmask is critical\n   *       here, as they could have only set options they knew about.\n   *\n   *       Unfortunately ares_destroy_options() doesn't take an optmask, so\n   *       there are a few pointers we *must* zero out otherwise we won't\n   *       know if they were allocated or not\n   */\n  options->servers         = NULL;\n  options->domains         = NULL;\n  options->sortlist        = NULL;\n  options->lookups         = NULL;\n  options->resolvconf_path = NULL;\n  options->hosts_path      = NULL;\n\n  if (!ARES_CONFIG_CHECK(channel)) {\n    return ARES_ENODATA;\n  }\n\n  if (channel->optmask & ARES_OPT_FLAGS) {\n    options->flags = (int)channel->flags;\n  }\n\n  /* We convert ARES_OPT_TIMEOUT to ARES_OPT_TIMEOUTMS in\n   * ares_init_by_options() */\n  if (channel->optmask & ARES_OPT_TIMEOUTMS) {\n    options->timeout = (int)channel->timeout;\n  }\n\n  if (channel->optmask & ARES_OPT_TRIES) {\n    options->tries = (int)channel->tries;\n  }\n\n  if (channel->optmask & ARES_OPT_NDOTS) {\n    options->ndots = (int)channel->ndots;\n  }\n\n  if (channel->optmask & ARES_OPT_MAXTIMEOUTMS) {\n    options->maxtimeout = (int)channel->maxtimeout;\n  }\n\n  if (channel->optmask & ARES_OPT_UDP_PORT) {\n    options->udp_port = channel->udp_port;\n  }\n  if (channel->optmask & ARES_OPT_TCP_PORT) {\n    options->tcp_port = channel->tcp_port;\n  }\n\n  if (channel->optmask & ARES_OPT_SOCK_STATE_CB) {\n    options->sock_state_cb      = channel->sock_state_cb;\n    options->sock_state_cb_data = channel->sock_state_cb_data;\n  }\n\n  if (channel->optmask & ARES_OPT_SERVERS) {\n    options->servers = ares_save_opt_servers(channel, &options->nservers);\n    if (options->servers == NULL) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  if (channel->optmask & ARES_OPT_DOMAINS) {\n    options->domains = NULL;\n    if (channel->ndomains) {\n      options->domains = ares_malloc(channel->ndomains * sizeof(char *));\n      if (!options->domains) {\n        return ARES_ENOMEM;\n      }\n\n      for (i = 0; i < channel->ndomains; i++) {\n        options->domains[i] = ares_strdup(channel->domains[i]);\n        if (!options->domains[i]) {\n          options->ndomains = (int)i;\n          return ARES_ENOMEM;\n        }\n      }\n    }\n    options->ndomains = (int)channel->ndomains;\n  }\n\n  if (channel->optmask & ARES_OPT_LOOKUPS) {\n    options->lookups = ares_strdup(channel->lookups);\n    if (!options->lookups && channel->lookups) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  if (channel->optmask & ARES_OPT_SORTLIST) {\n    options->sortlist = NULL;\n    if (channel->nsort) {\n      options->sortlist = ares_malloc(channel->nsort * sizeof(struct apattern));\n      if (!options->sortlist) {\n        return ARES_ENOMEM;\n      }\n      for (i = 0; i < channel->nsort; i++) {\n        options->sortlist[i] = channel->sortlist[i];\n      }\n    }\n    options->nsort = (int)channel->nsort;\n  }\n\n  if (channel->optmask & ARES_OPT_RESOLVCONF) {\n    options->resolvconf_path = ares_strdup(channel->resolvconf_path);\n    if (!options->resolvconf_path) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  if (channel->optmask & ARES_OPT_HOSTS_FILE) {\n    options->hosts_path = ares_strdup(channel->hosts_path);\n    if (!options->hosts_path) {\n      return ARES_ENOMEM;\n    }\n  }\n\n  if (channel->optmask & ARES_OPT_SOCK_SNDBUF &&\n      channel->socket_send_buffer_size > 0) {\n    options->socket_send_buffer_size = channel->socket_send_buffer_size;\n  }\n\n  if (channel->optmask & ARES_OPT_SOCK_RCVBUF &&\n      channel->socket_receive_buffer_size > 0) {\n    options->socket_receive_buffer_size = channel->socket_receive_buffer_size;\n  }\n\n  if (channel->optmask & ARES_OPT_EDNSPSZ) {\n    options->ednspsz = (int)channel->ednspsz;\n  }\n\n  if (channel->optmask & ARES_OPT_UDP_MAX_QUERIES) {\n    options->udp_max_queries = (int)channel->udp_max_queries;\n  }\n\n  if (channel->optmask & ARES_OPT_QUERY_CACHE) {\n    options->qcache_max_ttl = channel->qcache_max_ttl;\n  }\n\n  if (channel->optmask & ARES_OPT_EVENT_THREAD) {\n    options->evsys = channel->evsys;\n  }\n\n  /* Set options for server failover behavior */\n  if (channel->optmask & ARES_OPT_SERVER_FAILOVER) {\n    options->server_failover_opts.retry_chance = channel->server_retry_chance;\n    options->server_failover_opts.retry_delay  = channel->server_retry_delay;\n  }\n\n  *optmask = (int)channel->optmask;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          82,
+          0
+        ],
+        [
+          238,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_save_options",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "options": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static ares_status_t ares_init_options_servers(ares_channel_t       *channel,\n                                               const struct in_addr *servers,\n                                               size_t                nservers)\n{\n  ares_llist_t *slist = NULL;\n  ares_status_t status;\n\n  status = ares_in_addr_to_sconfig_llist(servers, nservers, &slist);\n  if (status != ARES_SUCCESS) {\n    return status; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  status = ares_servers_update(channel, slist, ARES_TRUE);\n\n  ares_llist_destroy(slist);\n\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          240,
+          0
+        ],
+        [
+          257,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_options_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "servers": "struct in_addr",
+          "nservers": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_init_by_options(ares_channel_t            *channel,\n                                   const struct ares_options *options,\n                                   int                        optmask)\n{\n  size_t i;\n\n  if (channel == NULL) {\n    return ARES_ENODATA; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  if (options == NULL) {\n    if (optmask != 0) {\n      return ARES_ENODATA; /* LCOV_EXCL_LINE: DefensiveCoding */\n    }\n    return ARES_SUCCESS;\n  }\n\n  /* Easy stuff. */\n\n  /* Event Thread requires threading support and is incompatible with socket\n   * state callbacks */\n  if (optmask & ARES_OPT_EVENT_THREAD) {\n    if (!ares_threadsafety()) {\n      return ARES_ENOTIMP;\n    }\n    if (optmask & ARES_OPT_SOCK_STATE_CB) {\n      return ARES_EFORMERR;\n    }\n    channel->evsys = options->evsys;\n  }\n\n  if (optmask & ARES_OPT_FLAGS) {\n    channel->flags = (unsigned int)options->flags;\n  }\n\n  if (optmask & ARES_OPT_TIMEOUTMS) {\n    /* Apparently some integrations were passing -1 to tell c-ares to use\n     * the default instead of just omitting the optmask */\n    if (options->timeout <= 0) {\n      optmask &= ~(ARES_OPT_TIMEOUTMS);\n    } else {\n      channel->timeout = (unsigned int)options->timeout;\n    }\n  } else if (optmask & ARES_OPT_TIMEOUT) {\n    optmask &= ~(ARES_OPT_TIMEOUT);\n    /* Apparently some integrations were passing -1 to tell c-ares to use\n     * the default instead of just omitting the optmask */\n    if (options->timeout > 0) {\n      /* Convert to milliseconds */\n      optmask          |= ARES_OPT_TIMEOUTMS;\n      channel->timeout  = (unsigned int)options->timeout * 1000;\n    }\n  }\n\n  if (optmask & ARES_OPT_TRIES) {\n    if (options->tries <= 0) {\n      optmask &= ~(ARES_OPT_TRIES);\n    } else {\n      channel->tries = (size_t)options->tries;\n    }\n  }\n\n  if (optmask & ARES_OPT_NDOTS) {\n    if (options->ndots < 0) {\n      optmask &= ~(ARES_OPT_NDOTS);\n    } else {\n      channel->ndots = (size_t)options->ndots;\n    }\n  }\n\n  if (optmask & ARES_OPT_MAXTIMEOUTMS) {\n    if (options->maxtimeout <= 0) {\n      optmask &= ~(ARES_OPT_MAXTIMEOUTMS);\n    } else {\n      channel->maxtimeout = (size_t)options->maxtimeout;\n    }\n  }\n\n  if (optmask & ARES_OPT_ROTATE) {\n    channel->rotate = ARES_TRUE;\n  }\n\n  if (optmask & ARES_OPT_NOROTATE) {\n    channel->rotate = ARES_FALSE;\n  }\n\n  if (optmask & ARES_OPT_UDP_PORT) {\n    channel->udp_port = options->udp_port;\n  }\n\n  if (optmask & ARES_OPT_TCP_PORT) {\n    channel->tcp_port = options->tcp_port;\n  }\n\n  if (optmask & ARES_OPT_SOCK_STATE_CB) {\n    channel->sock_state_cb      = options->sock_state_cb;\n    channel->sock_state_cb_data = options->sock_state_cb_data;\n  }\n\n  if (optmask & ARES_OPT_SOCK_SNDBUF) {\n    if (options->socket_send_buffer_size <= 0) {\n      optmask &= ~(ARES_OPT_SOCK_SNDBUF);\n    } else {\n      channel->socket_send_buffer_size = options->socket_send_buffer_size;\n    }\n  }\n\n  if (optmask & ARES_OPT_SOCK_RCVBUF) {\n    if (options->socket_receive_buffer_size <= 0) {\n      optmask &= ~(ARES_OPT_SOCK_RCVBUF);\n    } else {\n      channel->socket_receive_buffer_size = options->socket_receive_buffer_size;\n    }\n  }\n\n  if (optmask & ARES_OPT_EDNSPSZ) {\n    if (options->ednspsz <= 0) {\n      optmask &= ~(ARES_OPT_EDNSPSZ);\n    } else {\n      channel->ednspsz = (size_t)options->ednspsz;\n    }\n  }\n\n  /* Copy the domains, if given.  Keep channel->ndomains consistent so\n   * we can clean up in case of error.\n   */\n  if (optmask & ARES_OPT_DOMAINS && options->ndomains > 0) {\n    channel->domains =\n      ares_malloc_zero((size_t)options->ndomains * sizeof(char *));\n    if (!channel->domains) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    channel->ndomains = (size_t)options->ndomains;\n    for (i = 0; i < (size_t)options->ndomains; i++) {\n      channel->domains[i] = ares_strdup(options->domains[i]);\n      if (!channel->domains[i]) {\n        return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  /* Set lookups, if given. */\n  if (optmask & ARES_OPT_LOOKUPS) {\n    if (options->lookups == NULL) {\n      optmask &= ~(ARES_OPT_LOOKUPS);\n    } else {\n      channel->lookups = ares_strdup(options->lookups);\n      if (!channel->lookups) {\n        return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  /* copy sortlist */\n  if (optmask & ARES_OPT_SORTLIST && options->nsort > 0) {\n    channel->nsort = (size_t)options->nsort;\n    channel->sortlist =\n      ares_malloc((size_t)options->nsort * sizeof(struct apattern));\n    if (!channel->sortlist) {\n      return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n    }\n    for (i = 0; i < (size_t)options->nsort; i++) {\n      channel->sortlist[i] = options->sortlist[i];\n    }\n  }\n\n  /* Set path for resolv.conf file, if given. */\n  if (optmask & ARES_OPT_RESOLVCONF) {\n    if (options->resolvconf_path == NULL) {\n      optmask &= ~(ARES_OPT_RESOLVCONF);\n    } else {\n      channel->resolvconf_path = ares_strdup(options->resolvconf_path);\n      if (channel->resolvconf_path == NULL) {\n        return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  /* Set path for hosts file, if given. */\n  if (optmask & ARES_OPT_HOSTS_FILE) {\n    if (options->hosts_path == NULL) {\n      optmask &= ~(ARES_OPT_HOSTS_FILE);\n    } else {\n      channel->hosts_path = ares_strdup(options->hosts_path);\n      if (channel->hosts_path == NULL) {\n        return ARES_ENOMEM; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  if (optmask & ARES_OPT_UDP_MAX_QUERIES) {\n    if (options->udp_max_queries <= 0) {\n      optmask &= ~(ARES_OPT_UDP_MAX_QUERIES);\n    } else {\n      channel->udp_max_queries = (size_t)options->udp_max_queries;\n    }\n  }\n\n  /* As of c-ares 1.31.0, the Query Cache is on by default.  The only way to\n   * disable it is to set options->qcache_max_ttl = 0 while specifying the\n   * ARES_OPT_QUERY_CACHE which will actually disable it completely. */\n  if (optmask & ARES_OPT_QUERY_CACHE) {\n    /* qcache_max_ttl is unsigned unlike the others */\n    channel->qcache_max_ttl = options->qcache_max_ttl;\n  } else {\n    optmask                 |= ARES_OPT_QUERY_CACHE;\n    channel->qcache_max_ttl  = 3600;\n  }\n\n  /* Initialize the ipv4 servers if provided */\n  if (optmask & ARES_OPT_SERVERS) {\n    if (options->nservers <= 0) {\n      optmask &= ~(ARES_OPT_SERVERS);\n    } else {\n      ares_status_t status;\n      status = ares_init_options_servers(channel, options->servers,\n                                         (size_t)options->nservers);\n      if (status != ARES_SUCCESS) {\n        return status; /* LCOV_EXCL_LINE: OutOfMemory */\n      }\n    }\n  }\n\n  /* Set fields for server failover behavior */\n  if (optmask & ARES_OPT_SERVER_FAILOVER) {\n    channel->server_retry_chance = options->server_failover_opts.retry_chance;\n    channel->server_retry_delay  = options->server_failover_opts.retry_delay;\n  }\n\n  channel->optmask = (unsigned int)optmask;\n\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          259,
+          0
+        ],
+        [
+          491,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_init_by_options",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "options": "struct ares_options",
+          "optmask": "int"
+        },
+        "return_type": "ares_status_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_save_opt_servers(const ares_channel_t *channel,\n                                             int                  *nservers)",
+      "fn_dec_pos": [
+        [
+          53,
+          23
+        ],
+        [
+          54,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_save_opt_servers",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "nservers": "int"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        36,
+        26
+      ],
+      [
+        36,
+        45
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        53,
+        7
+      ],
+      [
+        53,
+        21
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        57,
+        2
+      ],
+      [
+        57,
+        16
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        83,
+        22
+      ],
+      [
+        83,
+        41
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        178,
+        62
+      ],
+      [
+        178,
+        77
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        241,
+        53
+      ],
+      [
+        241,
+        67
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        260,
+        41
+      ],
+      [
+        260,
+        60
+      ]
+    ],
+    [
+      "struct apattern",
+      {},
+      "",
+      [
+        416,
+        50
+      ],
+      [
+        416,
+        65
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <arpa/inet.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_data.h\"\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_inet_net_pton.h\"\n",
+      [
+        34,
+        0
+      ],
+      [
+        35,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

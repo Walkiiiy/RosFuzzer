@@ -1,5 +1,20 @@
 this project will be witten based on CKGFUZZER
-# CKGFuzzer
+
+- 需要ubuntu下的conda和docker 
+- bash env_setup.sh
+- conda activate ros-fuzzer
+- wget https://github.com/github/codeql-action/releases/download/codeql-bundle-20211208/codeql-bundle-linux64.tar.gz
+- 解压后mv codeql到docker_shared
+- pip  install docker
+- ROSFuzzerPath=$(pwd)
+- cd $ROSFuzzerPath/fuzzing_llm_engine/codetext/parser/tree-sitter
+- git clone https://github.com/tree-sitter/tree-sitter-cpp.git tree-sitter-cpp
+- cd $ROSFuzzerPath/fuzzing_llm_engine/repo/
+- 构建c-ares知识图谱 python repo.py --project_name c-ares --shared_llm_dir $ROSFuzzerPath/docker_shared --saved_dir $ROSFuzze
+rPath/fuzzing_llm_engine/external_database/c-ares/codebase --src_api --call_graph
+
+
+# CKGFuzzer legacy
 
 
 CKGFuzzer is an automated fuzzing framework that leverages large language models (LLMs) and a code knowledge graph to generate fuzz drivers. By automating the fuzz driver creation process and analyzing API usage, CKGFuzzer improves fuzzing efficiency, code coverage, and bug detection in complex software systems.

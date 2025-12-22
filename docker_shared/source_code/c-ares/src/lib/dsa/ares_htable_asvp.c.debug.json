@@ -1,0 +1,475 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_htable_asvp_destroy(ares_htable_asvp_t *htable)\n{\n  if (htable == NULL) {\n    return;\n  }\n\n  ares_htable_destroy(htable->hash);\n  ares_free(htable);\n}",
+      "fn_code_pos": [
+        [
+          40,
+          0
+        ],
+        [
+          48,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_destroy",
+        "parameters": {
+          "htable": "ares_htable_asvp_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static unsigned int hash_func(const void *key, unsigned int seed)\n{\n  const ares_socket_t *arg = key;\n  return ares_htable_hash_FNV1a((const unsigned char *)arg, sizeof(*arg), seed);\n}",
+      "fn_code_pos": [
+        [
+          50,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "hash_func",
+        "parameters": {
+          "key": "void",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static const void *bucket_key(const void *bucket)\n{\n  const ares_htable_asvp_bucket_t *arg = bucket;\n  return &arg->key;\n}",
+      "fn_code_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_key",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void bucket_free(void *bucket)\n{\n  ares_htable_asvp_bucket_t *arg = bucket;\n\n  if (arg->parent->free_val) {\n    arg->parent->free_val(arg->val);\n  }\n\n  ares_free(arg);\n}",
+      "fn_code_pos": [
+        [
+          62,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_free",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t key_eq(const void *key1, const void *key2)\n{\n  const ares_socket_t *k1 = key1;\n  const ares_socket_t *k2 = key2;\n\n  if (*k1 == *k2) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          73,
+          0
+        ],
+        [
+          83,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "key_eq",
+        "parameters": {
+          "key1": "void",
+          "key2": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_asvp_t *\n  ares_htable_asvp_create(ares_htable_asvp_val_free_t val_free)\n{\n  ares_htable_asvp_t *htable = ares_malloc(sizeof(*htable));\n  if (htable == NULL) {\n    goto fail;\n  }\n\n  htable->hash = ares_htable_create(hash_func, bucket_key, bucket_free, key_eq);\n  if (htable->hash == NULL) {\n    goto fail;\n  }\n\n  htable->free_val = val_free;\n\n  return htable;\n\nfail:\n  if (htable) {\n    ares_htable_destroy(htable->hash);\n    ares_free(htable);\n  }\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          85,
+          0
+        ],
+        [
+          108,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_create",
+        "parameters": {
+          "val_free": "ares_htable_asvp_val_free_t"
+        },
+        "return_type": "ares_htable_asvp_t"
+      }
+    },
+    {
+      "fn_code": "ares_socket_t *ares_htable_asvp_keys(const ares_htable_asvp_t *htable,\n                                     size_t                   *num)\n{\n  const void   **buckets = NULL;\n  size_t         cnt     = 0;\n  ares_socket_t *out     = NULL;\n  size_t         i;\n\n  if (htable == NULL || num == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *num = 0;\n\n  buckets = ares_htable_all_buckets(htable->hash, &cnt);\n  if (buckets == NULL || cnt == 0) {\n    return NULL;\n  }\n\n  out = ares_malloc_zero(sizeof(*out) * cnt);\n  if (out == NULL) {\n    ares_free(buckets); /* LCOV_EXCL_LINE: OutOfMemory */\n    return NULL;        /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; i < cnt; i++) {\n    out[i] = ((const ares_htable_asvp_bucket_t *)buckets[i])->key;\n  }\n\n  ares_free(buckets);\n  *num = cnt;\n  return out;\n}",
+      "fn_code_pos": [
+        [
+          110,
+          0
+        ],
+        [
+          142,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_keys",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "num": "size_t"
+        },
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_asvp_insert(ares_htable_asvp_t *htable,\n                                    ares_socket_t key, void *val)\n{\n  ares_htable_asvp_bucket_t *bucket = NULL;\n\n  if (htable == NULL) {\n    goto fail;\n  }\n\n  bucket = ares_malloc(sizeof(*bucket));\n  if (bucket == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  bucket->parent = htable;\n  bucket->key    = key;\n  bucket->val    = val;\n\n  if (!ares_htable_insert(htable->hash, bucket)) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return ARES_TRUE;\n\nfail:\n  if (bucket) {\n    ares_free(bucket); /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          144,
+          0
+        ],
+        [
+          173,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_insert",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "key": "ares_socket_t",
+          "val": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_asvp_get(const ares_htable_asvp_t *htable,\n                                 ares_socket_t key, void **val)\n{\n  ares_htable_asvp_bucket_t *bucket = NULL;\n\n  if (val) {\n    *val = NULL;\n  }\n\n  if (htable == NULL) {\n    return ARES_FALSE;\n  }\n\n  bucket = ares_htable_get(htable->hash, &key);\n  if (bucket == NULL) {\n    return ARES_FALSE;\n  }\n\n  if (val) {\n    *val = bucket->val;\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          175,
+          0
+        ],
+        [
+          197,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_get",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "key": "ares_socket_t",
+          "val": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "void *ares_htable_asvp_get_direct(const ares_htable_asvp_t *htable,\n                                  ares_socket_t             key)\n{\n  void *val = NULL;\n  ares_htable_asvp_get(htable, key, &val);\n  return val;\n}",
+      "fn_code_pos": [
+        [
+          199,
+          0
+        ],
+        [
+          205,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_get_direct",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "key": "ares_socket_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_asvp_remove(ares_htable_asvp_t *htable,\n                                    ares_socket_t       key)\n{\n  if (htable == NULL) {\n    return ARES_FALSE;\n  }\n\n  return ares_htable_remove(htable->hash, &key);\n}",
+      "fn_code_pos": [
+        [
+          207,
+          0
+        ],
+        [
+          215,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_remove",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "key": "ares_socket_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_htable_asvp_num_keys(const ares_htable_asvp_t *htable)\n{\n  if (htable == NULL) {\n    return 0;\n  }\n  return ares_htable_num_keys(htable->hash);\n}",
+      "fn_code_pos": [
+        [
+          217,
+          0
+        ],
+        [
+          223,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_num_keys",
+        "parameters": {
+          "htable": "ares_htable_asvp_t"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "bucket_key(const void *bucket)",
+      "fn_dec_pos": [
+        [
+          56,
+          19
+        ],
+        [
+          56,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_key",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_asvp_create(ares_htable_asvp_val_free_t val_free)",
+      "fn_dec_pos": [
+        [
+          86,
+          2
+        ],
+        [
+          86,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_create",
+        "parameters": {
+          "val_free": "ares_htable_asvp_val_free_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_asvp_keys(const ares_htable_asvp_t *htable,\n                                     size_t                   *num)",
+      "fn_dec_pos": [
+        [
+          110,
+          15
+        ],
+        [
+          111,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_keys",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_asvp_get_direct(const ares_htable_asvp_t *htable,\n                                  ares_socket_t             key)",
+      "fn_dec_pos": [
+        [
+          199,
+          6
+        ],
+        [
+          200,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_asvp_get_direct",
+        "parameters": {
+          "htable": "ares_htable_asvp_t",
+          "key": "ares_socket_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable_asvp {\n  ares_htable_asvp_val_free_t free_val;\n  ares_htable_t              *hash;\n}",
+      {
+        "free_val": "ares_htable_asvp_val_free_t",
+        "*hash": "ares_htable_t"
+      },
+      "ares_htable_asvp",
+      [
+        29,
+        0
+      ],
+      [
+        32,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_socket_t       key;\n  void               *val;\n  ares_htable_asvp_t *parent;\n} ares_htable_asvp_bucket_t;",
+      {
+        "key": "ares_socket_t",
+        "*val": "void",
+        "*parent": "ares_htable_asvp_t"
+      },
+      "ares_htable_asvp_bucket_t",
+      [
+        34,
+        0
+      ],
+      [
+        38,
+        28
+      ]
+    ],
+    [
+      "struct ares_htable_asvp {\n  ares_htable_asvp_val_free_t free_val;\n  ares_htable_t              *hash;\n}",
+      {
+        "free_val": "ares_htable_asvp_val_free_t",
+        "*hash": "ares_htable_t"
+      },
+      "ares_htable_asvp",
+      [
+        29,
+        0
+      ],
+      [
+        32,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_socket_t       key;\n  void               *val;\n  ares_htable_asvp_t *parent;\n} ares_htable_asvp_bucket_t;",
+      {
+        "key": "ares_socket_t",
+        "*val": "void",
+        "*parent": "ares_htable_asvp_t"
+      },
+      "ares_htable_asvp_bucket_t",
+      [
+        34,
+        0
+      ],
+      [
+        38,
+        28
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_asvp.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

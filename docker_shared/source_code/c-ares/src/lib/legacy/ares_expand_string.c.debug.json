@@ -1,0 +1,96 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "ares_status_t ares_expand_string_ex(const unsigned char *encoded,\n                                    const unsigned char *abuf, size_t alen,\n                                    unsigned char **s, size_t *enclen)\n{\n  ares_status_t status;\n  ares_buf_t   *buf = NULL;\n  size_t        start_len;\n  size_t        len = 0;\n\n  if (encoded == NULL || abuf == NULL || alen == 0 || enclen == NULL) {\n    return ARES_EBADSTR; /* EFORMERR would be better */\n  }\n\n  if (encoded < abuf || encoded >= abuf + alen) {\n    return ARES_EBADSTR; /* EFORMERR would be better */\n  }\n\n  *enclen = 0;\n\n  /* NOTE: we allow 's' to be NULL to skip it */\n  if (s) {\n    *s = NULL;\n  }\n\n  buf = ares_buf_create_const(abuf, alen);\n\n  if (buf == NULL) {\n    return ARES_ENOMEM;\n  }\n\n  status = ares_buf_set_position(buf, (size_t)(encoded - abuf));\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  start_len = ares_buf_len(buf);\n  status    = ares_buf_parse_dns_binstr(buf, ares_buf_len(buf), s, &len);\n  /* hrm, no way to pass back 'len' with the prototype */\n  if (status != ARES_SUCCESS) {\n    goto done;\n  }\n\n  *enclen = start_len - ares_buf_len(buf);\n\ndone:\n  ares_buf_destroy(buf);\n  if (status == ARES_EBADNAME || status == ARES_EBADRESP) {\n    status = ARES_EBADSTR;\n  }\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          40,
+          0
+        ],
+        [
+          90,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_string_ex",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "size_t",
+          "s": "unsigned char",
+          "enclen": "size_t"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "int ares_expand_string(const unsigned char *encoded, const unsigned char *abuf,\n                       int alen, unsigned char **s, long *enclen)\n{\n  ares_status_t status;\n  size_t        temp_enclen = 0;\n\n  if (encoded == NULL || abuf == NULL || alen <= 0 || enclen == NULL) {\n    return ARES_EBADRESP;\n  }\n\n  status = ares_expand_string_ex(encoded, abuf, (size_t)alen, s, &temp_enclen);\n\n  *enclen = (long)temp_enclen;\n  return (int)status;\n}",
+      "fn_code_pos": [
+        [
+          92,
+          0
+        ],
+        [
+          106,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_expand_string",
+        "parameters": {
+          "encoded": "unsigned char",
+          "abuf": "unsigned char",
+          "alen": "int",
+          "s": "unsigned char",
+          "enclen": "long"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_nameser.h\"\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

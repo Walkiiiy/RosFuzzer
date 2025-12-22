@@ -1,0 +1,293 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static jclass    jni_get_class(JNIEnv *env, const char *path)\n{\n  jclass cls = NULL;\n\n  if (env == NULL || path == NULL || *path == '\\0') {\n    return NULL;\n  }\n\n  cls = (*env)->FindClass(env, path);\n  if ((*env)->ExceptionOccurred(env)) {\n    (*env)->ExceptionClear(env);\n    return NULL;\n  }\n  return cls;\n}",
+      "fn_code_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          63,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "jni_get_class",
+        "parameters": {
+          "env": "JNIEnv",
+          "path": "char"
+        },
+        "return_type": "jclass"
+      }
+    },
+    {
+      "fn_code": "static jmethodID jni_get_method_id(JNIEnv *env, jclass cls,\n                                   const char *func_name, const char *signature)\n{\n  jmethodID mid = NULL;\n\n  if (env == NULL || cls == NULL || func_name == NULL || *func_name == '\\0' ||\n      signature == NULL || *signature == '\\0') {\n    return NULL;\n  }\n\n  mid = (*env)->GetMethodID(env, cls, func_name, signature);\n  if ((*env)->ExceptionOccurred(env)) {\n    (*env)->ExceptionClear(env);\n    return NULL;\n  }\n\n  return mid;\n}",
+      "fn_code_pos": [
+        [
+          65,
+          0
+        ],
+        [
+          82,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "jni_get_method_id",
+        "parameters": {
+          "env": "JNIEnv",
+          "cls": "jclass",
+          "func_name": "char",
+          "signature": "char"
+        },
+        "return_type": "jmethodID"
+      }
+    },
+    {
+      "fn_code": "static int jvm_attach(JNIEnv **env)\n{\n  char             name[17] = { 0 };\n\n  JavaVMAttachArgs args;\n\n  args.version = JNI_VERSION_1_6;\n  if (prctl(PR_GET_NAME, name) == 0) {\n    args.name = name;\n  } else {\n    args.name = NULL;\n  }\n  args.group = NULL;\n\n  return (*android_jvm)->AttachCurrentThread(android_jvm, env, &args);\n}",
+      "fn_code_pos": [
+        [
+          84,
+          0
+        ],
+        [
+          99,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "jvm_attach",
+        "parameters": {
+          "env": "JNIEnv"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "void ares_library_init_jvm(JavaVM *jvm)\n{\n  android_jvm = jvm;\n}",
+      "fn_code_pos": [
+        [
+          101,
+          0
+        ],
+        [
+          104,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_jvm",
+        "parameters": {
+          "jvm": "JavaVM"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "int ares_library_init_android(jobject connectivity_manager)\n{\n  JNIEnv       *env          = NULL;\n  int           need_detatch = 0;\n  int           res;\n  ares_status_t ret     = ARES_ENOTINITIALIZED;\n  jclass        obj_cls = NULL;\n\n  if (android_jvm == NULL) {\n    goto cleanup;\n  }\n\n  res = (*android_jvm)->GetEnv(android_jvm, (void **)&env, JNI_VERSION_1_6);\n  if (res == JNI_EDETACHED) {\n    env          = NULL;\n    res          = jvm_attach(&env);\n    need_detatch = 1;\n  }\n  if (res != JNI_OK || env == NULL) {\n    goto cleanup;\n  }\n\n  android_connectivity_manager =\n    (*env)->NewGlobalRef(env, connectivity_manager);\n  if (android_connectivity_manager == NULL) {\n    goto cleanup;\n  }\n\n  /* Initialization has succeeded. Now attempt to cache the methods that will be\n   * called by ares_get_android_server_list. */\n  ret = ARES_SUCCESS;\n\n  /* ConnectivityManager in API 1. */\n  obj_cls = jni_get_class(env, \"android/net/ConnectivityManager\");\n  if (obj_cls == NULL) {\n    goto cleanup;\n  }\n\n  /* ConnectivityManager.getActiveNetwork in API 23. */\n  android_cm_active_net_mid = jni_get_method_id(\n    env, obj_cls, \"getActiveNetwork\", \"()Landroid/net/Network;\");\n  if (android_cm_active_net_mid == NULL) {\n    goto cleanup;\n  }\n\n  /* ConnectivityManager.getLinkProperties in API 21. */\n  android_cm_link_props_mid =\n    jni_get_method_id(env, obj_cls, \"getLinkProperties\",\n                      \"(Landroid/net/Network;)Landroid/net/LinkProperties;\");\n  if (android_cm_link_props_mid == NULL) {\n    goto cleanup;\n  }\n\n  /* LinkProperties in API 21. */\n  (*env)->DeleteLocalRef(env, obj_cls);\n  obj_cls = jni_get_class(env, \"android/net/LinkProperties\");\n  if (obj_cls == NULL) {\n    goto cleanup;\n  }\n\n  /* getDnsServers in API 21. */\n  android_lp_dns_servers_mid =\n    jni_get_method_id(env, obj_cls, \"getDnsServers\", \"()Ljava/util/List;\");\n  if (android_lp_dns_servers_mid == NULL) {\n    goto cleanup;\n  }\n\n  /* getDomains in API 21. */\n  android_lp_domains_mid =\n    jni_get_method_id(env, obj_cls, \"getDomains\", \"()Ljava/lang/String;\");\n  if (android_lp_domains_mid == NULL) {\n    goto cleanup;\n  }\n\n  (*env)->DeleteLocalRef(env, obj_cls);\n  obj_cls = jni_get_class(env, \"java/util/List\");\n  if (obj_cls == NULL) {\n    goto cleanup;\n  }\n\n  android_list_size_mid = jni_get_method_id(env, obj_cls, \"size\", \"()I\");\n  if (android_list_size_mid == NULL) {\n    goto cleanup;\n  }\n\n  android_list_get_mid =\n    jni_get_method_id(env, obj_cls, \"get\", \"(I)Ljava/lang/Object;\");\n  if (android_list_get_mid == NULL) {\n    goto cleanup;\n  }\n\n  (*env)->DeleteLocalRef(env, obj_cls);\n  obj_cls = jni_get_class(env, \"java/net/InetAddress\");\n  if (obj_cls == NULL) {\n    goto cleanup;\n  }\n\n  android_ia_host_addr_mid =\n    jni_get_method_id(env, obj_cls, \"getHostAddress\", \"()Ljava/lang/String;\");\n  if (android_ia_host_addr_mid == NULL) {\n    goto cleanup;\n  }\n\n  (*env)->DeleteLocalRef(env, obj_cls);\n  goto done;\n\ncleanup:\n  if (obj_cls != NULL) {\n    (*env)->DeleteLocalRef(env, obj_cls);\n  }\n\n  android_cm_active_net_mid  = NULL;\n  android_cm_link_props_mid  = NULL;\n  android_lp_dns_servers_mid = NULL;\n  android_lp_domains_mid     = NULL;\n  android_list_size_mid      = NULL;\n  android_list_get_mid       = NULL;\n  android_ia_host_addr_mid   = NULL;\n\ndone:\n  if (need_detatch) {\n    (*android_jvm)->DetachCurrentThread(android_jvm);\n  }\n\n  return (int)ret;\n}",
+      "fn_code_pos": [
+        [
+          106,
+          0
+        ],
+        [
+          231,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_init_android",
+        "parameters": {
+          "connectivity_manager": "jobject"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "int ares_library_android_initialized(void)\n{\n  if (android_jvm == NULL || android_connectivity_manager == NULL) {\n    return ARES_ENOTINITIALIZED;\n  }\n  return ARES_SUCCESS;\n}",
+      "fn_code_pos": [
+        [
+          233,
+          0
+        ],
+        [
+          239,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_android_initialized",
+        "parameters": {},
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "void ares_library_cleanup_android(void)\n{\n  JNIEnv *env          = NULL;\n  int     need_detatch = 0;\n  int     res;\n\n  if (android_jvm == NULL || android_connectivity_manager == NULL) {\n    return;\n  }\n\n  res = (*android_jvm)->GetEnv(android_jvm, (void **)&env, JNI_VERSION_1_6);\n  if (res == JNI_EDETACHED) {\n    env          = NULL;\n    res          = jvm_attach(&env);\n    need_detatch = 1;\n  }\n  if (res != JNI_OK || env == NULL) {\n    return;\n  }\n\n  android_cm_active_net_mid  = NULL;\n  android_cm_link_props_mid  = NULL;\n  android_lp_dns_servers_mid = NULL;\n  android_lp_domains_mid     = NULL;\n  android_list_size_mid      = NULL;\n  android_list_get_mid       = NULL;\n  android_ia_host_addr_mid   = NULL;\n\n  (*env)->DeleteGlobalRef(env, android_connectivity_manager);\n  android_connectivity_manager = NULL;\n\n  if (need_detatch) {\n    (*android_jvm)->DetachCurrentThread(android_jvm);\n  }\n}",
+      "fn_code_pos": [
+        [
+          241,
+          0
+        ],
+        [
+          275,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_library_cleanup_android",
+        "parameters": {},
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "char **ares_get_android_server_list(size_t max_servers, size_t *num_servers)\n{\n  JNIEnv     *env             = NULL;\n  jobject     active_network  = NULL;\n  jobject     link_properties = NULL;\n  jobject     server_list     = NULL;\n  jobject     server          = NULL;\n  jstring     str             = NULL;\n  jint        nserv;\n  const char *ch_server_address;\n  int         res;\n  size_t      i;\n  char      **dns_list     = NULL;\n  int         need_detatch = 0;\n\n  if (android_jvm == NULL || android_connectivity_manager == NULL ||\n      max_servers == 0 || num_servers == NULL) {\n    return NULL;\n  }\n\n  if (android_cm_active_net_mid == NULL || android_cm_link_props_mid == NULL ||\n      android_lp_dns_servers_mid == NULL || android_list_size_mid == NULL ||\n      android_list_get_mid == NULL || android_ia_host_addr_mid == NULL) {\n    return NULL;\n  }\n\n  res = (*android_jvm)->GetEnv(android_jvm, (void **)&env, JNI_VERSION_1_6);\n  if (res == JNI_EDETACHED) {\n    env          = NULL;\n    res          = jvm_attach(&env);\n    need_detatch = 1;\n  }\n  if (res != JNI_OK || env == NULL) {\n    goto done;\n  }\n\n  /* JNI below is equivalent to this Java code.\n     import android.content.Context;\n     import android.net.ConnectivityManager;\n     import android.net.LinkProperties;\n     import android.net.Network;\n     import java.net.InetAddress;\n     import java.util.List;\n\n     ConnectivityManager cm = (ConnectivityManager)this.getApplicationContext()\n       .getSystemService(Context.CONNECTIVITY_SERVICE);\n     Network an = cm.getActiveNetwork();\n     LinkProperties lp = cm.getLinkProperties(an);\n     List<InetAddress> dns = lp.getDnsServers();\n     for (InetAddress ia: dns) {\n       String ha = ia.getHostAddress();\n     }\n\n     Note: The JNI ConnectivityManager object and all method IDs were previously\n           initialized in ares_library_init_android.\n   */\n\n  active_network = (*env)->CallObjectMethod(env, android_connectivity_manager,\n                                            android_cm_active_net_mid);\n  if (active_network == NULL) {\n    goto done;\n  }\n\n  link_properties =\n    (*env)->CallObjectMethod(env, android_connectivity_manager,\n                             android_cm_link_props_mid, active_network);\n  if (link_properties == NULL) {\n    goto done;\n  }\n\n  server_list =\n    (*env)->CallObjectMethod(env, link_properties, android_lp_dns_servers_mid);\n  if (server_list == NULL) {\n    goto done;\n  }\n\n  nserv = (*env)->CallIntMethod(env, server_list, android_list_size_mid);\n  if (nserv > (jint)max_servers) {\n    nserv = (jint)max_servers;\n  }\n  if (nserv <= 0) {\n    goto done;\n  }\n  *num_servers = (size_t)nserv;\n\n  dns_list = ares_malloc(sizeof(*dns_list) * (*num_servers));\n  for (i = 0; i < *num_servers; i++) {\n    size_t len = 64;\n    server =\n      (*env)->CallObjectMethod(env, server_list, android_list_get_mid, (jint)i);\n    dns_list[i]    = ares_malloc(len);\n    dns_list[i][0] = 0;\n    if (server == NULL) {\n      continue;\n    }\n    str = (*env)->CallObjectMethod(env, server, android_ia_host_addr_mid);\n    ch_server_address = (*env)->GetStringUTFChars(env, str, 0);\n    ares_strcpy(dns_list[i], ch_server_address, len);\n    (*env)->ReleaseStringUTFChars(env, str, ch_server_address);\n    (*env)->DeleteLocalRef(env, str);\n    (*env)->DeleteLocalRef(env, server);\n  }\n\ndone:\n  if ((*env)->ExceptionOccurred(env)) {\n    (*env)->ExceptionClear(env);\n  }\n\n  if (server_list != NULL) {\n    (*env)->DeleteLocalRef(env, server_list);\n  }\n  if (link_properties != NULL) {\n    (*env)->DeleteLocalRef(env, link_properties);\n  }\n  if (active_network != NULL) {\n    (*env)->DeleteLocalRef(env, active_network);\n  }\n\n  if (need_detatch) {\n    (*android_jvm)->DetachCurrentThread(android_jvm);\n  }\n  return dns_list;\n}",
+      "fn_code_pos": [
+        [
+          277,
+          0
+        ],
+        [
+          399,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "char *ares_get_android_search_domains_list(void)\n{\n  JNIEnv     *env             = NULL;\n  jobject     active_network  = NULL;\n  jobject     link_properties = NULL;\n  jstring     domains         = NULL;\n  const char *domain;\n  int         res;\n  char       *domain_list  = NULL;\n  int         need_detatch = 0;\n\n  if (android_jvm == NULL || android_connectivity_manager == NULL) {\n    return NULL;\n  }\n\n  if (android_cm_active_net_mid == NULL || android_cm_link_props_mid == NULL ||\n      android_lp_domains_mid == NULL) {\n    return NULL;\n  }\n\n  res = (*android_jvm)->GetEnv(android_jvm, (void **)&env, JNI_VERSION_1_6);\n  if (res == JNI_EDETACHED) {\n    env          = NULL;\n    res          = jvm_attach(&env);\n    need_detatch = 1;\n  }\n  if (res != JNI_OK || env == NULL) {\n    goto done;\n  }\n\n  /* JNI below is equivalent to this Java code.\n     import android.content.Context;\n     import android.net.ConnectivityManager;\n     import android.net.LinkProperties;\n\n     ConnectivityManager cm = (ConnectivityManager)this.getApplicationContext()\n       .getSystemService(Context.CONNECTIVITY_SERVICE);\n     Network an = cm.getActiveNetwork();\n     LinkProperties lp = cm.getLinkProperties(an);\n   String domains = lp.getDomains();\n     for (String domain: domains.split(\",\")) {\n       String d = domain;\n     }\n\n     Note: The JNI ConnectivityManager object and all method IDs were previously\n           initialized in ares_library_init_android.\n   */\n\n  active_network = (*env)->CallObjectMethod(env, android_connectivity_manager,\n                                            android_cm_active_net_mid);\n  if (active_network == NULL) {\n    goto done;\n  }\n\n  link_properties =\n    (*env)->CallObjectMethod(env, android_connectivity_manager,\n                             android_cm_link_props_mid, active_network);\n  if (link_properties == NULL) {\n    goto done;\n  }\n\n  /* Get the domains. It is a common separated list of domains to search. */\n  domains =\n    (*env)->CallObjectMethod(env, link_properties, android_lp_domains_mid);\n  if (domains == NULL) {\n    goto done;\n  }\n\n  /* Split on , */\n  domain      = (*env)->GetStringUTFChars(env, domains, 0);\n  domain_list = ares_strdup(domain);\n  (*env)->ReleaseStringUTFChars(env, domains, domain);\n  (*env)->DeleteLocalRef(env, domains);\n\ndone:\n  if ((*env)->ExceptionOccurred(env)) {\n    (*env)->ExceptionClear(env);\n  }\n\n  if (link_properties != NULL) {\n    (*env)->DeleteLocalRef(env, link_properties);\n  }\n  if (active_network != NULL) {\n    (*env)->DeleteLocalRef(env, active_network);\n  }\n\n  if (need_detatch) {\n    (*android_jvm)->DetachCurrentThread(android_jvm);\n  }\n  return domain_list;\n}",
+      "fn_code_pos": [
+        [
+          401,
+          0
+        ],
+        [
+          491,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_android_search_domains_list",
+        "parameters": {},
+        "return_type": "char"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_get_android_server_list(size_t max_servers, size_t *num_servers)",
+      "fn_dec_pos": [
+        [
+          277,
+          7
+        ],
+        [
+          277,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_android_server_list",
+        "parameters": {
+          "max_servers": "size_t",
+          "num_servers": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_get_android_search_domains_list(void)",
+      "fn_dec_pos": [
+        [
+          401,
+          6
+        ],
+        [
+          401,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_get_android_search_domains_list",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#  include \"ares_private.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#  include <jni.h>\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <sys/prctl.h>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include \"ares_android.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

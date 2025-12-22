@@ -1,0 +1,466 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "void ares_htable_dict_destroy(ares_htable_dict_t *htable)\n{\n  if (htable == NULL) {\n    return; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  ares_htable_destroy(htable->hash);\n  ares_free(htable);\n}",
+      "fn_code_pos": [
+        [
+          39,
+          0
+        ],
+        [
+          47,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_destroy",
+        "parameters": {
+          "htable": "ares_htable_dict_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static unsigned int hash_func(const void *key, unsigned int seed)\n{\n  return ares_htable_hash_FNV1a_casecmp(key, ares_strlen(key), seed);\n}",
+      "fn_code_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          52,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "hash_func",
+        "parameters": {
+          "key": "void",
+          "seed": "unsigned int"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "static const void *bucket_key(const void *bucket)\n{\n  const ares_htable_dict_bucket_t *arg = bucket;\n  return arg->key;\n}",
+      "fn_code_pos": [
+        [
+          54,
+          0
+        ],
+        [
+          58,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_key",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void bucket_free(void *bucket)\n{\n  ares_htable_dict_bucket_t *arg = bucket;\n\n  ares_free(arg->key);\n  ares_free(arg->val);\n\n  ares_free(arg);\n}",
+      "fn_code_pos": [
+        [
+          60,
+          0
+        ],
+        [
+          68,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_free",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t key_eq(const void *key1, const void *key2)\n{\n  return ares_strcaseeq(key1, key2);\n}",
+      "fn_code_pos": [
+        [
+          70,
+          0
+        ],
+        [
+          73,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "key_eq",
+        "parameters": {
+          "key1": "void",
+          "key2": "void"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_htable_dict_t *ares_htable_dict_create(void)\n{\n  ares_htable_dict_t *htable = ares_malloc(sizeof(*htable));\n  if (htable == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  htable->hash = ares_htable_create(hash_func, bucket_key, bucket_free, key_eq);\n  if (htable->hash == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  return htable;\n\n/* LCOV_EXCL_START: OutOfMemory */\nfail:\n  if (htable) {\n    ares_htable_destroy(htable->hash);\n    ares_free(htable);\n  }\n  return NULL;\n  /* LCOV_EXCL_STOP */\n}",
+      "fn_code_pos": [
+        [
+          75,
+          0
+        ],
+        [
+          97,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_create",
+        "parameters": {},
+        "return_type": "ares_htable_dict_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_dict_insert(ares_htable_dict_t *htable, const char *key,\n                                    const char *val)\n{\n  ares_htable_dict_bucket_t *bucket = NULL;\n\n  if (htable == NULL || ares_strlen(key) == 0) {\n    goto fail;\n  }\n\n  bucket = ares_malloc_zero(sizeof(*bucket));\n  if (bucket == NULL) {\n    goto fail;\n  }\n\n  bucket->parent = htable;\n  bucket->key    = ares_strdup(key);\n  if (bucket->key == NULL) {\n    goto fail;\n  }\n\n  if (val != NULL) {\n    bucket->val = ares_strdup(val);\n    if (bucket->val == NULL) {\n      goto fail;\n    }\n  }\n\n  if (!ares_htable_insert(htable->hash, bucket)) {\n    goto fail;\n  }\n\n  return ARES_TRUE;\n\nfail:\n  if (bucket) {\n    ares_free(bucket->val);\n    ares_free(bucket);\n  }\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          99,
+          0
+        ],
+        [
+          138,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_insert",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "key": "char",
+          "val": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_dict_get(const ares_htable_dict_t *htable,\n                                 const char *key, const char **val)\n{\n  const ares_htable_dict_bucket_t *bucket = NULL;\n\n  if (val) {\n    *val = NULL;\n  }\n\n  if (htable == NULL) {\n    return ARES_FALSE;\n  }\n\n  bucket = ares_htable_get(htable->hash, key);\n  if (bucket == NULL) {\n    return ARES_FALSE;\n  }\n\n  if (val) {\n    *val = bucket->val;\n  }\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          140,
+          0
+        ],
+        [
+          162,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_get",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "key": "char",
+          "val": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "const char *ares_htable_dict_get_direct(const ares_htable_dict_t *htable,\n                                        const char               *key)\n{\n  const char *val = NULL;\n  ares_htable_dict_get(htable, key, &val);\n  return val;\n}",
+      "fn_code_pos": [
+        [
+          164,
+          0
+        ],
+        [
+          170,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_get_direct",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "key": "char"
+        },
+        "return_type": "char"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t ares_htable_dict_remove(ares_htable_dict_t *htable, const char *key)\n{\n  if (htable == NULL) {\n    return ARES_FALSE;\n  }\n\n  return ares_htable_remove(htable->hash, key);\n}",
+      "fn_code_pos": [
+        [
+          172,
+          0
+        ],
+        [
+          179,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_remove",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "key": "char"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "size_t ares_htable_dict_num_keys(const ares_htable_dict_t *htable)\n{\n  if (htable == NULL) {\n    return 0;\n  }\n  return ares_htable_num_keys(htable->hash);\n}",
+      "fn_code_pos": [
+        [
+          181,
+          0
+        ],
+        [
+          187,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_num_keys",
+        "parameters": {
+          "htable": "ares_htable_dict_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "char **ares_htable_dict_keys(const ares_htable_dict_t *htable, size_t *num)\n{\n  const void **buckets = NULL;\n  size_t       cnt     = 0;\n  char       **out     = NULL;\n  size_t       i;\n\n  if (htable == NULL || num == NULL) {\n    return NULL; /* LCOV_EXCL_LINE: DefensiveCoding */\n  }\n\n  *num = 0;\n\n  buckets = ares_htable_all_buckets(htable->hash, &cnt);\n  if (buckets == NULL || cnt == 0) {\n    return NULL;\n  }\n\n  out = ares_malloc_zero(sizeof(*out) * cnt);\n  if (out == NULL) {\n    goto fail; /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  for (i = 0; i < cnt; i++) {\n    out[i] = ares_strdup(((const ares_htable_dict_bucket_t *)buckets[i])->key);\n    if (out[i] == NULL) {\n      goto fail;\n    }\n  }\n\n  ares_free(buckets);\n  *num = cnt;\n  return out;\n\nfail:\n  *num = 0;\n  ares_free_array(out, cnt, ares_free);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          189,
+          0
+        ],
+        [
+          227,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": "char"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "bucket_key(const void *bucket)",
+      "fn_dec_pos": [
+        [
+          54,
+          19
+        ],
+        [
+          54,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "bucket_key",
+        "parameters": {
+          "bucket": "void"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_dict_create(void)",
+      "fn_dec_pos": [
+        [
+          75,
+          20
+        ],
+        [
+          75,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_dict_get_direct(const ares_htable_dict_t *htable,\n                                        const char               *key)",
+      "fn_dec_pos": [
+        [
+          164,
+          12
+        ],
+        [
+          165,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_get_direct",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "key": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_htable_dict_keys(const ares_htable_dict_t *htable, size_t *num)",
+      "fn_dec_pos": [
+        [
+          189,
+          7
+        ],
+        [
+          189,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_htable_dict_keys",
+        "parameters": {
+          "htable": "ares_htable_dict_t",
+          "num": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_htable_dict {\n  ares_htable_t *hash;\n}",
+      {
+        "*hash": "ares_htable_t"
+      },
+      "ares_htable_dict",
+      [
+        29,
+        0
+      ],
+      [
+        31,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  char               *key;\n  char               *val;\n  ares_htable_dict_t *parent;\n} ares_htable_dict_bucket_t;",
+      {
+        "*key": "char",
+        "*val": "char",
+        "*parent": "ares_htable_dict_t"
+      },
+      "ares_htable_dict_bucket_t",
+      [
+        33,
+        0
+      ],
+      [
+        37,
+        28
+      ]
+    ],
+    [
+      "struct ares_htable_dict {\n  ares_htable_t *hash;\n}",
+      {
+        "*hash": "ares_htable_t"
+      },
+      "ares_htable_dict",
+      [
+        29,
+        0
+      ],
+      [
+        31,
+        1
+      ]
+    ],
+    [
+      "typedef struct {\n  char               *key;\n  char               *val;\n  ares_htable_dict_t *parent;\n} ares_htable_dict_bucket_t;",
+      {
+        "*key": "char",
+        "*val": "char",
+        "*parent": "ares_htable_dict_t"
+      },
+      "ares_htable_dict_bucket_t",
+      [
+        33,
+        0
+      ],
+      [
+        37,
+        28
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_htable_dict.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

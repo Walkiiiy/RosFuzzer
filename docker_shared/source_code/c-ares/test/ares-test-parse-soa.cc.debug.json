@@ -1,0 +1,155 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseSoaReplyOK) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_SOA))\n    .add_answer(new DNSSoaRR(\"example.com\", 100,\n                             \"soa1.example.com\", \"fred.example.com\",\n                             1, 2, 3, 4, 5));\n  std::vector<byte> data = pkt.data();\n\n  struct ares_soa_reply* soa = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  ASSERT_NE(nullptr, soa);\n  EXPECT_EQ(\"soa1.example.com\", std::string(soa->nsname));\n  EXPECT_EQ(\"fred.example.com\", std::string(soa->hostmaster));\n  EXPECT_EQ((unsigned int)1, soa->serial);\n  EXPECT_EQ((unsigned int)2, soa->refresh);\n  EXPECT_EQ((unsigned int)3, soa->retry);\n  EXPECT_EQ((unsigned int)4, soa->expire);\n  EXPECT_EQ((unsigned int)5, soa->minttl);\n  ares_free_data(soa);\n}",
+      "fn_code_pos": [
+        [
+          34,
+          0
+        ],
+        [
+          54,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseSoaReplyErrors) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_SOA))\n    .add_answer(new DNSSoaRR(\"example.com\", 100,\n                             \"soa1.example.com\", \"fred.example.com\",\n                             1, 2, 3, 4, 5));\n  std::vector<byte> data;\n  struct ares_soa_reply* soa = nullptr;\n\n  // No question.\n  pkt.questions_.clear();\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  pkt.add_question(new DNSQuestion(\"example.com\", T_SOA));\n\n#ifdef DISABLED\n  // Question != answer\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"Axample.com\", T_SOA));\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"example.com\", T_SOA));\n#endif\n\n  // Two questions\n  pkt.add_question(new DNSQuestion(\"example.com\", T_SOA));\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  pkt.questions_.clear();\n  pkt.add_question(new DNSQuestion(\"example.com\", T_SOA));\n\n  // Wrong sort of answer.\n  pkt.answers_.clear();\n  pkt.add_answer(new DNSMxRR(\"example.com\", 100, 100, \"mx1.example.com\"));\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  pkt.answers_.clear();\n  pkt.add_answer(new DNSSoaRR(\"example.com\", 100,\n                             \"soa1.example.com\", \"fred.example.com\",\n                             1, 2, 3, 4, 5));\n\n  // No answer.\n  pkt.answers_.clear();\n  data = pkt.data();\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)data.size(), &soa));\n  pkt.add_answer(new DNSSoaRR(\"example.com\", 100,\n                             \"soa1.example.com\", \"fred.example.com\",\n                             1, 2, 3, 4, 5));\n\n  // Truncated packets.\n  data = pkt.data();\n  for (size_t len = 1; len < data.size(); len++) {\n    EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), (int)len, &soa));\n  }\n\n  // Negative Length\n  EXPECT_EQ(ARES_EBADRESP, ares_parse_soa_reply(data.data(), -1, &soa));\n}",
+      "fn_code_pos": [
+        [
+          56,
+          0
+        ],
+        [
+          115,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ParseSoaReplyAllocFail) {\n  DNSPacket pkt;\n  pkt.set_qid(0x1234).set_response().set_aa()\n    .add_question(new DNSQuestion(\"example.com\", T_SOA))\n    .add_answer(new DNSSoaRR(\"example.com\", 100,\n                             \"soa1.example.com\", \"fred.example.com\",\n                             1, 2, 3, 4, 5));\n  std::vector<byte> data = pkt.data();\n  struct ares_soa_reply* soa = nullptr;\n\n  for (int ii = 1; ii <= 5; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    EXPECT_EQ(ARES_ENOMEM, ares_parse_soa_reply(data.data(), (int)data.size(), &soa)) << ii;\n  }\n}",
+      "fn_code_pos": [
+        [
+          117,
+          0
+        ],
+        [
+          132,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_soa_reply",
+      {},
+      "",
+      [
+        43,
+        2
+      ],
+      [
+        43,
+        23
+      ]
+    ],
+    [
+      "struct ares_soa_reply",
+      {},
+      "",
+      [
+        64,
+        2
+      ],
+      [
+        64,
+        23
+      ]
+    ],
+    [
+      "struct ares_soa_reply",
+      {},
+      "",
+      [
+        125,
+        2
+      ],
+      [
+        125,
+        23
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"dns-proto.h\"\n",
+      [
+        26,
+        0
+      ],
+      [
+        27,
+        0
+      ]
+    ],
+    [
+      "#include <sstream>\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include <vector>\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

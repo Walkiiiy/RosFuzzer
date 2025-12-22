@@ -1,0 +1,1303 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_buf_create(void)",
+      "fn_dec_pos": [
+        [
+          56,
+          28
+        ],
+        [
+          56,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_create_const(const unsigned char *data,\n                                                  size_t               data_len)",
+      "fn_dec_pos": [
+        [
+          67,
+          28
+        ],
+        [
+          68,
+          80
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_create_const",
+        "parameters": {
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_destroy(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          75,
+          28
+        ],
+        [
+          75,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_destroy",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append(ares_buf_t          *buf,\n                                            const unsigned char *data,\n                                            size_t               data_len)",
+      "fn_dec_pos": [
+        [
+          85,
+          13
+        ],
+        [
+          87,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_byte(ares_buf_t   *buf,\n                                                 unsigned char b)",
+      "fn_dec_pos": [
+        [
+          95,
+          13
+        ],
+        [
+          96,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_byte",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "b": "unsigned char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_str(ares_buf_t *buf,\n                                                const char *str)",
+      "fn_dec_pos": [
+        [
+          104,
+          13
+        ],
+        [
+          105,
+          64
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_be16(ares_buf_t    *buf,\n                                                 unsigned short u16)",
+      "fn_dec_pos": [
+        [
+          113,
+          13
+        ],
+        [
+          114,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u16": "unsigned short"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_be32(ares_buf_t  *buf,\n                                                 unsigned int u32)",
+      "fn_dec_pos": [
+        [
+          122,
+          13
+        ],
+        [
+          123,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u32": "unsigned int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_num_dec(ares_buf_t *buf, size_t num,\n                                                    size_t len)",
+      "fn_dec_pos": [
+        [
+          132,
+          13
+        ],
+        [
+          133,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_num_dec",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "num": "size_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_append_num_hex(ares_buf_t *buf, size_t num,\n                                                    size_t len)",
+      "fn_dec_pos": [
+        [
+          142,
+          13
+        ],
+        [
+          143,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_append_num_hex",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "num": "size_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_set_length(ares_buf_t *buf, size_t len)",
+      "fn_dec_pos": [
+        [
+          158,
+          13
+        ],
+        [
+          158,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_set_length",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_append_start(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          172,
+          28
+        ],
+        [
+          172,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_start",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_append_finish(ares_buf_t *buf, size_t len)",
+      "fn_dec_pos": [
+        [
+          182,
+          28
+        ],
+        [
+          182,
+          79
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_append_finish",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_hexdump(ares_buf_t          *buf,\n                                             const unsigned char *data,\n                                             size_t               len)",
+      "fn_dec_pos": [
+        [
+          191,
+          13
+        ],
+        [
+          193,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_hexdump",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_finish_bin(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          203,
+          28
+        ],
+        [
+          203,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_bin",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_finish_str(ares_buf_t *buf, size_t *len)",
+      "fn_dec_pos": [
+        [
+          219,
+          28
+        ],
+        [
+          219,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_finish_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_replace(ares_buf_t *buf,\n                                             const unsigned char *srch,\n                                             size_t srch_size,\n                                             const unsigned char *rplc,\n                                             size_t rplc_size)",
+      "fn_dec_pos": [
+        [
+          235,
+          13
+        ],
+        [
+          239,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_replace",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "srch": "unsigned char",
+          "srch_size": "size_t",
+          "rplc": "unsigned char",
+          "rplc_size": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_tag(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          248,
+          28
+        ],
+        [
+          248,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_tag_rollback(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          255,
+          13
+        ],
+        [
+          255,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_tag_rollback",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t  ares_buf_tag_clear(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          264,
+          13
+        ],
+        [
+          264,
+          63
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t  ares_buf_tag_clear",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_tag_fetch(const ares_buf_t *buf,\n                                                     size_t           *len)",
+      "fn_dec_pos": [
+        [
+          275,
+          34
+        ],
+        [
+          276,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_fetch",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_buf_tag_length(const ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          283,
+          34
+        ],
+        [
+          283,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_tag_length",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_bytes(const ares_buf_t *buf,\n                                                    unsigned char    *bytes,\n                                                    size_t           *len)",
+      "fn_dec_pos": [
+        [
+          294,
+          13
+        ],
+        [
+          296,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_tag_fetch_bytes",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "bytes": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_string(const ares_buf_t *buf,\n                                                     char *str, size_t len)",
+      "fn_dec_pos": [
+        [
+          309,
+          13
+        ],
+        [
+          310,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_tag_fetch_string",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_strdup(const ares_buf_t *buf,\n                                                     char            **str)",
+      "fn_dec_pos": [
+        [
+          323,
+          13
+        ],
+        [
+          324,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_tag_fetch_strdup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_tag_fetch_constbuf(const ares_buf_t *buf,\n                                                       ares_buf_t **newbuf)",
+      "fn_dec_pos": [
+        [
+          336,
+          13
+        ],
+        [
+          337,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_tag_fetch_constbuf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "newbuf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_consume(ares_buf_t *buf, size_t len)",
+      "fn_dec_pos": [
+        [
+          345,
+          13
+        ],
+        [
+          345,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_consume",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_be16(ares_buf_t     *buf,\n                                               unsigned short *u16)",
+      "fn_dec_pos": [
+        [
+          353,
+          13
+        ],
+        [
+          354,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_be16",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u16": "unsigned short"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_be32(ares_buf_t   *buf,\n                                               unsigned int *u32)",
+      "fn_dec_pos": [
+        [
+          362,
+          13
+        ],
+        [
+          363,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_be32",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "u32": "unsigned int"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes(ares_buf_t    *buf,\n                                                unsigned char *bytes,\n                                                size_t         len)",
+      "fn_dec_pos": [
+        [
+          373,
+          13
+        ],
+        [
+          375,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_bytes",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "bytes": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes_dup(ares_buf_t *buf, size_t len,\n                                                    ares_bool_t     null_term,\n                                                    unsigned char **bytes)",
+      "fn_dec_pos": [
+        [
+          389,
+          13
+        ],
+        [
+          391,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_bytes_dup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t",
+          "null_term": "ares_bool_t",
+          "bytes": "unsigned char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_bytes_into_buf(ares_buf_t *buf,\n                                                         ares_buf_t *dest,\n                                                         size_t      len)",
+      "fn_dec_pos": [
+        [
+          401,
+          13
+        ],
+        [
+          403,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_bytes_into_buf",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "dest": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_fetch_str_dup(ares_buf_t *buf, size_t len,\n                                                  char **str)",
+      "fn_dec_pos": [
+        [
+          414,
+          13
+        ],
+        [
+          415,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_fetch_str_dup",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t",
+          "str": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_whitespace(ares_buf_t *buf,\n                                                       ares_bool_t include_linefeed)",
+      "fn_dec_pos": [
+        [
+          425,
+          27
+        ],
+        [
+          426,
+          84
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_whitespace",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "include_linefeed": "ares_bool_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_nonwhitespace(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          435,
+          27
+        ],
+        [
+          435,
+          74
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_nonwhitespace",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_until_charset(ares_buf_t          *buf,\n                                                          const unsigned char *charset,\n                                                          size_t               len,\n                                                          ares_bool_t require_charset)",
+      "fn_dec_pos": [
+        [
+          450,
+          27
+        ],
+        [
+          453,
+          86
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_until_charset",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "charset": "unsigned char",
+          "len": "size_t",
+          "require_charset": "ares_bool_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_until_seq(ares_buf_t          *buf,\n                                                      const unsigned char *seq,\n                                                      size_t               len,\n                                                      ares_bool_t require_seq)",
+      "fn_dec_pos": [
+        [
+          468,
+          27
+        ],
+        [
+          471,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_until_seq",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "seq": "unsigned char",
+          "len": "size_t",
+          "require_seq": "ares_bool_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_charset(ares_buf_t          *buf,\n                                                    const unsigned char *charset,\n                                                    size_t               len)",
+      "fn_dec_pos": [
+        [
+          480,
+          27
+        ],
+        [
+          482,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_charset",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "charset": "unsigned char",
+          "len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_consume_line(ares_buf_t *buf,\n                                                 ares_bool_t include_linefeed)",
+      "fn_dec_pos": [
+        [
+          493,
+          27
+        ],
+        [
+          494,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_consume_line",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "include_linefeed": "ares_bool_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split(\n  ares_buf_t *buf, const unsigned char *delims, size_t delims_len,\n  ares_buf_split_t flags, size_t max_sections, ares_array_t **arr)",
+      "fn_dec_pos": [
+        [
+          545,
+          13
+        ],
+        [
+          547,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_split",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split_str_array(\n  ares_buf_t *buf, const unsigned char *delims, size_t delims_len,\n  ares_buf_split_t flags, size_t max_sections, ares_array_t **arr)",
+      "fn_dec_pos": [
+        [
+          565,
+          13
+        ],
+        [
+          567,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_split_str_array",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "arr": "ares_array_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_split_str(\n  ares_buf_t *buf, const unsigned char *delims, size_t delims_len,\n  ares_buf_split_t flags, size_t max_sections, char ***strs, size_t *nstrs)",
+      "fn_dec_pos": [
+        [
+          586,
+          13
+        ],
+        [
+          588,
+          75
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_split_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "delims": "unsigned char",
+          "delims_len": "size_t",
+          "flags": "ares_buf_split_t",
+          "max_sections": "size_t",
+          "strs": "char",
+          "nstrs": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_bool_t          ares_buf_begins_with(const ares_buf_t    *buf,\n                                                       const unsigned char *data,\n                                                       size_t               data_len)",
+      "fn_dec_pos": [
+        [
+          598,
+          13
+        ],
+        [
+          600,
+          85
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_bool_t          ares_buf_begins_with",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "data": "unsigned char",
+          "data_len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_len(const ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          608,
+          34
+        ],
+        [
+          608,
+          69
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_len",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_peek(const ares_buf_t *buf,\n                                                size_t           *len)",
+      "fn_dec_pos": [
+        [
+          618,
+          34
+        ],
+        [
+          619,
+          70
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_peek",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "len": "size_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_status_t        ares_buf_peek_byte(const ares_buf_t *buf,\n                                                     unsigned char    *b)",
+      "fn_dec_pos": [
+        [
+          627,
+          13
+        ],
+        [
+          628,
+          73
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t        ares_buf_peek_byte",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "b": "unsigned char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_reclaim(ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          650,
+          34
+        ],
+        [
+          650,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_reclaim",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_set_position(ares_buf_t *buf, size_t idx)",
+      "fn_dec_pos": [
+        [
+          666,
+          13
+        ],
+        [
+          666,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_set_position",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "idx": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_buf_get_position(const ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          680,
+          27
+        ],
+        [
+          680,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_buf_get_position",
+        "parameters": {
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_parse_dns_str(ares_buf_t *buf,\n                                                  size_t      remaining_len,\n                                                  char      **name)",
+      "fn_dec_pos": [
+        [
+          694,
+          13
+        ],
+        [
+          696,
+          67
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_parse_dns_str",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "name": "char"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_parse_dns_binstr(ares_buf_t *buf,\n                                                     size_t      remaining_len,\n                                                     unsigned char **bin,\n                                                     size_t         *bin_len)",
+      "fn_dec_pos": [
+        [
+          712,
+          13
+        ],
+        [
+          715,
+          77
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_parse_dns_binstr",
+        "parameters": {
+          "buf": "ares_buf_t",
+          "remaining_len": "size_t",
+          "bin": "unsigned char",
+          "bin_len": "size_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_buf_load_file(const char *filename,\n                                              ares_buf_t *buf)",
+      "fn_dec_pos": [
+        [
+          726,
+          13
+        ],
+        [
+          727,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_status_t ares_buf_load_file",
+        "parameters": {
+          "filename": "char",
+          "buf": "ares_buf_t"
+        },
+        "return_type": "CARES_EXTERN"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct ares_buf",
+      {},
+      "",
+      [
+        47,
+        0
+      ],
+      [
+        47,
+        15
+      ]
+    ],
+    [
+      "typedef struct ares_buf     ares_buf_t;",
+      {},
+      "ares_buf_t",
+      [
+        50,
+        0
+      ],
+      [
+        50,
+        39
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_array.h\"\n",
+      [
+        29,
+        0
+      ],
+      [
+        30,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  /*! No flags */\n  ARES_BUF_SPLIT_NONE = 0,\n  /*! The delimiter will be the first character in the buffer, except the\n   *  first buffer since the start doesn't have a delimiter.  This option is\n   *  incompatible with ARES_BUF_SPLIT_LTRIM since the delimiter is always\n   *  the first character.\n   */\n  ARES_BUF_SPLIT_KEEP_DELIMS = 1 << 0,\n  /*! Allow blank sections, by default blank sections are not emitted.  If using\n   *  ARES_BUF_SPLIT_KEEP_DELIMS, the delimiter is not counted as part\n   *  of the section */\n  ARES_BUF_SPLIT_ALLOW_BLANK = 1 << 1,\n  /*! Remove duplicate entries */\n  ARES_BUF_SPLIT_NO_DUPLICATES = 1 << 2,\n  /*! Perform case-insensitive matching when comparing values */\n  ARES_BUF_SPLIT_CASE_INSENSITIVE = 1 << 3,\n  /*! Trim leading whitespace from buffer */\n  ARES_BUF_SPLIT_LTRIM = 1 << 4,\n  /*! Trim trailing whitespace from buffer */\n  ARES_BUF_SPLIT_RTRIM = 1 << 5,\n  /*! Trim leading and trailing whitespace from buffer */\n  ARES_BUF_SPLIT_TRIM = (ARES_BUF_SPLIT_LTRIM | ARES_BUF_SPLIT_RTRIM)\n} ares_buf_split_t;",
+      {
+        "ARES_BUF_SPLIT_NONE": "",
+        "ARES_BUF_SPLIT_KEEP_DELIMS": "",
+        "ARES_BUF_SPLIT_ALLOW_BLANK": "",
+        "ARES_BUF_SPLIT_NO_DUPLICATES": "",
+        "ARES_BUF_SPLIT_CASE_INSENSITIVE": "",
+        "ARES_BUF_SPLIT_LTRIM": "",
+        "ARES_BUF_SPLIT_RTRIM": "",
+        "ARES_BUF_SPLIT_TRIM": ""
+      },
+      "ares_buf_split_t",
+      [
+        496,
+        0
+      ],
+      [
+        519,
+        19
+      ]
+    ]
+  ]
+}

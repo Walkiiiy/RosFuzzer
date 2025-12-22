@@ -1,0 +1,1421 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetHostByNameV4) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_LT(0, (int)result.host_.addrs_.size());\n  EXPECT_EQ(AF_INET, result.host_.addrtype_);\n}",
+      "fn_code_pos": [
+        [
+          112,
+          0
+        ],
+        [
+          120,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetHostByNameV6) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_LT(0, (int)result.host_.addrs_.size());\n  EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n}",
+      "fn_code_pos": [
+        [
+          122,
+          0
+        ],
+        [
+          130,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetHostByAddrV4) {\n  HostResult result;\n  ares_gethostbyaddr(channel_, cflare_addr4, sizeof(cflare_addr4), AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_LT(0, (int)result.host_.addrs_.size());\n  EXPECT_EQ(AF_INET, result.host_.addrtype_);\n}",
+      "fn_code_pos": [
+        [
+          132,
+          0
+        ],
+        [
+          140,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetHostByAddrV6) {\n  HostResult result;\n  ares_gethostbyaddr(channel_, cflare_addr6, sizeof(cflare_addr6), AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_LT(0, (int)result.host_.addrs_.size());\n  EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n}",
+      "fn_code_pos": [
+        [
+          142,
+          0
+        ],
+        [
+          150,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetHostByNameFile) {\n  struct hostent *host = nullptr;\n\n  // Still need a channel even to query /etc/hosts.\n  EXPECT_EQ(ARES_ENOTFOUND,\n            ares_gethostbyname_file(nullptr, \"localhost\", AF_INET, &host));\n\n  int rc = ares_gethostbyname_file(channel_, \"bogus.mcname\", AF_INET, &host);\n  EXPECT_EQ(nullptr, host);\n  EXPECT_EQ(ARES_ENOTFOUND, rc);\n\n  rc = ares_gethostbyname_file(channel_, \"localhost\", AF_INET, &host);\n  if (rc == ARES_SUCCESS) {\n    EXPECT_NE(nullptr, host);\n    ares_free_hostent(host);\n  }\n}",
+      "fn_code_pos": [
+        [
+          152,
+          0
+        ],
+        [
+          168,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByNameV4) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"localhost\", AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ECONNREFUSED) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_EQ(1, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET, result.host_.addrtype_);\n    EXPECT_NE(SIZE_MAX, result.host_.name_.find(\"localhost\"));\n  }\n}",
+      "fn_code_pos": [
+        [
+          170,
+          0
+        ],
+        [
+          181,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByNameV6) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"localhost\", AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ECONNREFUSED) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_EQ(1, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n    std::stringstream ss;\n    ss << HostEnt(result.host_);\n    EXPECT_NE(SIZE_MAX, result.host_.name_.find(\"localhost\"));\n  }\n}",
+      "fn_code_pos": [
+        [
+          183,
+          0
+        ],
+        [
+          196,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetNonExistLocalhostByNameV4) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"idonotexist.localhost\", AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ECONNREFUSED) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_EQ(1, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET, result.host_.addrtype_);\n    EXPECT_NE(SIZE_MAX, result.host_.name_.find(\"idonotexist.localhost\"));\n  }\n}",
+      "fn_code_pos": [
+        [
+          198,
+          0
+        ],
+        [
+          209,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetNonExistLocalhostByNameV6) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"idonotexist.localhost\", AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ECONNREFUSED) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_EQ(1, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n    std::stringstream ss;\n    ss << HostEnt(result.host_);\n    EXPECT_NE(SIZE_MAX, result.host_.name_.find(\"idonotexist.localhost\"));\n  }\n}",
+      "fn_code_pos": [
+        [
+          211,
+          0
+        ],
+        [
+          224,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByNameIPV4) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"127.0.0.1\", AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(1, (int)result.host_.addrs_.size());\n  EXPECT_EQ(AF_INET, result.host_.addrtype_);\n  std::stringstream ss;\n  ss << HostEnt(result.host_);\n  EXPECT_EQ(\"{'127.0.0.1' aliases=[] addrs=[127.0.0.1]}\", ss.str());\n}",
+      "fn_code_pos": [
+        [
+          226,
+          0
+        ],
+        [
+          237,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByNameIPV6) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"::1\", AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ENOTFOUND) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_EQ(1, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n    std::stringstream ss;\n    ss << HostEnt(result.host_);\n    EXPECT_EQ(\"{'::1' aliases=[] addrs=[0000:0000:0000:0000:0000:0000:0000:0001]}\", ss.str());\n  }\n}",
+      "fn_code_pos": [
+        [
+          239,
+          0
+        ],
+        [
+          252,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostFailFamily) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"127.0.0.1\", AF_INET+AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTIMP, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          254,
+          0
+        ],
+        [
+          260,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByAddrV4) {\n  HostResult result;\n  struct in_addr addr;\n  addr.s_addr = htonl(INADDR_LOOPBACK);\n  ares_gethostbyaddr(channel_, &addr, sizeof(addr), AF_INET, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ENOTFOUND) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_LT(0, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET, result.host_.addrtype_);\n    // oddly, travis does not resolve to localhost, but a random hostname starting with travis-job\n    if (result.host_.name_.find(\"travis-job\") == SIZE_MAX) {\n        EXPECT_NE(SIZE_MAX,\n                  result.host_.name_.find(\"localhost\"));\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          262,
+          0
+        ],
+        [
+          279,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetLocalhostByAddrV6) {\n  HostResult result;\n  struct in6_addr addr;\n  memset(&addr, 0, sizeof(addr));\n  addr.s6_addr[15] = 1;  // in6addr_loopback\n  ares_gethostbyaddr(channel_, &addr, sizeof(addr), AF_INET6, HostCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  if (result.status_ != ARES_ENOTFOUND) {\n    EXPECT_EQ(ARES_SUCCESS, result.status_);\n    EXPECT_LT(0, (int)result.host_.addrs_.size());\n    EXPECT_EQ(AF_INET6, result.host_.addrtype_);\n    const std::string& name = result.host_.name_;\n    EXPECT_TRUE(SIZE_MAX != name.find(\"localhost\") ||\n                SIZE_MAX != name.find(\"ip6-loopback\"));\n  }\n}",
+      "fn_code_pos": [
+        [
+          281,
+          0
+        ],
+        [
+          297,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetHostByAddrFailFamily) {\n  HostResult result;\n  unsigned char addr[4] = {8, 8, 8, 8};\n  ares_gethostbyaddr(channel_, addr, sizeof(addr), AF_INET6+AF_INET,\n                     HostCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTIMP, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          299,
+          0
+        ],
+        [
+          306,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetHostByAddrFailAddrSize) {\n  HostResult result;\n  unsigned char addr[4] = {8, 8, 8, 8};\n  ares_gethostbyaddr(channel_, addr, sizeof(addr) - 1, AF_INET,\n                     HostCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTIMP, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          308,
+          0
+        ],
+        [
+          315,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_P(DefaultChannelModeTest, LiveGetHostByAddrFailAlloc) {\n  HostResult result;\n  unsigned char addr[4] = {8, 8, 8, 8};\n  SetAllocFail(1);\n  ares_gethostbyaddr(channel_, addr, sizeof(addr), AF_INET,\n                     HostCallback, &result);\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOMEM, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          317,
+          0
+        ],
+        [
+          325,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_P",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchA) {\n  SearchResult result;\n  ares_search(channel_, \"www.youtube.com.\", C_IN, T_A,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          330,
+          0
+        ],
+        [
+          337,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchEmptyA) {\n  SearchResult result;\n  ares_search(channel_, \"\", C_IN, T_A,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_NE(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          339,
+          0
+        ],
+        [
+          346,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchNS) {\n  SearchResult result;\n  ares_search(channel_, \"google.com.\", C_IN, T_NS,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          348,
+          0
+        ],
+        [
+          355,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchMX) {\n  SearchResult result;\n  ares_search(channel_, \"google.com.\", C_IN, T_MX,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          357,
+          0
+        ],
+        [
+          364,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchTXT) {\n  SearchResult result;\n  ares_search(channel_, \"google.com.\", C_IN, T_TXT,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          366,
+          0
+        ],
+        [
+          373,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchSOA) {\n  SearchResult result;\n  ares_search(channel_, \"google.com.\", C_IN, T_SOA,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          375,
+          0
+        ],
+        [
+          382,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchSRV) {\n  SearchResult result;\n  ares_search(channel_, \"_imap._tcp.gmail.com.\", C_IN, T_SRV,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          384,
+          0
+        ],
+        [
+          391,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveSearchANY) {\n  SearchResult result;\n  ares_search(channel_, \"google.com.\", C_IN, T_ANY,\n              SearchCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          393,
+          0
+        ],
+        [
+          400,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  if (verbose) std::cerr << \"8.8.8.8:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          402,
+          0
+        ],
+        [
+          416,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4NoPort) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(0);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  if (verbose) std::cerr << \"8.8.8.8:0 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          418,
+          0
+        ],
+        [
+          432,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4UnassignedPort) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(4);  // Unassigned at IANA\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  if (verbose) std::cerr << \"8.8.8.8:4 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          434,
+          0
+        ],
+        [
+          448,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV6Both) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  memcpy(sockaddr.sin6_addr.s6_addr, cflare_addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_TCP|ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_NOFQDN,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  if (verbose) std::cerr << \"[2001:4860:4860::8888]:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          450,
+          0
+        ],
+        [
+          464,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV6Neither) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  memcpy(sockaddr.sin6_addr.s6_addr, cflare_addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_TCP|ARES_NI_NOFQDN,  // Neither specified => assume lookup host.\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  if (verbose) std::cerr << \"[2001:4860:4860::8888]:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          466,
+          0
+        ],
+        [
+          480,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4Numeric) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_TCP|ARES_NI_NUMERICHOST,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"8.8.8.8\", result.node_);\n  if (verbose) std::cerr << \"8.8.8.8:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          482,
+          0
+        ],
+        [
+          497,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV6Numeric) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  memcpy(sockaddr.sin6_addr.s6_addr, cflare_addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_DCCP|ARES_NI_NUMERICHOST,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"2606:4700:4700::1111%0\", result.node_);\n  if (verbose) std::cerr << \"[2606:4700:4700::1111]:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          499,
+          0
+        ],
+        [
+          514,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV6LinkLocal) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  unsigned char addr6[16] = {0xfe, 0x80, 0x01, 0x02, 0x01, 0x02, 0x00, 0x00,\n                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04};\n  memcpy(sockaddr.sin6_addr.s6_addr, addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_DCCP|ARES_NI_NUMERICHOST,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"fe80:102:102::304%0\", result.node_);\n  if (verbose) std::cerr << \"[fe80:102:102::304]:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          516,
+          0
+        ],
+        [
+          533,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4NotFound) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(4);  // Port 4 unassigned at IANA\n  // RFC5737 says 192.0.2.0 should not be used publicly.\n  sockaddr.sin_addr.s_addr = htonl(0xC0000200);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"192.0.2.0\", result.node_);\n  if (verbose) std::cerr << \"192.0.2.0:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          535,
+          0
+        ],
+        [
+          551,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV4NotFoundFail) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  // RFC5737 says 192.0.2.0 should not be used publicly.\n  sockaddr.sin_addr.s_addr = htonl(0xC0000200);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP|ARES_NI_NAMEREQD,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTFOUND, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          553,
+          0
+        ],
+        [
+          567,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoV6NotFound) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  // 2001:db8::/32 is only supposed to be used in documentation.\n  unsigned char addr6[16] = {0x20, 0x01, 0x0d, 0xb8, 0x01, 0x02, 0x00, 0x00,\n                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04};\n  memcpy(sockaddr.sin6_addr.s6_addr, addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"2001:db8:102::304%0\", result.node_);\n  if (verbose) std::cerr << \"[2001:db8:102::304]:53 => \" << result.node_ << \"/\" << result.service_ << std::endl;\n}",
+      "fn_code_pos": [
+        [
+          569,
+          0
+        ],
+        [
+          587,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInvalidFamily) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6 + AF_INET;\n  sockaddr.sin6_port = htons(53);\n  memcpy(sockaddr.sin6_addr.s6_addr, cflare_addr6, 16);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOTIMP, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          589,
+          0
+        ],
+        [
+          602,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInvalidFlags) {\n  NameInfoResult result;\n  struct sockaddr_in6 sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin6_family = AF_INET6;\n  sockaddr.sin6_port = htons(53);\n  memcpy(sockaddr.sin6_addr.s6_addr, cflare_addr6, 16);\n  // Ask for both a name-required, and a numeric host.\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP|ARES_NI_NUMERICHOST|ARES_NI_NAMEREQD,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_EBADFLAGS, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          604,
+          0
+        ],
+        [
+          618,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetServiceInfo) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  // Just look up service info\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPSERVICE|ARES_NI_SCTP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"\", result.node_);\n}",
+      "fn_code_pos": [
+        [
+          620,
+          0
+        ],
+        [
+          635,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetServiceInfoNumeric) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  // Just look up service info\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPSERVICE|ARES_NI_SCTP|ARES_NI_NUMERICSERV,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_SUCCESS, result.status_);\n  EXPECT_EQ(\"\", result.node_);\n  EXPECT_EQ(\"53\", result.service_);\n}",
+      "fn_code_pos": [
+        [
+          637,
+          0
+        ],
+        [
+          653,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "VIRT_NONVIRT_TEST_F(DefaultChannelTest, LiveGetNameInfoAllocFail) {\n  NameInfoResult result;\n  struct sockaddr_in sockaddr;\n  memset(&sockaddr, 0, sizeof(sockaddr));\n  sockaddr.sin_family = AF_INET;\n  sockaddr.sin_port = htons(53);\n  sockaddr.sin_addr.s_addr = htonl(0x08080808);\n  SetAllocFail(1);\n  ares_getnameinfo(channel_, (const struct sockaddr*)&sockaddr, sizeof(sockaddr),\n                   ARES_NI_LOOKUPHOST|ARES_NI_LOOKUPSERVICE|ARES_NI_UDP,\n                   NameInfoCallback, &result);\n  Process();\n  EXPECT_TRUE(result.done_);\n  EXPECT_EQ(ARES_ENOMEM, result.status_);\n}",
+      "fn_code_pos": [
+        [
+          655,
+          0
+        ],
+        [
+          669,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "VIRT_NONVIRT_TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, LiveSetServers) {\n  struct ares_addr_node server1;\n  struct ares_addr_node server2;\n  server1.next = &server2;\n  server1.family = AF_INET;\n  server1.addr.addr4.s_addr = htonl(0x01020304);\n  server2.next = nullptr;\n  server2.family = AF_INET;\n  server2.addr.addr4.s_addr = htonl(0x02030405);\n\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers(channel_, &server1));\n  ares_cancel(channel_);\n}",
+      "fn_code_pos": [
+        [
+          673,
+          0
+        ],
+        [
+          687,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, LiveSetServersPorts) {\n  struct ares_addr_port_node server1;\n  struct ares_addr_port_node server2;\n  server1.next = &server2;\n  server1.family = AF_INET;\n  server1.addr.addr4.s_addr = htonl(0x01020304);\n  server1.udp_port = 111;\n  server1.tcp_port = 111;\n  server2.next = nullptr;\n  server2.family = AF_INET;\n  server2.addr.addr4.s_addr = htonl(0x02030405);\n  server2.udp_port = 0;\n  server2.tcp_port = 0;\n  EXPECT_EQ(ARES_ENODATA, ares_set_servers_ports(nullptr, &server1));\n\n  // Change while pending will requeue any requests to new servers\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_ports(channel_, &server1));\n  ares_cancel(channel_);\n}",
+      "fn_code_pos": [
+        [
+          689,
+          0
+        ],
+        [
+          709,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, LiveSetServersCSV) {\n  HostResult result;\n  ares_gethostbyname(channel_, \"www.google.com.\", AF_INET, HostCallback, &result);\n  // Change while pending will requeue any requests to new servers\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_csv(channel_, \"1.2.3.4,2.3.4.5\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_servers_ports_csv(channel_, \"1.2.3.4:56,2.3.4.5:67\"));\n  ares_cancel(channel_);\n}",
+      "fn_code_pos": [
+        [
+          711,
+          0
+        ],
+        [
+          718,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct hostent",
+      {},
+      "",
+      [
+        153,
+        2
+      ],
+      [
+        153,
+        16
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        264,
+        2
+      ],
+      [
+        264,
+        16
+      ]
+    ],
+    [
+      "struct in6_addr",
+      {},
+      "",
+      [
+        283,
+        2
+      ],
+      [
+        283,
+        17
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        404,
+        2
+      ],
+      [
+        404,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        409,
+        36
+      ],
+      [
+        409,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        420,
+        2
+      ],
+      [
+        420,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        425,
+        36
+      ],
+      [
+        425,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        436,
+        2
+      ],
+      [
+        436,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        441,
+        36
+      ],
+      [
+        441,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        452,
+        2
+      ],
+      [
+        452,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        457,
+        36
+      ],
+      [
+        457,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        468,
+        2
+      ],
+      [
+        468,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        473,
+        36
+      ],
+      [
+        473,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        484,
+        2
+      ],
+      [
+        484,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        489,
+        36
+      ],
+      [
+        489,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        501,
+        2
+      ],
+      [
+        501,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        506,
+        36
+      ],
+      [
+        506,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        518,
+        2
+      ],
+      [
+        518,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        525,
+        36
+      ],
+      [
+        525,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        537,
+        2
+      ],
+      [
+        537,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        543,
+        36
+      ],
+      [
+        543,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        555,
+        2
+      ],
+      [
+        555,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        561,
+        36
+      ],
+      [
+        561,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        571,
+        2
+      ],
+      [
+        571,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        579,
+        36
+      ],
+      [
+        579,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        591,
+        2
+      ],
+      [
+        591,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        596,
+        36
+      ],
+      [
+        596,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in6",
+      {},
+      "",
+      [
+        606,
+        2
+      ],
+      [
+        606,
+        21
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        612,
+        36
+      ],
+      [
+        612,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        622,
+        2
+      ],
+      [
+        622,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        628,
+        36
+      ],
+      [
+        628,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        639,
+        2
+      ],
+      [
+        639,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        645,
+        36
+      ],
+      [
+        645,
+        51
+      ]
+    ],
+    [
+      "struct sockaddr_in",
+      {},
+      "",
+      [
+        657,
+        2
+      ],
+      [
+        657,
+        20
+      ]
+    ],
+    [
+      "struct sockaddr",
+      {},
+      "",
+      [
+        663,
+        36
+      ],
+      [
+        663,
+        51
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        674,
+        2
+      ],
+      [
+        674,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_node",
+      {},
+      "",
+      [
+        675,
+        2
+      ],
+      [
+        675,
+        23
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        690,
+        2
+      ],
+      [
+        690,
+        28
+      ]
+    ],
+    [
+      "struct ares_addr_port_node",
+      {},
+      "",
+      [
+        691,
+        2
+      ],
+      [
+        691,
+        28
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ],
+    [
+      "#include <netdb.h>\n",
+      [
+        33,
+        0
+      ],
+      [
+        34,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

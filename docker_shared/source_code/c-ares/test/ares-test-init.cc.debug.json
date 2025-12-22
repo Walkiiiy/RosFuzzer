@@ -1,0 +1,624 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "TEST(LibraryInit, Basic) {\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n  EXPECT_EQ(ARES_SUCCESS, ares_library_init(ARES_LIB_INIT_ALL));\n  EXPECT_EQ(ARES_SUCCESS, ares_library_initialized());\n  ares_library_cleanup();\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n}",
+      "fn_code_pos": [
+        [
+          41,
+          0
+        ],
+        [
+          47,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST(LibraryInit, UnexpectedCleanup) {\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n  ares_library_cleanup();\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n}",
+      "fn_code_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          53,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST(LibraryInit, Nested) {\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n  EXPECT_EQ(ARES_SUCCESS, ares_library_init(ARES_LIB_INIT_ALL));\n  EXPECT_EQ(ARES_SUCCESS, ares_library_initialized());\n  EXPECT_EQ(ARES_SUCCESS, ares_library_init(ARES_LIB_INIT_ALL));\n  EXPECT_EQ(ARES_SUCCESS, ares_library_initialized());\n  ares_library_cleanup();\n  EXPECT_EQ(ARES_SUCCESS, ares_library_initialized());\n  ares_library_cleanup();\n  EXPECT_EQ(EXPECTED_NONINIT, ares_library_initialized());\n}",
+      "fn_code_pos": [
+        [
+          55,
+          0
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST(LibraryInit, BasicChannelInit) {\n  EXPECT_EQ(ARES_SUCCESS, ares_library_init(ARES_LIB_INIT_ALL));\n  ares_channel_t *channel = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_init(&channel));\n  EXPECT_NE(nullptr, channel);\n  ares_destroy(channel);\n  ares_library_cleanup();\n}",
+      "fn_code_pos": [
+        [
+          67,
+          0
+        ],
+        [
+          74,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, OptionsChannelInit) {\n  struct ares_options opts;\n  int optmask = 0;\n  memset(&opts, 0, sizeof(opts));\n  opts.flags = ARES_FLAG_USEVC | ARES_FLAG_PRIMARY;\n  optmask |= ARES_OPT_FLAGS;\n  opts.timeout = 2000;\n  optmask |= ARES_OPT_TIMEOUTMS;\n  opts.tries = 2;\n  optmask |= ARES_OPT_TRIES;\n  opts.ndots = 4;\n  optmask |= ARES_OPT_NDOTS;\n  opts.udp_port = 54;\n  optmask |= ARES_OPT_MAXTIMEOUTMS;\n  opts.maxtimeout = 10000;\n  optmask |= ARES_OPT_UDP_PORT;\n  opts.tcp_port = 54;\n  optmask |= ARES_OPT_TCP_PORT;\n  opts.socket_send_buffer_size = 514;\n  optmask |= ARES_OPT_SOCK_SNDBUF;\n  opts.socket_receive_buffer_size = 514;\n  optmask |= ARES_OPT_SOCK_RCVBUF;\n  opts.ednspsz = 1280;\n  optmask |= ARES_OPT_EDNSPSZ;\n  opts.nservers = 2;\n  opts.servers = (struct in_addr *)malloc((size_t)opts.nservers * sizeof(struct in_addr));\n  opts.servers[0].s_addr = htonl(0x01020304);\n  opts.servers[1].s_addr = htonl(0x02030405);\n  optmask |= ARES_OPT_SERVERS;\n  opts.ndomains = 2;\n  opts.domains = (char **)malloc((size_t)opts.ndomains * sizeof(char *));\n  opts.domains[0] = strdup(\"example.com\");\n  opts.domains[1] = strdup(\"example2.com\");\n  optmask |= ARES_OPT_DOMAINS;\n  opts.lookups = strdup(\"b\");\n  optmask |= ARES_OPT_LOOKUPS;\n  optmask |= ARES_OPT_ROTATE;\n  opts.resolvconf_path = strdup(\"/etc/resolv.conf\");\n  optmask |= ARES_OPT_RESOLVCONF;\n  opts.hosts_path = strdup(\"/etc/hosts\");\n  optmask |= ARES_OPT_HOSTS_FILE;\n\n  ares_channel_t *channel = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel, &opts, optmask));\n  EXPECT_NE(nullptr, channel);\n\n  ares_channel_t *channel2 = nullptr;\n  EXPECT_EQ(ARES_SUCCESS, ares_dup(&channel2, channel));\n  EXPECT_NE(nullptr, channel2);\n\n  struct ares_options opts2;\n  int optmask2 = 0;\n  memset(&opts2, 0, sizeof(opts2));\n  EXPECT_EQ(ARES_SUCCESS, ares_save_options(channel2, &opts2, &optmask2));\n\n  // Note that not all opts-settable fields are saved (e.g.\n  // ednspsz, socket_{send,receive}_buffer_size).\n  EXPECT_EQ(opts.flags, opts2.flags);\n  EXPECT_EQ(opts.timeout, opts2.timeout);\n  EXPECT_EQ(opts.tries, opts2.tries);\n  EXPECT_EQ(opts.ndots, opts2.ndots);\n  EXPECT_EQ(opts.maxtimeout, opts2.maxtimeout);\n  EXPECT_EQ(opts.udp_port, opts2.udp_port);\n  EXPECT_EQ(opts.tcp_port, opts2.tcp_port);\n  EXPECT_EQ(1, opts2.nservers);  // Truncated by ARES_FLAG_PRIMARY\n  EXPECT_EQ(opts.servers[0].s_addr, opts2.servers[0].s_addr);\n  EXPECT_EQ(opts.ndomains, opts2.ndomains);\n  EXPECT_EQ(std::string(opts.domains[0]), std::string(opts2.domains[0]));\n  EXPECT_EQ(std::string(opts.domains[1]), std::string(opts2.domains[1]));\n  EXPECT_EQ(std::string(opts.lookups), std::string(opts2.lookups));\n  EXPECT_EQ(std::string(opts.resolvconf_path), std::string(opts2.resolvconf_path));\n  EXPECT_EQ(std::string(opts.hosts_path), std::string(opts2.hosts_path));\n\n  ares_destroy_options(&opts);\n  ares_destroy_options(&opts2);\n  ares_destroy(channel);\n  ares_destroy(channel2);\n}",
+      "fn_code_pos": [
+        [
+          76,
+          0
+        ],
+        [
+          153,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, ChannelAllocFail) {\n  ares_channel_t *channel;\n  for (int ii = 1; ii <= 25; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    channel = nullptr;\n    int rc = ares_init(&channel);\n    // The number of allocations depends on local environment, so don't expect ENOMEM.\n    if (rc == ARES_ENOMEM) {\n      EXPECT_EQ(nullptr, channel);\n    } else {\n      ares_destroy(channel);\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          155,
+          0
+        ],
+        [
+          169,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, OptionsChannelAllocFail) {\n  struct ares_options opts;\n  int optmask = 0;\n  memset(&opts, 0, sizeof(opts));\n  opts.flags = ARES_FLAG_USEVC;\n  optmask |= ARES_OPT_FLAGS;\n  opts.timeout = 2;\n  optmask |= ARES_OPT_TIMEOUT;\n  opts.tries = 2;\n  optmask |= ARES_OPT_TRIES;\n  opts.ndots = 4;\n  optmask |= ARES_OPT_NDOTS;\n  opts.udp_port = 54;\n  optmask |= ARES_OPT_UDP_PORT;\n  opts.tcp_port = 54;\n  optmask |= ARES_OPT_TCP_PORT;\n  opts.socket_send_buffer_size = 514;\n  optmask |= ARES_OPT_SOCK_SNDBUF;\n  opts.socket_receive_buffer_size = 514;\n  optmask |= ARES_OPT_SOCK_RCVBUF;\n  opts.ednspsz = 1280;\n  optmask |= ARES_OPT_EDNSPSZ;\n  opts.nservers = 2;\n  opts.servers = (struct in_addr *)malloc((size_t)opts.nservers * sizeof(struct in_addr));\n  opts.servers[0].s_addr = htonl(0x01020304);\n  opts.servers[1].s_addr = htonl(0x02030405);\n  optmask |= ARES_OPT_SERVERS;\n  opts.ndomains = 2;\n  opts.domains = (char **)malloc((size_t)opts.ndomains * sizeof(char *));\n  opts.domains[0] = strdup(\"example.com\");\n  opts.domains[1] = strdup(\"example2.com\");\n  optmask |= ARES_OPT_DOMAINS;\n  opts.lookups = strdup(\"b\");\n  optmask |= ARES_OPT_LOOKUPS;\n  optmask |= ARES_OPT_ROTATE;\n  opts.resolvconf_path = strdup(\"/etc/resolv.conf\");\n  optmask |= ARES_OPT_RESOLVCONF;\n  opts.hosts_path = strdup(\"/etc/hosts\");\n  optmask |= ARES_OPT_HOSTS_FILE;\n\n  ares_channel_t *channel = nullptr;\n  for (int ii = 1; ii <= 8; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    int rc = ares_init_options(&channel, &opts, optmask);\n    if (rc == ARES_ENOMEM) {\n      EXPECT_EQ(nullptr, channel);\n    } else {\n      EXPECT_EQ(ARES_SUCCESS, rc);\n      ares_destroy(channel);\n      channel = nullptr;\n    }\n  }\n  ClearFails();\n\n  EXPECT_EQ(ARES_SUCCESS, ares_init_options(&channel, &opts, optmask));\n  EXPECT_NE(nullptr, channel);\n\n  // Add some servers and a sortlist for flavour.\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_set_servers_csv(channel, \"1.2.3.4,0102:0304:0506:0708:0910:1112:1314:1516,2.3.4.5\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel, \"1.2.3.4 2.3.4.5\"));\n\n  ares_channel_t *channel2 = nullptr;\n  for (int ii = 1; ii <= 18; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    EXPECT_EQ(ARES_ENOMEM, ares_dup(&channel2, channel)) << ii;\n    EXPECT_EQ(nullptr, channel2) << ii;\n  }\n\n  struct ares_options opts2;\n  int optmask2 = 0;\n  for (int ii = 1; ii <= 6; ii++) {\n    memset(&opts2, 0, sizeof(opts2));\n    ClearFails();\n    SetAllocFail(ii);\n    EXPECT_EQ(ARES_ENOMEM, ares_save_options(channel, &opts2, &optmask2)) << ii;\n    // May still have allocations even after ARES_ENOMEM return code.\n    ares_destroy_options(&opts2);\n  }\n  ares_destroy_options(&opts);\n  ares_destroy(channel);\n}",
+      "fn_code_pos": [
+        [
+          171,
+          0
+        ],
+        [
+          254,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, FailChannelInit) {\n  EXPECT_EQ(ARES_SUCCESS,\n            ares_library_init_mem(ARES_LIB_INIT_ALL,\n                                  &LibraryTest::amalloc,\n                                  &LibraryTest::afree,\n                                  &LibraryTest::arealloc));\n  SetAllocFail(1);\n  ares_channel_t *channel = nullptr;\n  EXPECT_EQ(ARES_ENOMEM, ares_init(&channel));\n  EXPECT_EQ(nullptr, channel);\n  ares_library_cleanup();\n}",
+      "fn_code_pos": [
+        [
+          256,
+          0
+        ],
+        [
+          267,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, EnvInit) {\n  ares_channel_t *channel = nullptr;\n  EnvValue v1(\"LOCALDOMAIN\", \"this.is.local\");\n  EnvValue v2(\"RES_OPTIONS\", \"options debug ndots:3 retry:3 rotate retrans:2\");\n  EXPECT_EQ(ARES_SUCCESS, ares_init(&channel));\n  ares_destroy(channel);\n}",
+      "fn_code_pos": [
+        [
+          270,
+          0
+        ],
+        [
+          276,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, EnvInitModernOptions) {\n  ares_channel_t *channel = nullptr;\n  EnvValue v1(\"LOCALDOMAIN\", \"this.is.local\");\n  EnvValue v2(\"RES_OPTIONS\", \"options debug retrans:2 ndots:3 attempts:4 timeout:5 rotate\");\n  EXPECT_EQ(ARES_SUCCESS, ares_init(&channel));\n\n  channel->optmask |= ARES_OPT_TRIES;\n  channel->optmask |= ARES_OPT_TIMEOUTMS;\n\n  struct ares_options opts;\n  memset(&opts, 0, sizeof(opts));\n  int optmask = 0;\n  EXPECT_EQ(ARES_SUCCESS, ares_save_options(channel, &opts, &optmask));\n  EXPECT_EQ(5000, opts.timeout);\n  EXPECT_EQ(4, opts.tries);\n\n  ares_destroy(channel);\n}",
+      "fn_code_pos": [
+        [
+          278,
+          0
+        ],
+        [
+          295,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(LibraryTest, EnvInitAllocFail) {\n  ares_channel_t *channel;\n  EnvValue v1(\"LOCALDOMAIN\", \"this.is.local\");\n  EnvValue v2(\"RES_OPTIONS\", \"options debug ndots:3 retry:3 rotate retrans:2\");\n  for (int ii = 1; ii <= 10; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    channel = nullptr;\n    int rc = ares_init(&channel);\n    if (rc == ARES_SUCCESS) {\n      ares_destroy(channel);\n    } else {\n      EXPECT_EQ(ARES_ENOMEM, rc);\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          297,
+          0
+        ],
+        [
+          312,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetAddresses) {\n  ares_set_local_ip4(channel_, 0x01020304);\n  byte addr6[16] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,\n                    0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10};\n  ares_set_local_ip6(channel_, addr6);\n  ares_set_local_dev(channel_, \"dummy\");\n}",
+      "fn_code_pos": [
+        [
+          315,
+          0
+        ],
+        [
+          321,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetSortlistFailures) {\n  EXPECT_EQ(ARES_ENODATA, ares_set_sortlist(nullptr, \"1.2.3.4\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"111.111.111.111*/16\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"111.111.111.111/255.255.255.240*\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"1 0123456789012345\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"1 /01234567890123456789012345678901\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"xyzzy ; lwk\"));\n  EXPECT_EQ(ARES_EBADSTR, ares_set_sortlist(channel_, \"xyzzy ; 0x123\"));\n}",
+      "fn_code_pos": [
+        [
+          323,
+          0
+        ],
+        [
+          331,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetSortlistVariants) {\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"1.2.3.4\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"1.2.3.4 ; 2.3.4.5\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"1.2.3.4/26;1234::5678/126;4.5.6.7;5678::1234\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \" 1.2.3.4/26 1234::5678/126   4.5.6.7 5678::1234  \"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"129.1.1.1\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"192.1.1.1\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"224.1.1.1\"));\n  EXPECT_EQ(ARES_SUCCESS, ares_set_sortlist(channel_, \"225.1.1.1\"));\n}",
+      "fn_code_pos": [
+        [
+          333,
+          0
+        ],
+        [
+          342,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_F(DefaultChannelTest, SetSortlistAllocFail) {\n  for (int ii = 1; ii <= 3; ii++) {\n    ClearFails();\n    SetAllocFail(ii);\n    EXPECT_EQ(ARES_ENOMEM, ares_set_sortlist(channel_, \"12.13.0.0/16 1234::5678/40 1.2.3.4\")) << ii;\n  }\n}",
+      "fn_code_pos": [
+        [
+          344,
+          0
+        ],
+        [
+          350,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST(Init, NoLibraryInit) {\n  ares_channel_t *channel = nullptr;\n  EXPECT_EQ(ARES_ENOTINITIALIZED, ares_init(&channel));\n}",
+      "fn_code_pos": [
+        [
+          353,
+          0
+        ],
+        [
+          356,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "explicit MakeUnreadable(const std::string& filename)\n    : filename_(filename) {\n    chmod(filename_.c_str(), 0000);\n  }",
+      "fn_code_pos": [
+        [
+          542,
+          2
+        ],
+        [
+          545,
+          3
+        ]
+      ],
+      "class_code": "f77489f9fd42798776383da3aceb4b4cb1b8fe183752b39eada5679181806099",
+      "class_node_pos": [
+        [
+          540,
+          0
+        ],
+        [
+          549,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "MakeUnreadable",
+        "parameters": {
+          "filename": "std::string"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "~MakeUnreadable() { chmod(filename_.c_str(), 0644); }",
+      "fn_code_pos": [
+        [
+          546,
+          2
+        ],
+        [
+          546,
+          55
+        ]
+      ],
+      "class_code": "f77489f9fd42798776383da3aceb4b4cb1b8fe183752b39eada5679181806099",
+      "class_node_pos": [
+        [
+          540,
+          0
+        ],
+        [
+          549,
+          1
+        ]
+      ],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {
+    "f77489f9fd42798776383da3aceb4b4cb1b8fe183752b39eada5679181806099": {
+      "class_code": "class MakeUnreadable {\n public:\n  explicit MakeUnreadable(const std::string& filename)\n    : filename_(filename) {\n    chmod(filename_.c_str(), 0000);\n  }\n  ~MakeUnreadable() { chmod(filename_.c_str(), 0644); }\n private:\n  std::string filename_;\n}",
+      "class_name": "MakeUnreadable",
+      "class_pos": [
+        [
+          540,
+          0
+        ],
+        [
+          549,
+          1
+        ]
+      ]
+    }
+  },
+  "struct_node_list": [
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        77,
+        2
+      ],
+      [
+        77,
+        21
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        101,
+        18
+      ],
+      [
+        101,
+        32
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        101,
+        73
+      ],
+      [
+        101,
+        87
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        126,
+        2
+      ],
+      [
+        126,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        172,
+        2
+      ],
+      [
+        172,
+        21
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        194,
+        18
+      ],
+      [
+        194,
+        32
+      ]
+    ],
+    [
+      "struct in_addr",
+      {},
+      "",
+      [
+        194,
+        73
+      ],
+      [
+        194,
+        87
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        242,
+        2
+      ],
+      [
+        242,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        287,
+        2
+      ],
+      [
+        287,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        419,
+        2
+      ],
+      [
+        419,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        464,
+        2
+      ],
+      [
+        464,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        491,
+        2
+      ],
+      [
+        491,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        600,
+        2
+      ],
+      [
+        600,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        693,
+        2
+      ],
+      [
+        693,
+        21
+      ]
+    ],
+    [
+      "struct ares_options",
+      {},
+      "",
+      [
+        707,
+        2
+      ],
+      [
+        707,
+        21
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares-test.h\"\n",
+      [
+        25,
+        0
+      ],
+      [
+        26,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        28,
+        2
+      ],
+      [
+        29,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

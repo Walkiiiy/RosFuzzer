@@ -1,0 +1,96 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_getopt_init(ares_getopt_state_t *state, int argc,\n                      const char * const *argv)",
+      "fn_dec_pos": [
+        [
+          45,
+          5
+        ],
+        [
+          46,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getopt_init",
+        "parameters": {
+          "state": "ares_getopt_state_t",
+          "argc": "int",
+          "argv": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_getopt(ares_getopt_state_t *state, const char *ostr)",
+      "fn_dec_pos": [
+        [
+          47,
+          5
+        ],
+        [
+          47,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_getopt",
+        "parameters": {
+          "state": "ares_getopt_state_t",
+          "ostr": "char"
+        },
+        "return_type": "int"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  const char         *optarg; /* argument associated with option */\n  int                 optind; /* index into parent argv vector */\n  int                 opterr; /* if error message should be printed */\n  int                 optopt; /* character checked for validity */\n  const char         *place;\n  int                 argc;\n  const char * const *argv;\n} ares_getopt_state_t;",
+      {
+        "char": "const",
+        "optind": "int",
+        "opterr": "int",
+        "optopt": "int",
+        "argc": "int"
+      },
+      "ares_getopt_state_t",
+      [
+        35,
+        0
+      ],
+      [
+        43,
+        22
+      ]
+    ],
+    [
+      "typedef struct {\n  const char         *optarg; /* argument associated with option */\n  int                 optind; /* index into parent argv vector */\n  int                 opterr; /* if error message should be printed */\n  int                 optopt; /* character checked for validity */\n  const char         *place;\n  int                 argc;\n  const char * const *argv;\n} ares_getopt_state_t;",
+      {
+        "char": "const",
+        "optind": "int",
+        "opterr": "int",
+        "optopt": "int",
+        "argc": "int"
+      },
+      "ares_getopt_state_t",
+      [
+        35,
+        0
+      ],
+      [
+        43,
+        22
+      ]
+    ]
+  ],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

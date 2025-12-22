@@ -1,0 +1,186 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ares_is_64bit(void)",
+      "fn_dec_pos": [
+        [
+          44,
+          14
+        ],
+        [
+          44,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_is_64bit",
+        "parameters": {},
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "ares_round_up_pow2(size_t n)",
+      "fn_dec_pos": [
+        [
+          45,
+          14
+        ],
+        [
+          45,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_round_up_pow2",
+        "parameters": {
+          "n": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_log2(size_t n)",
+      "fn_dec_pos": [
+        [
+          46,
+          14
+        ],
+        [
+          46,
+          33
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_log2",
+        "parameters": {
+          "n": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_pow(size_t x, size_t y)",
+      "fn_dec_pos": [
+        [
+          47,
+          14
+        ],
+        [
+          47,
+          42
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_pow",
+        "parameters": {
+          "x": "size_t",
+          "y": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_count_digits(size_t n)",
+      "fn_dec_pos": [
+        [
+          48,
+          14
+        ],
+        [
+          48,
+          41
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_count_digits",
+        "parameters": {
+          "n": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_count_hexdigits(size_t n)",
+      "fn_dec_pos": [
+        [
+          49,
+          14
+        ],
+        [
+          49,
+          44
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_count_hexdigits",
+        "parameters": {
+          "n": "size_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_count_bits_u8(unsigned char x)",
+      "fn_dec_pos": [
+        [
+          50,
+          14
+        ],
+        [
+          50,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_count_bits_u8",
+        "parameters": {
+          "x": "unsigned char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"ares_setup.h\"\n",
+      [
+        28,
+        0
+      ],
+      [
+        29,
+        0
+      ]
+    ],
+    [
+      "#  include <stdint.h>\n",
+      [
+        31,
+        0
+      ],
+      [
+        32,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

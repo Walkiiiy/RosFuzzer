@@ -1,0 +1,819 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void CARES_DEBUG_LOG(const char *fmt, ...)\n{\n  va_list ap;\n\n  va_start(ap, fmt);\n#  ifdef CARES_DEBUG\n  vfprintf(stderr, fmt, ap);\n  fflush(stderr);\n#  endif\n  va_end(ap);\n}",
+      "fn_code_pos": [
+        [
+          189,
+          0
+        ],
+        [
+          199,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "CARES_DEBUG_LOG",
+        "parameters": {
+          "fmt": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void   ares_iocpevent_signal(const ares_event_t *event)\n{\n  ares_event_thread_t          *e           = event->e;\n  ares_evsys_win32_t           *ew          = e->ev_sys_data;\n  ares_evsys_win32_eventdata_t *ed          = event->data;\n  ares_bool_t                   queue_event = ARES_FALSE;\n\n  ares_thread_mutex_lock(ed->lock);\n  if (ed->poll_status != POLL_STATUS_PENDING) {\n    ed->poll_status = POLL_STATUS_PENDING;\n    queue_event     = ARES_TRUE;\n  }\n  ares_thread_mutex_unlock(ed->lock);\n\n  if (!queue_event) {\n    return;\n  }\n\n  PostQueuedCompletionStatus(ew->iocp_handle, 0, (ULONG_PTR)event->data, NULL);\n}",
+      "fn_code_pos": [
+        [
+          253,
+          0
+        ],
+        [
+          272,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iocpevent_signal",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_iocpevent_cb(ares_event_thread_t *e, ares_socket_t fd,\n                              void *data, ares_event_flags_t flags)\n{\n  ares_evsys_win32_eventdata_t *ed = data;\n  (void)e;\n  (void)fd;\n  (void)flags;\n  ares_thread_mutex_lock(ed->lock);\n  ed->poll_status = POLL_STATUS_NONE;\n  ares_thread_mutex_unlock(ed->lock);\n}",
+      "fn_code_pos": [
+        [
+          274,
+          0
+        ],
+        [
+          284,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iocpevent_cb",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "fd": "ares_socket_t",
+          "data": "void",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_event_t *ares_iocpevent_create(ares_event_thread_t *e)\n{\n  ares_event_t *event = NULL;\n  ares_status_t status;\n\n  status =\n    ares_event_update(&event, e, ARES_EVENT_FLAG_OTHER, ares_iocpevent_cb,\n                      ARES_SOCKET_BAD, NULL, NULL, ares_iocpevent_signal);\n  if (status != ARES_SUCCESS) {\n    return NULL;\n  }\n\n  return event;\n}",
+      "fn_code_pos": [
+        [
+          286,
+          0
+        ],
+        [
+          299,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iocpevent_create",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_event_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_win32_destroy(ares_event_thread_t *e)\n{\n  ares_evsys_win32_t *ew = NULL;\n\n  if (e == NULL) {\n    return;\n  }\n\n  CARES_DEBUG_LOG(\"** Win32 Event Destroy\\n\");\n\n  ew = e->ev_sys_data;\n  if (ew == NULL) {\n    return;\n  }\n\n  ew->is_shutdown = ARES_TRUE;\n  CARES_DEBUG_LOG(\"  ** waiting on %lu remaining sockets to be destroyed\\n\",\n                  (unsigned long)ares_htable_vpvp_num_keys(ew->sockets));\n  while (ares_htable_vpvp_num_keys(ew->sockets)) {\n    ares_evsys_win32_wait(e, 0);\n  }\n  CARES_DEBUG_LOG(\"  ** all sockets cleaned up\\n\");\n\n\n  if (ew->iocp_handle != NULL) {\n    CloseHandle(ew->iocp_handle);\n  }\n\n  ares_slist_destroy(ew->afd_handles);\n\n  ares_htable_vpvp_destroy(ew->sockets);\n\n  ares_free(ew);\n  e->ev_sys_data = NULL;\n}",
+      "fn_code_pos": [
+        [
+          301,
+          0
+        ],
+        [
+          335,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_destroy",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_afd_handle_destroy(void *arg)\n{\n  ares_afd_handle_t *hnd = arg;\n  if (hnd != NULL && hnd->afd_handle != NULL) {\n    CloseHandle(hnd->afd_handle);\n  }\n  ares_free(hnd);\n}",
+      "fn_code_pos": [
+        [
+          342,
+          0
+        ],
+        [
+          349,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_destroy",
+        "parameters": {
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static int ares_afd_handle_cmp(const void *data1, const void *data2)\n{\n  const ares_afd_handle_t *hnd1 = data1;\n  const ares_afd_handle_t *hnd2 = data2;\n\n  if (hnd1->poll_cnt > hnd2->poll_cnt) {\n    return 1;\n  }\n  if (hnd1->poll_cnt < hnd2->poll_cnt) {\n    return -1;\n  }\n  return 0;\n}",
+      "fn_code_pos": [
+        [
+          351,
+          0
+        ],
+        [
+          363,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_cmp",
+        "parameters": {
+          "data1": "void",
+          "data2": "void"
+        },
+        "return_type": "int"
+      }
+    },
+    {
+      "fn_code": "static void fill_object_attributes(OBJECT_ATTRIBUTES *attr,\n                                   UNICODE_STRING *name, ULONG attributes)\n{\n  memset(attr, 0, sizeof(*attr));\n  attr->Length     = sizeof(*attr);\n  attr->ObjectName = name;\n  attr->Attributes = attributes;\n}",
+      "fn_code_pos": [
+        [
+          365,
+          0
+        ],
+        [
+          372,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "fill_object_attributes",
+        "parameters": {
+          "attr": "OBJECT_ATTRIBUTES",
+          "name": "UNICODE_STRING",
+          "attributes": "ULONG"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_slist_node_t *ares_afd_handle_create(ares_evsys_win32_t *ew)\n{\n  UNICODE_STRING     afd_device_name = UNICODE_STRING_CONSTANT(\"\\\\Device\\\\Afd\");\n  OBJECT_ATTRIBUTES  afd_attributes;\n  NTSTATUS           status;\n  IO_STATUS_BLOCK    iosb;\n  ares_afd_handle_t *afd  = ares_malloc_zero(sizeof(*afd));\n  ares_slist_node_t *node = NULL;\n  if (afd == NULL) {\n    goto fail;\n  }\n\n  /* Open a handle to the AFD subsystem */\n  fill_object_attributes(&afd_attributes, &afd_device_name, 0);\n  memset(&iosb, 0, sizeof(iosb));\n  iosb.Status = STATUS_PENDING;\n  status      = ew->NtCreateFile(&afd->afd_handle, SYNCHRONIZE, &afd_attributes,\n                                 &iosb, NULL, 0, FILE_SHARE_READ | FILE_SHARE_WRITE,\n                                 FILE_OPEN, 0, NULL, 0);\n  if (status != STATUS_SUCCESS) {\n    CARES_DEBUG_LOG(\"** Failed to create AFD endpoint\\n\");\n    goto fail;\n  }\n\n  if (CreateIoCompletionPort(afd->afd_handle, ew->iocp_handle,\n                             0 /* CompletionKey */, 0) == NULL) {\n    goto fail;\n  }\n\n#ifdef HAVE_SETFILECOMPLETIONNOTIFICATIONMODES\n  if (!SetFileCompletionNotificationModes(afd->afd_handle,\n                                          FILE_SKIP_SET_EVENT_ON_HANDLE)) {\n    goto fail;\n  }\n#endif\n\n  node = ares_slist_insert(ew->afd_handles, afd);\n  if (node == NULL) {\n    goto fail;\n  }\n\n  return node;\n\nfail:\n\n  ares_afd_handle_destroy(afd);\n  return NULL;\n}",
+      "fn_code_pos": [
+        [
+          377,
+          0
+        ],
+        [
+          424,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_create",
+        "parameters": {
+          "ew": "ares_evsys_win32_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "static ares_slist_node_t *ares_afd_handle_fetch(ares_evsys_win32_t *ew)\n{\n  ares_slist_node_t *node = ares_slist_node_first(ew->afd_handles);\n  ares_afd_handle_t *afd  = ares_slist_node_val(node);\n\n  if (afd != NULL && afd->poll_cnt < AFD_POLL_PER_HANDLE) {\n    return node;\n  }\n\n  return ares_afd_handle_create(ew);\n}",
+      "fn_code_pos": [
+        [
+          428,
+          0
+        ],
+        [
+          438,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_fetch",
+        "parameters": {
+          "ew": "ares_evsys_win32_t"
+        },
+        "return_type": "ares_slist_node_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_init(ares_event_thread_t *e)\n{\n  ares_evsys_win32_t *ew = NULL;\n  HMODULE             ntdll;\n\n  CARES_DEBUG_LOG(\"** Win32 Event Init\\n\");\n\n  ew = ares_malloc_zero(sizeof(*ew));\n  if (ew == NULL) {\n    return ARES_FALSE;\n  }\n\n  e->ev_sys_data = ew;\n\n  /* All apps should have ntdll.dll already loaded, so just get a handle to\n   * this */\n  ntdll = GetModuleHandleA(\"ntdll.dll\");\n  if (ntdll == NULL) {\n    goto fail;\n  }\n\n#  ifdef __GNUC__\n#    pragma GCC diagnostic push\n#    pragma GCC diagnostic ignored \"-Wpedantic\"\n/* Without the (void *) cast we get:\n *  warning: cast between incompatible function types from 'FARPROC' {aka 'long\n * long int (*)()'} to 'NTSTATUS (*)(...)'} [-Wcast-function-type] but with it\n * we get: warning: ISO C forbids conversion of function pointer to object\n * pointer type [-Wpedantic] look unsolvable short of killing the warning.\n */\n#  endif\n\n  /* Load Internal symbols not typically accessible */\n  ew->NtCreateFile =\n    (NtCreateFile_t)(void *)GetProcAddress(ntdll, \"NtCreateFile\");\n  ew->NtDeviceIoControlFile = (NtDeviceIoControlFile_t)(void *)GetProcAddress(\n    ntdll, \"NtDeviceIoControlFile\");\n  ew->NtCancelIoFileEx =\n    (NtCancelIoFileEx_t)(void *)GetProcAddress(ntdll, \"NtCancelIoFileEx\");\n\n#  ifdef __GNUC__\n#    pragma GCC diagnostic pop\n#  endif\n\n  if (ew->NtCreateFile == NULL || ew->NtCancelIoFileEx == NULL ||\n      ew->NtDeviceIoControlFile == NULL) {\n    goto fail;\n  }\n\n  ew->iocp_handle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);\n  if (ew->iocp_handle == NULL) {\n    goto fail;\n  }\n\n  ew->afd_handles = ares_slist_create(\n    e->channel->rand_state, ares_afd_handle_cmp, ares_afd_handle_destroy);\n  if (ew->afd_handles == NULL) {\n    goto fail;\n  }\n\n  /* Create at least the first afd handle, so we know of any critical system\n   * issues during startup */\n  if (ares_afd_handle_create(ew) == NULL) {\n    goto fail;\n  }\n\n  e->ev_signal = ares_iocpevent_create(e);\n  if (e->ev_signal == NULL) {\n    goto fail;\n  }\n\n  ew->sockets = ares_htable_vpvp_create(NULL, NULL);\n  if (ew->sockets == NULL) {\n    goto fail;\n  }\n\n  return ARES_TRUE;\n\nfail:\n  ares_evsys_win32_destroy(e);\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          440,
+          0
+        ],
+        [
+          521,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_init",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_socket_t ares_evsys_win32_basesocket(ares_socket_t socket)\n{\n#ifndef HAVE_WSAIOCTL\n  /* Assume we don't have an LSP and return the provided socket as the base\n   * socket.  WSAIoctl() isn't supported on Windows XP or below */\n  return socket;\n#else\n  while (1) {\n    DWORD         bytes; /* Not used */\n    ares_socket_t base_socket = ARES_SOCKET_BAD;\n    int           rv;\n\n    rv = WSAIoctl(socket, SIO_BASE_HANDLE, NULL, 0, &base_socket,\n                  sizeof(base_socket), &bytes, NULL, NULL);\n    if (rv != SOCKET_ERROR && base_socket != ARES_SOCKET_BAD) {\n      socket = base_socket;\n      break;\n    }\n\n    /* If we're here, an error occurred */\n    if (GetLastError() == WSAENOTSOCK) {\n      /* This is critical, exit */\n      return ARES_SOCKET_BAD;\n    }\n\n    /* Work around known bug in Komodia based LSPs, use ARES_BSP_HANDLE_POLL\n     * to retrieve the underlying socket to then loop and get the base socket:\n     *  https://docs.microsoft.com/en-us/windows/win32/winsock/winsock-ioctls\n     *  https://www.komodia.com/newwiki/index.php?title=Komodia%27s_Redirector_bug_fixes#Version_2.2.2.6\n     */\n    base_socket = ARES_SOCKET_BAD;\n    rv          = WSAIoctl(socket, SIO_BSP_HANDLE_POLL, NULL, 0, &base_socket,\n                           sizeof(base_socket), &bytes, NULL, NULL);\n\n    if (rv != SOCKET_ERROR && base_socket != ARES_SOCKET_BAD &&\n        base_socket != socket) {\n      socket = base_socket;\n      continue; /* loop! */\n    }\n\n    return ARES_SOCKET_BAD;\n  }\n\n  return socket;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          523,
+          0
+        ],
+        [
+          568,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_basesocket",
+        "parameters": {
+          "socket": "ares_socket_t"
+        },
+        "return_type": "ares_socket_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_afd_enqueue(ares_event_t      *event,\n                                                ares_event_flags_t flags)\n{\n  ares_event_thread_t          *e  = event->e;\n  ares_evsys_win32_t           *ew = e->ev_sys_data;\n  ares_evsys_win32_eventdata_t *ed = event->data;\n  ares_afd_handle_t            *afd;\n  NTSTATUS                      status;\n\n  if (e == NULL || ed == NULL || ew == NULL) {\n    return ARES_FALSE;\n  }\n\n  /* Misuse */\n  if (ed->poll_status != POLL_STATUS_NONE) {\n    return ARES_FALSE;\n  }\n\n  ed->afd_handle_node = ares_afd_handle_fetch(ew);\n  /* System resource issue? */\n  if (ed->afd_handle_node == NULL) {\n    return ARES_FALSE;\n  }\n\n  afd = ares_slist_node_val(ed->afd_handle_node);\n\n  /* Enqueue AFD Poll */\n  ed->afd_poll_info.Exclusive         = FALSE;\n  ed->afd_poll_info.NumberOfHandles   = 1;\n  ed->afd_poll_info.Timeout.QuadPart  = LLONG_MAX;\n  ed->afd_poll_info.Handles[0].Handle = (HANDLE)ed->base_socket;\n  ed->afd_poll_info.Handles[0].Status = 0;\n  ed->afd_poll_info.Handles[0].Events = AFD_POLL_LOCAL_CLOSE;\n\n  if (flags & ARES_EVENT_FLAG_READ) {\n    ed->afd_poll_info.Handles[0].Events |=\n      (AFD_POLL_RECEIVE | AFD_POLL_DISCONNECT | AFD_POLL_ACCEPT |\n       AFD_POLL_ABORT);\n  }\n  if (flags & ARES_EVENT_FLAG_WRITE) {\n    ed->afd_poll_info.Handles[0].Events |=\n      (AFD_POLL_SEND | AFD_POLL_CONNECT_FAIL);\n  }\n  if (flags == 0) {\n    ed->afd_poll_info.Handles[0].Events |= AFD_POLL_DISCONNECT;\n  }\n\n  memset(&ed->iosb, 0, sizeof(ed->iosb));\n  ed->iosb.Status = STATUS_PENDING;\n\n  status = ew->NtDeviceIoControlFile(\n    afd->afd_handle, NULL, NULL, &ed->iosb, &ed->iosb, IOCTL_AFD_POLL,\n    &ed->afd_poll_info, sizeof(ed->afd_poll_info), &ed->afd_poll_info,\n    sizeof(ed->afd_poll_info));\n  if (status != STATUS_SUCCESS && status != STATUS_PENDING) {\n    CARES_DEBUG_LOG(\"** afd_enqueue ed=%p FAILED\\n\", (void *)ed);\n    ed->afd_handle_node = NULL;\n    return ARES_FALSE;\n  }\n\n  /* Record that we submitted a poll request to this handle and tell it to\n   * re-sort the node since we changed its sort value */\n  afd->poll_cnt++;\n  ares_slist_node_reinsert(ed->afd_handle_node);\n\n  ed->poll_status = POLL_STATUS_PENDING;\n  CARES_DEBUG_LOG(\"++ afd_enqueue ed=%p flags=%X\\n\", (void *)ed,\n                  (unsigned int)flags);\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          570,
+          0
+        ],
+        [
+          639,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_afd_enqueue",
+        "parameters": {
+          "event": "ares_event_t",
+          "flags": "ares_event_flags_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_afd_cancel(ares_evsys_win32_eventdata_t *ed)\n{\n  IO_STATUS_BLOCK     cancel_iosb;\n  ares_evsys_win32_t *ew;\n  NTSTATUS            status;\n  ares_afd_handle_t  *afd;\n\n  ew = ed->event->e->ev_sys_data;\n\n  /* Misuse */\n  if (ed->poll_status != POLL_STATUS_PENDING) {\n    return ARES_FALSE;\n  }\n\n  afd = ares_slist_node_val(ed->afd_handle_node);\n\n  /* Misuse */\n  if (afd == NULL) {\n    return ARES_FALSE;\n  }\n\n  ed->poll_status = POLL_STATUS_CANCEL;\n\n  /* Not pending, nothing to do. Most likely that means there is a pending\n   * event that hasn't yet been delivered otherwise it would be re-armed\n   * already */\n  if (ed->iosb.Status != STATUS_PENDING) {\n    CARES_DEBUG_LOG(\"** cancel not needed for ed=%p\\n\", (void *)ed);\n    return ARES_FALSE;\n  }\n\n  status = ew->NtCancelIoFileEx(afd->afd_handle, &ed->iosb, &cancel_iosb);\n\n  CARES_DEBUG_LOG(\"** Enqueued cancel for ed=%p, status = %lX\\n\", (void *)ed,\n                  status);\n\n  /* NtCancelIoFileEx() may return STATUS_NOT_FOUND if the operation completed\n   * just before calling NtCancelIoFileEx(), but we have not yet received the\n   * notification (but it should be queued for the next IOCP event).  */\n  if (status == STATUS_SUCCESS || status == STATUS_NOT_FOUND) {\n    return ARES_TRUE;\n  }\n\n  return ARES_FALSE;\n}",
+      "fn_code_pos": [
+        [
+          641,
+          0
+        ],
+        [
+          685,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_afd_cancel",
+        "parameters": {
+          "ed": "ares_evsys_win32_eventdata_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_win32_eventdata_destroy(ares_evsys_win32_t           *ew,\n                                               ares_evsys_win32_eventdata_t *ed)\n{\n  if (ew == NULL || ed == NULL) {\n    return;\n  }\n  CARES_DEBUG_LOG(\"-- deleting ed=%p (%s)\\n\", (void *)ed,\n                  (ed->socket == ARES_SOCKET_BAD) ? \"data\" : \"socket\");\n  /* These type of handles are deferred destroy. Update tracking. */\n  if (ed->socket != ARES_SOCKET_BAD) {\n    ares_htable_vpvp_remove(ew->sockets, &ed->iosb);\n  }\n\n  ares_thread_mutex_destroy(ed->lock);\n\n  if (ed->event != NULL) {\n    ed->event->data = NULL;\n  }\n\n  ares_free(ed);\n}",
+      "fn_code_pos": [
+        [
+          687,
+          0
+        ],
+        [
+          707,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_eventdata_destroy",
+        "parameters": {
+          "ew": "ares_evsys_win32_t",
+          "ed": "ares_evsys_win32_eventdata_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_event_add(ares_event_t *event)\n{\n  ares_event_thread_t          *e  = event->e;\n  ares_evsys_win32_t           *ew = e->ev_sys_data;\n  ares_evsys_win32_eventdata_t *ed;\n  ares_bool_t                   rc = ARES_FALSE;\n\n  ed              = ares_malloc_zero(sizeof(*ed));\n  ed->event       = event;\n  ed->socket      = event->fd;\n  ed->base_socket = ARES_SOCKET_BAD;\n  event->data     = ed;\n\n  CARES_DEBUG_LOG(\"++ add ed=%p (%s) flags=%X\\n\", (void *)ed,\n                  (ed->socket == ARES_SOCKET_BAD) ? \"data\" : \"socket\",\n                  (unsigned int)event->flags);\n\n  /* Likely a signal event, not something we will directly handle.  We create\n   * the ares_evsys_win32_eventdata_t as the placeholder to use as the\n   * IOCP Completion Key */\n  if (ed->socket == ARES_SOCKET_BAD) {\n    ed->lock = ares_thread_mutex_create();\n    if (ed->lock == NULL) {\n      goto done;\n    }\n    rc = ARES_TRUE;\n    goto done;\n  }\n\n  ed->base_socket = ares_evsys_win32_basesocket(ed->socket);\n  if (ed->base_socket == ARES_SOCKET_BAD) {\n    goto done;\n  }\n\n  if (!ares_htable_vpvp_insert(ew->sockets, &ed->iosb, ed)) {\n    goto done;\n  }\n\n  if (!ares_evsys_win32_afd_enqueue(event, event->flags)) {\n    goto done;\n  }\n\n  rc = ARES_TRUE;\n\ndone:\n  if (!rc) {\n    ares_evsys_win32_eventdata_destroy(ew, ed);\n    event->data = NULL;\n  }\n  return rc;\n}",
+      "fn_code_pos": [
+        [
+          709,
+          0
+        ],
+        [
+          759,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_event_add",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_win32_event_del(ares_event_t *event)\n{\n  ares_evsys_win32_eventdata_t *ed = event->data;\n\n  /* Already cleaned up, likely a LOCAL_CLOSE */\n  if (ed == NULL) {\n    return;\n  }\n\n  CARES_DEBUG_LOG(\"-- DELETE requested for ed=%p (%s)\\n\", (void *)ed,\n                  (ed->socket != ARES_SOCKET_BAD) ? \"socket\" : \"data\");\n\n  /*\n   * Cancel pending AFD Poll operation.\n   */\n  if (ed->socket != ARES_SOCKET_BAD) {\n    ares_evsys_win32_afd_cancel(ed);\n    ed->poll_status = POLL_STATUS_DESTROY;\n    ed->event       = NULL;\n  } else {\n    ares_evsys_win32_eventdata_destroy(event->e->ev_sys_data, ed);\n  }\n\n  event->data = NULL;\n}",
+      "fn_code_pos": [
+        [
+          761,
+          0
+        ],
+        [
+          785,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_event_del",
+        "parameters": {
+          "event": "ares_event_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static void ares_evsys_win32_event_mod(ares_event_t      *event,\n                                       ares_event_flags_t new_flags)\n{\n  ares_evsys_win32_eventdata_t *ed = event->data;\n\n  /* Not for us */\n  if (event->fd == ARES_SOCKET_BAD || ed == NULL) {\n    return;\n  }\n\n  CARES_DEBUG_LOG(\"** mod ed=%p new_flags=%X\\n\", (void *)ed,\n                  (unsigned int)new_flags);\n\n  /* All we need to do is cancel the pending operation.  When the event gets\n   * delivered for the cancellation, it will automatically re-enqueue a new\n   * event */\n  ares_evsys_win32_afd_cancel(ed);\n}",
+      "fn_code_pos": [
+        [
+          787,
+          0
+        ],
+        [
+          804,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_event_mod",
+        "parameters": {
+          "event": "ares_event_t",
+          "new_flags": "ares_event_flags_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_process_other_event(\n  ares_evsys_win32_t *ew, ares_evsys_win32_eventdata_t *ed, size_t i)\n{\n  ares_event_t *event;\n\n  /* NOTE: do NOT dereference 'ed' if during shutdown as this could be an\n   * invalid pointer if the signal handle was cleaned up, but there was still a\n   * pending event! */\n\n  if (ew->is_shutdown) {\n    CARES_DEBUG_LOG(\"\\t\\t** i=%lu, skip non-socket handle during shutdown\\n\",\n                    (unsigned long)i);\n    return ARES_FALSE;\n  }\n\n  event = ed->event;\n  CARES_DEBUG_LOG(\"\\t\\t** i=%lu, ed=%p (data)\\n\", (unsigned long)i, (void *)ed);\n\n  event->cb(event->e, event->fd, event->data, ARES_EVENT_FLAG_OTHER);\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          806,
+          0
+        ],
+        [
+          826,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_process_other_event",
+        "parameters": {
+          "ew": "ares_evsys_win32_t",
+          "ed": "ares_evsys_win32_eventdata_t",
+          "i": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static ares_bool_t ares_evsys_win32_process_socket_event(\n  ares_evsys_win32_t *ew, ares_evsys_win32_eventdata_t *ed, size_t i)\n{\n  ares_event_flags_t flags = 0;\n  ares_event_t      *event = NULL;\n  ares_afd_handle_t *afd   = NULL;\n\n  /* Shouldn't be possible */\n  if (ed == NULL) {\n    CARES_DEBUG_LOG(\"\\t\\t** i=%lu, Invalid handle.\\n\", (unsigned long)i);\n    return ARES_FALSE;\n  }\n\n  event = ed->event;\n\n  CARES_DEBUG_LOG(\"\\t\\t** i=%lu, ed=%p (socket)\\n\", (unsigned long)i,\n                  (void *)ed);\n\n  /* Process events */\n  if (ed->poll_status == POLL_STATUS_PENDING &&\n      ed->iosb.Status == STATUS_SUCCESS &&\n      ed->afd_poll_info.NumberOfHandles > 0) {\n    if (ed->afd_poll_info.Handles[0].Events &\n        (AFD_POLL_RECEIVE | AFD_POLL_DISCONNECT | AFD_POLL_ACCEPT |\n         AFD_POLL_ABORT)) {\n      flags |= ARES_EVENT_FLAG_READ;\n    }\n    if (ed->afd_poll_info.Handles[0].Events &\n        (AFD_POLL_SEND | AFD_POLL_CONNECT_FAIL)) {\n      flags |= ARES_EVENT_FLAG_WRITE;\n    }\n    if (ed->afd_poll_info.Handles[0].Events & AFD_POLL_LOCAL_CLOSE) {\n      CARES_DEBUG_LOG(\"\\t\\t** ed=%p LOCAL CLOSE\\n\", (void *)ed);\n      ed->poll_status = POLL_STATUS_DESTROY;\n    }\n  }\n\n  CARES_DEBUG_LOG(\"\\t\\t** ed=%p, iosb status=%lX, poll_status=%d, flags=%X\\n\",\n                  (void *)ed, (unsigned long)ed->iosb.Status,\n                  (int)ed->poll_status, (unsigned int)flags);\n\n  /* Decrement poll count for AFD handle then resort, also disassociate\n   * with socket */\n  afd = ares_slist_node_val(ed->afd_handle_node);\n  afd->poll_cnt--;\n  ares_slist_node_reinsert(ed->afd_handle_node);\n  ed->afd_handle_node = NULL;\n\n  /* Pending destroy, go ahead and kill it */\n  if (ed->poll_status == POLL_STATUS_DESTROY) {\n    ares_evsys_win32_eventdata_destroy(ew, ed);\n    return ARES_FALSE;\n  }\n\n  ed->poll_status = POLL_STATUS_NONE;\n\n  /* Mask flags against current desired flags.  We could have an event\n   * queued that is outdated. */\n  flags &= event->flags;\n\n  /* Don't actually do anything with the event that was delivered as we are\n   * in a shutdown/cleanup process.  Mostly just handling the delayed\n   * destruction of sockets */\n  if (ew->is_shutdown) {\n    return ARES_FALSE;\n  }\n\n  /* Re-enqueue so we can get more events on the socket, we either\n   * received a real event, or a cancellation notice.  Both cases we\n   * re-queue using the current configured event flags.\n   *\n   * If we can't re-enqueue, that likely means the socket has been\n   * closed, so we want to kill our reference to it\n   */\n  if (!ares_evsys_win32_afd_enqueue(event, event->flags)) {\n    ares_evsys_win32_eventdata_destroy(ew, ed);\n    return ARES_FALSE;\n  }\n\n  /* No events we recognize to deliver */\n  if (flags == 0) {\n    return ARES_FALSE;\n  }\n\n  event->cb(event->e, event->fd, event->data, flags);\n  return ARES_TRUE;\n}",
+      "fn_code_pos": [
+        [
+          828,
+          0
+        ],
+        [
+          914,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_process_socket_event",
+        "parameters": {
+          "ew": "ares_evsys_win32_t",
+          "ed": "ares_evsys_win32_eventdata_t",
+          "i": "size_t"
+        },
+        "return_type": "ares_bool_t"
+      }
+    },
+    {
+      "fn_code": "static BOOL ares_GetQueuedCompletionStatusEx(\n  HANDLE CompletionPort,\n  LPOVERLAPPED_ENTRY lpCompletionPortEntries,\n  ULONG ulCount,\n  PULONG ulNumEntriesRemoved,\n  DWORD dwMilliseconds,\n  BOOL fAlertable)\n{\n#ifdef HAVE_GETQUEUEDCOMPLETIONSTATUSEX\n  return GetQueuedCompletionStatusEx(CompletionPort, lpCompletionPortEntries,\n    ulCount, ulNumEntriesRemoved, dwMilliseconds, fAlertable);\n#else\n  ULONG i;\n\n  (void)fAlertable;\n\n  memset(lpCompletionPortEntries, 0,\n         ulCount * sizeof(*lpCompletionPortEntries));\n  (*ulNumEntriesRemoved) = 0;\n\n  for (i=0; i<ulCount; i++) {\n    if (!GetQueuedCompletionStatus(CompletionPort,\n         &lpCompletionPortEntries[i].dwNumberOfBytesTransferred,\n         &lpCompletionPortEntries[i].lpCompletionKey,\n         &lpCompletionPortEntries[i].lpOverlapped,\n         (i == 0)?dwMilliseconds:0)) {\n      break;\n    }\n\n    (*ulNumEntriesRemoved)++;\n  }\n\n  if (*ulNumEntriesRemoved > 0) {\n    return TRUE;\n  }\n\n  return FALSE;\n#endif\n}",
+      "fn_code_pos": [
+        [
+          916,
+          0
+        ],
+        [
+          954,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_GetQueuedCompletionStatusEx",
+        "parameters": {
+          "CompletionPort": "HANDLE",
+          "lpCompletionPortEntries": "LPOVERLAPPED_ENTRY",
+          "ulCount": "ULONG",
+          "ulNumEntriesRemoved": "PULONG",
+          "dwMilliseconds": "DWORD",
+          "fAlertable": "BOOL"
+        },
+        "return_type": "BOOL"
+      }
+    },
+    {
+      "fn_code": "static size_t ares_evsys_win32_wait(ares_event_thread_t *e,\n                                    unsigned long        timeout_ms)\n{\n  ares_evsys_win32_t *ew = e->ev_sys_data;\n  OVERLAPPED_ENTRY    entries[16];\n  ULONG               maxentries = sizeof(entries) / sizeof(*entries);\n  ULONG               nentries;\n  BOOL                status;\n  size_t              i;\n  size_t              cnt  = 0;\n  DWORD               tout = (timeout_ms == 0) ? INFINITE : (DWORD)timeout_ms;\n\n  CARES_DEBUG_LOG(\"** Wait Enter\\n\");\n  /* Process in a loop for as long as it fills the entire entries buffer, and\n   * on subsequent attempts, ensure the timeout is 0 */\n  do {\n    nentries = maxentries;\n    status   = ares_GetQueuedCompletionStatusEx(ew->iocp_handle, entries,\n                                                nentries, &nentries, tout,\n                                                FALSE);\n\n    /* Next loop around, we want to return instantly if there are no events to\n     * be processed */\n    tout = 0;\n\n    if (!status) {\n      break;\n    }\n\n    CARES_DEBUG_LOG(\"\\t** GetQueuedCompletionStatusEx returned %lu entries\\n\",\n                    (unsigned long)nentries);\n    for (i = 0; i < (size_t)nentries; i++) {\n      ares_evsys_win32_eventdata_t *ed = NULL;\n      ares_bool_t                   rc;\n\n      /* For things triggered via PostQueuedCompletionStatus() we have an\n       * lpCompletionKey we can just use.  Otherwise we need to dereference the\n       * pointer returned in lpOverlapped to determine the referenced\n       * socket */\n      if (entries[i].lpCompletionKey) {\n        ed = (ares_evsys_win32_eventdata_t *)entries[i].lpCompletionKey;\n        rc = ares_evsys_win32_process_other_event(ew, ed, i);\n      } else {\n        ed = ares_htable_vpvp_get_direct(ew->sockets, entries[i].lpOverlapped);\n        rc = ares_evsys_win32_process_socket_event(ew, ed, i);\n      }\n\n      /* We processed actual events */\n      if (rc) {\n        cnt++;\n      }\n    }\n  } while (nentries == maxentries);\n\n  CARES_DEBUG_LOG(\"** Wait Exit\\n\");\n\n  return cnt;\n}",
+      "fn_code_pos": [
+        [
+          956,
+          0
+        ],
+        [
+          1013,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "CARES_DEBUG_LOG(const char *fmt, ...)",
+      "fn_dec_pos": [
+        [
+          187,
+          12
+        ],
+        [
+          187,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "CARES_DEBUG_LOG",
+        "parameters": {
+          "fmt": "char"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_evsys_win32_wait(ares_event_thread_t *e,\n                                    unsigned long        timeout_ms)",
+      "fn_dec_pos": [
+        [
+          250,
+          14
+        ],
+        [
+          251,
+          68
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_evsys_win32_wait",
+        "parameters": {
+          "e": "ares_event_thread_t",
+          "timeout_ms": "unsigned long"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "ares_iocpevent_create(ares_event_thread_t *e)",
+      "fn_dec_pos": [
+        [
+          286,
+          21
+        ],
+        [
+          286,
+          66
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_iocpevent_create",
+        "parameters": {
+          "e": "ares_event_thread_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_afd_handle_create(ares_evsys_win32_t *ew)",
+      "fn_dec_pos": [
+        [
+          377,
+          26
+        ],
+        [
+          377,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_create",
+        "parameters": {
+          "ew": "ares_evsys_win32_t"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ares_afd_handle_fetch(ares_evsys_win32_t *ew)",
+      "fn_dec_pos": [
+        [
+          428,
+          26
+        ],
+        [
+          428,
+          71
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_afd_handle_fetch",
+        "parameters": {
+          "ew": "ares_evsys_win32_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  /* Dynamically loaded symbols */\n  NtCreateFile_t          NtCreateFile;\n  NtDeviceIoControlFile_t NtDeviceIoControlFile;\n  NtCancelIoFileEx_t      NtCancelIoFileEx;\n\n  /* Implementation details */\n  ares_slist_t           *afd_handles;\n  HANDLE                  iocp_handle;\n\n  /* IO_STATUS_BLOCK * -> ares_evsys_win32_eventdata_t * mapping.  There is\n   * no completion key passed to IOCP with this method so we have to look\n   * up based on the lpOverlapped returned (which is mapped to IO_STATUS_BLOCK)\n   */\n  ares_htable_vpvp_t     *sockets;\n\n  /* Flag about whether or not we are shutting down */\n  ares_bool_t             is_shutdown;\n} ares_evsys_win32_t;",
+      {
+        "NtCreateFile": "NtCreateFile_t",
+        "NtDeviceIoControlFile": "NtDeviceIoControlFile_t",
+        "NtCancelIoFileEx": "NtCancelIoFileEx_t",
+        "*afd_handles": "ares_slist_t",
+        "iocp_handle": "HANDLE",
+        "*sockets": "ares_htable_vpvp_t",
+        "is_shutdown": "ares_bool_t"
+      },
+      "ares_evsys_win32_t",
+      [
+        201,
+        0
+      ],
+      [
+        219,
+        21
+      ]
+    ],
+    [
+      "typedef struct {\n  /*! Pointer to parent event container */\n  ares_event_t        *event;\n  /*! Socket passed in to monitor */\n  SOCKET               socket;\n  /*! Base socket derived from provided socket */\n  SOCKET               base_socket;\n  /*! Structure for submitting AFD POLL requests (Internals!) */\n  AFD_POLL_INFO        afd_poll_info;\n  /*! Status of current polling operation */\n  poll_status_t        poll_status;\n  /*! IO Status Block structure submitted with AFD POLL requests and returned\n   *  with IOCP results as lpOverlapped (even though its a different structure)\n   */\n  IO_STATUS_BLOCK      iosb;\n  /*! AFD handle node an outstanding poll request is associated with */\n  ares_slist_node_t   *afd_handle_node;\n  /* Lock is only for PostQueuedCompletionStatus() to prevent multiple\n   * signals. Tracking via POLL_STATUS_PENDING/POLL_STATUS_NONE */\n  ares_thread_mutex_t *lock;\n} ares_evsys_win32_eventdata_t;",
+      {
+        "*event": "ares_event_t",
+        "socket": "SOCKET",
+        "base_socket": "SOCKET",
+        "afd_poll_info": "AFD_POLL_INFO",
+        "poll_status": "poll_status_t",
+        "iosb": "IO_STATUS_BLOCK",
+        "*afd_handle_node": "ares_slist_node_t",
+        "*lock": "ares_thread_mutex_t"
+      },
+      "ares_evsys_win32_eventdata_t",
+      [
+        228,
+        0
+      ],
+      [
+        248,
+        31
+      ]
+    ],
+    [
+      "typedef struct {\n  size_t poll_cnt;\n  HANDLE afd_handle;\n} ares_afd_handle_t;",
+      {
+        "poll_cnt": "size_t",
+        "afd_handle": "HANDLE"
+      },
+      "ares_afd_handle_t",
+      [
+        337,
+        0
+      ],
+      [
+        340,
+        20
+      ]
+    ],
+    [
+      "typedef struct {\n  /* Dynamically loaded symbols */\n  NtCreateFile_t          NtCreateFile;\n  NtDeviceIoControlFile_t NtDeviceIoControlFile;\n  NtCancelIoFileEx_t      NtCancelIoFileEx;\n\n  /* Implementation details */\n  ares_slist_t           *afd_handles;\n  HANDLE                  iocp_handle;\n\n  /* IO_STATUS_BLOCK * -> ares_evsys_win32_eventdata_t * mapping.  There is\n   * no completion key passed to IOCP with this method so we have to look\n   * up based on the lpOverlapped returned (which is mapped to IO_STATUS_BLOCK)\n   */\n  ares_htable_vpvp_t     *sockets;\n\n  /* Flag about whether or not we are shutting down */\n  ares_bool_t             is_shutdown;\n} ares_evsys_win32_t;",
+      {
+        "NtCreateFile": "NtCreateFile_t",
+        "NtDeviceIoControlFile": "NtDeviceIoControlFile_t",
+        "NtCancelIoFileEx": "NtCancelIoFileEx_t",
+        "*afd_handles": "ares_slist_t",
+        "iocp_handle": "HANDLE",
+        "*sockets": "ares_htable_vpvp_t",
+        "is_shutdown": "ares_bool_t"
+      },
+      "ares_evsys_win32_t",
+      [
+        201,
+        0
+      ],
+      [
+        219,
+        21
+      ]
+    ],
+    [
+      "typedef struct {\n  /*! Pointer to parent event container */\n  ares_event_t        *event;\n  /*! Socket passed in to monitor */\n  SOCKET               socket;\n  /*! Base socket derived from provided socket */\n  SOCKET               base_socket;\n  /*! Structure for submitting AFD POLL requests (Internals!) */\n  AFD_POLL_INFO        afd_poll_info;\n  /*! Status of current polling operation */\n  poll_status_t        poll_status;\n  /*! IO Status Block structure submitted with AFD POLL requests and returned\n   *  with IOCP results as lpOverlapped (even though its a different structure)\n   */\n  IO_STATUS_BLOCK      iosb;\n  /*! AFD handle node an outstanding poll request is associated with */\n  ares_slist_node_t   *afd_handle_node;\n  /* Lock is only for PostQueuedCompletionStatus() to prevent multiple\n   * signals. Tracking via POLL_STATUS_PENDING/POLL_STATUS_NONE */\n  ares_thread_mutex_t *lock;\n} ares_evsys_win32_eventdata_t;",
+      {
+        "*event": "ares_event_t",
+        "socket": "SOCKET",
+        "base_socket": "SOCKET",
+        "afd_poll_info": "AFD_POLL_INFO",
+        "poll_status": "poll_status_t",
+        "iosb": "IO_STATUS_BLOCK",
+        "*afd_handle_node": "ares_slist_node_t",
+        "*lock": "ares_thread_mutex_t"
+      },
+      "ares_evsys_win32_eventdata_t",
+      [
+        228,
+        0
+      ],
+      [
+        248,
+        31
+      ]
+    ],
+    [
+      "typedef struct {\n  size_t poll_cnt;\n  HANDLE afd_handle;\n} ares_afd_handle_t;",
+      {
+        "poll_cnt": "size_t",
+        "afd_handle": "HANDLE"
+      },
+      "ares_afd_handle_t",
+      [
+        337,
+        0
+      ],
+      [
+        340,
+        20
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        36,
+        0
+      ],
+      [
+        37,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event.h\"\n",
+      [
+        37,
+        0
+      ],
+      [
+        38,
+        0
+      ]
+    ],
+    [
+      "#include \"ares_event_win32.h\"\n",
+      [
+        38,
+        0
+      ],
+      [
+        39,
+        0
+      ]
+    ],
+    [
+      "#  include <limits.h>\n",
+      [
+        44,
+        0
+      ],
+      [
+        45,
+        0
+      ]
+    ],
+    [
+      "#  include <stdarg.h>\n",
+      [
+        176,
+        0
+      ],
+      [
+        177,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "typedef enum {\n  POLL_STATUS_NONE    = 0,\n  POLL_STATUS_PENDING = 1,\n  POLL_STATUS_CANCEL  = 2,\n  POLL_STATUS_DESTROY = 3\n} poll_status_t;",
+      {
+        "POLL_STATUS_NONE": "",
+        "POLL_STATUS_PENDING": "",
+        "POLL_STATUS_CANCEL": "",
+        "POLL_STATUS_DESTROY": ""
+      },
+      "poll_status_t",
+      [
+        221,
+        0
+      ],
+      [
+        226,
+        16
+      ]
+    ]
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "static void ares_query_dnsrec_cb(void *arg, ares_status_t status,\n                                 size_t                   timeouts,\n                                 const ares_dns_record_t *dnsrec)\n{\n  ares_query_dnsrec_arg_t *qquery = arg;\n\n  if (status != ARES_SUCCESS) {\n    qquery->callback(qquery->arg, status, timeouts, dnsrec);\n  } else {\n    size_t           ancount;\n    ares_dns_rcode_t rcode;\n    /* Pull the response code and answer count from the packet and convert any\n     * errors.\n     */\n    rcode   = ares_dns_record_get_rcode(dnsrec);\n    ancount = ares_dns_record_rr_cnt(dnsrec, ARES_SECTION_ANSWER);\n    status  = ares_dns_query_reply_tostatus(rcode, ancount);\n    qquery->callback(qquery->arg, status, timeouts, dnsrec);\n  }\n  ares_free(qquery);\n}",
+      "fn_code_pos": [
+        [
+          38,
+          0
+        ],
+        [
+          58,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query_dnsrec_cb",
+        "parameters": {
+          "arg": "void",
+          "status": "ares_status_t",
+          "timeouts": "size_t",
+          "dnsrec": "ares_dns_record_t"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_query_nolock(ares_channel_t *channel, const char *name,\n                                ares_dns_class_t     dnsclass,\n                                ares_dns_rec_type_t  type,\n                                ares_callback_dnsrec callback, void *arg,\n                                unsigned short *qid)\n{\n  ares_status_t            status;\n  ares_dns_record_t       *dnsrec = NULL;\n  ares_dns_flags_t         flags  = 0;\n  ares_query_dnsrec_arg_t *qquery = NULL;\n\n  if (channel == NULL || name == NULL || callback == NULL) {\n    /* LCOV_EXCL_START: DefensiveCoding */\n    status = ARES_EFORMERR;\n    if (callback != NULL) {\n      callback(arg, status, 0, NULL);\n    }\n    return status;\n    /* LCOV_EXCL_STOP */\n  }\n\n  if (!(channel->flags & ARES_FLAG_NORECURSE)) {\n    flags |= ARES_FLAG_RD;\n  }\n\n  status = ares_dns_record_create_query(\n    &dnsrec, name, dnsclass, type, 0, flags,\n    (size_t)(channel->flags & ARES_FLAG_EDNS) ? channel->ednspsz : 0);\n  if (status != ARES_SUCCESS) {\n    callback(arg, status, 0, NULL); /* LCOV_EXCL_LINE: OutOfMemory */\n    return status;                  /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  qquery = ares_malloc(sizeof(*qquery));\n  if (qquery == NULL) {\n    /* LCOV_EXCL_START: OutOfMemory */\n    status = ARES_ENOMEM;\n    callback(arg, status, 0, NULL);\n    ares_dns_record_destroy(dnsrec);\n    return status;\n    /* LCOV_EXCL_STOP */\n  }\n\n  qquery->callback = callback;\n  qquery->arg      = arg;\n\n  /* Send it off.  qcallback will be called when we get an answer. */\n  status = ares_send_nolock(channel, NULL, 0, dnsrec, ares_query_dnsrec_cb,\n                            qquery, qid);\n\n  ares_dns_record_destroy(dnsrec);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          60,
+          0
+        ],
+        [
+          112,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query_nolock",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "ares_status_t ares_query_dnsrec(ares_channel_t *channel, const char *name,\n                                ares_dns_class_t     dnsclass,\n                                ares_dns_rec_type_t  type,\n                                ares_callback_dnsrec callback, void *arg,\n                                unsigned short *qid)\n{\n  ares_status_t status;\n\n  if (channel == NULL) {\n    return ARES_EFORMERR;\n  }\n\n  ares_channel_lock(channel);\n  status = ares_query_nolock(channel, name, dnsclass, type, callback, arg, qid);\n  ares_channel_unlock(channel);\n  return status;\n}",
+      "fn_code_pos": [
+        [
+          114,
+          0
+        ],
+        [
+          130,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query_dnsrec",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "ares_dns_class_t",
+          "type": "ares_dns_rec_type_t",
+          "callback": "ares_callback_dnsrec",
+          "arg": "void",
+          "qid": "unsigned short"
+        },
+        "return_type": "ares_status_t"
+      }
+    },
+    {
+      "fn_code": "void ares_query(ares_channel_t *channel, const char *name, int dnsclass,\n                int type, ares_callback callback, void *arg)\n{\n  void *carg = NULL;\n\n  if (channel == NULL) {\n    return;\n  }\n\n  carg = ares_dnsrec_convert_arg(callback, arg);\n  if (carg == NULL) {\n    callback(arg, ARES_ENOMEM, 0, NULL, 0); /* LCOV_EXCL_LINE: OutOfMemory */\n    return;                                 /* LCOV_EXCL_LINE: OutOfMemory */\n  }\n\n  ares_query_dnsrec(channel, name, (ares_dns_class_t)dnsclass,\n                    (ares_dns_rec_type_t)type, ares_dnsrec_convert_cb, carg,\n                    NULL);\n}",
+      "fn_code_pos": [
+        [
+          132,
+          0
+        ],
+        [
+          150,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ares_query",
+        "parameters": {
+          "channel": "ares_channel_t",
+          "name": "char",
+          "dnsclass": "int",
+          "type": "int",
+          "callback": "ares_callback",
+          "arg": "void"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct {\n  ares_callback_dnsrec callback;\n  void                *arg;\n} ares_query_dnsrec_arg_t;",
+      {
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void"
+      },
+      "ares_query_dnsrec_arg_t",
+      [
+        33,
+        0
+      ],
+      [
+        36,
+        26
+      ]
+    ],
+    [
+      "typedef struct {\n  ares_callback_dnsrec callback;\n  void                *arg;\n} ares_query_dnsrec_arg_t;",
+      {
+        "callback": "ares_callback_dnsrec",
+        "*arg": "void"
+      },
+      "ares_query_dnsrec_arg_t",
+      [
+        33,
+        0
+      ],
+      [
+        36,
+        26
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"ares_private.h\"\n",
+      [
+        27,
+        0
+      ],
+      [
+        28,
+        0
+      ]
+    ],
+    [
+      "#  include <netinet/in.h>\n",
+      [
+        30,
+        0
+      ],
+      [
+        31,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}
