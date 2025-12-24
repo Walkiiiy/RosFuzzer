@@ -1,0 +1,67 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct rosidl_runtime_c__U16String\n{\n  /// The pointer to the first character, the sequence ends with a null character.\n  uint_least16_t * data;  // using uint_least16_t to match a C++ std::u16string\n  /// The length of the u16string (excluding the null character).\n  size_t size;\n  /// The capacity represents the number of allocated characters (including the null character).\n  size_t capacity;\n} rosidl_runtime_c__U16String;",
+      {
+        "* data": "uint_least16_t",
+        "size": "size_t",
+        "capacity": "size_t"
+      },
+      "rosidl_runtime_c__U16String",
+      [
+        22,
+        0
+      ],
+      [
+        30,
+        30
+      ]
+    ],
+    [
+      "typedef struct rosidl_runtime_c__U16String\n{\n  /// The pointer to the first character, the sequence ends with a null character.\n  uint_least16_t * data;  // using uint_least16_t to match a C++ std::u16string\n  /// The length of the u16string (excluding the null character).\n  size_t size;\n  /// The capacity represents the number of allocated characters (including the null character).\n  size_t capacity;\n} rosidl_runtime_c__U16String;",
+      {
+        "* data": "uint_least16_t",
+        "size": "size_t",
+        "capacity": "size_t"
+      },
+      "rosidl_runtime_c__U16String",
+      [
+        22,
+        0
+      ],
+      [
+        30,
+        30
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include <stddef.h>\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/primitives_sequence.h\"\n",
+      [
+        19,
+        0
+      ],
+      [
+        20,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

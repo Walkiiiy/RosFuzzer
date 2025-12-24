@@ -1,0 +1,98 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "const rosidl_service_type_support_t * dummy_service_typesupport_handle_function(\n  const rosidl_service_type_support_t * handle, const char *) {return handle;}",
+      "fn_code_pos": [
+        [
+          17,
+          0
+        ],
+        [
+          18,
+          78
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dummy_service_typesupport_handle_function",
+        "parameters": {
+          "handle": "rosidl_service_type_support_t"
+        },
+        "return_type": "rosidl_service_type_support_t"
+      }
+    },
+    {
+      "fn_code": "TEST(service_typesupport, get_service_typesupport_handle) {\n  rosidl_service_type_support_t service_typesupport;\n\n  constexpr char identifier[] = \"identifier\";\n  service_typesupport.typesupport_identifier = &identifier[0];\n  service_typesupport.func = dummy_service_typesupport_handle_function;\n\n  EXPECT_EQ(\n    get_service_typesupport_handle(\n      &service_typesupport,\n      &identifier[0]), &service_typesupport);\n  EXPECT_EQ(\n    get_service_typesupport_handle_function(\n      &service_typesupport,\n      &identifier[0]), &service_typesupport);\n  EXPECT_EQ(\n    get_service_typesupport_handle_function(\n      &service_typesupport,\n      \"different identifier\"), nullptr);\n}",
+      "fn_code_pos": [
+        [
+          20,
+          0
+        ],
+        [
+          39,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "dummy_service_typesupport_handle_function(\n  const rosidl_service_type_support_t * handle, const char *)",
+      "fn_dec_pos": [
+        [
+          17,
+          38
+        ],
+        [
+          18,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dummy_service_typesupport_handle_function",
+        "parameters": {
+          "handle": "rosidl_service_type_support_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"gtest/gtest.h\"\n",
+      [
+        14,
+        0
+      ],
+      [
+        15,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/service_type_support_struct.h\"\n",
+      [
+        15,
+        0
+      ],
+      [
+        16,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

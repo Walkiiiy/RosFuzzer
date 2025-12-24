@@ -7,7 +7,11 @@
 cd /src/$1
 
 # 定义 build.sh 脚本的路径
-script_path=/src/build.sh
+if [ -f "/ws/build.sh" ]; then
+    script_path=/ws/build.sh
+else
+    script_path=/src/build.sh
+fi
 
 # 检查 build.sh 文件是否存在
 if [ ! -f "$script_path" ]; then

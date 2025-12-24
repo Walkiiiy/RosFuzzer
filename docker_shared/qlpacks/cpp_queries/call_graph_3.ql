@@ -62,7 +62,7 @@ predicate reachable(Function src, Function dest) {
 // Entry point predicate
 predicate isEntryPoint(Function f) {
   f.hasName("main") or
-  f.hasName("nameinfo_callback") or
+  f.hasName("rosidl_runtime_c__float64__Sequence__copy") or
   exists(Function func |
     func = f and
     (

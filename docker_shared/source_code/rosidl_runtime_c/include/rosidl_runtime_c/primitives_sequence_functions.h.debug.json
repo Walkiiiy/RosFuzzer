@@ -1,0 +1,479 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS(float)",
+      "fn_dec_pos": [
+        [
+          113,
+          0
+        ],
+        [
+          113,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS(double)",
+      "fn_dec_pos": [
+        [
+          114,
+          0
+        ],
+        [
+          114,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS(char)",
+      "fn_dec_pos": [
+        [
+          116,
+          0
+        ],
+        [
+          116,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "ROSIDL_RUNTIME_C__DECLARE_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__bool__Sequence__init(\n  rosidl_runtime_c__boolean__Sequence * sequence, size_t size)",
+      "fn_dec_pos": [
+        [
+          136,
+          5
+        ],
+        [
+          137,
+          62
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__bool__Sequence__init",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__boolean__Sequence",
+          "size": "size_t"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__bool__Sequence__fini(\n  rosidl_runtime_c__boolean__Sequence * sequence)",
+      "fn_dec_pos": [
+        [
+          140,
+          5
+        ],
+        [
+          141,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__bool__Sequence__fini",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__boolean__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__bool__Sequence__are_equal(\n  const rosidl_runtime_c__boolean__Sequence * lhs,\n  const rosidl_runtime_c__boolean__Sequence * rhs)",
+      "fn_dec_pos": [
+        [
+          144,
+          5
+        ],
+        [
+          146,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__bool__Sequence__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__boolean__Sequence",
+          "rhs": "rosidl_runtime_c__boolean__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__bool__Sequence__copy(\n  const rosidl_runtime_c__boolean__Sequence * input,\n  rosidl_runtime_c__boolean__Sequence * output)",
+      "fn_dec_pos": [
+        [
+          149,
+          5
+        ],
+        [
+          151,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__bool__Sequence__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__boolean__Sequence",
+          "output": "rosidl_runtime_c__boolean__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__byte__Sequence__init(\n  rosidl_runtime_c__octet__Sequence * sequence, size_t size)",
+      "fn_dec_pos": [
+        [
+          155,
+          5
+        ],
+        [
+          156,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__byte__Sequence__init",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__octet__Sequence",
+          "size": "size_t"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__byte__Sequence__fini(\n  rosidl_runtime_c__octet__Sequence * sequence)",
+      "fn_dec_pos": [
+        [
+          159,
+          5
+        ],
+        [
+          160,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__byte__Sequence__fini",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__octet__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__byte__Sequence__are_equal(\n  const rosidl_runtime_c__octet__Sequence * lhs,\n  const rosidl_runtime_c__octet__Sequence * rhs)",
+      "fn_dec_pos": [
+        [
+          163,
+          5
+        ],
+        [
+          165,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__byte__Sequence__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__octet__Sequence",
+          "rhs": "rosidl_runtime_c__octet__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__byte__Sequence__copy(\n  const rosidl_runtime_c__octet__Sequence * input,\n  rosidl_runtime_c__octet__Sequence * output)",
+      "fn_dec_pos": [
+        [
+          168,
+          5
+        ],
+        [
+          170,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__byte__Sequence__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__octet__Sequence",
+          "output": "rosidl_runtime_c__octet__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float32__Sequence__init(\n  rosidl_runtime_c__float__Sequence * sequence, size_t size)",
+      "fn_dec_pos": [
+        [
+          174,
+          5
+        ],
+        [
+          175,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float32__Sequence__init",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__float__Sequence",
+          "size": "size_t"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float32__Sequence__fini(\n  rosidl_runtime_c__float__Sequence * sequence)",
+      "fn_dec_pos": [
+        [
+          178,
+          5
+        ],
+        [
+          179,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float32__Sequence__fini",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__float__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float32__Sequence__are_equal(\n  const rosidl_runtime_c__float__Sequence * lhs,\n  const rosidl_runtime_c__float__Sequence * rhs)",
+      "fn_dec_pos": [
+        [
+          182,
+          5
+        ],
+        [
+          184,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float32__Sequence__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__float__Sequence",
+          "rhs": "rosidl_runtime_c__float__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float32__Sequence__copy(\n  const rosidl_runtime_c__float__Sequence * input,\n  rosidl_runtime_c__float__Sequence * output)",
+      "fn_dec_pos": [
+        [
+          187,
+          5
+        ],
+        [
+          189,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float32__Sequence__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__float__Sequence",
+          "output": "rosidl_runtime_c__float__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float64__Sequence__init(\n  rosidl_runtime_c__double__Sequence * sequence, size_t size)",
+      "fn_dec_pos": [
+        [
+          193,
+          5
+        ],
+        [
+          194,
+          61
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float64__Sequence__init",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__double__Sequence",
+          "size": "size_t"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float64__Sequence__fini(\n  rosidl_runtime_c__double__Sequence * sequence)",
+      "fn_dec_pos": [
+        [
+          197,
+          5
+        ],
+        [
+          198,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float64__Sequence__fini",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__double__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float64__Sequence__are_equal(\n  const rosidl_runtime_c__double__Sequence * lhs,\n  const rosidl_runtime_c__double__Sequence * rhs)",
+      "fn_dec_pos": [
+        [
+          201,
+          5
+        ],
+        [
+          203,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float64__Sequence__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__double__Sequence",
+          "rhs": "rosidl_runtime_c__double__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__float64__Sequence__copy(\n  const rosidl_runtime_c__double__Sequence * input,\n  rosidl_runtime_c__double__Sequence * output)",
+      "fn_dec_pos": [
+        [
+          206,
+          5
+        ],
+        [
+          208,
+          46
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__float64__Sequence__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__double__Sequence",
+          "output": "rosidl_runtime_c__double__Sequence"
+        },
+        "return_type": "ROSIDL_GENERATOR_C_PUBLIC"
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <stdbool.h>\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include <stddef.h>\n",
+      [
+        18,
+        0
+      ],
+      [
+        19,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/primitives_sequence.h\"\n",
+      [
+        20,
+        0
+      ],
+      [
+        21,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/visibility_control.h\"\n",
+      [
+        21,
+        0
+      ],
+      [
+        22,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

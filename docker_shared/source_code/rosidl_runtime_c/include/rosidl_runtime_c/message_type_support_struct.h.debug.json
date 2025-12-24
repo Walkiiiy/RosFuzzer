@@ -1,0 +1,147 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(* rosidl_message_typesupport_handle_function)(\n  const rosidl_message_type_support_t *, const char *)",
+      "fn_dec_pos": [
+        [
+          27,
+          46
+        ],
+        [
+          28,
+          54
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "get_message_typesupport_handle(\n  const rosidl_message_type_support_t * handle, const char * identifier)",
+      "fn_dec_pos": [
+        [
+          51,
+          38
+        ],
+        [
+          52,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "handle": "rosidl_message_type_support_t",
+          "identifier": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "get_message_typesupport_handle_function(\n  const rosidl_message_type_support_t * handle, const char * identifier)",
+      "fn_dec_pos": [
+        [
+          65,
+          38
+        ],
+        [
+          66,
+          72
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "handle": "rosidl_message_type_support_t",
+          "identifier": "char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct rosidl_message_type_support_t\n{\n  /// String identifier for the type_support.\n  const char * typesupport_identifier;\n  /// Pointer to the message type support library\n  const void * data;\n  /// Pointer to the message type support handler function\n  rosidl_message_typesupport_handle_function func;\n}",
+      {
+        "char": "const",
+        "void": "const",
+        "func": "rosidl_message_typesupport_handle_function"
+      },
+      "rosidl_message_type_support_t",
+      [
+        31,
+        0
+      ],
+      [
+        39,
+        1
+      ]
+    ],
+    [
+      "typedef struct rosidl_message_type_support_t rosidl_message_type_support_t;",
+      {},
+      "rosidl_message_type_support_t",
+      [
+        25,
+        0
+      ],
+      [
+        25,
+        75
+      ]
+    ],
+    [
+      "struct rosidl_message_type_support_t\n{\n  /// String identifier for the type_support.\n  const char * typesupport_identifier;\n  /// Pointer to the message type support library\n  const void * data;\n  /// Pointer to the message type support handler function\n  rosidl_message_typesupport_handle_function func;\n}",
+      {
+        "char": "const",
+        "void": "const",
+        "func": "rosidl_message_typesupport_handle_function"
+      },
+      "rosidl_message_type_support_t",
+      [
+        31,
+        0
+      ],
+      [
+        39,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"rosidl_runtime_c/visibility_control.h\"\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_typesupport_interface/macros.h\"\n",
+      [
+        18,
+        0
+      ],
+      [
+        19,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

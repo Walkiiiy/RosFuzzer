@@ -1,0 +1,28 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [],
+  "global_variables": [],
+  "enumerate_node_list": [
+    [
+      "enum rosidl_runtime_c__message_initialization\n{\n  // Initialize all fields of the message, either with the default value\n  // (if the field has one), or with an empty value (generally 0 or an\n  // empty string).\n  ROSIDL_RUNTIME_C_MSG_INIT_ALL,\n  // Skip initialization of all fields of the message.  It is up to the user to\n  // ensure that all fields are initialized before use.\n  ROSIDL_RUNTIME_C_MSG_INIT_SKIP,\n  // Initialize all fields of the message to an empty value (generally 0 or an\n  // empty string).\n  ROSIDL_RUNTIME_C_MSG_INIT_ZERO,\n  // Initialize all fields of the message that have defaults; all other fields\n  // are left untouched.\n  ROSIDL_RUNTIME_C_MSG_INIT_DEFAULTS_ONLY,\n}",
+      {
+        "ROSIDL_RUNTIME_C_MSG_INIT_ALL": "",
+        "ROSIDL_RUNTIME_C_MSG_INIT_SKIP": "",
+        "ROSIDL_RUNTIME_C_MSG_INIT_ZERO": "",
+        "ROSIDL_RUNTIME_C_MSG_INIT_DEFAULTS_ONLY": ""
+      },
+      "rosidl_runtime_c__message_initialization",
+      [
+        17,
+        0
+      ],
+      [
+        32,
+        1
+      ]
+    ]
+  ]
+}

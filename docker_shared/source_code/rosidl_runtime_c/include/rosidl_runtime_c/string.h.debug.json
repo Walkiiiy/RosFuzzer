@@ -1,0 +1,67 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "typedef struct rosidl_runtime_c__String\n{\n  /// The pointer to the first character, the sequence ends with a null byte.\n  char * data;\n  /// The length of the string (excluding the null byte).\n  size_t size;\n  /// The capacity represents the number of allocated bytes (including the null byte).\n  size_t capacity;\n} rosidl_runtime_c__String;",
+      {
+        "* data": "char",
+        "size": "size_t",
+        "capacity": "size_t"
+      },
+      "rosidl_runtime_c__String",
+      [
+        22,
+        0
+      ],
+      [
+        30,
+        27
+      ]
+    ],
+    [
+      "typedef struct rosidl_runtime_c__String\n{\n  /// The pointer to the first character, the sequence ends with a null byte.\n  char * data;\n  /// The length of the string (excluding the null byte).\n  size_t size;\n  /// The capacity represents the number of allocated bytes (including the null byte).\n  size_t capacity;\n} rosidl_runtime_c__String;",
+      {
+        "* data": "char",
+        "size": "size_t",
+        "capacity": "size_t"
+      },
+      "rosidl_runtime_c__String",
+      [
+        22,
+        0
+      ],
+      [
+        30,
+        27
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include <stddef.h>\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/primitives_sequence.h\"\n",
+      [
+        19,
+        0
+      ],
+      [
+        20,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

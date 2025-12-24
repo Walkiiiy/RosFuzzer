@@ -62,7 +62,7 @@ predicate reachable(Function src, Function dest) {
 // Entry point predicate
 predicate isEntryPoint(Function f) {
   f.hasName("main") or
-  f.hasName("ares_free_string") or
+  f.hasName("get_message_typesupport_handle_function") or
   exists(Function func |
     func = f and
     (

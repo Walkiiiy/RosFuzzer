@@ -1,0 +1,98 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "const rosidl_runtime_c__Sequence__bound * dummy_sequence_bound_handle_function(\n  const rosidl_runtime_c__Sequence__bound * handle, const char *) {return handle;}",
+      "fn_code_pos": [
+        [
+          17,
+          0
+        ],
+        [
+          18,
+          82
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dummy_sequence_bound_handle_function",
+        "parameters": {
+          "handle": "rosidl_runtime_c__Sequence__bound"
+        },
+        "return_type": "rosidl_runtime_c__Sequence__bound"
+      }
+    },
+    {
+      "fn_code": "TEST(sequence_bound, get_sequence_bound_handle) {\n  rosidl_runtime_c__Sequence__bound sequence_bound;\n\n  constexpr char identifier[] = \"identifier\";\n  sequence_bound.typesupport_identifier = &identifier[0];\n  sequence_bound.func = dummy_sequence_bound_handle_function;\n\n  EXPECT_EQ(get_sequence_bound_handle(&sequence_bound, &identifier[0]), &sequence_bound);\n  EXPECT_EQ(get_sequence_bound_handle_function(&sequence_bound, &identifier[0]), &sequence_bound);\n  EXPECT_EQ(get_sequence_bound_handle_function(&sequence_bound, \"different identifier\"), nullptr);\n}",
+      "fn_code_pos": [
+        [
+          20,
+          0
+        ],
+        [
+          30,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "dummy_sequence_bound_handle_function(\n  const rosidl_runtime_c__Sequence__bound * handle, const char *)",
+      "fn_dec_pos": [
+        [
+          17,
+          42
+        ],
+        [
+          18,
+          65
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "dummy_sequence_bound_handle_function",
+        "parameters": {
+          "handle": "rosidl_runtime_c__Sequence__bound"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"gtest/gtest.h\"\n",
+      [
+        14,
+        0
+      ],
+      [
+        15,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/sequence_bound.h\"\n",
+      [
+        15,
+        0
+      ],
+      [
+        16,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

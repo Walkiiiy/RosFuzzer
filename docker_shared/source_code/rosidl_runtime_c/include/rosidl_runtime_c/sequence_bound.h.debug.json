@@ -1,0 +1,147 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "(* rosidl_runtime_c__bound_handle_function)(\n  const rosidl_runtime_c__Sequence__bound *, const char *)",
+      "fn_dec_pos": [
+        [
+          27,
+          50
+        ],
+        [
+          28,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "get_sequence_bound_handle(\n  const rosidl_runtime_c__Sequence__bound * handle, const char * identifier)",
+      "fn_dec_pos": [
+        [
+          49,
+          42
+        ],
+        [
+          50,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "handle": "rosidl_runtime_c__Sequence__bound",
+          "identifier": "char"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "get_sequence_bound_handle_function(\n  const rosidl_runtime_c__Sequence__bound * handle, const char * identifier)",
+      "fn_dec_pos": [
+        [
+          63,
+          42
+        ],
+        [
+          64,
+          76
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "handle": "rosidl_runtime_c__Sequence__bound",
+          "identifier": "char"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [
+    [
+      "struct rosidl_runtime_c__Sequence__bound\n{\n  /// String identifier for the type_support.\n  const char * typesupport_identifier;\n  /// Pointer to type support handle function\n  const void * data;\n  rosidl_runtime_c__bound_handle_function func;\n}",
+      {
+        "char": "const",
+        "void": "const",
+        "func": "rosidl_runtime_c__bound_handle_function"
+      },
+      "rosidl_runtime_c__Sequence__bound",
+      [
+        30,
+        0
+      ],
+      [
+        37,
+        1
+      ]
+    ],
+    [
+      "typedef struct rosidl_runtime_c__Sequence__bound rosidl_runtime_c__Sequence__bound;",
+      {},
+      "rosidl_runtime_c__Sequence__bound",
+      [
+        25,
+        0
+      ],
+      [
+        25,
+        83
+      ]
+    ],
+    [
+      "struct rosidl_runtime_c__Sequence__bound\n{\n  /// String identifier for the type_support.\n  const char * typesupport_identifier;\n  /// Pointer to type support handle function\n  const void * data;\n  rosidl_runtime_c__bound_handle_function func;\n}",
+      {
+        "char": "const",
+        "void": "const",
+        "func": "rosidl_runtime_c__bound_handle_function"
+      },
+      "rosidl_runtime_c__Sequence__bound",
+      [
+        30,
+        0
+      ],
+      [
+        37,
+        1
+      ]
+    ]
+  ],
+  "include_list": [
+    [
+      "#include \"rosidl_runtime_c/visibility_control.h\"\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_typesupport_interface/macros.h\"\n",
+      [
+        18,
+        0
+      ],
+      [
+        19,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

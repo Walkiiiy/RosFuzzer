@@ -1,0 +1,452 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__init(rosidl_runtime_c__U16String * str)\n{\n  RCUTILS_CAN_RETURN_WITH_ERROR_OF(false);\n\n  if (!str) {\n    return false;\n  }\n  rcutils_allocator_t allocator = rcutils_get_default_allocator();\n  str->data = allocator.allocate(sizeof(uint16_t), allocator.state);\n  if (!str->data) {\n    return false;\n  }\n  str->data[0] = 0;\n  str->size = 0;\n  str->capacity = 1;\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          24,
+          0
+        ],
+        [
+          41,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__init",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "void\nrosidl_runtime_c__U16String__fini(rosidl_runtime_c__U16String * str)\n{\n  if (!str) {\n    return;\n  }\n  if (str->data) {\n    /* ensure that data and capacity values are consistent */\n    if (str->capacity <= 0) {\n      fprintf(\n        stderr, \"Unexpected condition: string capacity was zero for allocated data! \"\n        \"Exiting.\\n\");\n      exit(-1);\n    }\n    rcutils_allocator_t allocator = rcutils_get_default_allocator();\n    allocator.deallocate(str->data, allocator.state);\n    str->data = NULL;\n    str->size = 0;\n    str->capacity = 0;\n  } else {\n    /* ensure that data, size, and capacity values are consistent */\n    if (0 != str->size) {\n      fprintf(\n        stderr, \"Unexpected condition: string size was non-zero for deallocated data! \"\n        \"Exiting.\\n\");\n      exit(-1);\n    }\n    if (0 != str->capacity) {\n      fprintf(\n        stderr, \"Unexpected behavior: string capacity was non-zero for deallocated data! \"\n        \"Exiting.\\n\");\n      exit(-1);\n    }\n  }\n}",
+      "fn_code_pos": [
+        [
+          43,
+          0
+        ],
+        [
+          77,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__fini",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__are_equal(\n  const rosidl_runtime_c__U16String * lhs,\n  const rosidl_runtime_c__U16String * rhs)\n{\n  if (!lhs || !rhs) {\n    return false;\n  }\n  if (lhs->size != rhs->size) {\n    return false;\n  }\n  return memcmp(lhs->data, rhs->data, lhs->size * sizeof(uint16_t)) == 0;\n}",
+      "fn_code_pos": [
+        [
+          79,
+          0
+        ],
+        [
+          91,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__U16String",
+          "rhs": "rosidl_runtime_c__U16String"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__assignn(\n  rosidl_runtime_c__U16String * str, const uint16_t * value, size_t n)\n{\n  if (!str) {\n    return false;\n  }\n  // a NULL value is not valid\n  if (!value) {\n    return false;\n  }\n  // since n + 1 bytes are being allocated n can't be the maximum value\n  if (n == SIZE_MAX) {\n    return false;\n  }\n  rcutils_allocator_t allocator = rcutils_get_default_allocator();\n  uint16_t * data = allocator.reallocate(str->data, (n + 1) * sizeof(uint16_t), allocator.state);\n  if (!data) {\n    return false;\n  }\n  memcpy(data, value, n * sizeof(uint16_t));\n  data[n] = 0;\n  str->data = data;\n  str->size = n;\n  str->capacity = n + 1;\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          93,
+          0
+        ],
+        [
+          119,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__assignn",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String",
+          "value": "uint16_t",
+          "n": "size_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__assignn_from_char(\n  rosidl_runtime_c__U16String * str, const char * value, size_t n)\n{\n  // since n represents the number of 8-bit characters it must be an even number\n  if (n % 2 != 0) {\n    return false;\n  }\n  return rosidl_runtime_c__U16String__assignn(\n    str, (const uint16_t *)value, n / 2);\n}",
+      "fn_code_pos": [
+        [
+          121,
+          0
+        ],
+        [
+          131,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__assignn_from_char",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String",
+          "value": "char",
+          "n": "size_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__assign(\n  rosidl_runtime_c__U16String * str, const uint16_t * value)\n{\n  return rosidl_runtime_c__U16String__assignn(\n    str, value, rosidl_runtime_c__U16String__len(value));\n}",
+      "fn_code_pos": [
+        [
+          133,
+          0
+        ],
+        [
+          139,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__assign",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String",
+          "value": "uint16_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__copy(\n  const rosidl_runtime_c__U16String * input,\n  rosidl_runtime_c__U16String * output)\n{\n  if (!input) {\n    return false;\n  }\n  return rosidl_runtime_c__U16String__assignn(\n    output, input->data, input->size);\n}",
+      "fn_code_pos": [
+        [
+          141,
+          0
+        ],
+        [
+          151,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__U16String",
+          "output": "rosidl_runtime_c__U16String"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "size_t\nrosidl_runtime_c__U16String__len(const uint16_t * value)\n{\n  if (!value) {\n    return 0;\n  }\n  size_t len = 0;\n  while (value[len]) {\n    len++;\n  }\n  return len;\n}",
+      "fn_code_pos": [
+        [
+          153,
+          0
+        ],
+        [
+          164,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__len",
+        "parameters": {
+          "value": "uint16_t"
+        },
+        "return_type": "size_t"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__resize(\n  rosidl_runtime_c__U16String * str, size_t n)\n{\n  if (!str) {\n    return false;\n  }\n  // check valid range of n before allocating n + 1 characters\n  if (n > SIZE_MAX / sizeof(uint16_t) - 1) {\n    return false;\n  }\n  rcutils_allocator_t allocator = rcutils_get_default_allocator();\n  uint16_t * data = allocator.reallocate(str->data, (n + 1) * sizeof(uint16_t), allocator.state);\n  if (!data) {\n    return false;\n  }\n  data[n] = 0;\n  str->data = data;\n  str->size = n;\n  str->capacity = n + 1;\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          166,
+          0
+        ],
+        [
+          187,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__resize",
+        "parameters": {
+          "str": "rosidl_runtime_c__U16String",
+          "n": "size_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__Sequence__init(\n  rosidl_runtime_c__U16String__Sequence * sequence, size_t size)\n{\n  RCUTILS_CAN_RETURN_WITH_ERROR_OF(false);\n\n  if (!sequence) {\n    return false;\n  }\n  rosidl_runtime_c__U16String * data = NULL;\n  if (size) {\n    rcutils_allocator_t allocator = rcutils_get_default_allocator();\n    data = (rosidl_runtime_c__U16String *)allocator.allocate(\n      size * sizeof(rosidl_runtime_c__U16String), allocator.state);\n    if (!data) {\n      return false;\n    }\n    // initialize all sequence elements\n    for (size_t i = 0; i < size; ++i) {\n      if (!rosidl_runtime_c__U16String__init(&data[i])) {\n        /* free currently allocated and return false */\n        for (; i-- > 0; ) {\n          rosidl_runtime_c__U16String__fini(&data[i]);\n        }\n        allocator.deallocate(data, allocator.state);\n        return false;\n      }\n    }\n  }\n  sequence->data = data;\n  sequence->size = size;\n  sequence->capacity = size;\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          189,
+          0
+        ],
+        [
+          222,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__init",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__U16String__Sequence",
+          "size": "size_t"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "void\nrosidl_runtime_c__U16String__Sequence__fini(\n  rosidl_runtime_c__U16String__Sequence * sequence)\n{\n  if (!sequence) {\n    return;\n  }\n  if (sequence->data) {\n    // ensure that data and capacity values are consistent\n    assert(sequence->capacity > 0);\n    // finalize all sequence elements\n    for (size_t i = 0; i < sequence->capacity; ++i) {\n      rosidl_runtime_c__U16String__fini(&sequence->data[i]);\n    }\n    rcutils_allocator_t allocator = rcutils_get_default_allocator();\n    allocator.deallocate(sequence->data, allocator.state);\n    sequence->data = NULL;\n    sequence->size = 0;\n    sequence->capacity = 0;\n  } else {\n    // ensure that data, size, and capacity values are consistent\n    assert(0 == sequence->size);\n    assert(0 == sequence->capacity);\n  }\n}",
+      "fn_code_pos": [
+        [
+          224,
+          0
+        ],
+        [
+          248,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__fini",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__U16String__Sequence"
+        },
+        "return_type": "void"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__Sequence__are_equal(\n  const rosidl_runtime_c__U16String__Sequence * lhs,\n  const rosidl_runtime_c__U16String__Sequence * rhs)\n{\n  if (!lhs || !rhs) {\n    return false;\n  }\n  if (lhs->size != rhs->size) {\n    return false;\n  }\n  for (size_t i = 0; i < lhs->size; ++i) {\n    if (!rosidl_runtime_c__U16String__are_equal(\n        &(lhs->data[i]), &(rhs->data[i])))\n    {\n      return false;\n    }\n  }\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          250,
+          0
+        ],
+        [
+          269,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__are_equal",
+        "parameters": {
+          "lhs": "rosidl_runtime_c__U16String__Sequence",
+          "rhs": "rosidl_runtime_c__U16String__Sequence"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "bool\nrosidl_runtime_c__U16String__Sequence__copy(\n  const rosidl_runtime_c__U16String__Sequence * input,\n  rosidl_runtime_c__U16String__Sequence * output)\n{\n  if (!input || !output) {\n    return false;\n  }\n  if (output->capacity < input->size) {\n    const size_t size =\n      input->size * sizeof(rosidl_runtime_c__U16String);\n    rcutils_allocator_t allocator = rcutils_get_default_allocator();\n    rosidl_runtime_c__U16String * data =\n      (rosidl_runtime_c__U16String *)allocator.reallocate(\n      output->data, size, allocator.state);\n    if (!data) {\n      return false;\n    }\n    // If reallocation succeeded, memory may or may not have been moved\n    // to fulfill the allocation request, invalidating output->data.\n    output->data = data;\n    for (size_t i = output->capacity; i < input->size; ++i) {\n      if (!rosidl_runtime_c__U16String__init(&output->data[i])) {\n        // If initialization of any new items fails, roll back all\n        // previously initialized items. Existing items in output\n        // are to be left unmodified.\n        for (; i-- > output->capacity; ) {\n          rosidl_runtime_c__U16String__fini(&output->data[i]);\n        }\n        return false;\n      }\n    }\n    output->capacity = input->size;\n  }\n  output->size = input->size;\n  for (size_t i = 0; i < input->size; ++i) {\n    if (!rosidl_runtime_c__U16String__copy(\n        &(input->data[i]), &(output->data[i])))\n    {\n      return false;\n    }\n  }\n  return true;\n}",
+      "fn_code_pos": [
+        [
+          271,
+          0
+        ],
+        [
+          314,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__copy",
+        "parameters": {
+          "input": "rosidl_runtime_c__U16String__Sequence",
+          "output": "rosidl_runtime_c__U16String__Sequence"
+        },
+        "return_type": "bool"
+      }
+    },
+    {
+      "fn_code": "rosidl_runtime_c__U16String__Sequence *\nrosidl_runtime_c__U16String__Sequence__create(size_t size)\n{\n  rcutils_allocator_t allocator = rcutils_get_default_allocator();\n  rosidl_runtime_c__U16String__Sequence * sequence =\n    (rosidl_runtime_c__U16String__Sequence *)allocator.allocate(\n    sizeof(rosidl_runtime_c__U16String__Sequence), allocator.state);\n  if (!sequence) {\n    return NULL;\n  }\n  bool success = rosidl_runtime_c__U16String__Sequence__init(sequence, size);\n  if (!success) {\n    allocator.deallocate(sequence, allocator.state);\n    return NULL;\n  }\n  return sequence;\n}",
+      "fn_code_pos": [
+        [
+          317,
+          0
+        ],
+        [
+          333,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__create",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": "rosidl_runtime_c__U16String__Sequence"
+      }
+    },
+    {
+      "fn_code": "void\nrosidl_runtime_c__U16String__Sequence__destroy(\n  rosidl_runtime_c__U16String__Sequence * sequence)\n{\n  if (sequence) {\n    rosidl_runtime_c__U16String__Sequence__fini(sequence);\n  }\n  rcutils_allocator_t allocator = rcutils_get_default_allocator();\n  allocator.deallocate(sequence, allocator.state);\n}",
+      "fn_code_pos": [
+        [
+          335,
+          0
+        ],
+        [
+          344,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__destroy",
+        "parameters": {
+          "sequence": "rosidl_runtime_c__U16String__Sequence"
+        },
+        "return_type": "void"
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "rosidl_runtime_c__U16String__Sequence__create(size_t size)",
+      "fn_dec_pos": [
+        [
+          318,
+          0
+        ],
+        [
+          318,
+          58
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "rosidl_runtime_c__U16String__Sequence__create",
+        "parameters": {
+          "size": "size_t"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"rosidl_runtime_c/u16string_functions.h\"\n",
+      [
+        14,
+        0
+      ],
+      [
+        15,
+        0
+      ]
+    ],
+    [
+      "#include <assert.h>\n",
+      [
+        16,
+        0
+      ],
+      [
+        17,
+        0
+      ]
+    ],
+    [
+      "#include <stdlib.h>\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include <string.h>\n",
+      [
+        18,
+        0
+      ],
+      [
+        19,
+        0
+      ]
+    ],
+    [
+      "#include <stdio.h>\n",
+      [
+        19,
+        0
+      ],
+      [
+        20,
+        0
+      ]
+    ],
+    [
+      "#include <rcutils/allocator.h>\n",
+      [
+        21,
+        0
+      ],
+      [
+        22,
+        0
+      ]
+    ],
+    [
+      "#include \"rcutils/macros.h\"\n",
+      [
+        22,
+        0
+      ],
+      [
+        23,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

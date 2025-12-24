@@ -1,0 +1,424 @@
+{
+  "fn_def_list": [],
+  "fn_declaraion": [
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float, float)",
+      "fn_dec_pos": [
+        [
+          102,
+          0
+        ],
+        [
+          102,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(double, double)",
+      "fn_dec_pos": [
+        [
+          103,
+          0
+        ],
+        [
+          103,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(long_double, long double)",
+      "fn_dec_pos": [
+        [
+          104,
+          0
+        ],
+        [
+          104,
+          59
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(char, signed char)",
+      "fn_dec_pos": [
+        [
+          105,
+          0
+        ],
+        [
+          105,
+          52
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(wchar, uint16_t)",
+      "fn_dec_pos": [
+        [
+          106,
+          0
+        ],
+        [
+          106,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(boolean, bool)",
+      "fn_dec_pos": [
+        [
+          107,
+          0
+        ],
+        [
+          107,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(octet, uint8_t)",
+      "fn_dec_pos": [
+        [
+          108,
+          0
+        ],
+        [
+          108,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint8, uint8_t)",
+      "fn_dec_pos": [
+        [
+          109,
+          0
+        ],
+        [
+          109,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int8, int8_t)",
+      "fn_dec_pos": [
+        [
+          110,
+          0
+        ],
+        [
+          110,
+          47
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint16, uint16_t)",
+      "fn_dec_pos": [
+        [
+          111,
+          0
+        ],
+        [
+          111,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int16, int16_t)",
+      "fn_dec_pos": [
+        [
+          112,
+          0
+        ],
+        [
+          112,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint32, uint32_t)",
+      "fn_dec_pos": [
+        [
+          113,
+          0
+        ],
+        [
+          113,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int32, int32_t)",
+      "fn_dec_pos": [
+        [
+          114,
+          0
+        ],
+        [
+          114,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint64, uint64_t)",
+      "fn_dec_pos": [
+        [
+          115,
+          0
+        ],
+        [
+          115,
+          51
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int64, int64_t)",
+      "fn_dec_pos": [
+        [
+          116,
+          0
+        ],
+        [
+          116,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(bool, bool)",
+      "fn_dec_pos": [
+        [
+          119,
+          0
+        ],
+        [
+          119,
+          45
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(byte, uint8_t)",
+      "fn_dec_pos": [
+        [
+          120,
+          0
+        ],
+        [
+          120,
+          48
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float32, float)",
+      "fn_dec_pos": [
+        [
+          121,
+          0
+        ],
+        [
+          121,
+          49
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float64, double)",
+      "fn_dec_pos": [
+        [
+          122,
+          0
+        ],
+        [
+          122,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include \"gtest/gtest.h\"\n",
+      [
+        14,
+        0
+      ],
+      [
+        15,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/primitives_sequence.h\"\n",
+      [
+        15,
+        0
+      ],
+      [
+        16,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/primitives_sequence_functions.h\"\n",
+      [
+        16,
+        0
+      ],
+      [
+        17,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

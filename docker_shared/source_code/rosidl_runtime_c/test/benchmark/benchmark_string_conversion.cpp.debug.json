@@ -1,0 +1,224 @@
+{
+  "fn_def_list": [
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__String s;\n  if (!rosidl_runtime_c__String__init(&s)) {\n    st.SkipWithError(\"String initialization failed\");\n    return;\n  }\n\n  // No explicit resize function - just do a copy\n  rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n  }\n\n  rosidl_runtime_c__String__fini(&s);\n}",
+      "fn_code_pos": [
+        [
+          23,
+          0
+        ],
+        [
+          44,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "st": "benchmark::State"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_resize_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__String s;\n  if (!rosidl_runtime_c__String__init(&s)) {\n    st.SkipWithError(\"String initialization failed\");\n    return;\n  }\n\n  // No explicit resize function - just do a copy\n  rosidl_runtime_c__String__assignn(&s, data.c_str(), 0);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), 0);\n  }\n\n  rosidl_runtime_c__String__fini(&s);\n}",
+      "fn_code_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          71,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "st": "benchmark::State"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__U16String s;\n  if (!rosidl_runtime_c__U16String__init(&s)) {\n    st.SkipWithError(\"U16String initialization failed\");\n    return;\n  }\n\n  rosidl_runtime_c__U16String__resize(&s, len);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__U16String__assignn_from_char(&s, data.c_str(), len);\n  }\n\n  rosidl_runtime_c__U16String__fini(&s);\n}",
+      "fn_code_pos": [
+        [
+          76,
+          0
+        ],
+        [
+          96,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "st": "benchmark::State"
+        },
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_resize_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__U16String s;\n  if (!rosidl_runtime_c__U16String__init(&s)) {\n    st.SkipWithError(\"U16String initialization failed\");\n    return;\n  }\n\n  rosidl_runtime_c__U16String__resize(&s, 0);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__U16String__assignn_from_char(&s, data.c_str(), len);\n    rosidl_runtime_c__U16String__resize(&s, 0);\n  }\n\n  rosidl_runtime_c__U16String__fini(&s);\n}",
+      "fn_code_pos": [
+        [
+          101,
+          0
+        ],
+        [
+          122,
+          1
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "",
+        "parameters": {
+          "st": "benchmark::State"
+        },
+        "return_type": null
+      }
+    }
+  ],
+  "fn_declaraion": [
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_assign)",
+      "fn_dec_pos": [
+        [
+          23,
+          0
+        ],
+        [
+          23,
+          50
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "BENCHMARK_DEFINE_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_resize_assign)",
+      "fn_dec_pos": [
+        [
+          49,
+          0
+        ],
+        [
+          49,
+          57
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "BENCHMARK_DEFINE_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_assign)",
+      "fn_dec_pos": [
+        [
+          76,
+          0
+        ],
+        [
+          76,
+          53
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "BENCHMARK_DEFINE_F",
+        "parameters": {},
+        "return_type": null
+      }
+    },
+    {
+      "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_resize_assign)",
+      "fn_dec_pos": [
+        [
+          101,
+          0
+        ],
+        [
+          101,
+          60
+        ]
+      ],
+      "class_code": "",
+      "class_node_pos": [],
+      "fn_meta": {
+        "identifier": "BENCHMARK_DEFINE_F",
+        "parameters": {},
+        "return_type": null
+      }
+    }
+  ],
+  "class_node_list": {},
+  "struct_node_list": [],
+  "include_list": [
+    [
+      "#include <string>\n",
+      [
+        14,
+        0
+      ],
+      [
+        15,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/string_functions.h\"\n",
+      [
+        16,
+        0
+      ],
+      [
+        17,
+        0
+      ]
+    ],
+    [
+      "#include \"rosidl_runtime_c/u16string_functions.h\"\n",
+      [
+        17,
+        0
+      ],
+      [
+        18,
+        0
+      ]
+    ],
+    [
+      "#include \"performance_test_fixture/performance_test_fixture.hpp\"\n",
+      [
+        19,
+        0
+      ],
+      [
+        20,
+        0
+      ]
+    ]
+  ],
+  "global_variables": [],
+  "enumerate_node_list": []
+}

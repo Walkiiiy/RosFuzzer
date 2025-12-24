@@ -55,7 +55,9 @@ class RepositoryAgent:
         #super().__init__()
         self.args = args
         self.shared_llm_dir = args.shared_llm_dir
-        self.src_folder = f'{args.shared_llm_dir}/source_code/{args.project_name}'
+        self.target_src_path = args.target_src_path
+        self.src_folder = os.path.abspath(f'{args.shared_llm_dir}/source_code/{args.project_name}')
+        self.codeql_src_root = self.target_src_path or f"/src/{args.project_name}"
         self.queryes_folder = f'{args.shared_llm_dir}/qlpacks/cpp_queries/'
         self.database_db = f'{args.shared_llm_dir}/codeqldb/{args.project_name}'
         self.output_results_folder = f'{args.saved_dir}'
@@ -135,6 +137,8 @@ class RepositoryAgent:
         # Prepare the CodeQL command
         # 创建 codql 数据库
         codeql_command = f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}'
+        if args.target_src_path:
+            codeql_command += f' --source-root={args.target_src_path}'
         
         if args.language in ['c', 'cpp', 'c++', 'java', 'csharp', 'go', 'java-kotlin']:
             codeql_command += f' --command="/src/fuzzing_os/wrapper.sh {args.project_name}"'
@@ -171,11 +175,12 @@ class RepositoryAgent:
             create_image(args.project_name)
             
         # USER_NAME = getpass.getuser()
+        source_root_arg = f' --source-root={args.target_src_path}' if args.target_src_path else ''
         if args.language in ['c','cpp', 'java', 'csharp','go', 'java-kotlin']:
             logger.info(f"args.shared_llm_dir {args.shared_llm_dir}")
-            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}  --command="/src/fuzzing_os/wrapper.sh {args.project_name}" && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --command="/src/fuzzing_os/wrapper.sh {args.project_name} --source-root={args.project_name}
+            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg}  --command="/src/fuzzing_os/wrapper.sh {args.project_name}" && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --command="/src/fuzzing_os/wrapper.sh {args.project_name} --source-root={args.project_name}
         else:
-            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language} && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --source-root={args.project_name}
+            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg} && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --source-root={args.project_name}
         result,_ = docker_run(command, print_output=True, architecture='x86_64')
         #change_folder_owner(f"{args.shared_llm_dir}/change_owner.sh",f'{args.shared_llm_dir}/codeqldb/{args.project_name}', USER_NAME)
         if f"Successfully created database at /src/fuzzing_os/codeqldb/{args.project_name}" in result:
@@ -206,7 +211,7 @@ class RepositoryAgent:
             for item in fn_def_list:
                 fn_name = item['fn_meta']['identifier']
                 # 原始路径替换为容器内的路径 /src/，供 docker 中的 codeql 使用
-                src_api.append((fn_name, src_file.replace(f'{args.shared_llm_dir}/source_code/', '/src/')))
+                src_api.append((fn_name, src_file.replace(self.src_folder, self.codeql_src_root)))
                 # (函数名, 文件路径) example    ->    ('jni_get_class', '/src/c-ares/src/lib/ares_android.c')
 
         
@@ -295,10 +300,11 @@ class RepositoryAgent:
         docker_run(mkdir_command)
         
         # Then, copy the source code
+        source_copy_path = args.target_src_path or f'/src/{args.project_name}'
         copy_command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', 
                         '-t', f'{args.project_name}_base_image', 
                         '/bin/bash', '-c', 
-                        f'cp -rf /src/{args.project_name}/* /src/fuzzing_os/source_code/{args.project_name} && '
+                        f'cp -rf {source_copy_path}/* /src/fuzzing_os/source_code/{args.project_name} && '
                         f'chown -R 1000:1000 /src/fuzzing_os/source_code/{args.project_name}']
         docker_run(copy_command)
 
@@ -326,7 +332,9 @@ class RepositoryAgent:
     
     def extract_api_from_head(self):
         # 判断项目源码是否存在，直接从docker映射出来，相对路径为 docker_shared/source_code/{project_name}
-        if not os.path.isdir(self.src_folder): 
+        # 如果目录不存在或为空，则从 docker 中 copy 出来
+        src_folder_has_files = os.path.isdir(self.src_folder) and any(os.scandir(self.src_folder))
+        if not src_folder_has_files:
             logger.info(f"{self.src_folder} does not exist.")
             # 如果不存在需要从 docker 中 copy 出来
             self.copy_source_code_fromDocker()
@@ -447,6 +455,7 @@ def setup_parser() -> argparse.ArgumentParser:
     parser.add_argument('--shared_llm_dir', type=str, default="../docker_shared", help='Shared LLM Directory')
     parser.add_argument('--saved_dir', type=str, default="./external_database/c-ares/codebase", help='Saved Directory')
     parser.add_argument('--language', type=str, default="cpp", help='Language')
+    parser.add_argument('--target_src_path', type=str, default=None, help='Target source path in container, e.g., /ws/src/ros2/rosidl/rosidl_runtime_c')
     parser.add_argument('--build_command', type=str, default="/src/fuzzing_os/build_c_ares.sh", help='Build command')
     parser.add_argument('--project_build_info', type=str, default=None, help='Build information of the project')
     parser.add_argument('--environment_vars', dest='environment_vars', action='append', help="Set environment variable e.g., VAR=value")
