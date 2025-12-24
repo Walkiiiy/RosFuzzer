@@ -13,6 +13,10 @@ this project will be witten based on CKGFUZZER
 - 构建c-ares知识图谱 python repo.py --project_name c-ares --shared_llm_dir $ROSFuzzerPath/docker_shared --saved_dir $ROSFuzze
 rPath/fuzzing_llm_engine/external_database/c-ares/codebase --src_api --call_graph
 
+- 构建call_graph 以rosidl_runtime_c为例:
+```
+(ros-fuzzer) walkiiiy@DESKTOP-UI66N0K:~/RosFuzzer/fuzzing_llm_engine/repo$ python3 repo.py --project_name rosidl_runtime_c --language cpp --shared_llm_dir /home/walkiiiy/RosFuzzer/docker_shared --saved_dir /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/codebase --target_src_path /ws/src/ros2/rosidl/rosidl_runtime_c --src_api --call_graph
+```
 
 # CKGFuzzer legacy
 
