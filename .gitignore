@@ -1,3 +1,5 @@
 codeql
 codeqldb
 tree-sitter/*
+.cache
+call_graph
