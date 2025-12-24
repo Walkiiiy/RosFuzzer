@@ -17,6 +17,14 @@ rPath/fuzzing_llm_engine/external_database/c-ares/codebase --src_api --call_grap
 ```
 (ros-fuzzer) walkiiiy@DESKTOP-UI66N0K:~/RosFuzzer/fuzzing_llm_engine/repo$ python3 repo.py --project_name rosidl_runtime_c --language cpp --shared_llm_dir /home/walkiiiy/RosFuzzer/docker_shared --saved_dir /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/codebase --target_src_path /ws/src/ros2/rosidl/rosidl_runtime_c --src_api --call_graph
 ```
+- 提取api对应的代码调用图
+```
+python preproc.py --project_name rosidl_runtime_c --src_api_file_path /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c
+```
+- 执行fuzz
+```
+python fuzzing.py --yaml /fuzzing_llm_engine/external_database/rosidl_runtime_c/config.yaml --gen_driver --summary_api --check_compilation --gen_input
+```
 
 # CKGFuzzer legacy
 

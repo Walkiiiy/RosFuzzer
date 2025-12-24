@@ -1,0 +1,11 @@
+{
+  "message_type_support.c": {
+    "get_message_typesupport_handle": ""
+  },
+  "sequence_bound.c": {
+    "get_sequence_bound_handle_function": ""
+  },
+  "string_functions.c": {
+    "rosidl_runtime_c__String__Sequence__destroy": ""
+  }
+}
