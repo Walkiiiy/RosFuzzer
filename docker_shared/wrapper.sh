@@ -4,7 +4,11 @@
 
 
 # 切换到目标项目目录，$1 是脚本的第一个参数，表示项目的名称或路径
-cd /src/$1
+if [ -d "/ws" ] && [ -f "/ws/build.sh" ]; then
+    cd /ws
+else
+    cd /src/$1
+fi
 
 # 定义 build.sh 脚本的路径
 if [ -f "/ws/build.sh" ]; then

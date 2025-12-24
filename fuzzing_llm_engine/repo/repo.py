@@ -456,7 +456,6 @@ def setup_parser() -> argparse.ArgumentParser:
     parser.add_argument('--saved_dir', type=str, default="./external_database/c-ares/codebase", help='Saved Directory')
     parser.add_argument('--language', type=str, default="cpp", help='Language')
     parser.add_argument('--target_src_path', type=str, default=None, help='Target source path in container, e.g., /ws/src/ros2/rosidl/rosidl_runtime_c')
-    parser.add_argument('--build_command', type=str, default="/src/fuzzing_os/build_c_ares.sh", help='Build command')
     parser.add_argument('--project_build_info', type=str, default=None, help='Build information of the project')
     parser.add_argument('--environment_vars', dest='environment_vars', action='append', help="Set environment variable e.g., VAR=value")
     parser.add_argument('--engine', default=constants.DEFAULT_ENGINE, choices=constants.ENGINES, help='Engine used for building')
