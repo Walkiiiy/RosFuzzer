@@ -136,7 +136,9 @@ class RepositoryAgent:
 
         # Prepare the CodeQL command
         # 创建 codql 数据库
-        codeql_command = f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}'
+        # Pass TARGET_SRC_PATH so wrapper.sh can locate ROS/colcon workspaces.
+        target_src_env = f"TARGET_SRC_PATH={args.target_src_path} " if args.target_src_path else ""
+        codeql_command = f'{target_src_env}/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}'
         if args.target_src_path:
             codeql_command += f' --source-root={args.target_src_path}'
         
@@ -176,11 +178,12 @@ class RepositoryAgent:
             
         # USER_NAME = getpass.getuser()
         source_root_arg = f' --source-root={args.target_src_path}' if args.target_src_path else ''
+        target_src_env = f"TARGET_SRC_PATH={args.target_src_path} " if args.target_src_path else ""
         if args.language in ['c','cpp', 'java', 'csharp','go', 'java-kotlin']:
             logger.info(f"args.shared_llm_dir {args.shared_llm_dir}")
-            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg}  --command="/src/fuzzing_os/wrapper.sh {args.project_name}" && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --command="/src/fuzzing_os/wrapper.sh {args.project_name} --source-root={args.project_name}
+            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'{target_src_env}/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg}  --command="/src/fuzzing_os/wrapper.sh {args.project_name}" && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --command="/src/fuzzing_os/wrapper.sh {args.project_name} --source-root={args.project_name}
         else:
-            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg} && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --source-root={args.project_name}
+            command = ['-v', f'{os.path.abspath(args.shared_llm_dir)}:/src/fuzzing_os', '-t', f'gcr.io/oss-fuzz/{args.project_name}', '/bin/bash', '-c', f'{target_src_env}/src/fuzzing_os/codeql/codeql database create /src/fuzzing_os/codeqldb/{args.project_name} --language={args.language}{source_root_arg} && chown -R 1000:1000 /src/fuzzing_os/codeqldb/{args.project_name}' ] # --source-root={args.project_name}
         result,_ = docker_run(command, print_output=True, architecture='x86_64')
         #change_folder_owner(f"{args.shared_llm_dir}/change_owner.sh",f'{args.shared_llm_dir}/codeqldb/{args.project_name}', USER_NAME)
         if f"Successfully created database at /src/fuzzing_os/codeqldb/{args.project_name}" in result:

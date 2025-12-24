@@ -1,4 +1,1457 @@
 {
-  "src": {},
+  "src": {
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_string_functions.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "TEST(string_functions, init_fini_empty_string) {\n  rosidl_runtime_c__String empty_string;\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&empty_string));\n  EXPECT_EQ(empty_string.size, 0u);\n  EXPECT_EQ(empty_string.capacity, 1u);\n  EXPECT_EQ(empty_string.data[0], 0);\n\n  // Should just return without changing anything.\n  rosidl_runtime_c__String__fini(nullptr);\n\n  rosidl_runtime_c__String__fini(&empty_string);\n  EXPECT_EQ(empty_string.data, nullptr);\n  EXPECT_EQ(empty_string.size, 0u);\n  EXPECT_EQ(empty_string.capacity, 0u);\n}",
+          "fn_code_pos": [
+            [
+              20,
+              0
+            ],
+            [
+              34,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, init_fini_bad_data) {\n  EXPECT_FALSE(rosidl_runtime_c__String__init(nullptr));\n\n  rosidl_runtime_c__String bad_string;\n  bad_string.size = 1u;\n  bad_string.capacity = 1u;\n  bad_string.data = nullptr;\n\n  int expected_error_code = -1;\n#ifndef _WIN32\n  // While exit() takes an int, when a parent process waits for a child process to die, it only\n  // takes the lowest 8-bits.\n  // See Note: in https://pubs.opengroup.org/onlinepubs/009695399/functions/exit.html\n  expected_error_code &= 255;\n#endif\n  EXPECT_EXIT(\n    rosidl_runtime_c__String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected condition: string size was non-zero for deallocated data! Exiting.\");\n  bad_string.size = 0u;\n\n  EXPECT_EXIT(\n    rosidl_runtime_c__String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected behavior: string capacity was non-zero for deallocated data! Exiting.\");\n\n  char c = 0;\n  bad_string.data = &c;\n  bad_string.capacity = 0u;\n\n  EXPECT_EXIT(\n    rosidl_runtime_c__String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected condition: string capacity was zero for allocated data! Exiting.\");\n}",
+          "fn_code_pos": [
+            [
+              36,
+              0
+            ],
+            [
+              70,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, resize_assignn) {\n  rosidl_runtime_c__String s, t;\n  constexpr size_t s_size = 3u;\n  constexpr char data[s_size + 1] = {3u, 2u, 1u, 0u};\n\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&s));\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&t));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__assign(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__assignn(nullptr, nullptr, 0));\n  EXPECT_FALSE(rosidl_runtime_c__String__assignn(&s, nullptr, 0));\n  EXPECT_FALSE(rosidl_runtime_c__String__assignn(nullptr, &data[0], 0));\n\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&s, &data[0]));\n  EXPECT_EQ(s.size, s_size);\n  EXPECT_EQ(s.capacity, s_size + 1u);\n  EXPECT_EQ(s.data[0], data[0]);\n  EXPECT_EQ(s.data[1], data[1]);\n  EXPECT_EQ(s.data[2], data[2]);\n  EXPECT_EQ(s.data[3], 0);\n\n  EXPECT_TRUE(rosidl_runtime_c__String__assignn(&t, &data[0], s_size));\n  EXPECT_EQ(t.size, s_size);\n  EXPECT_EQ(t.capacity, s_size + 1u);\n  EXPECT_EQ(t.data[0], data[0]);\n  EXPECT_EQ(t.data[1], data[1]);\n  EXPECT_EQ(t.data[2], data[2]);\n  EXPECT_EQ(t.data[3], 0);\n\n  // Can't copy strings of size max\n  EXPECT_FALSE(rosidl_runtime_c__String__assignn(&s, &data[0], SIZE_MAX));\n\n  // Check assigning 0-length strings\n  EXPECT_TRUE(rosidl_runtime_c__String__assignn(&s, &data[0], 0));\n  EXPECT_EQ(s.size, 0u);\n  EXPECT_EQ(s.capacity, 1u);\n  EXPECT_EQ(s.data[0], 0);\n\n  rosidl_runtime_c__String__fini(&s);\n  rosidl_runtime_c__String__fini(&t);\n\n  // Check assign after fini without init\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&s, &data[0]));\n  rosidl_runtime_c__String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              72,
+              0
+            ],
+            [
+              116,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, equality_comparison) {\n  rosidl_runtime_c__String empty_string, foo_string, bar_string;\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&foo_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&foo_string, \"foo\"));\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&bar_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&bar_string, \"bar\"));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&empty_string, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(nullptr, &empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__are_equal(&empty_string, &empty_string));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&empty_string, &foo_string));\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&foo_string, &empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__are_equal(&foo_string, &foo_string));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&bar_string, &foo_string));\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&foo_string, &bar_string));\n  EXPECT_TRUE(rosidl_runtime_c__String__are_equal(&bar_string, &bar_string));\n\n  rosidl_runtime_c__String__fini(&bar_string);\n  rosidl_runtime_c__String__fini(&foo_string);\n  rosidl_runtime_c__String__fini(&empty_string);\n}",
+          "fn_code_pos": [
+            [
+              118,
+              0
+            ],
+            [
+              142,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, copy) {\n  rosidl_runtime_c__String input, output;\n\n  EXPECT_FALSE(rosidl_runtime_c__String__copy(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__copy(&input, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__copy(nullptr, &output));\n\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&input));\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&input, \"foo\"));\n  EXPECT_TRUE(rosidl_runtime_c__String__init(&output));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__are_equal(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__String__copy(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__String__are_equal(&input, &output));\n\n  rosidl_runtime_c__String__fini(&output);\n  rosidl_runtime_c__String__fini(&input);\n}",
+          "fn_code_pos": [
+            [
+              144,
+              0
+            ],
+            [
+              161,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, init_fini_sequence) {\n  rosidl_runtime_c__String__Sequence sequence;\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__init(nullptr, 0u));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&sequence, 0u));\n\n  EXPECT_EQ(sequence.size, 0u);\n  EXPECT_EQ(sequence.capacity, 0u);\n  EXPECT_EQ(sequence.data, nullptr);\n\n  // Checking these return without issue\n  rosidl_runtime_c__String__Sequence__fini(nullptr);\n  rosidl_runtime_c__String__Sequence__fini(&sequence);\n\n  constexpr size_t seq_size = 3u;\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&sequence, seq_size));\n  EXPECT_EQ(sequence.size, seq_size);\n  EXPECT_EQ(sequence.capacity, seq_size);\n  rosidl_runtime_c__String__Sequence__fini(&sequence);\n}",
+          "fn_code_pos": [
+            [
+              163,
+              0
+            ],
+            [
+              181,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, create_destroy_sequence) {\n  rosidl_runtime_c__String__Sequence * sequence =\n    rosidl_runtime_c__String__Sequence__create(0u);\n  EXPECT_NE(sequence, nullptr);\n  EXPECT_EQ(sequence->data, nullptr);\n  EXPECT_EQ(sequence->size, 0u);\n  EXPECT_EQ(sequence->capacity, 0u);\n\n  // Shouldn't do anything exciting\n  rosidl_runtime_c__String__Sequence__destroy(sequence);\n\n  constexpr size_t seq_size = 3u;\n  sequence = rosidl_runtime_c__String__Sequence__create(seq_size);\n  EXPECT_NE(sequence, nullptr);\n  EXPECT_EQ(sequence->size, seq_size);\n  EXPECT_EQ(sequence->capacity, seq_size);\n  rosidl_runtime_c__String__Sequence__destroy(sequence);\n}",
+          "fn_code_pos": [
+            [
+              183,
+              0
+            ],
+            [
+              200,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, create_destroy_sequence_maybe_fail) {\n  rosidl_runtime_c__String__Sequence * sequence = nullptr;\n  constexpr size_t seq_size = 10u;\n\n  RCUTILS_FAULT_INJECTION_TEST(\n  {\n    sequence = rosidl_runtime_c__String__Sequence__create(seq_size);\n    if (nullptr != sequence) {\n      rosidl_runtime_c__String__Sequence__destroy(sequence);\n      sequence = nullptr;\n    }\n  });\n}",
+          "fn_code_pos": [
+            [
+              202,
+              0
+            ],
+            [
+              214,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, sequence_equality_comparison) {\n  rosidl_runtime_c__String__Sequence empty_sequence;\n  rosidl_runtime_c__String__Sequence nonempty_sequence;\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&empty_sequence, 0u));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&nonempty_sequence, 1u));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(&empty_sequence, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(nullptr, &empty_sequence));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__are_equal(&empty_sequence, &empty_sequence));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(&empty_sequence, &nonempty_sequence));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(&nonempty_sequence, &empty_sequence));\n  EXPECT_TRUE(\n    rosidl_runtime_c__String__Sequence__are_equal(\n      &nonempty_sequence,\n      &nonempty_sequence));\n\n  rosidl_runtime_c__String__Sequence__fini(&empty_sequence);\n  rosidl_runtime_c__String__Sequence__fini(&nonempty_sequence);\n}",
+          "fn_code_pos": [
+            [
+              216,
+              0
+            ],
+            [
+              235,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, copy_sequence) {\n  rosidl_runtime_c__String__Sequence input, output;\n\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__copy(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__copy(&input, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__copy(nullptr, &output));\n\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&input, 1u));\n  EXPECT_TRUE(rosidl_runtime_c__String__assign(&input.data[0], \"foo\"));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__init(&output, 0u));\n\n  EXPECT_FALSE(rosidl_runtime_c__String__Sequence__are_equal(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__copy(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__String__Sequence__are_equal(&input, &output));\n\n  rosidl_runtime_c__String__Sequence__fini(&output);\n  rosidl_runtime_c__String__Sequence__fini(&input);\n}",
+          "fn_code_pos": [
+            [
+              237,
+              0
+            ],
+            [
+              254,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/string.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/string_functions.h\"\n",
+          [
+            16,
+            0
+          ],
+          [
+            17,
+            0
+          ]
+        ],
+        [
+          "#include \"rcutils/testing/fault_injection.h\"\n",
+          [
+            18,
+            0
+          ],
+          [
+            19,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_service_type_support.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "const rosidl_service_type_support_t * dummy_service_typesupport_handle_function(\n  const rosidl_service_type_support_t * handle, const char *) {return handle;}",
+          "fn_code_pos": [
+            [
+              17,
+              0
+            ],
+            [
+              18,
+              78
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_service_typesupport_handle_function",
+            "parameters": {
+              "handle": "rosidl_service_type_support_t"
+            },
+            "return_type": "rosidl_service_type_support_t"
+          }
+        },
+        {
+          "fn_code": "TEST(service_typesupport, get_service_typesupport_handle) {\n  rosidl_service_type_support_t service_typesupport;\n\n  constexpr char identifier[] = \"identifier\";\n  service_typesupport.typesupport_identifier = &identifier[0];\n  service_typesupport.func = dummy_service_typesupport_handle_function;\n\n  EXPECT_EQ(\n    get_service_typesupport_handle(\n      &service_typesupport,\n      &identifier[0]), &service_typesupport);\n  EXPECT_EQ(\n    get_service_typesupport_handle_function(\n      &service_typesupport,\n      &identifier[0]), &service_typesupport);\n  EXPECT_EQ(\n    get_service_typesupport_handle_function(\n      &service_typesupport,\n      \"different identifier\"), nullptr);\n}",
+          "fn_code_pos": [
+            [
+              20,
+              0
+            ],
+            [
+              39,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [
+        {
+          "fn_code": "dummy_service_typesupport_handle_function(\n  const rosidl_service_type_support_t * handle, const char *)",
+          "fn_dec_pos": [
+            [
+              17,
+              38
+            ],
+            [
+              18,
+              61
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_service_typesupport_handle_function",
+            "parameters": {
+              "handle": "rosidl_service_type_support_t"
+            },
+            "return_type": null
+          }
+        }
+      ],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/service_type_support_struct.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_sequence_bound.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "const rosidl_runtime_c__Sequence__bound * dummy_sequence_bound_handle_function(\n  const rosidl_runtime_c__Sequence__bound * handle, const char *) {return handle;}",
+          "fn_code_pos": [
+            [
+              17,
+              0
+            ],
+            [
+              18,
+              82
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_sequence_bound_handle_function",
+            "parameters": {
+              "handle": "rosidl_runtime_c__Sequence__bound"
+            },
+            "return_type": "rosidl_runtime_c__Sequence__bound"
+          }
+        },
+        {
+          "fn_code": "TEST(sequence_bound, get_sequence_bound_handle) {\n  rosidl_runtime_c__Sequence__bound sequence_bound;\n\n  constexpr char identifier[] = \"identifier\";\n  sequence_bound.typesupport_identifier = &identifier[0];\n  sequence_bound.func = dummy_sequence_bound_handle_function;\n\n  EXPECT_EQ(get_sequence_bound_handle(&sequence_bound, &identifier[0]), &sequence_bound);\n  EXPECT_EQ(get_sequence_bound_handle_function(&sequence_bound, &identifier[0]), &sequence_bound);\n  EXPECT_EQ(get_sequence_bound_handle_function(&sequence_bound, \"different identifier\"), nullptr);\n}",
+          "fn_code_pos": [
+            [
+              20,
+              0
+            ],
+            [
+              30,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [
+        {
+          "fn_code": "dummy_sequence_bound_handle_function(\n  const rosidl_runtime_c__Sequence__bound * handle, const char *)",
+          "fn_dec_pos": [
+            [
+              17,
+              42
+            ],
+            [
+              18,
+              65
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_sequence_bound_handle_function",
+            "parameters": {
+              "handle": "rosidl_runtime_c__Sequence__bound"
+            },
+            "return_type": null
+          }
+        }
+      ],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/sequence_bound.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_primitives_sequence_functions.cpp": {
+      "fn_def_list": [],
+      "fn_declaraion": [
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float, float)",
+          "fn_dec_pos": [
+            [
+              102,
+              0
+            ],
+            [
+              102,
+              47
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(double, double)",
+          "fn_dec_pos": [
+            [
+              103,
+              0
+            ],
+            [
+              103,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(long_double, long double)",
+          "fn_dec_pos": [
+            [
+              104,
+              0
+            ],
+            [
+              104,
+              59
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(char, signed char)",
+          "fn_dec_pos": [
+            [
+              105,
+              0
+            ],
+            [
+              105,
+              52
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(wchar, uint16_t)",
+          "fn_dec_pos": [
+            [
+              106,
+              0
+            ],
+            [
+              106,
+              50
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(boolean, bool)",
+          "fn_dec_pos": [
+            [
+              107,
+              0
+            ],
+            [
+              107,
+              48
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(octet, uint8_t)",
+          "fn_dec_pos": [
+            [
+              108,
+              0
+            ],
+            [
+              108,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint8, uint8_t)",
+          "fn_dec_pos": [
+            [
+              109,
+              0
+            ],
+            [
+              109,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int8, int8_t)",
+          "fn_dec_pos": [
+            [
+              110,
+              0
+            ],
+            [
+              110,
+              47
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint16, uint16_t)",
+          "fn_dec_pos": [
+            [
+              111,
+              0
+            ],
+            [
+              111,
+              51
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int16, int16_t)",
+          "fn_dec_pos": [
+            [
+              112,
+              0
+            ],
+            [
+              112,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint32, uint32_t)",
+          "fn_dec_pos": [
+            [
+              113,
+              0
+            ],
+            [
+              113,
+              51
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int32, int32_t)",
+          "fn_dec_pos": [
+            [
+              114,
+              0
+            ],
+            [
+              114,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(uint64, uint64_t)",
+          "fn_dec_pos": [
+            [
+              115,
+              0
+            ],
+            [
+              115,
+              51
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(int64, int64_t)",
+          "fn_dec_pos": [
+            [
+              116,
+              0
+            ],
+            [
+              116,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(bool, bool)",
+          "fn_dec_pos": [
+            [
+              119,
+              0
+            ],
+            [
+              119,
+              45
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(byte, uint8_t)",
+          "fn_dec_pos": [
+            [
+              120,
+              0
+            ],
+            [
+              120,
+              48
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float32, float)",
+          "fn_dec_pos": [
+            [
+              121,
+              0
+            ],
+            [
+              121,
+              49
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS(float64, double)",
+          "fn_dec_pos": [
+            [
+              122,
+              0
+            ],
+            [
+              122,
+              50
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST_PRIMITIVE_SEQUENCE_FUNCTIONS",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/primitives_sequence.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/primitives_sequence_functions.h\"\n",
+          [
+            16,
+            0
+          ],
+          [
+            17,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_u16string_functions.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "TEST(u16string_functions, init_fini_empty_string) {\n  rosidl_runtime_c__U16String empty_string;\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&empty_string));\n  EXPECT_EQ(empty_string.size, 0u);\n  EXPECT_EQ(empty_string.capacity, 1u);\n  EXPECT_EQ(empty_string.data[0], 0u);\n\n  // Should just return without changing anything.\n  rosidl_runtime_c__U16String__fini(nullptr);\n\n  rosidl_runtime_c__U16String__fini(&empty_string);\n  EXPECT_EQ(empty_string.data, nullptr);\n  EXPECT_EQ(empty_string.size, 0u);\n  EXPECT_EQ(empty_string.capacity, 0u);\n}",
+          "fn_code_pos": [
+            [
+              20,
+              0
+            ],
+            [
+              34,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, init_fini_bad_data) {\n  EXPECT_FALSE(rosidl_runtime_c__U16String__init(nullptr));\n\n  rosidl_runtime_c__U16String bad_string;\n  bad_string.size = 1u;\n  bad_string.capacity = 1u;\n  bad_string.data = nullptr;\n\n  int expected_error_code = -1;\n#ifndef _WIN32\n  // While exit() takes an int, when a parent process waits for a child process to die, it only\n  // takes the lowest 8-bits.\n  // See Note: in https://pubs.opengroup.org/onlinepubs/009695399/functions/exit.html\n  expected_error_code &= 255;\n#endif\n  EXPECT_EXIT(\n    rosidl_runtime_c__U16String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected condition: string size was non-zero for deallocated data! Exiting.\");\n  bad_string.size = 0u;\n\n  EXPECT_EXIT(\n    rosidl_runtime_c__U16String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected behavior: string capacity was non-zero for deallocated data! Exiting.\");\n\n  uint16_t i = 0;\n  bad_string.data = &i;\n  bad_string.capacity = 0u;\n\n  EXPECT_EXIT(\n    rosidl_runtime_c__U16String__fini(&bad_string),\n    ::testing::ExitedWithCode(expected_error_code),\n    \"Unexpected condition: string capacity was zero for allocated data! Exiting.\");\n}",
+          "fn_code_pos": [
+            [
+              36,
+              0
+            ],
+            [
+              70,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, resize_assignn) {\n  rosidl_runtime_c__U16String s, t;\n  constexpr size_t s_size = 3u;\n  constexpr uint16_t data[s_size + 1] = {3u, 2u, 1u, 0u};\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&s));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&t));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__resize(nullptr, s_size));\n\n  // If you're here because this test crashed your computer, it might be because it just tried\n  // to allocate SIZE_MAX * 2 bytes, which means someone removed an important check.\n  EXPECT_FALSE(rosidl_runtime_c__U16String__resize(&s, SIZE_MAX));\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__resize(&s, s_size));\n  EXPECT_EQ(s.size, s_size);\n  EXPECT_EQ(s.capacity, s_size + 1);\n  EXPECT_NE(s.data, nullptr);\n  EXPECT_EQ(s.data[s_size], 0u);\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assign(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn(nullptr, nullptr, 0));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn(&s, nullptr, 0));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn(nullptr, &data[0], 0));\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&t, &data[0]));\n  EXPECT_EQ(t.size, s_size);\n  EXPECT_EQ(t.capacity, s_size + 1u);\n  EXPECT_EQ(t.data[0], data[0]);\n  EXPECT_EQ(t.data[1], data[1]);\n  EXPECT_EQ(t.data[2], data[2]);\n  EXPECT_EQ(t.data[3], 0u);\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assignn(&s, &data[0], s_size));\n  EXPECT_EQ(s.size, s_size);\n  EXPECT_EQ(s.capacity, s_size + 1u);\n  EXPECT_EQ(s.data[0], data[0]);\n  EXPECT_EQ(s.data[1], data[1]);\n  EXPECT_EQ(s.data[2], data[2]);\n  EXPECT_EQ(s.data[3], 0u);\n\n  // Can't copy strings of size max\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn(&s, &data[0], SIZE_MAX));\n\n  // Check assigning 0-length strings\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assignn(&s, &data[0], 0));\n  EXPECT_EQ(s.size, 0u);\n  EXPECT_EQ(s.capacity, 1u);\n  EXPECT_EQ(s.data[0], 0u);\n\n  constexpr size_t s8_size = 2 * s_size;\n  // To avoid endian issues, these double-wide chars are the same for big/little endian\n  constexpr char data_8t[s8_size + 2u] = {3, 3, 2, 2, 1, 1, 0, 0};\n  // str is nullptr\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn_from_char(nullptr, nullptr, 0));\n  // value is nullptr\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn_from_char(&s, nullptr, 0));\n  // n is odd\n  EXPECT_FALSE(rosidl_runtime_c__U16String__assignn_from_char(&s, &data_8t[0], 1u));\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assignn_from_char(&s, &data_8t[0], s8_size));\n  EXPECT_EQ(s.size, s_size);\n  EXPECT_EQ(s.capacity, s_size + 1u);\n  EXPECT_EQ(s.data[0], 771u);\n  EXPECT_EQ(s.data[1], 514u);\n  EXPECT_EQ(s.data[2], 257u);\n  EXPECT_EQ(s.data[3], 0u);\n\n  rosidl_runtime_c__U16String__fini(&s);\n  rosidl_runtime_c__U16String__fini(&t);\n\n  // Check assign after fini without init\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&s, &data[0]));\n  rosidl_runtime_c__U16String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              72,
+              0
+            ],
+            [
+              146,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, equality_comparison) {\n  rosidl_runtime_c__U16String empty_string, foo_string, bar_string;\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&foo_string));\n  const uint16_t encoded_foo_string[] = {102u, 111u, 111u, 0u};\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&foo_string, encoded_foo_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&bar_string));\n  const uint16_t encoded_bar_string[] = {98u, 97u, 114u, 0u};\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&bar_string, encoded_bar_string));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&empty_string, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(nullptr, &empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__are_equal(&empty_string, &empty_string));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&empty_string, &foo_string));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&foo_string, &empty_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__are_equal(&foo_string, &foo_string));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&bar_string, &foo_string));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&foo_string, &bar_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__are_equal(&bar_string, &bar_string));\n\n  rosidl_runtime_c__U16String__fini(&bar_string);\n  rosidl_runtime_c__U16String__fini(&foo_string);\n  rosidl_runtime_c__U16String__fini(&empty_string);\n}",
+          "fn_code_pos": [
+            [
+              148,
+              0
+            ],
+            [
+              174,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, copy) {\n  rosidl_runtime_c__U16String input, output;\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__copy(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__copy(&input, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__copy(nullptr, &output));\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&input));\n  const uint16_t encoded_foo_string[] = {102u, 111u, 111u, 0u};\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&input, encoded_foo_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__init(&output));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__are_equal(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__copy(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__are_equal(&input, &output));\n\n  rosidl_runtime_c__U16String__fini(&output);\n  rosidl_runtime_c__U16String__fini(&input);\n}",
+          "fn_code_pos": [
+            [
+              176,
+              0
+            ],
+            [
+              194,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, init_fini_sequence) {\n  rosidl_runtime_c__U16String__Sequence sequence;\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__init(nullptr, 0u));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&sequence, 0u));\n\n  EXPECT_EQ(sequence.size, 0u);\n  EXPECT_EQ(sequence.capacity, 0u);\n  EXPECT_EQ(sequence.data, nullptr);\n\n  // Checking these return without issue\n  rosidl_runtime_c__U16String__Sequence__fini(nullptr);\n  rosidl_runtime_c__U16String__Sequence__fini(&sequence);\n\n  constexpr size_t seq_size = 3u;\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&sequence, seq_size));\n  EXPECT_EQ(sequence.size, seq_size);\n  EXPECT_EQ(sequence.capacity, seq_size);\n  rosidl_runtime_c__U16String__Sequence__fini(&sequence);\n}",
+          "fn_code_pos": [
+            [
+              196,
+              0
+            ],
+            [
+              214,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, create_destroy_sequence) {\n  rosidl_runtime_c__U16String__Sequence * sequence =\n    rosidl_runtime_c__U16String__Sequence__create(0u);\n  EXPECT_NE(sequence, nullptr);\n  EXPECT_EQ(sequence->data, nullptr);\n  EXPECT_EQ(sequence->size, 0u);\n  EXPECT_EQ(sequence->capacity, 0u);\n\n  // Shouldn't do anything exciting\n  rosidl_runtime_c__U16String__Sequence__destroy(sequence);\n\n  constexpr size_t seq_size = 3u;\n  sequence = rosidl_runtime_c__U16String__Sequence__create(seq_size);\n  EXPECT_NE(sequence, nullptr);\n  EXPECT_EQ(sequence->size, seq_size);\n  EXPECT_EQ(sequence->capacity, seq_size);\n  rosidl_runtime_c__U16String__Sequence__destroy(sequence);\n}",
+          "fn_code_pos": [
+            [
+              216,
+              0
+            ],
+            [
+              233,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(string_functions, create_destroy_sequence_maybe_fail) {\n  rosidl_runtime_c__U16String__Sequence * sequence = nullptr;\n  constexpr size_t seq_size = 10u;\n  RCUTILS_FAULT_INJECTION_TEST(\n  {\n    sequence = rosidl_runtime_c__U16String__Sequence__create(seq_size);\n    if (nullptr != sequence) {\n      rosidl_runtime_c__U16String__Sequence__destroy(sequence);\n      sequence = nullptr;\n    }\n  });\n}",
+          "fn_code_pos": [
+            [
+              235,
+              0
+            ],
+            [
+              246,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, sequence_equality_comparison) {\n  rosidl_runtime_c__U16String__Sequence empty_sequence;\n  rosidl_runtime_c__U16String__Sequence nonempty_sequence;\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&empty_sequence, 0u));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&nonempty_sequence, 1u));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__are_equal(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__are_equal(&empty_sequence, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__are_equal(nullptr, &empty_sequence));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__are_equal(&empty_sequence, &empty_sequence));\n  EXPECT_FALSE(\n    rosidl_runtime_c__U16String__Sequence__are_equal(\n      &empty_sequence,\n      &nonempty_sequence));\n  EXPECT_FALSE(\n    rosidl_runtime_c__U16String__Sequence__are_equal(\n      &nonempty_sequence,\n      &empty_sequence));\n  EXPECT_TRUE(\n    rosidl_runtime_c__U16String__Sequence__are_equal(\n      &nonempty_sequence,\n      &nonempty_sequence));\n\n  rosidl_runtime_c__U16String__Sequence__fini(&empty_sequence);\n  rosidl_runtime_c__U16String__Sequence__fini(&nonempty_sequence);\n}",
+          "fn_code_pos": [
+            [
+              249,
+              0
+            ],
+            [
+              274,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "TEST(u16string_functions, copy_sequence) {\n  rosidl_runtime_c__U16String__Sequence input, output;\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__copy(nullptr, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__copy(&input, nullptr));\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__copy(nullptr, &output));\n\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&input, 1u));\n  const uint16_t encoded_foo_string[] = {102u, 111u, 111u, 0u};\n  EXPECT_TRUE(rosidl_runtime_c__U16String__assign(&input.data[0], encoded_foo_string));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__init(&output, 0u));\n\n  EXPECT_FALSE(rosidl_runtime_c__U16String__Sequence__are_equal(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__copy(&input, &output));\n  EXPECT_TRUE(rosidl_runtime_c__U16String__Sequence__are_equal(&input, &output));\n\n  rosidl_runtime_c__U16String__Sequence__fini(&output);\n  rosidl_runtime_c__U16String__Sequence__fini(&input);\n}",
+          "fn_code_pos": [
+            [
+              276,
+              0
+            ],
+            [
+              294,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/u16string.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/u16string_functions.h\"\n",
+          [
+            16,
+            0
+          ],
+          [
+            17,
+            0
+          ]
+        ],
+        [
+          "#include \"rcutils/testing/fault_injection.h\"\n",
+          [
+            18,
+            0
+          ],
+          [
+            19,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/test_message_type_support.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "const rosidl_message_type_support_t * dummy_message_typesupport_handle_function(\n  const rosidl_message_type_support_t * handle, const char *) {return handle;}",
+          "fn_code_pos": [
+            [
+              17,
+              0
+            ],
+            [
+              18,
+              78
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_message_typesupport_handle_function",
+            "parameters": {
+              "handle": "rosidl_message_type_support_t"
+            },
+            "return_type": "rosidl_message_type_support_t"
+          }
+        },
+        {
+          "fn_code": "TEST(message_typesupport, get_message_typesupport_handle) {\n  rosidl_message_type_support_t message_typesupport;\n\n  constexpr char identifier[] = \"identifier\";\n  message_typesupport.typesupport_identifier = &identifier[0];\n  message_typesupport.func = dummy_message_typesupport_handle_function;\n\n  EXPECT_EQ(\n    get_message_typesupport_handle(\n      &message_typesupport,\n      &identifier[0]), &message_typesupport);\n  EXPECT_EQ(\n    get_message_typesupport_handle_function(\n      &message_typesupport,\n      &identifier[0]), &message_typesupport);\n  EXPECT_EQ(\n    get_message_typesupport_handle_function(\n      &message_typesupport,\n      \"different identifier\"), nullptr);\n}",
+          "fn_code_pos": [
+            [
+              20,
+              0
+            ],
+            [
+              39,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "TEST",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [
+        {
+          "fn_code": "dummy_message_typesupport_handle_function(\n  const rosidl_message_type_support_t * handle, const char *)",
+          "fn_dec_pos": [
+            [
+              17,
+              38
+            ],
+            [
+              18,
+              61
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "dummy_message_typesupport_handle_function",
+            "parameters": {
+              "handle": "rosidl_message_type_support_t"
+            },
+            "return_type": null
+          }
+        }
+      ],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include \"gtest/gtest.h\"\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/message_type_support_struct.h\"\n",
+          [
+            15,
+            0
+          ],
+          [
+            16,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    },
+    "/home/walkiiiy/RosFuzzer/docker_shared/source_code/rosidl_runtime_c/test/benchmark/benchmark_string_conversion.cpp": {
+      "fn_def_list": [
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__String s;\n  if (!rosidl_runtime_c__String__init(&s)) {\n    st.SkipWithError(\"String initialization failed\");\n    return;\n  }\n\n  // No explicit resize function - just do a copy\n  rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n  }\n\n  rosidl_runtime_c__String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              23,
+              0
+            ],
+            [
+              44,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "",
+            "parameters": {
+              "st": "benchmark::State"
+            },
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_resize_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__String s;\n  if (!rosidl_runtime_c__String__init(&s)) {\n    st.SkipWithError(\"String initialization failed\");\n    return;\n  }\n\n  // No explicit resize function - just do a copy\n  rosidl_runtime_c__String__assignn(&s, data.c_str(), 0);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), len);\n    rosidl_runtime_c__String__assignn(&s, data.c_str(), 0);\n  }\n\n  rosidl_runtime_c__String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              49,
+              0
+            ],
+            [
+              71,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "",
+            "parameters": {
+              "st": "benchmark::State"
+            },
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__U16String s;\n  if (!rosidl_runtime_c__U16String__init(&s)) {\n    st.SkipWithError(\"U16String initialization failed\");\n    return;\n  }\n\n  rosidl_runtime_c__U16String__resize(&s, len);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__U16String__assignn_from_char(&s, data.c_str(), len);\n  }\n\n  rosidl_runtime_c__U16String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              76,
+              0
+            ],
+            [
+              96,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "",
+            "parameters": {
+              "st": "benchmark::State"
+            },
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_resize_assign)(benchmark::State & st)\n{\n  size_t len = st.range(0);\n  std::string data(len, '*');\n\n  rosidl_runtime_c__U16String s;\n  if (!rosidl_runtime_c__U16String__init(&s)) {\n    st.SkipWithError(\"U16String initialization failed\");\n    return;\n  }\n\n  rosidl_runtime_c__U16String__resize(&s, 0);\n\n  reset_heap_counters();\n\n  for (auto _ : st) {\n    rosidl_runtime_c__U16String__assignn_from_char(&s, data.c_str(), len);\n    rosidl_runtime_c__U16String__resize(&s, 0);\n  }\n\n  rosidl_runtime_c__U16String__fini(&s);\n}",
+          "fn_code_pos": [
+            [
+              101,
+              0
+            ],
+            [
+              122,
+              1
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "",
+            "parameters": {
+              "st": "benchmark::State"
+            },
+            "return_type": null
+          }
+        }
+      ],
+      "fn_declaraion": [
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_assign)",
+          "fn_dec_pos": [
+            [
+              23,
+              0
+            ],
+            [
+              23,
+              50
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "BENCHMARK_DEFINE_F",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, string_resize_assign)",
+          "fn_dec_pos": [
+            [
+              49,
+              0
+            ],
+            [
+              49,
+              57
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "BENCHMARK_DEFINE_F",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_assign)",
+          "fn_dec_pos": [
+            [
+              76,
+              0
+            ],
+            [
+              76,
+              53
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "BENCHMARK_DEFINE_F",
+            "parameters": {},
+            "return_type": null
+          }
+        },
+        {
+          "fn_code": "BENCHMARK_DEFINE_F(PerformanceTest, u16string_resize_assign)",
+          "fn_dec_pos": [
+            [
+              101,
+              0
+            ],
+            [
+              101,
+              60
+            ]
+          ],
+          "class_code": "",
+          "class_node_pos": [],
+          "fn_meta": {
+            "identifier": "BENCHMARK_DEFINE_F",
+            "parameters": {},
+            "return_type": null
+          }
+        }
+      ],
+      "class_node_list": {},
+      "struct_node_list": [],
+      "include_list": [
+        [
+          "#include <string>\n",
+          [
+            14,
+            0
+          ],
+          [
+            15,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/string_functions.h\"\n",
+          [
+            16,
+            0
+          ],
+          [
+            17,
+            0
+          ]
+        ],
+        [
+          "#include \"rosidl_runtime_c/u16string_functions.h\"\n",
+          [
+            17,
+            0
+          ],
+          [
+            18,
+            0
+          ]
+        ],
+        [
+          "#include \"performance_test_fixture/performance_test_fixture.hpp\"\n",
+          [
+            19,
+            0
+          ],
+          [
+            20,
+            0
+          ]
+        ]
+      ],
+      "global_variables": [],
+      "enumerate_node_list": []
+    }
+  },
   "head": {}
 }

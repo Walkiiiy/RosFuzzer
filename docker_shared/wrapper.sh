@@ -1,49 +1,85 @@
 #!/bin/bash
+set -euo pipefail
 
-# Call your script. Replace 'your_script.sh' with the actual script name
+# The wrapper is invoked by CodeQL to record build commands. It needs to work
+# for both OSS-Fuzz style projects and ROS2 workspaces where the source may
+# live under a nested /ws/src/... tree. The caller can optionally set
+# TARGET_SRC_PATH to point to the package being analyzed.
 
+PROJECT_NAME="${1:-}"
+TARGET_SRC_PATH="${TARGET_SRC_PATH:-}"
 
-# 切换到目标项目目录，$1 是脚本的第一个参数，表示项目的名称或路径
-if [ -d "/ws" ] && [ -f "/ws/build.sh" ]; then
+if [[ -n "$TARGET_SRC_PATH" ]]; then
+    # Normalize to an absolute path if possible.
+    TARGET_SRC_PATH="$(realpath "$TARGET_SRC_PATH" 2>/dev/null || echo "$TARGET_SRC_PATH")"
+fi
+
+# Detect a workspace root from TARGET_SRC_PATH if it contains /src/
+WORKSPACE_ROOT=""
+if [[ -n "$TARGET_SRC_PATH" && "$TARGET_SRC_PATH" == *"/src/"* ]]; then
+    WORKSPACE_ROOT="${TARGET_SRC_PATH%%/src/*}"
+fi
+
+# Prefer to run from a workspace root so colcon can resolve dependencies.
+if [[ -n "$WORKSPACE_ROOT" && -d "$WORKSPACE_ROOT" ]]; then
+    cd "$WORKSPACE_ROOT"
+elif [[ -d "/ws" ]]; then
     cd /ws
+elif [[ -n "$TARGET_SRC_PATH" && -d "$TARGET_SRC_PATH" ]]; then
+    cd "$TARGET_SRC_PATH"
+elif [[ -n "$PROJECT_NAME" && -d "/src/$PROJECT_NAME" ]]; then
+    cd "/src/$PROJECT_NAME"
 else
-    cd /src/$1
-fi
-
-# 定义 build.sh 脚本的路径
-if [ -f "/ws/build.sh" ]; then
-    script_path=/ws/build.sh
-else
-    script_path=/src/build.sh
-fi
-
-# 检查 build.sh 文件是否存在
-if [ ! -f "$script_path" ]; then
-    # 如果文件不存在，输出错误信息并退出脚本，返回状态码为 1
-    echo "Error: File '$script_path' does not exist."
+    echo "Error: could not locate a workspace to build ($TARGET_SRC_PATH)."
     exit 1
 fi
 
-# 使用 grep 命令检查 build.sh 文件中是否包含命令 "bazel_build_fuzz_tests"
-if grep -q "bazel_build_fuzz_tests" "$script_path"; then
-    # 如果找到该命令，输出提示信息
-    echo "The command 'bazel_build_fuzz_tests' is found in '$script_path'."
-    
-    # 将 /src/fuzzing_os/bazel_build 文件复制到 /usr/local/bin/ 目录下
-    cp /src/fuzzing_os/bazel_build /usr/local/bin/
-    
-    # 使用 sed 命令将 build.sh 文件中的 "exec bazel_build_fuzz_tests" 替换为 "exec bazel_build"
-    sed -i 's/exec bazel_build_fuzz_tests/exec bazel_build/g' $script_path
-    
-    # 注释掉以下行，表示可以选择替换 script_path 的值为另一个脚本路径（当前未启用）
-    # script_path=/src/fuzzing_os/bazel_build.sh
+# Source ROS environment if available to satisfy ament_* dependencies.
+# Disable nounset temporarily because some setup scripts rely on unset vars.
+set +u
+if [[ -f "/opt/ros/humble/setup.bash" ]]; then
+    source /opt/ros/humble/setup.bash
+elif [[ -f "/opt/ros/foxy/setup.bash" ]]; then
+    source /opt/ros/foxy/setup.bash
+fi
+set -u
+
+# Choose the build entry point. Prefer a workspace-level build.sh, otherwise
+# fall back to a package-local build or a colcon build command.
+if [[ -f "./build.sh" ]]; then
+    script_path="./build.sh"
+elif [[ -f "/src/build.sh" ]]; then
+    script_path="/src/build.sh"
+elif [[ -n "$TARGET_SRC_PATH" && -f "$TARGET_SRC_PATH/build.sh" ]]; then
+    script_path="$TARGET_SRC_PATH/build.sh"
 else
-    # 如果未找到该命令，输出提示信息
-    echo "The command 'bazel_build_fuzz_tests' is not found in '$script_path'."
+    script_path=""
 fi
 
-# 执行 build.sh 脚本
-bash $script_path
+if [[ -n "$script_path" ]]; then
+    if grep -q "bazel_build_fuzz_tests" "$script_path"; then
+        echo "The command 'bazel_build_fuzz_tests' is found in '$script_path'."
+        cp /src/fuzzing_os/bazel_build /usr/local/bin/
+        sed -i 's/exec bazel_build_fuzz_tests/exec bazel_build/g' "$script_path"
+    else
+        echo "The command 'bazel_build_fuzz_tests' is not found in '$script_path'."
+    fi
+    # Keep running even if the project build fails so CodeQL can still finalize.
+    set +e
+    bash "$script_path"
+    set -e
+else
+    # Fallback for ROS workspaces: try building the target package directly.
+    if command -v colcon >/dev/null 2>&1 && [[ -n "$PROJECT_NAME" ]]; then
+        echo "No build.sh found; running colcon build for $PROJECT_NAME"
+        set +e
+        colcon build --merge-install --packages-select "$PROJECT_NAME" --cmake-args -DBUILD_TESTING=OFF
+        set -e
+    else
+        echo "Error: no build script found and colcon unavailable."
+        exit 1
+    fi
+fi
 
-# 强制将脚本的退出状态码设置为 0，无论前面的命令执行结果如何
+# Do not propagate build failures to CodeQL so database creation can continue.
 exit 0
