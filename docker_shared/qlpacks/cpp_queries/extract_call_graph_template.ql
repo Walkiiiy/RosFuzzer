@@ -61,7 +61,8 @@ predicate reachable(Function src, Function dest) {
 
 // Entry point predicate
 predicate isEntryPoint(Function f) {
-  f.hasName("main") or
+  // Only treat the requested function as the entry; avoid mixing in `main`
+  // which would make every query share the same root and identical CSV rows.
   f.hasName("ENTRY_FNC")
 }
 

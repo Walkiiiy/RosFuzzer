@@ -20,6 +20,7 @@ outputfolder=$4  # 输出文件夹路径
 pid=$5      # 进程ID
 
 # 打印相关信息
+echo "running extract_call_graph.sh for $fn_name..."
 echo "Script Dir ====== $script_dir"
 echo "Database path: $dbbase"
 echo "Output folder: $outputfolder"
@@ -34,7 +35,7 @@ outputfile="$outputfolder/call_graph/${fn_file}@${fn_name}_call_graph.bqrs"
 # 定义查询模板文件路径
 QUERY_TEMPLATE="./extract_call_graph_template.ql"  
 # 定义生成的查询文件名
-QUERY="call_graph_${pid}.ql"  
+QUERY="call_graph_${pid}.ql"
 
 # 打印信息：复制模板并生成查询文件
 echo "Copying template and generating query file..."  
