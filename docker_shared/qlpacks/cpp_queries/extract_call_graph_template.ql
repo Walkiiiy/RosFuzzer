@@ -61,9 +61,10 @@ predicate reachable(Function src, Function dest) {
 
 // Entry point predicate
 predicate isEntryPoint(Function f) {
-  // Only treat the requested function as the entry; avoid mixing in `main`
-  // which would make every query share the same root and identical CSV rows.
-  f.hasName("ENTRY_FNC")
+  // Be permissive so we still match when CodeQL stores qualified names or overloads.
+  f.hasName("ENTRY_FNC") or
+  f.getQualifiedName().matches("%::ENTRY_FNC") or
+  f.getQualifiedName().matches("%ENTRY_FNC%")
 }
 
 // Main query (direct edges only to keep result size small)
