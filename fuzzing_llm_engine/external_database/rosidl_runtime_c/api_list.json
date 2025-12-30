@@ -1,5 +1,3 @@
 [
-  "get_message_typesupport_handle",
-  "get_sequence_bound_handle_function",
-  "rosidl_runtime_c__String__Sequence__destroy"
+
 ]

@@ -9,7 +9,6 @@ config:
   time_budget: "5m"
 
   headers:
-    - "cJSON.h"
     - <stdlib.h>
     - <string.h>
     - <stdint.h>

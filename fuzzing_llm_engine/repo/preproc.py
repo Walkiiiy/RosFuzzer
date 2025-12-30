@@ -2,6 +2,28 @@ import os
 import json
 import shutil
 
+# Collect all API identifiers from the extracted src_api.json content.
+def _get_all_api_names(src_api_data):
+    api_names = []
+    seen = set()
+    for section in src_api_data.values():
+        if not isinstance(section, dict):
+            continue
+        for file_data in section.values():
+            if not isinstance(file_data, dict):
+                continue
+            for entry in file_data.get("fn_def_list", []):
+                name = entry.get("fn_meta", {}).get("identifier", "")
+                if name and name not in seen:
+                    seen.add(name)
+                    api_names.append(name)
+            for entry in file_data.get("fn_declaraion", []):
+                name = entry.get("fn_meta", {}).get("identifier", "")
+                if name and name not in seen:
+                    seen.add(name)
+                    api_names.append(name)
+    return api_names
+
 
 def extract_api_from_file(src_api_file_path):
     api_list_path=os.path.join(src_api_file_path, 'api_list.json')
@@ -12,6 +34,9 @@ def extract_api_from_file(src_api_file_path):
     # 加载之前提取的 api 信息
     with open(src_api_file_path+"/codebase/api/src_api.json", 'r') as f:
         src_api_data = json.load(f)
+    if not api_list:
+        api_list = _get_all_api_names(src_api_data)
+        print(f"api_list is empty, fallback to all APIs: {len(api_list)} found")
 
     api_file_dict = {}
     api_cnt = 0
@@ -67,7 +92,13 @@ def extract_api_list(src_api_path, file_name_path,head_or_src):
     if os.path.exists(api_list_file):
         with open(api_list_file, 'r', encoding='utf-8') as f:
             api_list = json.load(f)
-        print(f"Loaded {len(api_list)} APIs from {api_list_file}")
+        if not api_list:
+            with open(src_api_path+"/codebase/api/src_api.json", 'r', encoding='utf-8') as file:
+                src_api_data = json.load(file)
+            api_list = _get_all_api_names(src_api_data)
+            print(f"api_list.json empty, using all APIs from src_api.json: {len(api_list)}")
+        else:
+            print(f"Loaded {len(api_list)} APIs from {api_list_file}")
         return api_list
     
     else:
@@ -112,6 +143,9 @@ def extract_fn_code(src_api_file_path):
     # 加载repo中提取的 src_api.json
     with open(src_api_file_path+"/codebase/api/src_api.json", 'r') as f:
         src_api_data = json.load(f)
+    if not api_list:
+        api_list = _get_all_api_names(src_api_data)
+        print(f"api_list is empty, fallback to all APIs: {len(api_list)} found")
     # 提取code
     api_code_dict = {}
     api_name_list = []
@@ -153,6 +187,11 @@ def combine_call_graph(src_api_file_path):
     api_list_path=os.path.join(src_api_file_path, 'api_list.json')
     with open(api_list_path, 'r') as f:
         api_list = json.load(f)
+    if not api_list:
+        with open(os.path.join(src_api_file_path, 'codebase/api/src_api.json'), 'r') as f:
+            src_api_data = json.load(f)
+        api_list = _get_all_api_names(src_api_data)
+        print(f"api_list is empty, fallback to all APIs: {len(api_list)} found")
     csv_folder_path = os.path.join(src_api_file_path, 'codebase/call_graph')
     csv_files = []
     # 遍历 codebase/call_graph 文件夹中所有以 .csv 结尾的文件
@@ -251,7 +290,6 @@ if __name__ == "__main__":
 
     
     
-
 
 
 
