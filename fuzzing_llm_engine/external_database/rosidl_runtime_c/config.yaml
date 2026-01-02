@@ -9,11 +9,12 @@ config:
   time_budget: "5m"
 
   headers:
-    - <stdlib.h>
-    - <string.h>
-    - <stdint.h>
-    - <sstream>
-    - <sstream>
+    - "rosidl_runtime_c/message_type_support.h"
+    - "rosidl_runtime_c/primitives_sequence_functions.h"
+    - "rosidl_runtime_c/sequence_bound.h"
+    - "rosidl_runtime_c/service_type_support.h"
+    - "rosidl_runtime_c/string_functions.h"
+    - "rosidl_runtime_c/u16string_functions.h"
   
 
 llm_embedding:

@@ -105,7 +105,21 @@ class FuzzingGenerationAgent:
         根据提供的 API 信息（源码、摘要）,项目名称 自动生成 fuzz driver。
         参数：
             api_list:      组合中使用的 API 名称列表
-            api_info:      这些 API 的源码拼接文本
+            api_info:      这些 API 的源码拼# Optional libFuzzer target for string APIs
+option(ROSIDL_RUNTIME_C_ENABLE_FUZZ "Build libFuzzer targets for rosidl_runtime_c" OFF)
+if(ROSIDL_RUNTIME_C_ENABLE_FUZZ AND CMAKE_C_COMPILER_ID MATCHES "Clang")
+  add_executable(fuzz_string fuzz/string_fuzzer.c)
+  target_link_libraries(fuzz_string PRIVATE ${PROJECT_NAME} -fsanitize=fuzzer,address,undefined)
+  target_compile_options(fuzz_string PRIVATE -fsanitize=fuzzer,address,undefined)
+  # Ensure the installed binary can locate shared libs from its own directory tree.
+  set_target_properties(fuzz_string PROPERTIES
+    BUILD_RPATH "$ORIGIN;$ORIGIN/.."
+    # Covers local lib dir, parent, and common dependency install locations.
+    INSTALL_RPATH
+      "$ORIGIN;$ORIGIN/..;$ORIGIN/../../../rcutils/lib;$ORIGIN/../../../rosidl_typesupport_interface/lib"
+  )
+  install(TARGETS fuzz_string RUNTIME DESTINATION lib/${PROJECT_NAME})
+endif()接文本
             headers:       请求中使用的头部信息(config中的headers)
             api_sum:       这些 API 的摘要文本
         返回：
