@@ -85,7 +85,7 @@ class FuzzingPlanner:
             "2. `reason`: a concise explanation for choosing these APIs\n\n"
             "Output MUST be valid JSON with no extra text, markdown, or commentary.\n\n"
             "Example:\n"
-            "{\n"
+            "{{\n"
             '  "combination": [\n'
             '    "ares_destroy",\n'
             '    "ares_init",\n'
@@ -94,7 +94,7 @@ class FuzzingPlanner:
             '    "ares_init_options"\n'
             "  ],\n"
             '  "reason": "This combination covers the complete lifecycle of channel initialization, duplication, reinitialization, and destruction. The APIs are closely related through channel management operations and share common internal calls. Selecting these lower-usage-count APIs together ensures comprehensive coverage of channel state handling while maintaining diversity in the fuzz driver."\n'
-            "}"
+            "}}"
         )
 
         self.api_combination_query_with_memory = PromptTemplate(

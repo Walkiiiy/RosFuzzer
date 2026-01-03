@@ -15,7 +15,10 @@ config:
     - "rosidl_runtime_c/service_type_support.h"
     - "rosidl_runtime_c/string_functions.h"
     - "rosidl_runtime_c/u16string_functions.h"
-  
+    - <stdlib.h>
+    - <string.h>
+    - <stdint.h>
+    - <sstream>
 
 llm_embedding:
 
