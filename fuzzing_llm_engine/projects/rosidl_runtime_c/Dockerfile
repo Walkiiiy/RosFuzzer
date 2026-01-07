@@ -92,6 +92,14 @@
         rm -rf /var/lib/apt/lists/*
 
     COPY build.sh /ws/
+    
+    COPY fuzzing.sh /ws/
+    COPY CMakeLists.txt /ws/
+
+
+    
+    
+
     # ========= 默认进入 bash =========
     CMD ["/bin/bash"]
 

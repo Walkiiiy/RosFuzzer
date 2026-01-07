@@ -114,6 +114,9 @@ endif()
 option(ROSIDL_RUNTIME_C_ENABLE_FUZZ "Build libFuzzer targets for rosidl_runtime_c" OFF)
 if(ROSIDL_RUNTIME_C_ENABLE_FUZZ AND CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_executable(fuzz_string fuzz/string_fuzzer.c)
+  target_include_directories(fuzz_string PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
   target_link_libraries(fuzz_string PRIVATE ${PROJECT_NAME} -fsanitize=fuzzer,address,undefined)
   target_compile_options(fuzz_string PRIVATE -fsanitize=fuzzer,address,undefined)
   # Ensure the installed binary can locate shared libs from its own directory tree.

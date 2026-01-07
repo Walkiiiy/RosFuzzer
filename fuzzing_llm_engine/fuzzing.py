@@ -50,13 +50,20 @@ def prepare_container(args, container_name):
     target_fuzz_dir = f"{args.container_path.rstrip('/')}/fuzz"
     _run(["docker", "exec", container_name, "mkdir", "-p", target_fuzz_dir])
 
-    # Copy fuzz driver.
-    driver_dest = f"{container_name}:{target_fuzz_dir}/{Path(args.fuzz_driver).name}"
+    # Copy fuzz driver (rename to configurable target source name).
+    driver_dest_name = args.driver_dest_name
+    driver_dest = f"{container_name}:{target_fuzz_dir}/{driver_dest_name}"
     _run(["docker", "cp", str(Path(args.fuzz_driver).resolve()), driver_dest])
 
     # Replace CMakeLists.txt.
     cmake_dest = f"{container_name}:{args.container_path.rstrip('/')}/CMakeLists.txt"
     _run(["docker", "cp", str(Path(args.cmakelists).resolve()), cmake_dest])
+
+    # Copy fuzzing.sh if provided.
+    if args.fuzz_script:
+        workdir = args.workdir.rstrip("/") if args.workdir else "/"
+        script_dest = f"{container_name}:{workdir}/fuzzing.sh"
+        _run(["docker", "cp", str(Path(args.fuzz_script).resolve()), script_dest])
 
     return target_fuzz_dir
 
@@ -72,12 +79,43 @@ def run_fuzzing(args):
 
     try:
         prepare_container(args, container_name)
+        # Ensure fuzzing.sh is executable and run through bash with envs to avoid permission issues.
+        fuzz_cmd = (
+            "chmod +x ./fuzzing.sh || true; "
+            f"FUZZ_TIMEOUT={args.timeout_seconds} "
+            f"FUZZ_TARGET_NAME={args.target_binary} "
+            f"COVERAGE_OUT={args.coverage_container_path} "
+            f"COVERAGE_TXT={args.coverage_text_container_path} "
+            "bash ./fuzzing.sh"
+        )
         fuzzing_returncode, fuzzing_output, container_output = _stream_docker_exec(
-            container_name, "./fuzzing.sh", args.workdir, container_output
+            container_name, fuzz_cmd, args.workdir, container_output
         )
 
         # Copy the tee'd output file back to host.
         _run(["docker", "cp", f"{container_name}:{container_output}", str(host_output)], allow_error=True)
+
+        # Copy coverage output if present.
+        if args.coverage_output:
+            _run(
+                [
+                    "docker",
+                    "cp",
+                    f"{container_name}:{args.coverage_container_path}",
+                    str(Path(args.coverage_output).resolve()),
+                ],
+                allow_error=True,
+            )
+        if args.coverage_text_output:
+            _run(
+                [
+                    "docker",
+                    "cp",
+                    f"{container_name}:{args.coverage_text_container_path}",
+                    str(Path(args.coverage_text_output).resolve()),
+                ],
+                allow_error=True,
+            )
     finally:
         # Cleanup container regardless of success.
         _run(["docker", "rm", "-f", container_name], allow_error=True)
@@ -99,6 +137,47 @@ def parse_args():
     )
     parser.add_argument("--fuzz-driver", required=True, help="Host path to the fuzz driver source file.")
     parser.add_argument("--cmakelists", required=True, help="Host path to the replacement CMakeLists.txt.")
+    parser.add_argument(
+        "--fuzz-script",
+        default=str(Path(__file__).parent / "projects/rosidl_runtime_c/fuzzing.sh"),
+        help="Host path to fuzzing.sh to copy into container (defaults to project script).",
+    )
+    parser.add_argument(
+        "--driver-dest-name",
+        default="string_fuzzer.c",
+        help="Destination filename inside container fuzz/ directory (matches target source name).",
+    )
+    parser.add_argument(
+        "--target-binary",
+        default="fuzz_string",
+        help="Fuzz target binary name inside install dir (used for coverage export).",
+    )
+    parser.add_argument(
+        "--timeout-seconds",
+        type=int,
+        default=120,
+        help="Fuzzing run timeout inside container (seconds).",
+    )
+    parser.add_argument(
+        "--coverage-output",
+        default="docker_shared/rosidl_coverage.json",
+        help="Host path to save coverage json (if produced).",
+    )
+    parser.add_argument(
+        "--coverage-container-path",
+        default="/ws/fuzz_corpus/coverage.json",
+        help="Container path where fuzzing.sh writes coverage json.",
+    )
+    parser.add_argument(
+        "--coverage-text-output",
+        default="docker_shared/rosidl_coverage.txt",
+        help="Host path to save human-readable coverage report (if produced).",
+    )
+    parser.add_argument(
+        "--coverage-text-container-path",
+        default="/ws/fuzz_corpus/coverage.txt",
+        help="Container path where fuzzing.sh writes text coverage report.",
+    )
     parser.add_argument(
         "--output",
         default="docker_shared/fuzzing_output.txt",

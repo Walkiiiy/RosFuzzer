@@ -14,6 +14,7 @@ this project will be witten based on CKGFUZZER
 rPath/fuzzing_llm_engine/external_database/c-ares/codebase --src_api --call_graph
 
 - 构建call_graph 以rosidl_runtime_c为例:
+# 预处理
 ```
 (ros-fuzzer) walkiiiy@DESKTOP-UI66N0K:~/RosFuzzer/fuzzing_llm_engine/repo$ python3 repo.py --project_name rosidl_runtime_c --language cpp --shared_llm_dir /home/walkiiiy/RosFuzzer/docker_shared --saved_dir /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/codebase --target_src_path /ws/src/ros2/rosidl/rosidl_runtime_c --src_api --call_graph
 ```
@@ -21,10 +22,18 @@ rPath/fuzzing_llm_engine/external_database/c-ares/codebase --src_api --call_grap
 ```
 python preproc.py --project_name rosidl_runtime_c --src_api_file_path /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c
 ```
+
+# 正式操作
+- 生成driver
+```
+python driver_gen.py --yaml /fuzzing_llm_engine/external_database/rosidl_runtime_c/config.yaml --gen_driver --summary_api --check_compilation --gen_input
+```
 - 执行fuzz
 ```
-python fuzzing.py --yaml /fuzzing_llm_engine/external_database/rosidl_runtime_c/config.yaml --gen_driver --summary_api --check_compilation --gen_input
+python fuzzing_llm_engine/fuzzing.py   --container-path /ws/src/ros2/rosidl/rosidl_runtime_c   --fuzz-driver /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/fuzz_driver/ros2_rosidl_runtime_c_fuzz_driver_False_deepseek-coder_1.c --cmakelists /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/projects/rosidl_runtime_c/CMakeLists.txt   --workdir /ws   --output docker_shared/rosidl_fuzz_output.txt
 ```
+
+
 
 # CKGFuzzer legacy
 
