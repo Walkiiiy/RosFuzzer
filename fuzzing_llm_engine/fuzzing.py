@@ -40,7 +40,10 @@ def _stream_docker_exec(container_name, command, container_workdir=None, tee_pat
 
 
 def prepare_container(args, container_name):
-    """Start container and copy fuzz assets."""
+    '''
+    Start container and copy fuzz assets.
+    copy fuzz driver, CMakeLists.txt, and optional fuzzing.sh into container.
+    '''
     # Ensure image exists.
     _run(["docker", "image", "inspect", args.image])
 
@@ -144,12 +147,12 @@ def parse_args():
     )
     parser.add_argument(
         "--driver-dest-name",
-        default="string_fuzzer.c",
+        default="fuzzer.c",
         help="Destination filename inside container fuzz/ directory (matches target source name).",
     )
     parser.add_argument(
         "--target-binary",
-        default="fuzz_string",
+        default="fuzzer",
         help="Fuzz target binary name inside install dir (used for coverage export).",
     )
     parser.add_argument(

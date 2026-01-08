@@ -62,9 +62,9 @@ predicate reachable(Function src, Function dest) {
 // Entry point predicate
 predicate isEntryPoint(Function f) {
   // Be permissive so we still match when CodeQL stores qualified names or overloads.
-  f.hasName("ai_callback") or
-  f.getQualifiedName().matches("%::ai_callback") or
-  f.getQualifiedName().matches("%ai_callback%")
+  f.hasName("rosidl_runtime_c__bool__Sequence__init") or
+  f.getQualifiedName().matches("%::rosidl_runtime_c__bool__Sequence__init") or
+  f.getQualifiedName().matches("%rosidl_runtime_c__bool__Sequence__init%")
 }
 
 // Main query (direct edges only to keep result size small)

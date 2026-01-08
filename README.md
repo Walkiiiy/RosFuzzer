@@ -33,7 +33,23 @@ python driver_gen.py --yaml /fuzzing_llm_engine/external_database/rosidl_runtime
 python fuzzing_llm_engine/fuzzing.py   --container-path /ws/src/ros2/rosidl/rosidl_runtime_c   --fuzz-driver /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/fuzz_driver/ros2_rosidl_runtime_c_fuzz_driver_False_deepseek-coder_1.c --cmakelists /home/walkiiiy/RosFuzzer/fuzzing_llm_engine/projects/rosidl_runtime_c/CMakeLists.txt   --workdir /ws   --output docker_shared/rosidl_fuzz_output.txt
 ```
 
+## FUZZ GEN流程设计
 
+下一步：
+- 生成的fuzzer编译通过率，覆盖率问题，合并成一个fuzzer
+- 生成对应的input
+
+
+## Fuzz 流程设计
+
+build.sh 负责初始构建没有fuzz的项目，供codeql生成调用图
+
+将projects里面的cmakelists和fuzzing.sh复制到docker里面，将external_database里上一步llm生成的driver也复制到里面
+fuzzing.sh负责用新的cmakelist链接libfuzzer模块重新编译指定模块并执行fuzzer输出覆盖率报告
+
+下一步：
+- 自动生成能连接libfuzzer的cmakelists,（fuzzing.sh能在各个模块间通用但cmakelists不行）
+- 使用生成的input
 
 # CKGFuzzer legacy
 

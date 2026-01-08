@@ -62,9 +62,9 @@ predicate reachable(Function src, Function dest) {
 // Entry point predicate
 predicate isEntryPoint(Function f) {
   // Be permissive so we still match when CodeQL stores qualified names or overloads.
-  f.hasName("callback") or
-  f.getQualifiedName().matches("%::callback") or
-  f.getQualifiedName().matches("%callback%")
+  f.hasName("get_sequence_bound_handle") or
+  f.getQualifiedName().matches("%::get_sequence_bound_handle") or
+  f.getQualifiedName().matches("%get_sequence_bound_handle%")
 }
 
 // Main query (direct edges only to keep result size small)

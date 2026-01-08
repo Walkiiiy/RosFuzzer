@@ -44,7 +44,7 @@ else
 fi
 
 FUZZ_TIMEOUT=${FUZZ_TIMEOUT:-120}
-FUZZ_TARGET_NAME=${FUZZ_TARGET_NAME:-fuzz_string}
+FUZZ_TARGET_NAME=${FUZZ_TARGET_NAME:-fuzzer}
 COVERAGE_OUT=${COVERAGE_OUT:-/ws/fuzz_corpus/coverage.json}
 COVERAGE_TXT=${COVERAGE_TXT:-/ws/fuzz_corpus/coverage.txt}
 FUZZ_ARGS=${FUZZ_ARGS:-"-max_total_time=${FUZZ_TIMEOUT} -print_final_stats=1 -ignore_crashes=1 -handle_segv=1 -handle_abort=1 -handle_bus=1 -handle_sigill=1"}
@@ -104,3 +104,4 @@ fi
 mkdir -p "$(dirname "${DEFAULT_COVERAGE_JSON}")" "$(dirname "${DEFAULT_COVERAGE_TXT}")"
 [ -f "${DEFAULT_COVERAGE_JSON}" ] || : > "${DEFAULT_COVERAGE_JSON}"
 [ -f "${DEFAULT_COVERAGE_TXT}" ] || : > "${DEFAULT_COVERAGE_TXT}"
+echo "fuzz_target_name:${FUZZ_TARGET_NAME}"

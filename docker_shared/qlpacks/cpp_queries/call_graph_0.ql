@@ -62,9 +62,9 @@ predicate reachable(Function src, Function dest) {
 // Entry point predicate
 predicate isEntryPoint(Function f) {
   // Be permissive so we still match when CodeQL stores qualified names or overloads.
-  f.hasName("main") or
-  f.getQualifiedName().matches("%::main") or
-  f.getQualifiedName().matches("%main%")
+  f.hasName("get_sequence_bound_handle_function") or
+  f.getQualifiedName().matches("%::get_sequence_bound_handle_function") or
+  f.getQualifiedName().matches("%get_sequence_bound_handle_function%")
 }
 
 // Main query (direct edges only to keep result size small)

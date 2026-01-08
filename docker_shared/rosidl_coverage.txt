@@ -1,6 +1,6 @@
 Filename                                Regions    Missed Regions     Cover   Functions  Missed Functions  Executed       Lines      Missed Lines     Cover    Branches   Missed Branches     Cover
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-fuzz/string_fuzzer.c                         30                 2    93.33%           2                 0   100.00%          63                 2    96.83%          20                 3    85.00%
+fuzz/fuzzer.c                                30                 2    93.33%           2                 0   100.00%          63                 2    96.83%          20                 3    85.00%
 src/message_type_support.c                   10                10     0.00%           2                 2     0.00%          16                16     0.00%           2                 2     0.00%
 src/primitives_sequence_functions.c          61                61     0.00%          20                20     0.00%         123               123     0.00%          28                28     0.00%
 src/sequence_bound.c                         10                10     0.00%           2                 2     0.00%          16                16     0.00%           2                 2     0.00%

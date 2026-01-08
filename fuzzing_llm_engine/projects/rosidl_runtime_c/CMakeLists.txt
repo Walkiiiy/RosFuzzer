@@ -113,20 +113,20 @@ endif()
 # Optional libFuzzer target for string APIs
 option(ROSIDL_RUNTIME_C_ENABLE_FUZZ "Build libFuzzer targets for rosidl_runtime_c" OFF)
 if(ROSIDL_RUNTIME_C_ENABLE_FUZZ AND CMAKE_C_COMPILER_ID MATCHES "Clang")
-  add_executable(fuzz_string fuzz/string_fuzzer.c)
-  target_include_directories(fuzz_string PRIVATE
+  add_executable(fuzzer fuzz/fuzzer.c)
+  target_include_directories(fuzzer PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
-  target_link_libraries(fuzz_string PRIVATE ${PROJECT_NAME} -fsanitize=fuzzer,address,undefined)
-  target_compile_options(fuzz_string PRIVATE -fsanitize=fuzzer,address,undefined)
+  target_link_libraries(fuzzer PRIVATE ${PROJECT_NAME} -fsanitize=fuzzer,address,undefined)
+  target_compile_options(fuzzer PRIVATE -fsanitize=fuzzer,address,undefined)
   # Ensure the installed binary can locate shared libs from its own directory tree.
-  set_target_properties(fuzz_string PROPERTIES
+  set_target_properties(fuzzer PROPERTIES
     BUILD_RPATH "$ORIGIN;$ORIGIN/.."
     # Covers local lib dir, parent, and common dependency install locations.
     INSTALL_RPATH
       "$ORIGIN;$ORIGIN/..;$ORIGIN/../../../rcutils/lib;$ORIGIN/../../../rosidl_typesupport_interface/lib"
   )
-  install(TARGETS fuzz_string RUNTIME DESTINATION lib/${PROJECT_NAME})
+  install(TARGETS fuzzer RUNTIME DESTINATION lib/${PROJECT_NAME})
 endif()
 
 install(
