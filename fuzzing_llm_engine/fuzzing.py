@@ -98,9 +98,10 @@ def run_fuzzing(args):
         # Copy the tee'd output file back to host.
         _run(["docker", "cp", f"{container_name}:{container_output}", str(host_output)], allow_error=True)
 
+        compile_succeed=1
         # Copy coverage output if present.
         if args.coverage_output:
-            _run(
+            return_code,_=_run(
                 [
                     "docker",
                     "cp",
@@ -109,8 +110,11 @@ def run_fuzzing(args):
                 ],
                 allow_error=True,
             )
+            if return_code != 0:
+                compile_succeed=0
+
         if args.coverage_text_output:
-            _run(
+            return_code,_=_run(
                 [
                     "docker",
                     "cp",
@@ -119,6 +123,8 @@ def run_fuzzing(args):
                 ],
                 allow_error=True,
             )
+            if return_code != 0:
+                compile_succeed=0
     finally:
         # Cleanup container regardless of success.
         _run(["docker", "rm", "-f", container_name], allow_error=True)
@@ -127,7 +133,7 @@ def run_fuzzing(args):
     with host_output.open("w", encoding="utf-8") as f:
         f.write(fuzzing_output)
 
-    return fuzzing_returncode
+    return fuzzing_returncode,compile_succeed
 
 
 def parse_args():
@@ -206,10 +212,29 @@ def main():
         if not Path(path_arg).is_file():
             raise FileNotFoundError(f"Missing {label} file: {path_arg}")
 
-    returncode = run_fuzzing(args)
+    returncode,compile_succeed = run_fuzzing(args)
     if returncode != 0:
         raise SystemExit(returncode)
 
+# 由driver_gen调用的检查driver是否能编译成功的入口,与main类似但是fuzz时间为10
+def check_compile_fuzz_driver(args):
+
+    # Validate input paths on host.
+    for path_arg, label in [(args.fuzz_driver, "fuzz driver"), (args.cmakelists, "CMakeLists.txt")]:
+        if not Path(path_arg).is_file():
+            raise FileNotFoundError(f"Missing {label} file: {path_arg}")
+
+    returncode,compile_succeed = run_fuzzing(args)
+    if returncode != 0:
+        raise SystemExit(returncode)
+    
+    if compile_succeed != 1:
+        print("Fuzz driver compilation failed.")
+        return 0
+    else:
+        print("Fuzz driver compilation succeeded.")
+        return 1
 
 if __name__ == "__main__":
     main()
+    # check_compile_fuzz_driver()

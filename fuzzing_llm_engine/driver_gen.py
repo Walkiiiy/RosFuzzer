@@ -78,29 +78,6 @@ def args_parser():
     return args
         
 
-# 启动一个 Docker 准备检查 fuzz 代码是否可以成功编译
-def start_docker_for_check_compilation(project_dir, project_name):
-    # 检测 project_name 的容器是否正在运行
-    if is_docker_container_running(project_name):
-        logger.info(f"Docker container '{project_name}_check' is already running. Continuing...") 
-        return True
-    else:
-        # 如果不在运行, 启动一个 Docker
-        logger.info(f"Docker container '{project_name}_check' is not running. Starting...")
-        try:
-            # 利用 check_gen_fuzzer.py 脚本启动 docker
-            # 没做 docker images 是否已经存在的检查 
-            docker_start_command = f"python  {project_dir}fuzzing_llm_engine/utils/check_gen_fuzzer.py start_docker_check_compilation {project_name} --fuzzing_llm_dir {project_dir}docker_shared/"
-            logger.debug(f"docker_start_command: \n{docker_start_command}")
-            subprocess.run(shlex.split(docker_start_command), check=True)
-            logger.info("Docker for check compilation started successfully.")
-            return True
-        except subprocess.CalledProcessError as e:
-            logger.info(f"Error starting Docker for check compilation: {e}")
-            return False
-
-
-
 if __name__ == '__main__':
     args = args_parser()
 
@@ -348,17 +325,17 @@ if __name__ == '__main__':
         logger.error(f"Error copying fuzz drivers: {e}")
         exit()
 
-    # 启动检查编译使用的 docker
-    if not start_docker_for_check_compilation(work_dir, project_name):
-        logger.info("Failed to start docker for check compilation")
-        exit()
+    # # 启动检查编译使用的 docker
+    # if not start_docker_for_check_compilation(work_dir, project_name):
+    #     logger.info("Failed to start docker for check compilation")
+    #     exit()
     
-    # 检查编译
-    if args.check_compilation:
-        logger.info("Check Compilation")
-        fix_agent.check_compilation(shared_dir, project_name, file_suffix=["c","cc"])
-    else:
-        logger.info("Skip Check Compilation")
+    # # 检查编译
+    # if args.check_compilation:
+    #     logger.info("Check Compilation")
+    #     fix_agent.check_compilation(shared_dir, project_name, file_suffix=["c","cc"])
+    # else:
+    #     logger.info("Skip Check Compilation")
 
     # 生成输入
     if args.gen_input:

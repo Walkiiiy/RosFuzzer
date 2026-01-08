@@ -27,6 +27,9 @@ import json
 from rag.query_engine_factory import build_test_query, build_cwe_query,build_kg_query
 from rag.hybrid_retriever import CodeGraphRetriever
 from llama_index.core import Settings
+
+from fuzzing import check_compile_fuzz_driver
+
 # 检测 Docker 容器是否正在运行
 def is_docker_container_running(project_name):
     """Check if a Docker container is running."""

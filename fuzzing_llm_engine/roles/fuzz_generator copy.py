@@ -13,8 +13,6 @@ from tqdm import tqdm
 import os
 from loguru import logger
 
-from fuzzing import check_compile_fuzz_driver
-
 class FuzzingGenerationAgent:
     file_suffix = {"c": "c", "c++": "cc"}
     
