@@ -1,146 +1,111 @@
-#include <rosidl_runtime_c/message_type_support.h>
+#include <rosidl_runtime_c/action_type_support_struct.h>
+#include <rosidl_runtime_c/message_initialization.h>
+#include <rosidl_runtime_c/message_type_support_struct.h>
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
+#include <rosidl_runtime_c/primitives_sequence.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
+#include <rosidl_runtime_c/service_type_support_struct.h>
 #include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
+#include <rosidl_runtime_c/visibility_control.h>
+#include <rosidl_runtime_c/string.h>
+#include <rosidl_runtime_c/string_bound.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
 #include <rcutils/allocator.h>
 
-// LLVMFuzzerTestOneInput function signature
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
-
+// Fuzzer entry point
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    // Early return if insufficient data
-    if (size < 2) {
+    // Early return if input is too small for meaningful fuzzing
+    if (size < 4) {
         return 0;
     }
 
-    // Initialize variables
-    rosidl_runtime_c__U16String__Sequence seq1 = {0};
-    rosidl_runtime_c__U16String__Sequence seq2 = {0};
-    rosidl_runtime_c__Sequence__bound bound_handle = {0};
-    const rosidl_runtime_c__Sequence__bound *result_handle = NULL;
-    bool init_success = false;
-    bool are_equal = false;
-
-    // Step 1: Use get_sequence_bound_handle and get_sequence_bound_handle_function
-    // We need to set up a minimal bound handle structure for testing
-    // Use fuzz data to create identifier string (with bounds checking)
-    size_t identifier_len = size > 100 ? 100 : size;
-    char *identifier = (char *)malloc(identifier_len + 1);
-    if (!identifier) {
-        return 0;
-    }
+    // Initialize default allocator
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
     
-    // Copy data for identifier, ensuring null termination
-    memcpy(identifier, data, identifier_len);
-    identifier[identifier_len] = '\0';
+    // Use first byte to determine sequence sizes (with bounds checking)
+    uint8_t size_mod = data[0];
+    size_t seq_size = (size_mod % 8) + 1;  // Sequence size between 1-8
     
-    // Set up a dummy bound handle for testing
-    bound_handle.func = (void (*)(void))get_sequence_bound_handle_function;
-    bound_handle.typesupport_identifier = "test_identifier";
+    // Initialize two sequences for comparison
+    rosidl_runtime_c__U16String__Sequence seq1;
+    rosidl_runtime_c__U16String__Sequence seq2;
     
-    // Call get_sequence_bound_handle
-    result_handle = get_sequence_bound_handle(&bound_handle, identifier);
-    // Note: result_handle will be NULL since identifiers don't match
-    
-    // Step 2: Initialize U16String sequences using fuzz data
-    // Determine sequence size from fuzz input (ensure it's reasonable)
-    size_t seq_size = (size_t)(data[0] % 8) + 1;  // 1-8 elements
+    // Initialize sequences to zero to avoid undefined behavior
+    memset(&seq1, 0, sizeof(seq1));
+    memset(&seq2, 0, sizeof(seq2));
     
     // Initialize first sequence
-    init_success = rosidl_runtime_c__U16String__Sequence__init(&seq1, seq_size);
-    if (!init_success) {
-        free(identifier);
-        return 0;
-    }
-    
-    // Initialize second sequence with same size
-    init_success = rosidl_runtime_c__U16String__Sequence__init(&seq2, seq_size);
-    if (!init_success) {
+    if (!rosidl_runtime_c__U16String__Sequence__init(&seq1, seq_size)) {
+        // If initialization fails, clean up and return
         rosidl_runtime_c__U16String__Sequence__fini(&seq1);
-        free(identifier);
+        rosidl_runtime_c__U16String__Sequence__fini(&seq2);
         return 0;
     }
     
-    // Step 3: Populate sequences with fuzz data
-    size_t data_offset = 1;  // Start after the first byte used for seq_size
+    // Initialize second sequence
+    if (!rosidl_runtime_c__U16String__Sequence__init(&seq2, seq_size)) {
+        // Clean up and return if second sequence fails
+        rosidl_runtime_c__U16String__Sequence__fini(&seq1);
+        rosidl_runtime_c__U16String__Sequence__fini(&seq2);
+        return 0;
+    }
+    
+    // Fill sequences with data from fuzz input
+    size_t data_offset = 1;  // Skip the size byte
     for (size_t i = 0; i < seq_size; i++) {
-        if (data_offset >= size) {
-            break;  // Not enough fuzz data
+        // Calculate available data for this string
+        size_t remaining_data = (size > data_offset) ? (size - data_offset) : 0;
+        
+        // Determine string length (limited to avoid excessive allocation)
+        size_t str_len = 0;
+        if (remaining_data > 0) {
+            // Use next byte modulo 64 to limit string length
+            str_len = (data[data_offset % size] % 64) + 1;
+            data_offset = (data_offset + 1) % size;
         }
         
-        // Determine string length for this element (limited to avoid overflow)
-        size_t str_len = (size_t)(data[data_offset] % 16) + 1;  // 1-16 characters
-        data_offset++;
-        
-        // Ensure we have enough data
-        if (data_offset + str_len * 2 > size) {
-            str_len = (size - data_offset) / 2;
-            if (str_len == 0) {
-                break;
-            }
+        // Ensure we don't exceed available data
+        if (str_len * sizeof(uint16_t) > remaining_data) {
+            str_len = remaining_data / sizeof(uint16_t);
         }
         
-        // Resize the U16String to hold our data
+        // Resize strings to accommodate data
         if (!rosidl_runtime_c__U16String__resize(&seq1.data[i], str_len)) {
-            // Cleanup and exit if resize fails
-            for (size_t j = 0; j <= i; j++) {
-                rosidl_runtime_c__U16String__fini(&seq1.data[j]);
-                rosidl_runtime_c__U16String__fini(&seq2.data[j]);
-            }
+            // If resize fails, clean up and return
             rosidl_runtime_c__U16String__Sequence__fini(&seq1);
             rosidl_runtime_c__U16String__Sequence__fini(&seq2);
-            free(identifier);
             return 0;
         }
         
-        // Copy fuzz data into the U16String
-        for (size_t j = 0; j < str_len && data_offset < size; j++) {
-            uint16_t char_val = 0;
-            if (data_offset + 1 < size) {
-                char_val = (data[data_offset] << 8) | data[data_offset + 1];
-                data_offset += 2;
-            } else {
-                char_val = data[data_offset];
-                data_offset++;
-            }
-            seq1.data[i].data[j] = char_val;
-        }
-        
-        // For testing equality, make seq2 identical to seq1
         if (!rosidl_runtime_c__U16String__resize(&seq2.data[i], str_len)) {
-            // Cleanup and exit if resize fails
-            for (size_t j = 0; j <= i; j++) {
-                rosidl_runtime_c__U16String__fini(&seq1.data[j]);
-                rosidl_runtime_c__U16String__fini(&seq2.data[j]);
-            }
             rosidl_runtime_c__U16String__Sequence__fini(&seq1);
             rosidl_runtime_c__U16String__Sequence__fini(&seq2);
-            free(identifier);
             return 0;
         }
         
-        memcpy(seq2.data[i].data, seq1.data[i].data, str_len * sizeof(uint16_t));
+        // Copy data to both strings (same content for equality test)
+        if (str_len > 0 && remaining_data >= str_len * sizeof(uint16_t)) {
+            memcpy(seq1.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
+            memcpy(seq2.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
+            data_offset += str_len * sizeof(uint16_t);
+        }
     }
     
-    // Step 4: Test rosidl_runtime_c__U16String__are_equal on individual strings
-    if (seq_size > 0) {
-        bool string_equal = rosidl_runtime_c__U16String__are_equal(
-            &seq1.data[0], &seq2.data[0]);
-        // Result should be true since we made them identical
-        (void)string_equal;  // Mark as used to avoid compiler warning
+    // Test sequence equality - should return true since we filled them identically
+    bool sequences_equal = rosidl_runtime_c__U16String__Sequence__are_equal(&seq1, &seq2);
+    (void)sequences_equal;  // Mark as used to avoid compiler warnings
+    
+    // Test individual string equality for each pair
+    for (size_t i = 0; i < seq_size; i++) {
+        bool strings_equal = rosidl_runtime_c__U16String__are_equal(&seq1.data[i], &seq2.data[i]);
+        (void)strings_equal;  // Mark as used
     }
     
-    // Step 5: Test rosidl_runtime_c__U16String__Sequence__are_equal
-    are_equal = rosidl_runtime_c__U16String__Sequence__are_equal(&seq1, &seq2);
-    // Result should be true since sequences are identical
-    
-    // Also test with NULL pointers (error cases)
+    // Test with NULL pointers for robustness
     bool null_test1 = rosidl_runtime_c__U16String__Sequence__are_equal(NULL, &seq1);
     bool null_test2 = rosidl_runtime_c__U16String__Sequence__are_equal(&seq1, NULL);
     bool null_test3 = rosidl_runtime_c__U16String__Sequence__are_equal(NULL, NULL);
@@ -148,20 +113,82 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     (void)null_test2;
     (void)null_test3;
     
-    // Test individual string equality with NULL pointers
-    if (seq_size > 0) {
-        bool null_str_test1 = rosidl_runtime_c__U16String__are_equal(NULL, &seq1.data[0]);
-        bool null_str_test2 = rosidl_runtime_c__U16String__are_equal(&seq1.data[0], NULL);
-        bool null_str_test3 = rosidl_runtime_c__U16String__are_equal(NULL, NULL);
-        (void)null_str_test1;
-        (void)null_str_test2;
-        (void)null_str_test3;
-    }
+    // Test individual string comparison with NULL
+    bool str_null_test1 = rosidl_runtime_c__U16String__are_equal(NULL, &seq1.data[0]);
+    bool str_null_test2 = rosidl_runtime_c__U16String__are_equal(&seq1.data[0], NULL);
+    bool str_null_test3 = rosidl_runtime_c__U16String__are_equal(NULL, NULL);
+    (void)str_null_test1;
+    (void)str_null_test2;
+    (void)str_null_test3;
     
-    // Cleanup
+    // Create a mock sequence bound handle for testing
+    rosidl_runtime_c__Sequence__bound mock_handle;
+    memset(&mock_handle, 0, sizeof(mock_handle));
+    
+    // Set up a typesupport identifier
+    const char* test_identifier = "test_type";
+    mock_handle.typesupport_identifier = test_identifier;
+    
+    // Test get_sequence_bound_handle_function
+    const rosidl_runtime_c__Sequence__bound* result1 = 
+        get_sequence_bound_handle_function(&mock_handle, test_identifier);
+    (void)result1;
+    
+    // Test with different identifier
+    const rosidl_runtime_c__Sequence__bound* result2 = 
+        get_sequence_bound_handle_function(&mock_handle, "different_type");
+    (void)result2;
+    
+    // Test get_sequence_bound_handle with a function pointer
+    mock_handle.func = (void*)get_sequence_bound_handle_function;
+    const rosidl_runtime_c__Sequence__bound* result3 = 
+        get_sequence_bound_handle(&mock_handle, test_identifier);
+    (void)result3;
+    
+    // Test with NULL handle (should assert in debug, but we protect in release)
+    #ifndef NDEBUG
+    // In debug mode, these would assert - we skip them
+    #else
+    const rosidl_runtime_c__Sequence__bound* result4 = 
+        get_sequence_bound_handle_function(NULL, test_identifier);
+    const rosidl_runtime_c__Sequence__bound* result5 = 
+        get_sequence_bound_handle(NULL, test_identifier);
+    (void)result4;
+    (void)result5;
+    #endif
+    
+    // Clean up sequences
     rosidl_runtime_c__U16String__Sequence__fini(&seq1);
     rosidl_runtime_c__U16String__Sequence__fini(&seq2);
-    free(identifier);
     
     return 0;
 }
+
+// If the rosidl_runtime_c__U16String__Sequence__fini function is not available
+// in headers, we need to declare it or implement a simple version
+#ifndef rosidl_runtime_c__U16String__Sequence__fini
+static void rosidl_runtime_c__U16String__Sequence__fini(
+    rosidl_runtime_c__U16String__Sequence * sequence)
+{
+    if (sequence) {
+        if (sequence->data) {
+            // Finalize each string
+            for (size_t i = 0; i < sequence->size; ++i) {
+                rosidl_runtime_c__U16String__fini(&sequence->data[i]);
+            }
+            // Free the array
+            rcutils_allocator_t allocator = rcutils_get_default_allocator();
+            allocator.deallocate(sequence->data, allocator.state);
+        }
+        sequence->data = NULL;
+        sequence->size = 0;
+        sequence->capacity = 0;
+    }
+}
+#endif
+
+// If rosidl_runtime_c__U16String__resize is not available, declare it
+#ifndef rosidl_runtime_c__U16String__resize
+bool rosidl_runtime_c__U16String__resize(
+    rosidl_runtime_c__U16String * str, size_t size);
+#endif

@@ -1,192 +1,160 @@
-#include <rosidl_runtime_c/message_type_support.h>
-#include <rosidl_runtime_c/primitives_sequence_functions.h>
-#include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
-#include <rosidl_runtime_c/string_functions.h>
-#include <rosidl_runtime_c/u16string_functions.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
 
-// We need rcutils headers for the allocator
-#include <rcutils/allocator.h>
+/* ROS 2 headers */
+#include "rosidl_runtime_c/action_type_support_struct.h"
+#include "rosidl_runtime_c/message_initialization.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/primitives_sequence_functions.h"
+#include "rosidl_runtime_c/primitives_sequence.h"
+#include "rosidl_runtime_c/sequence_bound.h"
+#include "rosidl_runtime_c/service_type_support_struct.h"
+#include "rosidl_runtime_c/string_functions.h"
+#include "rosidl_runtime_c/u16string_functions.h"
+#include "rosidl_runtime_c/visibility_control.h"
+#include "rosidl_runtime_c/string.h"
+#include "rosidl_runtime_c/string_bound.h"
 
-// LLVMFuzzerTestOneInput function signature
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    // Early return if input is too small for meaningful fuzzing
-    if (size < 2) {
+/* For rcutils allocator */
+#include "rcutils/allocator.h"
+
+/* For boolean sequence type */
+#include "rosidl_runtime_c/primitives_sequence_functions.h"
+
+/* Helper to extract values from fuzz input */
+static uint8_t get_byte(const uint8_t *data, size_t size, size_t *offset) {
+    if (*offset >= size) {
         return 0;
     }
+    return data[(*offset)++];
+}
 
-    // Initialize variables
-    rosidl_runtime_c__String__Sequence seq1 = {0};
-    rosidl_runtime_c__String__Sequence seq2 = {0};
+static uint32_t get_uint32(const uint8_t *data, size_t size, size_t *offset) {
+    uint32_t value = 0;
+    for (int i = 0; i < 4; i++) {
+        value = (value << 8) | get_byte(data, size, offset);
+    }
+    return value;
+}
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    /* Initialize offset for reading from fuzz input */
+    size_t offset = 0;
+    
+    /* 1. Test rosidl_runtime_c__String__Sequence__init */
+    rosidl_runtime_c__String__Sequence str_seq1 = {0};
+    rosidl_runtime_c__String__Sequence str_seq2 = {0};
+    
+    /* Get sequence size from fuzz input (limit to reasonable size) */
+    uint32_t seq_size = get_uint32(data, size, &offset);
+    seq_size = seq_size % 256; /* Limit to prevent excessive memory usage */
+    
+    bool init_success1 = rosidl_runtime_c__String__Sequence__init(&str_seq1, seq_size);
+    bool init_success2 = rosidl_runtime_c__String__Sequence__init(&str_seq2, seq_size);
+    
+    /* If initialization failed, clean up and return */
+    if (!init_success1 || !init_success2) {
+        if (init_success1) {
+            rosidl_runtime_c__String__Sequence__fini(&str_seq1);
+        }
+        if (init_success2) {
+            rosidl_runtime_c__String__Sequence__fini(&str_seq2);
+        }
+        return 0;
+    }
+    
+    /* Fill string sequences with data from fuzz input */
+    for (size_t i = 0; i < seq_size && offset < size; i++) {
+        /* Get string length from fuzz input */
+        uint8_t str_len = get_byte(data, size, &offset);
+        str_len = str_len % 64; /* Limit string length */
+        
+        if (str_len > 0 && offset + str_len <= size) {
+            /* Copy data to string */
+            rosidl_runtime_c__String__assignn(&str_seq1.data[i], 
+                                            (const char*)&data[offset], 
+                                            str_len);
+            rosidl_runtime_c__String__assignn(&str_seq2.data[i], 
+                                            (const char*)&data[offset], 
+                                            str_len);
+            offset += str_len;
+        }
+    }
+    
+    /* 2. Test rosidl_runtime_c__String__Sequence__are_equal */
+    bool strings_equal = rosidl_runtime_c__String__Sequence__are_equal(&str_seq1, &str_seq2);
+    /* Should be true since we filled them with the same data */
+    (void)strings_equal; /* Mark as used to avoid compiler warning */
+    
+    /* 3. Test rosidl_runtime_c__bool__Sequence__are_equal */
     rosidl_runtime_c__boolean__Sequence bool_seq1 = {0};
     rosidl_runtime_c__boolean__Sequence bool_seq2 = {0};
     
-    // Use fuzz data to determine sequence sizes
-    // Use first byte for seq1 size (modulo reasonable limit to avoid excessive allocation)
-    size_t seq1_size = (data[0] % 16) + 1;  // 1-16 elements
-    // Use second byte for seq2 size
-    size_t seq2_size = (data[1] % 16) + 1;  // 1-16 elements
-    
-    // Initialize first string sequence
-    if (!rosidl_runtime_c__String__Sequence__init(&seq1, seq1_size)) {
-        // Initialization failed, clean up and return
-        goto cleanup;
-    }
-    
-    // Initialize second string sequence
-    if (!rosidl_runtime_c__String__Sequence__init(&seq2, seq2_size)) {
-        goto cleanup;
-    }
-    
-    // Populate string sequences with data from fuzz input
-    size_t data_offset = 2;
-    for (size_t i = 0; i < seq1_size && data_offset < size; i++) {
-        // Calculate string length from fuzz data (1-32 chars)
-        size_t str_len = (data[data_offset % size] % 32) + 1;
-        data_offset = (data_offset + 1) % size;
+    /* Initialize boolean sequences */
+    if (rosidl_runtime_c__boolean__Sequence__init(&bool_seq1, seq_size) &&
+        rosidl_runtime_c__boolean__Sequence__init(&bool_seq2, seq_size)) {
         
-        // Ensure we don't read beyond buffer
-        if (data_offset + str_len > size) {
-            str_len = size - data_offset;
-            if (str_len == 0) break;
+        /* Fill boolean sequences with data from fuzz input */
+        for (size_t i = 0; i < seq_size && offset < size; i++) {
+            bool_seq1.data[i] = (get_byte(data, size, &offset) & 0x01) != 0;
+            bool_seq2.data[i] = bool_seq1.data[i]; /* Make them equal */
         }
         
-        // Resize string if needed
-        if (!rosidl_runtime_c__String__resize(&seq1.data[i], str_len)) {
-            goto cleanup;
-        }
+        /* Test equality */
+        bool bools_equal = rosidl_runtime_c__bool__Sequence__are_equal(&bool_seq1, &bool_seq2);
+        (void)bools_equal; /* Mark as used */
         
-        // Copy fuzz data into string
-        if (str_len > 0) {
-            memcpy(seq1.data[i].data, data + data_offset, str_len);
-            seq1.data[i].data[str_len] = '\0';  // Ensure null termination
-        }
-        
-        data_offset = (data_offset + str_len) % size;
-    }
-    
-    // Populate second sequence similarly
-    for (size_t i = 0; i < seq2_size && data_offset < size; i++) {
-        size_t str_len = (data[data_offset % size] % 32) + 1;
-        data_offset = (data_offset + 1) % size;
-        
-        if (data_offset + str_len > size) {
-            str_len = size - data_offset;
-            if (str_len == 0) break;
-        }
-        
-        if (!rosidl_runtime_c__String__resize(&seq2.data[i], str_len)) {
-            goto cleanup;
-        }
-        
-        if (str_len > 0) {
-            memcpy(seq2.data[i].data, data + data_offset, str_len);
-            seq2.data[i].data[str_len] = '\0';
-        }
-        
-        data_offset = (data_offset + str_len) % size;
-    }
-    
-    // Test rosidl_runtime_c__String__Sequence__are_equal
-    bool strings_equal = rosidl_runtime_c__String__Sequence__are_equal(&seq1, &seq2);
-    (void)strings_equal;  // Use result to avoid unused variable warning
-    
-    // Initialize boolean sequences for testing
-    // Use fuzz data to determine boolean sequence sizes
-    size_t bool_seq1_size = (data[0] % 8) + 1;  // 1-8 elements
-    size_t bool_seq2_size = (data[1] % 8) + 1;  // 1-8 elements
-    
-    if (!rosidl_runtime_c__boolean__Sequence__init(&bool_seq1, bool_seq1_size)) {
-        goto cleanup;
-    }
-    
-    if (!rosidl_runtime_c__boolean__Sequence__init(&bool_seq2, bool_seq2_size)) {
+        /* Clean up boolean sequences */
         rosidl_runtime_c__boolean__Sequence__fini(&bool_seq1);
-        goto cleanup;
+        rosidl_runtime_c__boolean__Sequence__fini(&bool_seq2);
     }
     
-    // Populate boolean sequences with fuzz data
-    data_offset = 2;
-    for (size_t i = 0; i < bool_seq1_size && data_offset < size; i++) {
-        bool_seq1.data[i] = (data[data_offset] & 0x01) != 0;
-        data_offset = (data_offset + 1) % size;
-    }
-    
-    for (size_t i = 0; i < bool_seq2_size && data_offset < size; i++) {
-        bool_seq2.data[i] = (data[data_offset] & 0x01) != 0;
-        data_offset = (data_offset + 1) % size;
-    }
-    
-    // Test rosidl_runtime_c__bool__Sequence__are_equal
-    bool bools_equal = rosidl_runtime_c__bool__Sequence__are_equal(&bool_seq1, &bool_seq2);
-    (void)bools_equal;
-    
-    // Test get_message_typesupport_handle_function with dummy data
-    // Create minimal dummy structures for testing
-    static const char test_identifier[] = "test_identifier";
-    static const char other_identifier[] = "other_identifier";
-    
-    // Create a minimal rosidl_message_type_support_t structure
-    rosidl_message_type_support_t dummy_msg_ts = {
-        .typesupport_identifier = test_identifier,
+    /* 4. Test get_message_typesupport_handle_function */
+    /* Create a dummy message typesupport structure */
+    static const char dummy_identifier[] = "rosidl_typesupport_c";
+    static rosidl_message_type_support_t dummy_handle = {
+        .typesupport_identifier = dummy_identifier,
         .data = NULL,
         .func = NULL
     };
     
-    // Test with matching identifier
-    const rosidl_message_type_support_t *result1 = 
-        get_message_typesupport_handle_function(&dummy_msg_ts, test_identifier);
-    (void)result1;
+    /* Test with matching identifier */
+    const rosidl_message_type_support_t *msg_handle = 
+        get_message_typesupport_handle_function(&dummy_handle, dummy_identifier);
+    (void)msg_handle; /* Mark as used */
     
-    // Test with non-matching identifier
-    const rosidl_message_type_support_t *result2 = 
-        get_message_typesupport_handle_function(&dummy_msg_ts, other_identifier);
-    (void)result2;
+    /* Test with non-matching identifier */
+    const char *non_matching = "rosidl_typesupport_other";
+    msg_handle = get_message_typesupport_handle_function(&dummy_handle, non_matching);
+    (void)msg_handle; /* Mark as used */
     
-    // Test get_service_typesupport_handle with dummy data
-    // Create a minimal rosidl_service_type_support_t structure
-    rosidl_service_type_support_t dummy_svc_ts = {
-        .typesupport_identifier = test_identifier,
-        .data = NULL,
-        .func = NULL  // Note: This would normally be a function pointer
-    };
+    /* 5. Test get_service_typesupport_handle */
+    /* Create a dummy service typesupport structure with a simple function */
+    static rosidl_service_type_support_t dummy_service_handle = {0};
     
-    // Note: We can't actually call get_service_typesupport_handle with this
-    // dummy structure because func is NULL, which would cause a crash.
-    // We'll just declare it to show the API usage pattern.
-    // const rosidl_service_type_support_t *svc_result = 
-    //     get_service_typesupport_handle(&dummy_svc_ts, test_identifier);
-
-cleanup:
-    // Clean up all allocated resources
-    if (seq1.data) {
-        rosidl_runtime_c__String__Sequence__fini(&seq1);
+    /* We need to provide a valid function pointer that returns something */
+    static const rosidl_service_type_support_t dummy_return_handle = {0};
+    
+    /* Create a simple handler function */
+    static rosidl_service_type_support_t* dummy_handler(
+        const rosidl_service_type_support_t *handle, const char *identifier) {
+        (void)handle;
+        (void)identifier;
+        return (rosidl_service_type_support_t*)&dummy_return_handle;
     }
-    if (seq2.data) {
-        rosidl_runtime_c__String__Sequence__fini(&seq2);
-    }
-    if (bool_seq1.data) {
-        rosidl_runtime_c__boolean__Sequence__fini(&bool_seq1);
-    }
-    if (bool_seq2.data) {
-        rosidl_runtime_c__boolean__Sequence__fini(&bool_seq2);
-    }
+    
+    dummy_service_handle.func = (const void*)dummy_handler;
+    
+    /* Call get_service_typesupport_handle */
+    const rosidl_service_type_support_t *service_handle = 
+        get_service_typesupport_handle(&dummy_service_handle, dummy_identifier);
+    (void)service_handle; /* Mark as used */
+    
+    /* Clean up string sequences */
+    rosidl_runtime_c__String__Sequence__fini(&str_seq1);
+    rosidl_runtime_c__String__Sequence__fini(&str_seq2);
     
     return 0;
 }
-
-// Main function for standalone testing (not used by libFuzzer)
-#ifdef STANDALONE_TEST
-#include <stdio.h>
-int main() {
-    // Test with some sample data
-    uint8_t test_data[] = {5, 5, 'H', 'e', 'l', 'l', 'o', 'W', 'o', 'r', 'l', 'd'};
-    LLVMFuzzerTestOneInput(test_data, sizeof(test_data));
-    printf("Fuzz test completed successfully\n");
-    return 0;
-}
-#endif

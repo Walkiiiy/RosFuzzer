@@ -36,8 +36,10 @@ python fuzzing_llm_engine/fuzzing.py   --container-path /ws/src/ros2/rosidl/rosi
 ## FUZZ GEN流程设计
 
 下一步：
-- 生成的fuzzer编译通过率，覆盖率问题，合并成一个fuzzer
+- 生成的fuzzer编译通过率问题
+- 合并成一个fuzzer
 - 生成对应的input
+- 头文件自动获取
 
 
 ## Fuzz 流程设计

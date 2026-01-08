@@ -9,12 +9,19 @@ config:
   time_budget: "5m"
 
   headers:
-    - "rosidl_runtime_c/message_type_support.h"
+    - "rosidl_runtime_c/action_type_support_struct.h"
+    - "rosidl_runtime_c/message_initialization.h"
+    - "rosidl_runtime_c/message_type_support_struct.h"
     - "rosidl_runtime_c/primitives_sequence_functions.h"
+    - "rosidl_runtime_c/primitives_sequence.h"
     - "rosidl_runtime_c/sequence_bound.h"
-    - "rosidl_runtime_c/service_type_support.h"
+    - "rosidl_runtime_c/service_type_support_struct.h"
     - "rosidl_runtime_c/string_functions.h"
     - "rosidl_runtime_c/u16string_functions.h"
+    - "rosidl_runtime_c/visibility_control.h"
+    - "rosidl_runtime_c/string.h"
+    - "rosidl_runtime_c/string_functions.h"
+    - "rosidl_runtime_c/string_bound.h"
     - <stdlib.h>
     - <string.h>
     - <stdint.h>
