@@ -1,7 +1,6 @@
 import json
 import re
 from typing import Dict, List
-from argparse import Namespace
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.memory import (
     VectorMemory,
@@ -13,7 +12,6 @@ from regex import P
 from tqdm import tqdm
 import os
 from loguru import logger
-import yaml
 
 from fuzzing import check_compile_fuzz_driver
 
@@ -39,7 +37,6 @@ class FuzzingGenerationAgent:
             secondary_memory_sources=[self.vector_memory],
         )
         self.use_memory = use_memory
-        self.project_config = self._load_project_config()
         
         self.fuzz_driver_generation_prompt = PromptTemplate(
             "You are a fuzz driver expert, capable of writing a high-quality, compilable fuzz driver to test a library with extensive code coverage and robust error handling."
@@ -72,103 +69,6 @@ class FuzzingGenerationAgent:
             "If file operations are required, you firstly need to convert the fuzz input into a string and create the corresponding object (e.g., TIFFStreamOpen()) directly in memory with the string rather than reading input files from disk. If an output file is needed, name it uniformly as 'output_file.'\n"
             "Add any non-code content as comments. Generate an executable {lang} fuzz driver according to the above descriptions, focusing on safety, proper resource management, and error handling."
         )
-
-        self.fix_compilation_prompt = PromptTemplate(
-            "You are an expert C/C++ programmer specializing in fixing compilation errors.\n"
-            "Fix the following fuzz driver file:\n"
-            "```\n"
-            "{fuzz_driver}\n"
-            "```\n"
-            "Compilation errors:\n"
-            "{error}\n"
-            "Instructions:\n"
-            "1. Make minimal changes to fix the errors.\n"
-            "2. Do NOT modify or remove any #include statements.\n"
-            "3. Return the complete fixed code wrapped in triple backticks.\n"
-        )
-
-    def _load_project_config(self):
-        config_path = os.path.join(self.database_dir, "config.yaml")
-        if not os.path.isfile(config_path):
-            logger.warning(f"Missing config.yaml at {config_path}, fallback to defaults.")
-            return {}
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f) or {}
-        return config.get("config", {})
-
-    def _build_compile_args(self, project, fuzz_driver_path):
-        project_base = project.split("/")[-1]
-        work_dir = self.project_config.get("work_dir", os.getcwd())
-        shared_dir = self.project_config.get("shared_dir", os.path.join(work_dir, "docker_shared"))
-        if "/" in project:
-            container_path = f"/ws/src/{project}"
-            workdir = "/ws"
-        else:
-            container_path = f"/src/{project}"
-            workdir = "/src"
-        cmakelists_path = os.path.join(
-            work_dir, "fuzzing_llm_engine", "projects", project_base, "CMakeLists.txt"
-        )
-        if not os.path.isfile(cmakelists_path):
-            logger.warning(f"Missing CMakeLists.txt at {cmakelists_path}, skip compilation check.")
-            return None
-        fuzz_script_path = os.path.join(
-            work_dir, "fuzzing_llm_engine", "projects", project_base, "fuzzing.sh"
-        )
-        if not os.path.isfile(fuzz_script_path):
-            logger.warning(f"Missing fuzzing.sh at {fuzz_script_path}, skip compilation check.")
-            return None
-        fuzz_script = fuzz_script_path
-        output_path = os.path.join(shared_dir, f"{project_base}_fuzz_output.txt")
-        image = f"{project_base}_base_image:latest"
-        return Namespace(
-            image=image,
-            container_path=container_path,
-            fuzz_driver=fuzz_driver_path,
-            cmakelists=cmakelists_path,
-            fuzz_script=fuzz_script,
-            driver_dest_name="fuzzer.c",
-            target_binary="fuzzer",
-            timeout_seconds=10,
-            coverage_output=None,
-            coverage_container_path="/ws/fuzz_corpus/coverage.json",
-            coverage_text_output=None,
-            coverage_text_container_path="/ws/fuzz_corpus/coverage.txt",
-            output=output_path,
-            container_name=None,
-            workdir=workdir,
-        )
-
-    def _check_compile(self, args):
-        try:
-            return check_compile_fuzz_driver(args)
-        except SystemExit:
-            return 0
-
-    def _read_compile_output(self, output_path):
-        if not output_path or not os.path.isfile(output_path):
-            return ""
-        with open(output_path, "r", encoding="utf-8", errors="ignore") as f:
-            return f.read()
-
-    def fix_compilation(self, fuzz_driver_path, error_message):
-        if not error_message:
-            logger.warning("Empty compilation error output, skip fix.")
-            return False
-        if not os.path.isfile(fuzz_driver_path):
-            logger.warning(f"Missing fuzz driver file: {fuzz_driver_path}")
-            return False
-        with open(fuzz_driver_path, "r", encoding="utf-8", errors="ignore") as f:
-            code = f.read()
-        question = self.fix_compilation_prompt.format(fuzz_driver=code, error=error_message)
-        fix_code_raw = self.llm_coder.complete(question).text
-        fix_code = self.extract_code(str(fix_code_raw))
-        if fix_code == "No code found":
-            logger.warning("Failed to extract fixed code from LLM response.")
-            return False
-        with open(fuzz_driver_path, "w", encoding="utf-8") as f:
-            f.write(fix_code)
-        return True
   
         self.fuzz_driver_generation_prompt_with_memory = PromptTemplate(
             "You are a fuzz driver expert, capable of writing a high-quality, compilable fuzz driver to test a library with extensive code coverage and robust error handling."
@@ -305,22 +205,8 @@ endif()接文本
                 model_name = self.llm_coder.model.replace(":", "_")
                 safe_project = project.replace("/", "_")
                 fuzzer_name = f"{safe_project}_fuzz_driver_{self.use_memory}_{model_name}_{i}.{self.file_suffix[self.language.lower()]}"
-                fuzzer_path = os.path.join(fuzz_gen_code_output_dir, fuzzer_name)
-                with open(fuzzer_path, "w") as f:
+                with open(os.path.join(fuzz_gen_code_output_dir, fuzzer_name), "w") as f:
                     f.write(fuzz_driver_generation_response)
-                compile_args = self._build_compile_args(project, fuzzer_path)
-                if compile_args:
-                    compile_ok = self._check_compile(compile_args)
-                    fix_attempts = 0
-                    while compile_ok == 0 and fix_attempts < 5:
-                        error_message = self._read_compile_output(compile_args.output)
-                        if not self.fix_compilation(fuzzer_path, error_message):
-                            break
-                        compile_ok = self._check_compile(compile_args)
-                        fix_attempts += 1
-                    if compile_ok == 0:
-                        logger.warning(f"Compilation failed after {fix_attempts} fixes, delete {fuzzer_path}")
-                        os.remove(fuzzer_path)
                 i += 1
             else:
                 return False
@@ -346,25 +232,7 @@ endif()接文本
             fuzz_driver_generation_response = self.fuzz_driver_generation(api_list_proc, api_info, self.headers, api_sum)
             fuzz_driver_generation_response = self.extract_code(str(fuzz_driver_generation_response))
             logger.info(fuzz_driver_generation_response)
-            fuzzer_path = os.path.join(fuzz_gen_code_output_dir, fuzzer_name)
-            with open(fuzzer_path, "w") as f:
+            with open(os.path.join(fuzz_gen_code_output_dir, fuzzer_name), "w") as f:
                 f.write(fuzz_driver_generation_response)
-            project_name = self.project_config.get("project_name")
-            if not project_name:
-                logger.warning("Missing project_name in config, skip compilation check.")
-            else:
-                compile_args = self._build_compile_args(project_name, fuzzer_path)
-                if compile_args:
-                    compile_ok = self._check_compile(compile_args)
-                    fix_attempts = 0
-                    while compile_ok == 0 and fix_attempts < 5:
-                        error_message = self._read_compile_output(compile_args.output)
-                        if not self.fix_compilation(fuzzer_path, error_message):
-                            break
-                        compile_ok = self._check_compile(compile_args)
-                        fix_attempts += 1
-                    if compile_ok == 0:
-                        logger.warning(f"Compilation failed after {fix_attempts} fixes, delete {fuzzer_path}")
-                        os.remove(fuzzer_path)
         else:
             return False

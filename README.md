@@ -37,6 +37,7 @@ python fuzzing_llm_engine/fuzzing.py   --container-path /ws/src/ros2/rosidl/rosi
 
 下一步：
 - 生成的fuzzer编译通过率问题
+  - 在genfuzzer模块后面单独再加一个模块check_compilation，调用fuzzing执行编译检查修复
 - 合并成一个fuzzer
 - 生成对应的input
 - 头文件自动获取
