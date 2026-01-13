@@ -7,6 +7,27 @@
     ENV LANG=en_US.UTF-8
     ENV LC_ALL=en_US.UTF-8
 
+
+    # ========= 系统内存和核心转储配置 =========
+    # 配置系统以允许核心转储并增加限制
+    RUN echo "kernel.core_pattern=/tmp/core.%e.%p.%t" >> /etc/sysctl.conf && \
+        echo "kernel.core_uses_pid=1" >> /etc/sysctl.conf && \
+        echo "fs.suid_dumpable=2" >> /etc/sysctl.conf && \
+        echo "vm.overcommit_memory=1" >> /etc/sysctl.conf && \
+        echo "vm.mmap_min_addr=0" >> /etc/sysctl.conf && \
+        sysctl -p
+
+    # 增加用户进程限制
+    RUN echo "* soft core unlimited" >> /etc/security/limits.conf && \
+        echo "* hard core unlimited" >> /etc/security/limits.conf && \
+        echo "* soft memlock unlimited" >> /etc/security/limits.conf && \
+        echo "* hard memlock unlimited" >> /etc/security/limits.conf && \
+        echo "* soft stack unlimited" >> /etc/security/limits.conf && \
+        echo "* hard stack unlimited" >> /etc/security/limits.conf && \
+        echo "* soft nofile 65536" >> /etc/security/limits.conf && \
+        echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+
     # ========= 换源（HTTP bootstrap，规避 TLS/CA 问题） =========
     RUN sed -i 's@http://archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list && \
         sed -i 's@http://security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g' /etc/apt/sources.list && \
@@ -90,6 +111,16 @@
                     python3-catkin-pkg-modules \
                     python3-rosdistro-modules" && \
         rm -rf /var/lib/apt/lists/*
+
+
+    # ========= 安装额外依赖(原fuzzing.sh安装) =========
+    RUN apt update && apt-get install -y --no-install-recommends \
+    clang lld \
+    llvm llvm-dev llvm-runtime \
+    llvm \
+    && rm -rf /var/lib/apt/lists/*
+
+
 
     COPY build.sh /ws/
     

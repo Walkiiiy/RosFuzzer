@@ -4,7 +4,6 @@
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
 #include <rosidl_runtime_c/primitives_sequence.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
 #include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
 #include <rosidl_runtime_c/visibility_control.h>
@@ -18,17 +17,13 @@
 
 // Forward declarations for dummy type support structures
 // These would normally come from generated message/service headers
-typedef struct rosidl_message_type_support_t {
-    const char * typesupport_identifier;
-    const void * data;
-    const void * func;
-} rosidl_message_type_support_t;
 
-typedef struct rosidl_service_type_support_t {
-    const char * typesupport_identifier;
-    const void * data;
-    const void * func;
-} rosidl_service_type_support_t;
+// Define function pointer types for type support handles
+typedef const struct rosidl_message_type_support_t * (*rosidl_message_typesupport_handle_function)(
+    const struct rosidl_message_type_support_t *, const char *);
+
+typedef const struct rosidl_service_type_support_t * (*rosidl_service_typesupport_handle_function)(
+    const struct rosidl_service_type_support_t *, const char *);
 
 // Dummy function implementations for testing
 // These simulate the actual type support functions
@@ -60,9 +55,7 @@ const rosidl_message_type_support_t * get_message_typesupport_handle(
 {
     assert(handle);
     assert(handle->func);
-    typedef const rosidl_message_type_support_t * (*func_type)(const rosidl_message_type_support_t *, const char *);
-    func_type func = (func_type)(handle->func);
-    return func(handle, identifier);
+    return handle->func(handle, identifier);
 }
 
 const rosidl_message_type_support_t * get_message_typesupport_handle_function(
@@ -126,9 +119,7 @@ const rosidl_service_type_support_t * get_service_typesupport_handle(
 {
     assert(handle);
     assert(handle->func);
-    typedef const rosidl_service_type_support_t * (*func_type)(const rosidl_service_type_support_t *, const char *);
-    func_type func = (func_type)(handle->func);
-    return func(handle, identifier);
+    return handle->func(handle, identifier);
 }
 
 // Main fuzzer entry point
@@ -196,12 +187,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     rosidl_message_type_support_t dummy_msg_handle;
     dummy_msg_handle.typesupport_identifier = "rosidl_typesupport_c";
     dummy_msg_handle.data = NULL;
-    dummy_msg_handle.func = (void *)dummy_message_typesupport_func;
+    dummy_msg_handle.func = dummy_message_typesupport_func;
     
     rosidl_message_type_support_t dummy_msg_handle2;
     dummy_msg_handle2.typesupport_identifier = identifier;
     dummy_msg_handle2.data = NULL;
-    dummy_msg_handle2.func = (void *)dummy_message_typesupport_func;
+    dummy_msg_handle2.func = dummy_message_typesupport_func;
     
     // Test get_message_typesupport_handle_function
     const rosidl_message_type_support_t *msg_result = 
@@ -230,12 +221,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     rosidl_service_type_support_t dummy_srv_handle;
     dummy_srv_handle.typesupport_identifier = "rosidl_typesupport_c";
     dummy_srv_handle.data = NULL;
-    dummy_srv_handle.func = (void *)dummy_service_typesupport_func;
+    dummy_srv_handle.func = dummy_service_typesupport_func;
     
     rosidl_service_type_support_t dummy_srv_handle2;
     dummy_srv_handle2.typesupport_identifier = identifier;
     dummy_srv_handle2.data = NULL;
-    dummy_srv_handle2.func = (void *)dummy_service_typesupport_func;
+    dummy_srv_handle2.func = dummy_service_typesupport_func;
     
     // Test get_service_typesupport_handle
     const rosidl_service_type_support_t *srv_result = 

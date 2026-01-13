@@ -39,6 +39,15 @@ static uint32_t get_uint32(const uint8_t *data, size_t size, size_t *offset) {
     return value;
 }
 
+/* Create a simple handler function outside of LLVMFuzzerTestOneInput */
+static rosidl_service_type_support_t* dummy_handler(
+    const rosidl_service_type_support_t *handle, const char *identifier) {
+    (void)handle;
+    (void)identifier;
+    static const rosidl_service_type_support_t dummy_return_handle = {0};
+    return (rosidl_service_type_support_t*)&dummy_return_handle;
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     /* Initialize offset for reading from fuzz input */
     size_t offset = 0;
@@ -133,17 +142,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     /* 5. Test get_service_typesupport_handle */
     /* Create a dummy service typesupport structure with a simple function */
     static rosidl_service_type_support_t dummy_service_handle = {0};
-    
-    /* We need to provide a valid function pointer that returns something */
-    static const rosidl_service_type_support_t dummy_return_handle = {0};
-    
-    /* Create a simple handler function */
-    static rosidl_service_type_support_t* dummy_handler(
-        const rosidl_service_type_support_t *handle, const char *identifier) {
-        (void)handle;
-        (void)identifier;
-        return (rosidl_service_type_support_t*)&dummy_return_handle;
-    }
     
     dummy_service_handle.func = (const void*)dummy_handler;
     

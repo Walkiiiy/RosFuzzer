@@ -1,0 +1,863 @@
+Starting fuzzing script for rosidl_runtime_c...
+Starting >>> ament_package
+Starting >>> ament_lint
+Starting >>> gtest_vendor
+Starting >>> ament_pycodestyle
+Starting >>> ament_cppcheck
+Starting >>> osrf_pycommon
+Starting >>> google_benchmark_vendor
+Starting >>> osrf_testing_tools_cpp
+--- stderr: gtest_vendor
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    BUILD_TESTING
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---Finished <<< gtest_vendor [1.01s]
+
+Starting >>> gmock_vendor
+--- stderr: gmock_vendor
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    BUILD_TESTING
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< gmock_vendor [0.24s]
+Finished <<< ament_lint [1.73s]
+Starting >>> ament_flake8
+Finished <<< ament_package [1.92s]
+Finished <<< ament_cppcheck [1.92s]
+Finished <<< osrf_pycommon [1.92s]
+Finished <<< ament_pycodestyle [1.93s]
+Starting >>> ament_cmake_core
+--- stderr: ament_cmake_core
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_core [1.02s]
+Starting >>> ament_cmake_python
+Starting >>> ament_cmake_libraries
+Starting >>> ament_cmake_export_libraries
+Starting >>> ament_cmake_include_directories
+Starting >>> ament_cmake_export_definitions
+Starting >>> ament_cmake_export_include_directories
+Starting >>> ament_cmake_export_link_flags
+Starting >>> ament_cmake_version
+Finished <<< ament_flake8 [1.42s]
+Starting >>> ament_pep257
+--- stderr: ament_cmake_python
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_python [1.56s]
+Starting >>> ament_cmake_test
+--- stderr: ament_cmake_export_libraries
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_libraries [1.59s]
+--- stderr: ament_cmake_export_include_directories
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_include_directories [1.60s]
+Starting >>> ament_cmake_export_interfaces
+Starting >>> ament_cmake_export_targets
+--- stderr: ament_cmake_version
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_version [1.70s]
+--- stderr: ament_cmake_libraries
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_libraries [1.78s]
+Starting >>> ament_cmake_export_dependencies
+--- stderr: ament_cmake_include_directories
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_include_directories [1.81s]
+Starting >>> ament_cmake_target_dependencies
+--- stderr: ament_cmake_export_definitions
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_definitions [1.84s]
+--- stderr: ament_cmake_export_link_flags
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_link_flags [1.86s]
+Finished <<< ament_pep257 [1.88s]
+Starting >>> ament_copyright
+--- stderr: ament_cmake_export_targets
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_targets [0.81s]
+--- stderr: ament_cmake_export_interfaces
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_interfaces [0.83s]
+--- stderr: ament_cmake_target_dependencies
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_target_dependencies [0.65s]
+--- stderr: ament_cmake_export_dependencies
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_export_dependencies [0.71s]
+--- stderr: ament_cmake_test
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_test [1.14s]
+Starting >>> ament_cmake_gtest
+Starting >>> ament_lint_auto
+Starting >>> ament_cmake_pytest
+--- stderr: osrf_testing_tools_cpp
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< osrf_testing_tools_cpp [5.70s]
+Finished <<< ament_copyright [0.83s]
+Starting >>> ament_lint_cmake
+Starting >>> ament_cpplint
+Starting >>> ament_xmllint
+Starting >>> ament_index_python
+Starting >>> domain_coordinator
+--- stderr: ament_cmake_gtest
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_gtest [1.10s]
+Finished <<< ament_cmake_pytest [1.13s]
+--- stderr: ament_cmake_pytest
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Starting >>> ament_cmake_gen_version_h
+Starting >>> ament_cmake_gmock
+--- stderr: ament_lint_auto
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_lint_auto [1.16s]
+Finished <<< ament_index_python [1.56s]
+Starting >>> launch
+Finished <<< ament_lint_cmake [1.58s]
+Finished <<< ament_cpplint [1.59s]
+Starting >>> ament_cmake_lint_cmake
+Finished <<< domain_coordinator [1.59s]
+Finished <<< ament_xmllint [1.61s]
+--- stderr: ament_cmake_gmock
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_gmock [0.87s]
+--- stderr: ament_cmake_gen_version_h
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_gen_version_h [1.08s]
+Starting >>> ament_cmake
+--- stderr: ament_cmake_lint_cmake
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_lint_cmake [0.59s]
+Starting >>> ament_cmake_copyright
+Finished <<< launch [0.80s]
+Starting >>> launch_xml
+Starting >>> launch_yaml
+--- stderr: ament_cmake
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake [0.56s]
+Starting >>> uncrustify_vendor
+--- stderr: ament_cmake_copyright
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_copyright [0.58s]
+Starting >>> ament_cmake_cppcheck
+Starting >>> ament_cmake_cpplint
+Starting >>> ament_cmake_flake8
+Starting >>> ament_cmake_pep257
+Starting >>> ament_cmake_xmllint
+Finished <<< ament_cmake_flake8 [0.70s]
+--- stderr: ament_cmake_flake8
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+--- stderr: ament_cmake_cppcheck
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_cppcheck [0.72s]
+Finished <<< launch_xml [1.13s]
+Finished <<< launch_yaml [1.14s]
+--- stderr: ament_cmake_pep257
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_pep257 [0.75s]
+Starting >>> launch_testing
+--- stderr: ament_cmake_xmllint
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_xmllint [0.77s]
+--- stderr: ament_cmake_cpplint
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_cpplint [0.79s]
+--- stderr: uncrustify_vendor
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< uncrustify_vendor [1.17s]
+Starting >>> ament_uncrustify
+Finished <<< launch_testing [0.81s]
+Finished <<< ament_uncrustify [0.67s]
+Starting >>> ament_cmake_uncrustify
+--- stderr: ament_cmake_uncrustify
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_uncrustify [1.07s]
+Starting >>> ament_lint_common
+--- stderr: ament_lint_common
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_lint_common [0.88s]
+Starting >>> python_cmake_module
+Starting >>> ament_cmake_ros
+Starting >>> mimick_vendor
+Starting >>> rosidl_typesupport_interface
+--- stderr: rosidl_typesupport_interface
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< rosidl_typesupport_interface [0.68s]
+--- stderr: python_cmake_module
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< python_cmake_module [0.71s]
+Starting >>> launch_testing_ament_cmake
+--- stderr: ament_cmake_ros
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_ros [0.73s]
+--- stderr: launch_testing_ament_cmake
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< launch_testing_ament_cmake [0.91s]
+--- stderr: google_benchmark_vendor
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    BUILD_TESTING
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+Cloning into 'benchmark-1.5.3'...
+HEAD is now at c05843a [sysinfo] Fix CPU Frequency reading on AMD Ryzen CPU's (#1117)
+---
+Finished <<< google_benchmark_vendor [14.8s]
+Starting >>> ament_cmake_google_benchmark
+--- stderr: ament_cmake_google_benchmark
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    CMAKE_EXE_LINKER_FLAGS
+    CMAKE_SHARED_LINKER_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Finished <<< ament_cmake_google_benchmark [0.67s]
+Starting >>> performance_test_fixture
+Finished <<< performance_test_fixture [1.67s]
+--- stderr: performance_test_fixture
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+--- stderr: mimick_vendor
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+Cloning into 'mimick-de11f8377eb95f932a03707b583bf3d4ce5bd3e7'...
+HEAD is now at de11f83 Support raspberry pi zero (#21)
+---
+Finished <<< mimick_vendor [4.86s]
+Starting >>> rcutils
+Finished <<< rcutils [1.84s]
+--- stderr: rcutils
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    ROSIDL_RUNTIME_C_ENABLE_FUZZ
+
+
+---
+Starting >>> rosidl_runtime_c
+--- stderr: rosidl_runtime_c
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_CXX_COMPILER
+    CMAKE_CXX_FLAGS
+
+
+/ws/src/ros2/rosidl/rosidl_runtime_c/fuzz/fuzzer.c:52:25: warning: unused variable 'allocator' [-Wunused-variable]
+    rcutils_allocator_t allocator = rcutils_get_default_allocator();
+                        ^
+1 warning generated.
+---
+Finished <<< rosidl_runtime_c [1.19s]
+
+Summary: 61 packages finished [21.7s]
+  43 packages had stderr output: ament_cmake ament_cmake_copyright ament_cmake_core ament_cmake_cppcheck ament_cmake_cpplint ament_cmake_export_definitions ament_cmake_export_dependencies ament_cmake_export_include_directories ament_cmake_export_interfaces ament_cmake_export_libraries ament_cmake_export_link_flags ament_cmake_export_targets ament_cmake_flake8 ament_cmake_gen_version_h ament_cmake_gmock ament_cmake_google_benchmark ament_cmake_gtest ament_cmake_include_directories ament_cmake_libraries ament_cmake_lint_cmake ament_cmake_pep257 ament_cmake_pytest ament_cmake_python ament_cmake_ros ament_cmake_target_dependencies ament_cmake_test ament_cmake_uncrustify ament_cmake_version ament_cmake_xmllint ament_lint_auto ament_lint_common gmock_vendor google_benchmark_vendor gtest_vendor launch_testing_ament_cmake mimick_vendor osrf_testing_tools_cpp performance_test_fixture python_cmake_module rcutils rosidl_runtime_c rosidl_typesupport_interface uncrustify_vendor
+
+
+WARNING: unrecognized flag '-handle_abort=1'; use -help=1 to list all flags
+
+
+
+WARNING: unrecognized flag '-handle_sigill=1'; use -help=1 to list all flags
+
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1437550222
+INFO: Loaded 1 modules   (191 inline 8-bit counters): 191 [0x59be4abffe20, 0x59be4abffedf), 
+INFO: Loaded 1 PC tables (191 PCs): 191 [0x59be4abffee0,0x59be4ac00ad0), 
+INFO:        4 files found in fuzz_corpus
+INFO: -max_len is not provided; libFuzzer will not generate inputs larger than 136392 bytes
+INFO: seed corpus: files: 4 min: 192b max: 136392b total: 137360b rss: 30Mb
+#5	INITED cov: 52 ft: 53 corp: 1/192b exec/s: 0 rss: 32Mb
+#7	NEW    cov: 53 ft: 54 corp: 2/384b lim: 192 exec/s: 0 rss: 32Mb L: 192/192 MS: 2 ChangeByte-CrossOver-
+#8	NEW    cov: 63 ft: 64 corp: 3/576b lim: 192 exec/s: 0 rss: 32Mb L: 192/192 MS: 1 ChangeByte-
+#14	REDUCE cov: 63 ft: 64 corp: 3/517b lim: 192 exec/s: 0 rss: 32Mb L: 133/192 MS: 1 EraseBytes-
+#21	REDUCE cov: 63 ft: 64 corp: 3/426b lim: 192 exec/s: 0 rss: 32Mb L: 101/192 MS: 2 ChangeBinInt-CrossOver-
+#27	REDUCE cov: 63 ft: 64 corp: 3/414b lim: 192 exec/s: 0 rss: 32Mb L: 180/180 MS: 1 EraseBytes-
+#31	REDUCE cov: 63 ft: 64 corp: 3/352b lim: 192 exec/s: 0 rss: 32Mb L: 118/133 MS: 4 InsertByte-ChangeBit-InsertRepeatedBytes-EraseBytes-
+#57	REDUCE cov: 63 ft: 64 corp: 3/347b lim: 192 exec/s: 0 rss: 32Mb L: 113/133 MS: 1 EraseBytes-
+#83	REDUCE cov: 63 ft: 64 corp: 3/339b lim: 192 exec/s: 0 rss: 32Mb L: 105/133 MS: 1 CrossOver-
+#108	REDUCE cov: 63 ft: 64 corp: 3/331b lim: 192 exec/s: 0 rss: 32Mb L: 93/133 MS: 5 ChangeBinInt-CopyPart-CrossOver-CopyPart-EraseBytes-
+#111	REDUCE cov: 63 ft: 64 corp: 3/321b lim: 192 exec/s: 0 rss: 32Mb L: 123/123 MS: 3 ChangeBit-InsertRepeatedBytes-EraseBytes-
+#161	REDUCE cov: 63 ft: 64 corp: 3/243b lim: 192 exec/s: 0 rss: 32Mb L: 45/105 MS: 5 ShuffleBytes-ShuffleBytes-InsertByte-InsertRepeatedBytes-CrossOver-
+#191	REDUCE cov: 65 ft: 92 corp: 4/275b lim: 192 exec/s: 0 rss: 32Mb L: 32/105 MS: 5 ChangeBit-EraseBytes-ShuffleBytes-ChangeBit-ChangeByte-
+#192	NEW    cov: 65 ft: 99 corp: 5/351b lim: 192 exec/s: 0 rss: 32Mb L: 76/105 MS: 1 CrossOver-
+#195	NEW    cov: 65 ft: 100 corp: 6/383b lim: 192 exec/s: 0 rss: 32Mb L: 32/105 MS: 3 CrossOver-ChangeBit-CopyPart-
+#196	NEW    cov: 65 ft: 107 corp: 7/550b lim: 192 exec/s: 0 rss: 32Mb L: 167/167 MS: 1 InsertRepeatedBytes-
+#197	NEW    cov: 65 ft: 120 corp: 8/714b lim: 192 exec/s: 0 rss: 32Mb L: 164/167 MS: 1 EraseBytes-
+#203	NEW    cov: 65 ft: 138 corp: 9/807b lim: 192 exec/s: 0 rss: 32Mb L: 93/167 MS: 1 EraseBytes-
+#208	NEW    cov: 65 ft: 139 corp: 10/985b lim: 192 exec/s: 0 rss: 32Mb L: 178/178 MS: 5 ChangeByte-ShuffleBytes-CrossOver-EraseBytes-InsertByte-
+#214	REDUCE cov: 65 ft: 139 corp: 10/982b lim: 192 exec/s: 0 rss: 32Mb L: 164/178 MS: 1 EraseBytes-
+#219	NEW    cov: 65 ft: 144 corp: 11/1047b lim: 192 exec/s: 0 rss: 32Mb L: 65/178 MS: 5 CMP-CrossOver-InsertByte-CrossOver-InsertByte- DE: "\001\000"-
+#223	NEW    cov: 65 ft: 149 corp: 12/1232b lim: 192 exec/s: 0 rss: 32Mb L: 185/185 MS: 4 PersAutoDict-CopyPart-CrossOver-InsertRepeatedBytes- DE: "\001\000"-
+#237	REDUCE cov: 65 ft: 149 corp: 12/1229b lim: 192 exec/s: 0 rss: 33Mb L: 161/185 MS: 4 ChangeByte-ChangeByte-InsertRepeatedBytes-EraseBytes-
+#248	REDUCE cov: 65 ft: 149 corp: 12/1177b lim: 192 exec/s: 0 rss: 33Mb L: 112/185 MS: 1 CrossOver-
+#266	REDUCE cov: 65 ft: 149 corp: 12/1136b lim: 192 exec/s: 0 rss: 33Mb L: 71/185 MS: 3 ChangeBinInt-PersAutoDict-EraseBytes- DE: "\001\000"-
+#302	NEW    cov: 65 ft: 163 corp: 13/1322b lim: 192 exec/s: 0 rss: 33Mb L: 186/186 MS: 1 InsertByte-
+#305	REDUCE cov: 65 ft: 163 corp: 13/1306b lim: 192 exec/s: 0 rss: 33Mb L: 55/186 MS: 3 ChangeByte-CrossOver-EraseBytes-
+#313	REDUCE cov: 65 ft: 163 corp: 13/1243b lim: 192 exec/s: 0 rss: 33Mb L: 98/186 MS: 3 ChangeByte-PersAutoDict-EraseBytes- DE: "\001\000"-
+#357	REDUCE cov: 65 ft: 163 corp: 13/1209b lim: 192 exec/s: 0 rss: 33Mb L: 59/186 MS: 4 InsertByte-PersAutoDict-InsertByte-EraseBytes- DE: "\001\000"-
+#376	REDUCE cov: 65 ft: 163 corp: 13/1150b lim: 192 exec/s: 0 rss: 33Mb L: 126/186 MS: 4 ChangeByte-EraseBytes-ChangeBinInt-CrossOver-
+#416	REDUCE cov: 65 ft: 163 corp: 13/1139b lim: 192 exec/s: 0 rss: 33Mb L: 87/186 MS: 5 InsertByte-ChangeBinInt-InsertByte-EraseBytes-PersAutoDict- DE: "\001\000"-
+#423	NEW    cov: 65 ft: 176 corp: 14/1188b lim: 192 exec/s: 0 rss: 33Mb L: 49/186 MS: 2 PersAutoDict-EraseBytes- DE: "\001\000"-
+#436	REDUCE cov: 65 ft: 176 corp: 14/1145b lim: 192 exec/s: 0 rss: 33Mb L: 83/186 MS: 3 ChangeByte-InsertByte-EraseBytes-
+#463	REDUCE cov: 65 ft: 176 corp: 14/1093b lim: 192 exec/s: 0 rss: 33Mb L: 126/186 MS: 2 ChangeBinInt-EraseBytes-
+#466	REDUCE cov: 65 ft: 176 corp: 14/1067b lim: 192 exec/s: 0 rss: 33Mb L: 79/186 MS: 3 InsertByte-InsertByte-CrossOver-
+#482	REDUCE cov: 65 ft: 176 corp: 14/1064b lim: 192 exec/s: 0 rss: 33Mb L: 52/186 MS: 1 EraseBytes-
+#494	REDUCE cov: 65 ft: 176 corp: 14/1063b lim: 192 exec/s: 0 rss: 33Mb L: 58/186 MS: 2 EraseBytes-PersAutoDict- DE: "\001\000"-
+#506	NEW    cov: 66 ft: 177 corp: 15/1077b lim: 192 exec/s: 0 rss: 33Mb L: 14/186 MS: 2 ShuffleBytes-CrossOver-
+#532	REDUCE cov: 66 ft: 177 corp: 15/1051b lim: 192 exec/s: 0 rss: 33Mb L: 57/186 MS: 1 EraseBytes-
+#534	REDUCE cov: 66 ft: 177 corp: 15/1032b lim: 192 exec/s: 0 rss: 33Mb L: 39/186 MS: 2 CMP-EraseBytes- DE: "lI\000\000``\000\000"-
+#558	REDUCE cov: 66 ft: 177 corp: 15/998b lim: 192 exec/s: 0 rss: 33Mb L: 53/186 MS: 4 CMP-ShuffleBytes-EraseBytes-ChangeByte- DE: "\001\000\000\000\000\000\000\000"-
+#589	REDUCE cov: 66 ft: 177 corp: 15/962b lim: 192 exec/s: 0 rss: 33Mb L: 90/186 MS: 1 EraseBytes-
+#612	REDUCE cov: 66 ft: 177 corp: 15/956b lim: 192 exec/s: 0 rss: 34Mb L: 47/186 MS: 3 PersAutoDict-EraseBytes-InsertByte- DE: "lI\000\000``\000\000"-
+#620	REDUCE cov: 66 ft: 177 corp: 15/932b lim: 192 exec/s: 0 rss: 34Mb L: 69/186 MS: 3 ChangeBinInt-PersAutoDict-EraseBytes- DE: "\001\000\000\000\000\000\000\000"-
+#660	REDUCE cov: 66 ft: 177 corp: 15/883b lim: 192 exec/s: 0 rss: 34Mb L: 20/186 MS: 5 ShuffleBytes-ShuffleBytes-ShuffleBytes-ChangeASCIIInt-CrossOver-
+#747	REDUCE cov: 66 ft: 177 corp: 15/864b lim: 192 exec/s: 0 rss: 34Mb L: 28/186 MS: 2 EraseBytes-InsertByte-
+#750	NEW    cov: 67 ft: 178 corp: 16/886b lim: 192 exec/s: 0 rss: 34Mb L: 22/186 MS: 3 ChangeBinInt-ChangeBit-EraseBytes-
+#802	REDUCE cov: 67 ft: 178 corp: 16/880b lim: 192 exec/s: 0 rss: 34Mb L: 16/186 MS: 2 ChangeBit-EraseBytes-
+#856	REDUCE cov: 67 ft: 178 corp: 16/860b lim: 192 exec/s: 0 rss: 34Mb L: 25/186 MS: 4 InsertByte-ChangeBinInt-InsertByte-EraseBytes-
+#877	REDUCE cov: 67 ft: 178 corp: 16/853b lim: 192 exec/s: 0 rss: 34Mb L: 50/186 MS: 1 EraseBytes-
+#928	REDUCE cov: 67 ft: 178 corp: 16/850b lim: 192 exec/s: 0 rss: 34Mb L: 11/186 MS: 1 EraseBytes-
+#951	REDUCE cov: 67 ft: 178 corp: 16/846b lim: 192 exec/s: 0 rss: 34Mb L: 16/186 MS: 3 ChangeBit-EraseBytes-CopyPart-
+#963	REDUCE cov: 67 ft: 178 corp: 16/832b lim: 192 exec/s: 0 rss: 34Mb L: 51/186 MS: 2 ShuffleBytes-EraseBytes-
+#966	REDUCE cov: 67 ft: 178 corp: 16/825b lim: 192 exec/s: 0 rss: 34Mb L: 43/186 MS: 3 InsertRepeatedBytes-CopyPart-EraseBytes-
+#1033	REDUCE cov: 67 ft: 178 corp: 16/801b lim: 192 exec/s: 0 rss: 34Mb L: 27/186 MS: 2 CopyPart-EraseBytes-
+#1132	REDUCE cov: 67 ft: 178 corp: 16/796b lim: 192 exec/s: 0 rss: 35Mb L: 6/186 MS: 4 ChangeByte-CMP-CopyPart-EraseBytes- DE: "\377\377"-
+#1159	REDUCE cov: 67 ft: 178 corp: 16/760b lim: 192 exec/s: 0 rss: 35Mb L: 43/186 MS: 2 InsertByte-EraseBytes-
+#1317	REDUCE cov: 67 ft: 178 corp: 16/758b lim: 192 exec/s: 0 rss: 35Mb L: 4/186 MS: 3 CrossOver-ChangeByte-EraseBytes-
+#1393	REDUCE cov: 67 ft: 178 corp: 16/744b lim: 192 exec/s: 0 rss: 35Mb L: 18/186 MS: 1 CrossOver-
+#1433	REDUCE cov: 67 ft: 178 corp: 16/730b lim: 192 exec/s: 0 rss: 35Mb L: 29/186 MS: 5 PersAutoDict-EraseBytes-ShuffleBytes-EraseBytes-EraseBytes- DE: "\377\377"-
+#1589	REDUCE cov: 67 ft: 178 corp: 16/725b lim: 192 exec/s: 0 rss: 35Mb L: 22/186 MS: 1 EraseBytes-
+#1638	REDUCE cov: 67 ft: 178 corp: 16/707b lim: 192 exec/s: 0 rss: 35Mb L: 21/186 MS: 4 InsertByte-ChangeByte-InsertByte-EraseBytes-
+#1659	REDUCE cov: 67 ft: 178 corp: 16/706b lim: 192 exec/s: 0 rss: 35Mb L: 3/186 MS: 1 EraseBytes-
+#1665	REDUCE cov: 67 ft: 178 corp: 16/669b lim: 192 exec/s: 0 rss: 35Mb L: 149/149 MS: 1 EraseBytes-
+#1692	REDUCE cov: 67 ft: 178 corp: 16/645b lim: 192 exec/s: 0 rss: 36Mb L: 66/149 MS: 2 EraseBytes-CrossOver-
+#1707	REDUCE cov: 67 ft: 178 corp: 16/610b lim: 192 exec/s: 0 rss: 36Mb L: 114/114 MS: 5 PersAutoDict-ShuffleBytes-PersAutoDict-InsertRepeatedBytes-EraseBytes- DE: "\001\000"-"lI\000\000``\000\000"-
+#1715	REDUCE cov: 67 ft: 178 corp: 16/608b lim: 192 exec/s: 0 rss: 36Mb L: 50/114 MS: 3 ShuffleBytes-ChangeByte-EraseBytes-
+#1722	REDUCE cov: 67 ft: 178 corp: 16/602b lim: 192 exec/s: 0 rss: 36Mb L: 19/114 MS: 2 EraseBytes-ChangeBinInt-
+#1755	REDUCE cov: 67 ft: 178 corp: 16/568b lim: 192 exec/s: 0 rss: 36Mb L: 42/114 MS: 3 ChangeBinInt-ChangeBinInt-EraseBytes-
+#1842	REDUCE cov: 67 ft: 178 corp: 16/567b lim: 192 exec/s: 0 rss: 36Mb L: 48/114 MS: 2 EraseBytes-CopyPart-
+#1863	REDUCE cov: 67 ft: 178 corp: 16/566b lim: 192 exec/s: 0 rss: 36Mb L: 2/114 MS: 1 EraseBytes-
+#1889	REDUCE cov: 67 ft: 178 corp: 16/565b lim: 192 exec/s: 0 rss: 36Mb L: 20/114 MS: 1 EraseBytes-
+#1899	REDUCE cov: 67 ft: 178 corp: 16/535b lim: 192 exec/s: 0 rss: 36Mb L: 84/84 MS: 5 ShuffleBytes-InsertByte-ChangeBinInt-EraseBytes-CopyPart-
+#1931	REDUCE cov: 67 ft: 178 corp: 16/533b lim: 192 exec/s: 0 rss: 36Mb L: 30/84 MS: 2 ChangeBit-EraseBytes-
+#2007	REDUCE cov: 67 ft: 178 corp: 16/532b lim: 192 exec/s: 0 rss: 36Mb L: 1/84 MS: 1 EraseBytes-
+#2063	REDUCE cov: 67 ft: 178 corp: 16/525b lim: 192 exec/s: 0 rss: 36Mb L: 35/84 MS: 1 EraseBytes-
+#2105	REDUCE cov: 67 ft: 178 corp: 16/511b lim: 192 exec/s: 0 rss: 36Mb L: 34/84 MS: 2 PersAutoDict-EraseBytes- DE: "\001\000"-
+#2143	REDUCE cov: 67 ft: 178 corp: 16/510b lim: 192 exec/s: 0 rss: 36Mb L: 27/84 MS: 3 EraseBytes-ChangeBit-PersAutoDict- DE: "\001\000\000\000\000\000\000\000"-
+#2168	REDUCE cov: 67 ft: 185 corp: 17/641b lim: 192 exec/s: 0 rss: 36Mb L: 131/131 MS: 5 PersAutoDict-ChangeByte-CopyPart-ChangeBinInt-InsertRepeatedBytes- DE: "\001\000\000\000\000\000\000\000"-
+#2211	REDUCE cov: 67 ft: 185 corp: 17/636b lim: 192 exec/s: 0 rss: 37Mb L: 45/131 MS: 3 InsertByte-CopyPart-EraseBytes-
+#2308	REDUCE cov: 67 ft: 185 corp: 17/628b lim: 192 exec/s: 0 rss: 37Mb L: 26/131 MS: 2 ChangeByte-EraseBytes-
+#2370	REDUCE cov: 67 ft: 185 corp: 17/622b lim: 192 exec/s: 0 rss: 37Mb L: 78/131 MS: 2 InsertByte-EraseBytes-
+#2447	REDUCE cov: 67 ft: 185 corp: 17/606b lim: 192 exec/s: 0 rss: 37Mb L: 29/131 MS: 2 ChangeBinInt-EraseBytes-
+#2484	REDUCE cov: 67 ft: 185 corp: 17/604b lim: 192 exec/s: 0 rss: 37Mb L: 24/131 MS: 2 ChangeByte-EraseBytes-
+#2633	REDUCE cov: 67 ft: 185 corp: 17/599b lim: 192 exec/s: 0 rss: 37Mb L: 25/131 MS: 4 ChangeBit-InsertByte-PersAutoDict-EraseBytes- DE: "\001\000"-
+#2794	REDUCE cov: 67 ft: 185 corp: 17/591b lim: 192 exec/s: 0 rss: 38Mb L: 16/131 MS: 1 EraseBytes-
+#2841	REDUCE cov: 67 ft: 185 corp: 17/585b lim: 192 exec/s: 0 rss: 38Mb L: 16/131 MS: 2 EraseBytes-ChangeBinInt-
+#2866	REDUCE cov: 67 ft: 185 corp: 17/566b lim: 192 exec/s: 0 rss: 38Mb L: 24/131 MS: 5 EraseBytes-EraseBytes-ChangeBinInt-CopyPart-InsertByte-
+#2871	REDUCE cov: 67 ft: 185 corp: 17/552b lim: 192 exec/s: 0 rss: 38Mb L: 21/131 MS: 5 ChangeBit-ChangeBit-CMP-PersAutoDict-EraseBytes- DE: "\000\000\000\000"-"lI\000\000``\000\000"-
+#2876	REDUCE cov: 67 ft: 185 corp: 17/540b lim: 192 exec/s: 0 rss: 38Mb L: 17/131 MS: 5 PersAutoDict-InsertByte-ChangeBit-PersAutoDict-EraseBytes- DE: "\001\000\000\000\000\000\000\000"-"\377\377"-
+#2950	REDUCE cov: 67 ft: 185 corp: 17/539b lim: 192 exec/s: 0 rss: 38Mb L: 16/131 MS: 4 ShuffleBytes-InsertRepeatedBytes-PersAutoDict-EraseBytes- DE: "\001\000\000\000\000\000\000\000"-
+#2953	REDUCE cov: 67 ft: 185 corp: 17/520b lim: 192 exec/s: 0 rss: 38Mb L: 47/131 MS: 3 InsertByte-ChangeByte-EraseBytes-
+#2955	REDUCE cov: 67 ft: 185 corp: 17/518b lim: 192 exec/s: 0 rss: 38Mb L: 25/131 MS: 2 EraseBytes-InsertByte-
+#3591	REDUCE cov: 67 ft: 185 corp: 17/517b lim: 192 exec/s: 0 rss: 39Mb L: 20/131 MS: 1 EraseBytes-
+#3752	REDUCE cov: 67 ft: 185 corp: 17/495b lim: 192 exec/s: 0 rss: 39Mb L: 25/131 MS: 1 EraseBytes-
+#3835	REDUCE cov: 67 ft: 185 corp: 17/489b lim: 192 exec/s: 0 rss: 39Mb L: 19/131 MS: 3 ChangeByte-EraseBytes-EraseBytes-
+#3976	REDUCE cov: 67 ft: 185 corp: 17/481b lim: 192 exec/s: 0 rss: 39Mb L: 16/131 MS: 1 EraseBytes-
+#4020	REDUCE cov: 67 ft: 185 corp: 17/477b lim: 192 exec/s: 0 rss: 39Mb L: 25/131 MS: 4 PersAutoDict-CopyPart-PersAutoDict-EraseBytes- DE: "\000\000\000\000"-"\001\000\000\000\000\000\000\000"-
+#4048	REDUCE cov: 67 ft: 185 corp: 17/452b lim: 192 exec/s: 0 rss: 40Mb L: 106/106 MS: 3 CMP-EraseBytes-PersAutoDict- DE: "\377\377"-"\000\000\000\000"-
+#4287	REDUCE cov: 67 ft: 185 corp: 17/451b lim: 192 exec/s: 0 rss: 40Mb L: 19/106 MS: 4 ShuffleBytes-ShuffleBytes-ChangeBit-EraseBytes-
+#4640	REDUCE cov: 67 ft: 185 corp: 17/447b lim: 192 exec/s: 0 rss: 41Mb L: 21/106 MS: 3 InsertRepeatedBytes-ChangeBinInt-EraseBytes-
+#4716	REDUCE cov: 67 ft: 185 corp: 17/445b lim: 192 exec/s: 0 rss: 41Mb L: 19/106 MS: 1 EraseBytes-
+#4728	REDUCE cov: 67 ft: 185 corp: 17/443b lim: 192 exec/s: 0 rss: 41Mb L: 17/106 MS: 2 ChangeBinInt-EraseBytes-
+#4894	REDUCE cov: 67 ft: 185 corp: 17/440b lim: 192 exec/s: 0 rss: 41Mb L: 16/106 MS: 1 EraseBytes-
+#5351	REDUCE cov: 67 ft: 185 corp: 17/438b lim: 192 exec/s: 0 rss: 42Mb L: 17/106 MS: 2 ChangeByte-EraseBytes-
+#5381	REDUCE cov: 67 ft: 185 corp: 17/436b lim: 192 exec/s: 0 rss: 42Mb L: 17/106 MS: 5 EraseBytes-InsertByte-ShuffleBytes-ShuffleBytes-ChangeBinInt-
+#6125	REDUCE cov: 67 ft: 185 corp: 17/429b lim: 199 exec/s: 0 rss: 43Mb L: 18/106 MS: 4 ChangeBinInt-EraseBytes-PersAutoDict-CMP- DE: "\377\377"-"\377\377\377\377"-
+#6539	REDUCE cov: 67 ft: 185 corp: 17/419b lim: 199 exec/s: 0 rss: 43Mb L: 68/106 MS: 4 InsertRepeatedBytes-ChangeBit-EraseBytes-EraseBytes-
+#8463	REDUCE cov: 67 ft: 185 corp: 17/417b lim: 213 exec/s: 0 rss: 46Mb L: 16/106 MS: 4 CrossOver-InsertByte-EraseBytes-ChangeBinInt-
+#8970	REDUCE cov: 67 ft: 185 corp: 17/416b lim: 213 exec/s: 0 rss: 47Mb L: 16/106 MS: 2 ShuffleBytes-EraseBytes-
+#9590	REDUCE cov: 67 ft: 185 corp: 17/415b lim: 213 exec/s: 0 rss: 48Mb L: 24/106 MS: 5 InsertByte-InsertByte-ChangeByte-InsertByte-EraseBytes-
+#9766	REDUCE cov: 67 ft: 185 corp: 17/401b lim: 213 exec/s: 0 rss: 48Mb L: 92/92 MS: 1 EraseBytes-
+#9986	REDUCE cov: 67 ft: 185 corp: 17/400b lim: 213 exec/s: 0 rss: 49Mb L: 91/91 MS: 5 EraseBytes-CrossOver-CMP-ShuffleBytes-ChangeBinInt- DE: "\000\000"-
+#10357	REDUCE cov: 67 ft: 185 corp: 17/378b lim: 213 exec/s: 0 rss: 49Mb L: 69/69 MS: 1 EraseBytes-
+#10948	REDUCE cov: 67 ft: 185 corp: 17/356b lim: 213 exec/s: 0 rss: 50Mb L: 46/69 MS: 1 EraseBytes-
+#10977	REDUCE cov: 67 ft: 185 corp: 17/355b lim: 213 exec/s: 0 rss: 50Mb L: 16/69 MS: 4 EraseBytes-PersAutoDict-ShuffleBytes-InsertByte- DE: "\001\000\000\000\000\000\000\000"-
+#11669	REDUCE cov: 67 ft: 185 corp: 17/336b lim: 213 exec/s: 0 rss: 51Mb L: 27/69 MS: 2 ChangeBit-EraseBytes-
+#15679	REDUCE cov: 67 ft: 185 corp: 17/335b lim: 248 exec/s: 0 rss: 57Mb L: 19/69 MS: 5 ShuffleBytes-ChangeBinInt-CrossOver-EraseBytes-InsertByte-
+#16881	REDUCE cov: 67 ft: 185 corp: 17/334b lim: 255 exec/s: 0 rss: 59Mb L: 16/69 MS: 2 EraseBytes-ChangeByte-
+#20778	REDUCE cov: 67 ft: 185 corp: 17/333b lim: 286 exec/s: 0 rss: 64Mb L: 18/69 MS: 2 EraseBytes-ChangeBit-
+#25288	REDUCE cov: 67 ft: 185 corp: 17/330b lim: 326 exec/s: 0 rss: 71Mb L: 21/69 MS: 5 EraseBytes-InsertByte-ChangeBit-ChangeByte-ChangeASCIIInt-
+#27600	REDUCE cov: 67 ft: 185 corp: 17/319b lim: 342 exec/s: 0 rss: 74Mb L: 58/58 MS: 2 CrossOver-EraseBytes-
+#29827	REDUCE cov: 67 ft: 185 corp: 17/317b lim: 358 exec/s: 0 rss: 77Mb L: 16/58 MS: 2 CrossOver-EraseBytes-
+#50810	REDUCE cov: 67 ft: 185 corp: 17/314b lim: 563 exec/s: 0 rss: 108Mb L: 18/58 MS: 3 ChangeBit-EraseBytes-ChangeByte-
+#51191	REDUCE cov: 67 ft: 185 corp: 17/312b lim: 563 exec/s: 0 rss: 109Mb L: 25/58 MS: 1 EraseBytes-
+#64676	REDUCE cov: 67 ft: 185 corp: 17/310b lim: 689 exec/s: 0 rss: 129Mb L: 16/58 MS: 5 ChangeBit-ChangeByte-PersAutoDict-EraseBytes-CopyPart- DE: "\001\000"-
+#151371	REDUCE cov: 67 ft: 185 corp: 17/309b lim: 1551 exec/s: 151371 rss: 256Mb L: 17/58 MS: 3 InsertByte-CMP-EraseBytes- DE: "\001\000\000\000\000\000\000\001"-
+#174755	REDUCE cov: 67 ft: 185 corp: 17/308b lim: 1781 exec/s: 174755 rss: 290Mb L: 57/57 MS: 4 ChangeByte-ChangeBit-CMP-EraseBytes- DE: "\000\000``\000\022\261\252"-
+#178052	REDUCE cov: 67 ft: 185 corp: 17/300b lim: 1811 exec/s: 89026 rss: 295Mb L: 49/49 MS: 2 InsertByte-EraseBytes-
+#183118	REDUCE cov: 67 ft: 185 corp: 17/299b lim: 1861 exec/s: 91559 rss: 302Mb L: 16/49 MS: 1 EraseBytes-
+#201476	REDUCE cov: 67 ft: 185 corp: 17/290b lim: 2041 exec/s: 100738 rss: 329Mb L: 40/40 MS: 3 ChangeBinInt-ShuffleBytes-EraseBytes-
+#219948	REDUCE cov: 67 ft: 185 corp: 17/288b lim: 2216 exec/s: 109974 rss: 355Mb L: 38/38 MS: 2 ChangeBit-EraseBytes-
+#262144	pulse  cov: 67 ft: 185 corp: 17/288b lim: 2634 exec/s: 131072 rss: 415Mb
+#303172	REDUCE cov: 67 ft: 185 corp: 17/287b lim: 3041 exec/s: 101057 rss: 475Mb L: 24/38 MS: 4 CopyPart-CopyPart-ShuffleBytes-EraseBytes-
+#330496	REDUCE cov: 67 ft: 185 corp: 17/280b lim: 3305 exec/s: 110165 rss: 514Mb L: 31/31 MS: 4 PersAutoDict-CMP-EraseBytes-CrossOver- DE: "\377\377\377\377"-"\377\377\377\377"-
+#352967	REDUCE cov: 67 ft: 185 corp: 17/279b lim: 3525 exec/s: 117655 rss: 546Mb L: 30/30 MS: 1 EraseBytes-
+#407854	REDUCE cov: 67 ft: 185 corp: 17/275b lim: 4064 exec/s: 101963 rss: 624Mb L: 26/26 MS: 2 InsertByte-EraseBytes-
+#524288	pulse  cov: 67 ft: 185 corp: 17/275b lim: 5213 exec/s: 104857 rss: 709Mb
+#658636	REDUCE cov: 67 ft: 185 corp: 17/273b lim: 6557 exec/s: 94090 rss: 712Mb L: 24/24 MS: 2 CopyPart-EraseBytes-
+#1009711	DONE   cov: 67 ft: 185 corp: 17/273b lim: 10047 exec/s: 91791 rss: 714Mb
+###### Recommended dictionary. ######
+"\001\000" # Uses: 11181
+"lI\000\000``\000\000" # Uses: 11052
+"\001\000\000\000\000\000\000\000" # Uses: 10973
+"\377\377" # Uses: 11077
+"\000\000\000\000" # Uses: 10978
+"\377\377\377\377" # Uses: 10940
+"\000\000" # Uses: 11070
+"\001\000\000\000\000\000\000\001" # Uses: 9005
+"\000\000``\000\022\261\252" # Uses: 8550
+###### End of recommended dictionary. ######
+Done 1009711 runs in 11 second(s)
+stat::number_of_executed_units: 1009711
+stat::average_exec_per_sec:     91791
+stat::new_units_added:          136
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              714
+fuzz_target_name:fuzzer

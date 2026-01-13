@@ -1,7 +1,7 @@
-#include <rosidl_runtime_c/message_type_support.h>
+#include <rosidl_runtime_c/message_type_support_struct.h>
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
+#include <rosidl_runtime_c/service_type_support_struct.h>
 #include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
 #include <stdlib.h>
@@ -45,15 +45,11 @@ static bool init_string_from_fuzz(rosidl_runtime_c__String * str, const uint8_t 
     }
     
     if (str_size > 0) {
-        // Resize the string to hold our data
-        if (!rosidl_runtime_c__String__resize(str, str_size)) {
+        // Resize the string to hold our data - use assign instead of resize
+        if (!rosidl_runtime_c__String__assignn(str, (const char*)(data + offset), str_size)) {
             rosidl_runtime_c__String__fini(str);
             return false;
         }
-        
-        // Copy the fuzz data into the string
-        memcpy(str->data, data + offset, str_size);
-        str->data[str_size] = '\0';  // Ensure null termination
     }
     
     return true;
@@ -64,22 +60,16 @@ static bool init_float64_sequence_from_fuzz(rosidl_runtime_c__double__Sequence *
                                            const uint8_t *data, size_t size, size_t offset) {
     if (!seq) return false;
     
-    // Initialize the sequence
-    if (!rosidl_runtime_c__float64__Sequence__init(seq, 0)) {
-        return false;
-    }
-    
     // Calculate sequence size from fuzz data (limit to reasonable size)
     size_t seq_size = (size - offset) % 64;
     
+    // Initialize the sequence with the calculated size
+    if (!rosidl_runtime_c__float64__Sequence__init(seq, seq_size)) {
+        return false;
+    }
+    
     // Ensure we have enough data for the sequence
     if (seq_size > 0 && offset + seq_size * sizeof(double) <= size) {
-        // Resize the sequence
-        if (!rosidl_runtime_c__float64__Sequence__resize(seq, seq_size)) {
-            rosidl_runtime_c__float64__Sequence__fini(seq);
-            return false;
-        }
-        
         // Fill with values derived from fuzz data
         for (size_t i = 0; i < seq_size; i++) {
             double value = 0.0;
@@ -98,21 +88,15 @@ static bool init_bool_sequence_from_fuzz(rosidl_runtime_c__boolean__Sequence * s
                                         const uint8_t *data, size_t size, size_t offset) {
     if (!seq) return false;
     
-    // Initialize the sequence
-    if (!rosidl_runtime_c__bool__Sequence__init(seq, 0)) {
-        return false;
-    }
-    
     // Calculate sequence size from fuzz data (limit to reasonable size)
     size_t seq_size = (size - offset) % 64;
     
+    // Initialize the sequence with the calculated size
+    if (!rosidl_runtime_c__bool__Sequence__init(seq, seq_size)) {
+        return false;
+    }
+    
     if (seq_size > 0 && offset + seq_size <= size) {
-        // Resize the sequence
-        if (!rosidl_runtime_c__bool__Sequence__resize(seq, seq_size)) {
-            rosidl_runtime_c__bool__Sequence__fini(seq);
-            return false;
-        }
-        
         // Fill with boolean values derived from fuzz data
         for (size_t i = 0; i < seq_size; i++) {
             size_t data_offset = (offset + i) % size;
@@ -128,21 +112,15 @@ static bool init_string_sequence_from_fuzz(rosidl_runtime_c__String__Sequence * 
                                           const uint8_t *data, size_t size, size_t offset) {
     if (!seq) return false;
     
-    // Initialize the sequence
-    if (!rosidl_runtime_c__String__Sequence__init(seq, 0)) {
-        return false;
-    }
-    
     // Calculate sequence size from fuzz data (limit to reasonable size)
     size_t seq_size = (size - offset) % 16;
     
+    // Initialize the sequence with the calculated size
+    if (!rosidl_runtime_c__String__Sequence__init(seq, seq_size)) {
+        return false;
+    }
+    
     if (seq_size > 0) {
-        // Resize the sequence
-        if (!rosidl_runtime_c__String__Sequence__resize(seq, seq_size)) {
-            rosidl_runtime_c__String__Sequence__fini(seq);
-            return false;
-        }
-        
         // Initialize each string in the sequence
         for (size_t i = 0; i < seq_size; i++) {
             // Use different offsets for each string to maximize coverage
@@ -152,6 +130,7 @@ static bool init_string_sequence_from_fuzz(rosidl_runtime_c__String__Sequence * 
                 for (size_t j = 0; j < i; j++) {
                     rosidl_runtime_c__String__fini(&seq->data[j]);
                 }
+                // Use the proper fini function to clean up the sequence
                 rosidl_runtime_c__String__Sequence__fini(seq);
                 return false;
             }
@@ -193,7 +172,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     
     // Initialize source sequence
     if (init_string_sequence_from_fuzz(&src_seq, data, size, size/3)) {
-        // Initialize destination sequence
+        // Initialize destination sequence with 0 size
         if (rosidl_runtime_c__String__Sequence__init(&dst_seq, 0)) {
             // Call the API
             bool copy_result = rosidl_runtime_c__String__Sequence__copy(&src_seq, &dst_seq);

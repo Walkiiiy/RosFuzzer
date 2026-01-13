@@ -1,18 +1,16 @@
 # !/bin/bash
 set -euo pipefail
 
+echo Starting fuzzing script for rosidl_runtime_c...
+
 export DEBIAN_FRONTEND=noninteractive
 
 # 安装 clang/lld/llvm 和 ament 依赖（使用 -y 以非交互方式）
-apt update
-apt-get install -y --no-install-recommends \
-    clang lld \
-    llvm llvm-dev llvm-runtime \
-    ros-humble-ament-cmake-ros \
-    ros-humble-rcutils \
-    ros-humble-rosidl-typesupport-interface \
-    ros-humble-ament-lint-auto \
-    llvm
+# apt update
+# apt-get install -y --no-install-recommends \
+#     clang lld \
+#     llvm llvm-dev llvm-runtime \
+#     llvm
 
 # ROS 环境（确保 ament_cmake_ros 可用），在 set -u 下暂时关闭未定义变量错误
 if [ -f /opt/ros/humble/setup.bash ]; then

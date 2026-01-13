@@ -1,7 +1,5 @@
-#include <rosidl_runtime_c/message_type_support.h>
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
 #include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
 #include <stdlib.h>
@@ -66,25 +64,16 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         
         // Ensure we don't overflow
         if (available_len > 0) {
-            // Allocate buffer for string copy
-            char *temp_buf = (char *)malloc(available_len + 1);
-            if (!temp_buf) {
+            // Use rosidl_runtime_c__String__assignn to properly assign the string
+            // This will free the previous allocation and allocate new memory
+            if (!rosidl_runtime_c__String__assignn(
+                &seq1.data[i], 
+                (const char *)(string_data + data_offset), 
+                available_len)) {
+                // If assignment fails, clean up and return
                 rosidl_runtime_c__String__Sequence__fini(&seq1);
                 return 0;
             }
-            
-            // Copy data and null-terminate
-            memcpy(temp_buf, string_data + data_offset, available_len);
-            temp_buf[available_len] = '\0';
-            
-            // Assign to sequence string
-            seq1.data[i].data = temp_buf;
-            seq1.data[i].size = available_len;
-            seq1.data[i].capacity = available_len + 1;
-            
-            // Note: We're directly manipulating the string structure
-            // because rosidl_runtime_c__String__assignn might not be available
-            // This is acceptable for fuzzing purposes
         }
     }
 
@@ -162,13 +151,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     rosidl_runtime_c__String__Sequence__fini(&seq3);
     rosidl_runtime_c__String__Sequence__fini(&seq2);
     rosidl_runtime_c__String__Sequence__fini(&seq1);
-
-    // Free any allocated string buffers
-    for (size_t i = 0; i < seq1.size && i * 16 < string_data_size; i++) {
-        if (seq1.data[i].data) {
-            free((void *)seq1.data[i].data);
-        }
-    }
 
     return 0;
 }

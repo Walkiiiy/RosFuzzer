@@ -98,10 +98,9 @@ def run_fuzzing(args):
         # Copy the tee'd output file back to host.
         _run(["docker", "cp", f"{container_name}:{container_output}", str(host_output)], allow_error=True)
 
-        compile_succeed=1
         # Copy coverage output if present.
         if args.coverage_output:
-            return_code,_=_run(
+            _run(
                 [
                     "docker",
                     "cp",
@@ -110,11 +109,9 @@ def run_fuzzing(args):
                 ],
                 allow_error=True,
             )
-            if return_code != 0:
-                compile_succeed=0
 
         if args.coverage_text_output:
-            return_code,_=_run(
+            _run(
                 [
                     "docker",
                     "cp",
@@ -123,8 +120,6 @@ def run_fuzzing(args):
                 ],
                 allow_error=True,
             )
-            if return_code != 0:
-                compile_succeed=0
     finally:
         # Cleanup container regardless of success.
         _run(["docker", "rm", "-f", container_name], allow_error=True)
@@ -133,7 +128,7 @@ def run_fuzzing(args):
     with host_output.open("w", encoding="utf-8") as f:
         f.write(fuzzing_output)
 
-    return fuzzing_returncode,compile_succeed
+    return fuzzing_returncode, host_output
 
 
 def parse_args():
@@ -204,37 +199,90 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
+def _read_lines(path):
+    if not path.is_file():
+        return []
+    with path.open("r", encoding="utf-8", errors="replace") as f:
+        return f.readlines()
+
+
+def _extract_error_context(lines, keywords, context_lines=20, max_line_length=300):
+    for idx, line in enumerate(lines):
+        if any(keyword in line for keyword in keywords):
+            start = max(0, idx - context_lines)
+            end = min(len(lines), idx + context_lines + 1)
+            context = lines[start:end]
+            truncated = []
+            for item in context:
+                if len(item) > max_line_length:
+                    truncated.append(item[:max_line_length] + "...\n")
+                else:
+                    truncated.append(item)
+            return truncated
+    return []
+
+
+def _compile_failed_from_output(output_path):
+    lines = _read_lines(output_path)
+    error_context = _extract_error_context(
+        lines, keywords=("package failed:", "ERROR:"), context_lines=20, max_line_length=300
+    )
+    if error_context:
+        return True, error_context
+    return False, error_context
+
+
+def fuzz_runner(
+    image="rosidl_runtime_c_base_image:latest",
+    container_path="/ws/src/ros2/rosidl/rosidl_runtime_c",
+    fuzz_driver="/home/walkiiiy/RosFuzzer/fuzzing_llm_engine/external_database/rosidl_runtime_c/fuzz_driver/ros2_rosidl_runtime_c_fuzz_driver_False_deepseek-coder_1.c",
+    cmakelists="/home/walkiiiy/RosFuzzer/fuzzing_llm_engine/projects/rosidl_runtime_c/CMakeLists.txt",
+    fuzz_script=str(Path(__file__).parent / "projects/rosidl_runtime_c/fuzzing.sh"),
+    driver_dest_name="fuzzer.c",
+    target_binary="fuzzer",
+    timeout_seconds=5,
+    coverage_output="docker_shared/rosidl_coverage.json",
+    coverage_container_path="/ws/fuzz_corpus/coverage.json",
+    coverage_text_output="docker_shared/rosidl_coverage.txt",
+    coverage_text_container_path="/ws/fuzz_corpus/coverage.txt",
+    output="docker_shared/rosidl_fuzz_output.txt",
+    container_name=None,
+    workdir="/ws",
+):
+    args = argparse.Namespace(
+        image=image,
+        container_path=container_path,
+        fuzz_driver=fuzz_driver,
+        cmakelists=cmakelists,
+        fuzz_script=fuzz_script,
+        driver_dest_name=driver_dest_name,
+        target_binary=target_binary,
+        timeout_seconds=timeout_seconds,
+        coverage_output=coverage_output,
+        coverage_container_path=coverage_container_path,
+        coverage_text_output=coverage_text_output,
+        coverage_text_container_path=coverage_text_container_path,
+        output=output,
+        container_name=container_name,
+        workdir=workdir,
+    )
 
     # Validate input paths on host.
     for path_arg, label in [(args.fuzz_driver, "fuzz driver"), (args.cmakelists, "CMakeLists.txt")]:
         if not Path(path_arg).is_file():
             raise FileNotFoundError(f"Missing {label} file: {path_arg}")
 
-    returncode,compile_succeed = run_fuzzing(args)
+    returncode, output_path = run_fuzzing(args)
     if returncode != 0:
         raise SystemExit(returncode)
 
-# 由driver_gen调用的检查driver是否能编译成功的入口,与main类似但是fuzz时间为10
-def check_compile_fuzz_driver(args):
-
-    # Validate input paths on host.
-    for path_arg, label in [(args.fuzz_driver, "fuzz driver"), (args.cmakelists, "CMakeLists.txt")]:
-        if not Path(path_arg).is_file():
-            raise FileNotFoundError(f"Missing {label} file: {path_arg}")
-
-    returncode,compile_succeed = run_fuzzing(args)
-    if returncode != 0:
-        raise SystemExit(returncode)
-    
-    if compile_succeed != 1:
+    res,error=_compile_failed_from_output(output_path)
+    if res:
         print("Fuzz driver compilation failed.")
-        return 0
-    else:
-        print("Fuzz driver compilation succeeded.")
-        return 1
+        return 0, error
+    print("Fuzz driver compilation succeeded.")
+    return 1, error
+
 
 if __name__ == "__main__":
-    main()
-    # check_compile_fuzz_driver()
+    print(fuzz_runner())

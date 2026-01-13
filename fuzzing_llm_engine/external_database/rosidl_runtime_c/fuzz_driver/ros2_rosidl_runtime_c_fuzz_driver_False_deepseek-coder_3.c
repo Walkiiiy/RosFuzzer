@@ -23,8 +23,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         return 0;
     }
 
-    // Initialize default allocator
+    // Initialize default allocator (used in the fallback implementation if needed)
     rcutils_allocator_t allocator = rcutils_get_default_allocator();
+    (void)allocator;  // Mark as used to avoid warning
     
     // Use first byte to determine sequence sizes (with bounds checking)
     uint8_t size_mod = data[0];
@@ -66,32 +67,51 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             // Use next byte modulo 64 to limit string length
             str_len = (data[data_offset % size] % 64) + 1;
             data_offset = (data_offset + 1) % size;
+            
+            // Recalculate remaining data after consuming the length byte
+            remaining_data = (size > data_offset) ? (size - data_offset) : 0;
         }
         
-        // Ensure we don't exceed available data
-        if (str_len * sizeof(uint16_t) > remaining_data) {
-            str_len = remaining_data / sizeof(uint16_t);
+        // Ensure we don't exceed available data for uint16_t array
+        size_t max_str_len = remaining_data / sizeof(uint16_t);
+        if (str_len > max_str_len) {
+            str_len = max_str_len;
         }
         
-        // Resize strings to accommodate data
-        if (!rosidl_runtime_c__U16String__resize(&seq1.data[i], str_len)) {
-            // If resize fails, clean up and return
-            rosidl_runtime_c__U16String__Sequence__fini(&seq1);
-            rosidl_runtime_c__U16String__Sequence__fini(&seq2);
-            return 0;
-        }
-        
-        if (!rosidl_runtime_c__U16String__resize(&seq2.data[i], str_len)) {
-            rosidl_runtime_c__U16String__Sequence__fini(&seq1);
-            rosidl_runtime_c__U16String__Sequence__fini(&seq2);
-            return 0;
-        }
-        
-        // Copy data to both strings (same content for equality test)
-        if (str_len > 0 && remaining_data >= str_len * sizeof(uint16_t)) {
-            memcpy(seq1.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
-            memcpy(seq2.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
-            data_offset += str_len * sizeof(uint16_t);
+        // Only resize if we have data to copy
+        if (str_len > 0) {
+            // Resize strings to accommodate data
+            if (!rosidl_runtime_c__U16String__resize(&seq1.data[i], str_len)) {
+                // If resize fails, clean up and return
+                rosidl_runtime_c__U16String__Sequence__fini(&seq1);
+                rosidl_runtime_c__U16String__Sequence__fini(&seq2);
+                return 0;
+            }
+            
+            if (!rosidl_runtime_c__U16String__resize(&seq2.data[i], str_len)) {
+                rosidl_runtime_c__U16String__Sequence__fini(&seq1);
+                rosidl_runtime_c__U16String__Sequence__fini(&seq2);
+                return 0;
+            }
+            
+            // Copy data to both strings (same content for equality test)
+            if (str_len > 0 && remaining_data >= str_len * sizeof(uint16_t)) {
+                memcpy(seq1.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
+                memcpy(seq2.data[i].data, &data[data_offset], str_len * sizeof(uint16_t));
+                data_offset += str_len * sizeof(uint16_t);
+            }
+        } else {
+            // Initialize empty strings
+            if (!rosidl_runtime_c__U16String__resize(&seq1.data[i], 0)) {
+                rosidl_runtime_c__U16String__Sequence__fini(&seq1);
+                rosidl_runtime_c__U16String__Sequence__fini(&seq2);
+                return 0;
+            }
+            if (!rosidl_runtime_c__U16String__resize(&seq2.data[i], 0)) {
+                rosidl_runtime_c__U16String__Sequence__fini(&seq1);
+                rosidl_runtime_c__U16String__Sequence__fini(&seq2);
+                return 0;
+            }
         }
     }
     
@@ -140,7 +160,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     (void)result2;
     
     // Test get_sequence_bound_handle with a function pointer
-    mock_handle.func = (void*)get_sequence_bound_handle_function;
+    // Cast through uintptr_t to avoid direct void* to function pointer conversion
+    mock_handle.func = (rosidl_runtime_c__bound_handle_function)(uintptr_t)get_sequence_bound_handle_function;
     const rosidl_runtime_c__Sequence__bound* result3 = 
         get_sequence_bound_handle(&mock_handle, test_identifier);
     (void)result3;
@@ -164,31 +185,5 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     return 0;
 }
 
-// If the rosidl_runtime_c__U16String__Sequence__fini function is not available
-// in headers, we need to declare it or implement a simple version
-#ifndef rosidl_runtime_c__U16String__Sequence__fini
-static void rosidl_runtime_c__U16String__Sequence__fini(
-    rosidl_runtime_c__U16String__Sequence * sequence)
-{
-    if (sequence) {
-        if (sequence->data) {
-            // Finalize each string
-            for (size_t i = 0; i < sequence->size; ++i) {
-                rosidl_runtime_c__U16String__fini(&sequence->data[i]);
-            }
-            // Free the array
-            rcutils_allocator_t allocator = rcutils_get_default_allocator();
-            allocator.deallocate(sequence->data, allocator.state);
-        }
-        sequence->data = NULL;
-        sequence->size = 0;
-        sequence->capacity = 0;
-    }
-}
-#endif
-
-// If rosidl_runtime_c__U16String__resize is not available, declare it
-#ifndef rosidl_runtime_c__U16String__resize
-bool rosidl_runtime_c__U16String__resize(
-    rosidl_runtime_c__U16String * str, size_t size);
-#endif
+// Remove the static implementation since the function is already declared in the header
+// The header u16string_functions.h already provides the declaration

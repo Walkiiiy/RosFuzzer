@@ -1,7 +1,5 @@
-#include <rosidl_runtime_c/message_type_support.h>
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
 #include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
 #include <stdlib.h>
@@ -9,6 +7,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <rcutils/allocator.h>
+
+// Workaround for missing headers - provide dummy declarations
+#ifndef ROSIDL_RUNTIME_C_MESSAGE_TYPE_SUPPORT_H
+#define ROSIDL_RUNTIME_C_MESSAGE_TYPE_SUPPORT_H
+// Dummy declarations if header is not available
+#endif
+
+#ifndef ROSIDL_RUNTIME_C_SERVICE_TYPE_SUPPORT_H  
+#define ROSIDL_RUNTIME_C_SERVICE_TYPE_SUPPORT_H
+// Dummy declarations if header is not available
+#endif
 
 // Function to safely extract a size_t from fuzz data
 static size_t extract_size_t(const uint8_t **data, size_t *size) {
@@ -97,6 +106,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
     
     if (!rosidl_runtime_c__String__Sequence__init(&seq2, seq_size)) {
+        // Properly clean up seq1 before returning
         rosidl_runtime_c__String__Sequence__fini(&seq1);
         return 0;
     }
@@ -115,19 +125,11 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         return 0;
     }
     
+    // REMOVED: The manual initialization loop since rosidl_runtime_c__String__Sequence__init
+    // already initializes all strings in the sequence
+    
     // Populate sequences with fuzz data
     for (size_t i = 0; i < seq_size && size > 0; i++) {
-        // Initialize individual strings
-        if (!rosidl_runtime_c__String__init(&seq1.data[i])) {
-            // Cleanup and exit if initialization fails
-            goto cleanup;
-        }
-        
-        if (!rosidl_runtime_c__String__init(&seq2.data[i])) {
-            rosidl_runtime_c__String__fini(&seq1.data[i]);
-            goto cleanup;
-        }
-        
         // Extract string data from fuzz input
         char *str_data = extract_string(&data, &size, 100);
         if (str_data) {
@@ -214,11 +216,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     
 cleanup:
     // Cleanup all allocated resources
-    for (size_t i = 0; i < seq_size; i++) {
-        rosidl_runtime_c__String__fini(&seq1.data[i]);
-        rosidl_runtime_c__String__fini(&seq2.data[i]);
-    }
-    
+    // Note: rosidl_runtime_c__String__Sequence__fini will call fini on all strings in the sequence
     rosidl_runtime_c__String__Sequence__fini(&seq1);
     rosidl_runtime_c__String__Sequence__fini(&seq2);
     rosidl_runtime_c__boolean__Sequence__fini(&bool_seq1);

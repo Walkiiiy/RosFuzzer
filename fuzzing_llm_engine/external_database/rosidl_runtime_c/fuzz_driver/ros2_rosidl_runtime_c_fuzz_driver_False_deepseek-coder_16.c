@@ -1,13 +1,11 @@
-#include <rosidl_runtime_c/message_type_support.h>
+#include <rosidl_runtime_c/string.h>
+#include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/primitives_sequence_functions.h>
 #include <rosidl_runtime_c/sequence_bound.h>
-#include <rosidl_runtime_c/service_type_support.h>
-#include <rosidl_runtime_c/string_functions.h>
 #include <rosidl_runtime_c/u16string_functions.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <sstream>
 #include <rcutils/allocator.h>
 
 // Fuzz driver entry point
